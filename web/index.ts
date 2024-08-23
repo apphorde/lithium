@@ -1,19 +1,37 @@
+import { Reactive, Ref } from "@lithium/reactive";
+
+export interface RuntimeInfo {
+  reactive: Reactive;
+  element: Element;
+  $state: any;
+  $stateKeys: string[];
+  $stateArgs: any[];
+  nodes: any;
+  componentSetup: Function;
+  init: VoidFunction | null;
+  destroy: VoidFunction | null;
+}
+
+type AnyFunction = (...args: any) => any;
+
 const eventFlags = ["capture", "once", "passive", "stop", "prevent"];
 const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
 const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
 const domParser = new DOMParser();
-const stack = [];
+const stack: RuntimeInfo[] = [];
 
 export const noop = () => {};
 export const DefineComponent = Symbol("@@def");
 
-export function createComponent(name, { setup, template }) {
+export function createComponent(name: string, { setup, template }: { setup: AnyFunction; template: any }): void {
   if (customElements.get(name)) {
-    customElements.get(name)[DefineComponent] = { name, setup, template };
+    customElements.get(name)![DefineComponent] = { name, setup, template };
     return;
   }
 
   class Component extends HTMLElement {
+    $el: RuntimeInfo;
+
     connectedCallback() {
       const { setup, template } = Component[DefineComponent];
       const $el = {
@@ -21,6 +39,8 @@ export function createComponent(name, { setup, template }) {
         componentSetup: setup,
         nodes: template,
         $state: {},
+        $stateKeys: [],
+        $stateArgs: [],
         init: null,
         destroy: null,
         reactive: new Reactive(),
@@ -41,121 +61,11 @@ export function createComponent(name, { setup, template }) {
   customElements.define(name, Component);
 }
 
-export class Reactive {
-  #watchers;
-  #suspended;
-
-  constructor() {
-    this.#watchers = [];
-    this.#suspended = false;
-    this.check = this.check.bind(this);
-  }
-
-  check() {
-    if (this.#suspended) return;
-
-    for (const w of this.#watchers) {
-      w();
-    }
-  }
-
-  watch(exec, effect) {
-    let lastValue;
-    let fn;
-
-    if (!effect) {
-      fn = exec;
-    } else {
-      fn = function () {
-        const value = exec();
-
-        if (value !== lastValue && !Number.isNaN(value)) {
-          lastValue = value;
-          effect(value);
-        }
-      };
-    }
-
-    this.#watchers.push(fn);
-  }
-
-  ref(initialValue) {
-    const target = { value: initialValue };
-
-    Object.defineProperty(target, "__isRef", { value: true, enumerable: false, configurable: false });
-    Object.defineProperty(target, "toString", {
-      value: function () {
-        return String(this.value);
-      },
-      enumerable: false,
-      configurable: false,
-    });
-
-    return this.watchDeep(target);
-  }
-
-  watchObject(context, callback) {
-    if (context.__w) {
-      return context;
-    }
-
-    callback ||= this.check;
-    const scope = this;
-    Object.defineProperty(context, "__w", { value: true, enumerable: false, configurable: false });
-
-    return new Proxy(context, {
-      set(target, p, value) {
-        if (typeof value === "object" && !value.__w) {
-          value = scope.watchDeep(value, callback);
-        }
-
-        target[p] = value;
-        callback();
-        return true;
-      },
-    });
-  }
-
-  watchDeep(context, callback) {
-    // wrapping HTML elements with proxies leads to sad panda
-    if (context.__w || context instanceof HTMLElement) {
-      return context;
-    }
-
-    callback ||= this.check;
-    const values = Object.entries(context);
-
-    for (const [key, next] of values) {
-      if (typeof next === "object" && next !== null) {
-        context[key] = this.watchObject(next, callback);
-      }
-    }
-
-    return this.watchObject(context, callback);
-  }
-
-  suspend() {
-    this.#suspended = true;
-  }
-
-  unsuspend() {
-    this.#suspended = false;
-  }
-
-  static isRef(t) {
-    return typeof t !== "object" ? false : t && t.__isRef;
-  }
-
-  static unref(v) {
-    return Reactive.isRef(v) ? v.value : v;
-  }
-}
-
 export class DOM {
-  static attachHandler(el, eventName, handler, options) {
+  static attachHandler(el: EventTarget, eventName: string, handler: AnyFunction, options?: any): void {
     el.addEventListener(
       eventName,
-      (event) => {
+      (event: { stopPropagation: () => any; preventDefault: () => any }) => {
         options.stop && event.stopPropagation();
         options.prevent && event.preventDefault();
         handler(event);
@@ -164,30 +74,30 @@ export class DOM {
     );
   }
 
-  static emitEvent(element, event, detail) {
-    return element.dispatchEvent(new CustomEvent(event, { detail }));
+  static emitEvent(element: Element, event: string, detail: any): void {
+    element.dispatchEvent(new CustomEvent(event, { detail }));
   }
 
-  static setProperty(el, property, value) {
+  static setProperty(el: Element, property: string, value: any): void {
     el[property] = Reactive.unref(value);
   }
 
-  static setClassName(el, classNames, value) {
+  static setClassName(el: Element, classNames: string, value: any): void {
     for (const cls of classNames.split(".")) {
       el.classList.toggle(cls, value);
     }
   }
 
-  static setStyle(el, style, value) {
-    el.style[style] = value;
+  static setStyle(el: HTMLElement, key: string, value: any): void {
+    el.style[key] = value;
   }
 
-  static setText(el, text) {
+  static setText(el: Text, text: any): void {
     el.textContent = String(text);
   }
 
-  static defineEvent(el, name) {
-    let handler;
+  static defineEvent(el: Element, name: string): void {
+    let handler: any;
 
     Object.defineProperty(el, "on" + name.toLowerCase(), {
       get() {
@@ -199,14 +109,18 @@ export class DOM {
     });
   }
 
-  static compileExpression(expression, args = []) {
+  static compileExpression(expression: string, args: string[] = []): AnyFunction {
     const parsed = domParser.parseFromString(expression, "text/html");
     const code = parsed.body.innerText.trim();
 
     return (expression.startsWith("await") ? AsyncFunction : Function)(...args, `return ${code}`);
   }
 
-  static materialize(node, visitor, context) {
+  static materialize(
+    node: any,
+    visitor: (el: any, attr?: any) => void,
+    context?: { ns?: any }
+  ): Element | Text | DocumentFragment | Comment {
     // text
     if (typeof node === "string") {
       const txt = document.createTextNode(node);
@@ -266,7 +180,7 @@ export class DOM {
     return el;
   }
 
-  static setAttribute(el, attribute, value) {
+  static setAttribute(el: Element, attribute: string, value: boolean): void {
     if (!validAttribute.test(attribute)) {
       return;
     }
@@ -281,7 +195,7 @@ export class DOM {
 }
 
 export class Runtime {
-  static async init($el) {
+  static async init($el: RuntimeInfo): Promise<void> {
     stack.push($el);
 
     try {
@@ -294,7 +208,7 @@ export class Runtime {
       reactive.check();
 
       if ($el.init) {
-        $el.init();
+        await $el.init();
       }
     } catch (error) {
       console.log("Failed to initialize component!", this, error);
@@ -303,7 +217,7 @@ export class Runtime {
     stack.pop();
   }
 
-  static createInstance() {
+  static createInstance(): void {
     // API
     // import { onInit, onDestroy, computed, defineEvents, defineProps, ref, watch, loadCss, loadScript } from 'lithium';
     const $el = getCurrentInstance();
@@ -313,21 +227,25 @@ export class Runtime {
     $el.$stateArgs = $el.$stateKeys.map((key) => $el.$state[key]);
   }
 
-  static createDom() {
+  static createDom(): void {
     const { element, nodes, $state } = getCurrentInstance();
     const dom = DOM.materialize(nodes, (el, attrs) => Runtime.createBindings($state, el, attrs), {});
     element.innerHTML = "";
     element.append(dom);
   }
 
-  static compileExpression(expression, context) {
+  static compileExpression(expression: string, context: any): AnyFunction {
     const { $stateKeys, $stateArgs } = getCurrentInstance();
     return DOM.compileExpression(expression, $stateKeys).bind(context, ...$stateArgs);
   }
 
-  static createBindings(state, element, attributes) {
+  static createBindings(
+    state: any,
+    element: { nodeType: any; TEXT_NODE: any; ELEMENT_NODE: any },
+    attributes: any
+  ): void {
     if (element.nodeType === element.TEXT_NODE) {
-      Runtime.createTextNodeBinding(state, element);
+      Runtime.createTextNodeBinding(state, <Text>element);
       return;
     }
 
@@ -337,17 +255,18 @@ export class Runtime {
     }
   }
 
-  static createTextNodeBinding(context, el) {
+  static createTextNodeBinding(context: any, el: Text): void {
     const text = el.textContent;
     if (text.includes("${") || text.includes("{{")) {
-      const expression = "`" + text.replace(/\{\{([\s\S]+?)}}/g, (_, inner) => "${ " + inner.trim() + " }") + "`";
+      const expression =
+        "`" + text.replace(/\{\{([\s\S]+?)}}/g, (_: any, inner: string) => "${ " + inner.trim() + " }") + "`";
       el.textContent = "";
       const fn = Runtime.compileExpression(expression, context);
-      watch(wrapTryCatch(expression, fn), (v) => DOM.setText(el, v));
+      watch(wrapTryCatch(expression, fn), (v?: any) => DOM.setText(el, v));
     }
   }
 
-  static createElementNodeBindings(context, el, attrs) {
+  static createElementNodeBindings(context: any, el: any, attrs: any): void {
     for (const attr of attrs) {
       const attribute = attr[0].trim();
       const expression = attr[1].trim();
@@ -379,7 +298,14 @@ export class Runtime {
     }
   }
 
-  static createElementNodeEventBinding(context, el, attribute, expression) {
+  static createElementNodeEventBinding(
+    context: any,
+    el: any,
+    attribute: {
+      slice: (arg0: number) => { (): any; new (): any; split: { (arg0: string): [any, ...any[]]; new (): any } };
+    },
+    expression: any
+  ): void {
     const [eventName, ...flags] = attribute.slice(1).split(".");
     const { $stateKeys, $stateArgs } = getCurrentInstance();
     const exec = DOM.compileExpression(expression, [...$stateKeys, "$event"]).bind(context, ...$stateArgs);
@@ -392,7 +318,7 @@ export class Runtime {
     DOM.attachHandler(
       el,
       eventName,
-      (e) => {
+      (e: any) => {
         try {
           exec(e);
         } catch (e) {
@@ -403,7 +329,12 @@ export class Runtime {
     );
   }
 
-  static createElementNodeRefBinding(context, el, _attribute, expression) {
+  static createElementNodeRefBinding(
+    context: { [x: string]: { value: any } },
+    el: unknown,
+    _attribute: any,
+    expression: string
+  ): void {
     const ref = expression.trim();
 
     if (Reactive.isRef(context[ref])) {
@@ -411,33 +342,33 @@ export class Runtime {
     }
   }
 
-  static createElementNodeClassBinding(context, el, attribute, expression) {
+  static createElementNodeClassBinding(context: any, el: any, attribute: string, expression: any): void {
     const classNames = attribute.replace(".class.", "");
     const fn = Runtime.compileExpression(expression, context);
-    watch(wrapTryCatch(expression, fn), (v) => DOM.setClassName(el, classNames, v));
+    watch(wrapTryCatch(expression, fn), (v?: any) => DOM.setClassName(el, classNames, v));
   }
 
-  static createElementNodeStyleBinding(context, el, attribute, expression) {
+  static createElementNodeStyleBinding(context: any, el: any, attribute: string, expression: any): void {
     const style = attribute.replace(".style.", "");
     const fn = Runtime.compileExpression(expression, context);
-    watch(wrapTryCatch(expression, fn), (v) => DOM.setStyle(el, style, v));
+    watch(wrapTryCatch(expression, fn), (v: any) => DOM.setStyle(el, style, v));
   }
 
-  static createElementNodePropertyBinding(context, el, attribute, expression) {
+  static createElementNodePropertyBinding(context: any, el: any, attribute: string, expression: any): void {
     const name = attribute.slice(1);
     const fn = Runtime.compileExpression(expression, context);
 
-    watch(wrapTryCatch(expression, fn), (v) => DOM.setProperty(el, name, v));
+    watch(wrapTryCatch(expression, fn), (v: any) => DOM.setProperty(el, name, v));
   }
 }
 
 //////////////////// public api
 
-export function getCurrentInstance() {
+export function getCurrentInstance(): RuntimeInfo {
   return stack[stack.length - 1];
 }
 
-export function loadCss(href, id, condition) {
+export function loadCss(href: string, id: string, condition: boolean): void {
   if (false === condition || (id && document.head.querySelector(`[id="css-${id}"]`))) {
     return;
   }
@@ -454,7 +385,7 @@ export function loadCss(href, id, condition) {
   document.head.append(tag);
 }
 
-export function loadScript(src, id, condition) {
+export function loadScript(src: string, id: string, condition: boolean): void {
   if (false === condition || (id && document.head.querySelector(`[id="js-${id}"]`))) {
     return;
   }
@@ -470,16 +401,16 @@ export function loadScript(src, id, condition) {
   document.head.append(tag);
 }
 
-export function onInit(fn) {
+export function onInit(fn: VoidFunction): void {
   getCurrentInstance().init = fn;
 }
 
-export function onDestroy(fn) {
+export function onDestroy(fn: VoidFunction): void {
   getCurrentInstance().destroy = fn;
 }
 
-export function computed(fn) {
-  const $ref = ref();
+export function computed<T>(fn: () => T): Ref<T> {
+  const $ref = ref<T>();
   watch(() => {
     const v = fn();
     if ($ref.value !== v) {
@@ -490,7 +421,7 @@ export function computed(fn) {
   return $ref;
 }
 
-export function defineEvents(eventNames) {
+export function defineEvents(eventNames: any): (event: string, detail: any) => void {
   const el = getCurrentInstance().element;
 
   for (const event of eventNames) {
@@ -500,7 +431,7 @@ export function defineEvents(eventNames) {
   return (e, d) => DOM.emitEvent(el, e, d);
 }
 
-export function defineProps(props) {
+export function defineProps(props: {}): any {
   const keys = !Array.isArray(props) ? Object.keys(props) : props;
   const $el = getCurrentInstance();
   const element = $el.element;
@@ -531,17 +462,17 @@ export function defineProps(props) {
   );
 }
 
-export function watch(expression, effect) {
+export function watch(expression: AnyFunction, effect?: AnyFunction): void {
   return getCurrentInstance().reactive.watch(expression, effect);
 }
 
-export function ref(value) {
+export function ref<T>(value?: T): Ref<T> {
   return getCurrentInstance().reactive.ref(value);
 }
 
 //////////////////// end of public api
 
-function wrapTryCatch(exp, fn) {
+function wrapTryCatch(exp: string, fn: AnyFunction) {
   return () => {
     try {
       const v = fn();
@@ -552,7 +483,7 @@ function wrapTryCatch(exp, fn) {
   };
 }
 
-function ensureDisplayBlock(name) {
+function ensureDisplayBlock(name: string) {
   if (!document.head.querySelector(`[id="ce-${name}"]`)) {
     const css = document.createElement("style");
     css.id = "ce-" + name;

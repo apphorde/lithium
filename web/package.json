@@ -1,0 +1,9 @@
+{
+  "name": "@lithium/web",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
+  }
+}

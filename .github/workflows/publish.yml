@@ -7,6 +7,11 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package:
+          - web
+          - reactive
 
     permissions:
       contents: read
@@ -15,5 +20,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install dependencies
+        run: npm i
+
+      - run: cd ${{ matrix.package }}
+      - run: npx tsc
+
       - name: Publish package
-        run: npx jsr publish
+        run: npx jsr publish --allow-slow-types
