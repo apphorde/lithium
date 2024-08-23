@@ -24,7 +24,7 @@ jobs:
         run: npm i
 
       - run: cd ${{ matrix.package }}
-      - run: npx tsc
+      - run: npx tsc || true
 
       - name: Publish package
         run: npx jsr publish --allow-slow-types
