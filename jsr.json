@@ -1,5 +1,5 @@
 {
   "name": "@lithium/web",
   "version": "0.1.0",
-  "exports": "./index.ts"
+  "exports": "./index.mjs"
 }

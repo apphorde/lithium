@@ -285,16 +285,16 @@ export class Runtime {
     stack.push($el);
 
     try {
-      const { reactive, element, init } = $el;
-      ensureDisplayBlock(element.nodeName);
+      const { reactive } = $el;
+      ensureDisplayBlock($el.element.nodeName);
       reactive.suspend();
       Runtime.createInstance();
       Runtime.createDom();
       reactive.unsuspend();
       reactive.check();
 
-      if (init) {
-        init();
+      if ($el.init) {
+        $el.init();
       }
     } catch (error) {
       console.log("Failed to initialize component!", this, error);
@@ -437,8 +437,10 @@ export function getCurrentInstance() {
   return stack[stack.length - 1];
 }
 
-export function loadCss(href, id) {
-  if (id && document.head.querySelector(`[id="css-${id}"]`)) return;
+export function loadCss(href, id, condition) {
+  if (false === condition || (id && document.head.querySelector(`[id="css-${id}"]`))) {
+    return;
+  }
 
   const tag = document.createElement("link");
   tag.rel = "stylesheet";
@@ -452,8 +454,10 @@ export function loadCss(href, id) {
   document.head.append(tag);
 }
 
-export function loadScript(src, id) {
-  if (id && document.head.querySelector(`[id="js-${id}"]`)) return;
+export function loadScript(src, id, condition) {
+  if (false === condition || (id && document.head.querySelector(`[id="js-${id}"]`))) {
+    return;
+  }
 
   const tag = document.createElement("script");
   tag.src = src;
