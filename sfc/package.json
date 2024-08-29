@@ -1,0 +1,13 @@
+{
+  "name": "@lithium/sfc",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "acorn": "latest",
+    "@homebots/parse-html": "latest"
+  }
+}

@@ -12,6 +12,7 @@ jobs:
         package:
           - web
           - reactive
+          - sfc
 
     permissions:
       contents: read
