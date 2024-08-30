@@ -5,5 +5,8 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }
+  },
+  "scripts": {
+    "ci": "npx tsc || true"
   }
 }

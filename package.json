@@ -4,8 +4,5 @@
     "jsr": "^0.13.1",
     "typescript": "^5.5.4"
   },
-  "workspaces": [
-    "./reactive",
-    "./web"
-  ]
+  "workspaces": ["./reactive", "./html-parser", "./sfc", "./web"]
 }
