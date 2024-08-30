@@ -1,7 +1,7 @@
-import { Reactive, Ref } from "@lithium/reactive";
+import { ReactiveContext, Ref, unref, isRef } from "@lithium/reactive";
 
 export interface RuntimeInfo {
-  reactive: Reactive;
+  reactive: ReactiveContext;
   element: Element;
   $state: any;
   $stateKeys: string[];
@@ -23,7 +23,10 @@ const stack: RuntimeInfo[] = [];
 export const noop = () => {};
 export const DefineComponent = Symbol("@@def");
 
-export function createComponent(name: string, { setup, template }: { setup: AnyFunction; template: any }): void {
+export function createComponent(
+  name: string,
+  { setup, template }: { setup: AnyFunction; template: any }
+): void {
   if (customElements.get(name)) {
     customElements.get(name)![DefineComponent] = { name, setup, template };
     return;
@@ -43,7 +46,7 @@ export function createComponent(name: string, { setup, template }: { setup: AnyF
         $stateArgs: [],
         init: null,
         destroy: null,
-        reactive: new Reactive(),
+        reactive: new ReactiveContext(),
       };
 
       this.$el = $el;
@@ -62,7 +65,12 @@ export function createComponent(name: string, { setup, template }: { setup: AnyF
 }
 
 export class DOM {
-  static attachHandler(el: EventTarget, eventName: string, handler: AnyFunction, options?: any): void {
+  static attachHandler(
+    el: EventTarget,
+    eventName: string,
+    handler: AnyFunction,
+    options?: any
+  ): void {
     el.addEventListener(
       eventName,
       (event: { stopPropagation: () => any; preventDefault: () => any }) => {
@@ -79,7 +87,7 @@ export class DOM {
   }
 
   static setProperty(el: Element, property: string, value: any): void {
-    el[property] = Reactive.unref(value);
+    el[property] = unref(value);
   }
 
   static setClassName(el: Element, classNames: string, value: any): void {
@@ -109,11 +117,17 @@ export class DOM {
     });
   }
 
-  static compileExpression(expression: string, args: string[] = []): AnyFunction {
+  static compileExpression(
+    expression: string,
+    args: string[] = []
+  ): AnyFunction {
     const parsed = domParser.parseFromString(expression, "text/html");
     const code = parsed.body.innerText.trim();
 
-    return (expression.startsWith("await") ? AsyncFunction : Function)(...args, `return ${code}`);
+    return (expression.startsWith("await") ? AsyncFunction : Function)(
+      ...args,
+      `return ${code}`
+    );
   }
 
   static materialize(
@@ -136,7 +150,9 @@ export class DOM {
       const doc = document.createDocumentFragment();
 
       if (Array.isArray(children) && children.length) {
-        doc.append(...children.map((next) => DOM.materialize(next, visitor, context)));
+        doc.append(
+          ...children.map((next) => DOM.materialize(next, visitor, context))
+        );
       }
 
       return doc;
@@ -154,7 +170,9 @@ export class DOM {
       context.ns = "http://www.w3.org/2000/svg";
     }
 
-    const el = context.ns ? document.createElementNS(context.ns, t) : document.createElement(t);
+    const el = context.ns
+      ? document.createElementNS(context.ns, t)
+      : document.createElement(t);
     visitor(el, attributes);
 
     if (attributes) {
@@ -229,14 +247,21 @@ export class Runtime {
 
   static createDom(): void {
     const { element, nodes, $state } = getCurrentInstance();
-    const dom = DOM.materialize(nodes, (el, attrs) => Runtime.createBindings($state, el, attrs), {});
+    const dom = DOM.materialize(
+      nodes,
+      (el, attrs) => Runtime.createBindings($state, el, attrs),
+      {}
+    );
     element.innerHTML = "";
     element.append(dom);
   }
 
   static compileExpression(expression: string, context: any): AnyFunction {
     const { $stateKeys, $stateArgs } = getCurrentInstance();
-    return DOM.compileExpression(expression, $stateKeys).bind(context, ...$stateArgs);
+    return DOM.compileExpression(expression, $stateKeys).bind(
+      context,
+      ...$stateArgs
+    );
   }
 
   static createBindings(
@@ -259,7 +284,12 @@ export class Runtime {
     const text = el.textContent;
     if (text.includes("${") || text.includes("{{")) {
       const expression =
-        "`" + text.replace(/\{\{([\s\S]+?)}}/g, (_: any, inner: string) => "${ " + inner.trim() + " }") + "`";
+        "`" +
+        text.replace(
+          /\{\{([\s\S]+?)}}/g,
+          (_: any, inner: string) => "${ " + inner.trim() + " }"
+        ) +
+        "`";
       el.textContent = "";
       const fn = Runtime.compileExpression(expression, context);
       watch(wrapTryCatch(expression, fn), (v?: any) => DOM.setText(el, v));
@@ -272,22 +302,42 @@ export class Runtime {
       const expression = attr[1].trim();
 
       if (attribute.charAt(0) === ":") {
-        Runtime.createElementNodePropertyBinding(context, el, attribute, expression);
+        Runtime.createElementNodePropertyBinding(
+          context,
+          el,
+          attribute,
+          expression
+        );
         continue;
       }
 
       if (attribute.charAt(0) === "@") {
-        Runtime.createElementNodeEventBinding(context, el, attribute, expression);
+        Runtime.createElementNodeEventBinding(
+          context,
+          el,
+          attribute,
+          expression
+        );
         continue;
       }
 
       if (attribute.startsWith(".class.")) {
-        Runtime.createElementNodeClassBinding(context, el, attribute, expression);
+        Runtime.createElementNodeClassBinding(
+          context,
+          el,
+          attribute,
+          expression
+        );
         continue;
       }
 
       if (attribute.startsWith(".style.")) {
-        Runtime.createElementNodeStyleBinding(context, el, attribute, expression);
+        Runtime.createElementNodeStyleBinding(
+          context,
+          el,
+          attribute,
+          expression
+        );
         continue;
       }
 
@@ -302,13 +352,20 @@ export class Runtime {
     context: any,
     el: any,
     attribute: {
-      slice: (arg0: number) => { (): any; new (): any; split: { (arg0: string): [any, ...any[]]; new (): any } };
+      slice: (arg0: number) => {
+        (): any;
+        new (): any;
+        split: { (arg0: string): [any, ...any[]]; new (): any };
+      };
     },
     expression: any
   ): void {
     const [eventName, ...flags] = attribute.slice(1).split(".");
     const { $stateKeys, $stateArgs } = getCurrentInstance();
-    const exec = DOM.compileExpression(expression, [...$stateKeys, "$event"]).bind(context, ...$stateArgs);
+    const exec = DOM.compileExpression(expression, [
+      ...$stateKeys,
+      "$event",
+    ]).bind(context, ...$stateArgs);
     const options = {};
 
     for (const flag of eventFlags) {
@@ -337,28 +394,47 @@ export class Runtime {
   ): void {
     const ref = expression.trim();
 
-    if (Reactive.isRef(context[ref])) {
+    if (isRef(context[ref])) {
       context[ref].value = el;
     }
   }
 
-  static createElementNodeClassBinding(context: any, el: any, attribute: string, expression: any): void {
+  static createElementNodeClassBinding(
+    context: any,
+    el: any,
+    attribute: string,
+    expression: any
+  ): void {
     const classNames = attribute.replace(".class.", "");
     const fn = Runtime.compileExpression(expression, context);
-    watch(wrapTryCatch(expression, fn), (v?: any) => DOM.setClassName(el, classNames, v));
+    watch(wrapTryCatch(expression, fn), (v?: any) =>
+      DOM.setClassName(el, classNames, v)
+    );
   }
 
-  static createElementNodeStyleBinding(context: any, el: any, attribute: string, expression: any): void {
+  static createElementNodeStyleBinding(
+    context: any,
+    el: any,
+    attribute: string,
+    expression: any
+  ): void {
     const style = attribute.replace(".style.", "");
     const fn = Runtime.compileExpression(expression, context);
     watch(wrapTryCatch(expression, fn), (v: any) => DOM.setStyle(el, style, v));
   }
 
-  static createElementNodePropertyBinding(context: any, el: any, attribute: string, expression: any): void {
+  static createElementNodePropertyBinding(
+    context: any,
+    el: any,
+    attribute: string,
+    expression: any
+  ): void {
     const name = attribute.slice(1);
     const fn = Runtime.compileExpression(expression, context);
 
-    watch(wrapTryCatch(expression, fn), (v: any) => DOM.setProperty(el, name, v));
+    watch(wrapTryCatch(expression, fn), (v: any) =>
+      DOM.setProperty(el, name, v)
+    );
   }
 }
 
@@ -369,7 +445,10 @@ export function getCurrentInstance(): RuntimeInfo {
 }
 
 export function loadCss(href: string, id: string, condition: boolean): void {
-  if (false === condition || (id && document.head.querySelector(`[id="css-${id}"]`))) {
+  if (
+    false === condition ||
+    (id && document.head.querySelector(`[id="css-${id}"]`))
+  ) {
     return;
   }
 
@@ -386,7 +465,10 @@ export function loadCss(href: string, id: string, condition: boolean): void {
 }
 
 export function loadScript(src: string, id: string, condition: boolean): void {
-  if (false === condition || (id && document.head.querySelector(`[id="js-${id}"]`))) {
+  if (
+    false === condition ||
+    (id && document.head.querySelector(`[id="js-${id}"]`))
+  ) {
     return;
   }
 
@@ -421,7 +503,9 @@ export function computed<T>(fn: () => T): Ref<T> {
   return $ref;
 }
 
-export function defineEvents(eventNames: any): (event: string, detail: any) => void {
+export function defineEvents(
+  eventNames: any
+): (event: string, detail: any) => void {
   const el = getCurrentInstance().element;
 
   for (const event of eventNames) {
@@ -476,7 +560,7 @@ function wrapTryCatch(exp: string, fn: AnyFunction) {
   return () => {
     try {
       const v = fn();
-      return Reactive.unref(v);
+      return unref(v);
     } catch (e) {
       console.log(exp, e);
     }

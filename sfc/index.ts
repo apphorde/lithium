@@ -28,7 +28,7 @@ export function getSetupCode(nodes: DocumentNode): string {
     setupNode?.children.find((s: ChildNode) => s.type === "text").text ?? "";
 
   if (!setupSource) {
-    return "function defineComponent(){ return {}; }";
+    return "export default function defineComponent(){ return {}; }";
   }
 
   const ast = parseJS(setupSource, {
@@ -57,7 +57,7 @@ export function getSetupCode(nodes: DocumentNode): string {
   );
   return (
     imports +
-    "\nfunction defineComponent($el, $dom) {  \n" +
+    "\nexport default function defineComponent($el, $dom) {  \n" +
     setupCode.trim() +
     "\nreturn { " +
     ids.join(", ") +

@@ -4,104 +4,104 @@ export interface Ref<T> {
 }
 
 type AnyFunction = (...args: any) => any;
+const watchedObject = "__w";
 
-export class Reactive {
-  private watchers: AnyFunction[] = [];
-  private suspended = false;
+export interface ObservableContext {
+  check: VoidFunction;
+  suspended: boolean;
+  observers: AnyFunction[];
+}
+
+export function check(target: ObservableContext): void {
+  if (target.suspended) return;
+
+  for (const w of target.observers) {
+    w();
+  }
+}
+
+export function watchValue<T>(valueGetter: () => T, effect: (value: T) => void): VoidFunction {
+  let lastValue: T | undefined;
+
+  return function () {
+    const value = valueGetter();
+
+    if (value !== lastValue && !Number.isNaN(value)) {
+      lastValue = value;
+      effect(value);
+    }
+  };
+}
+
+export function reactive<T extends object>(object: T, callback: VoidFunction): T {
+  // wrapping HTML elements with proxies leads to sad panda
+  if ((object === null && object !== undefined) || watchedObject in object || isElement(object)) {
+    return object;
+  }
+
+  markAsReactive(object);
+
+  const values = Object.entries(object);
+  for (const [key, next] of values) {
+    if (typeof next === "object" && next !== null) {
+      (<any>object)[key] = reactive(next, callback);
+    }
+  }
+
+  return new Proxy(object, {
+    set(target, p, value) {
+      if (typeof value === "object" && value !== null) {
+        value = reactive(value, callback);
+      }
+
+      (<any>target)[p] = value;
+      callback();
+      return true;
+    },
+  });
+}
+
+export function ref<T>(initialValue: T | null, effect: AnyFunction): Ref<T> {
+  const target: Ref<T | null> = { __isRef: true, value: initialValue };
+
+  Object.defineProperty(target, "toString", {
+    value: function () {
+      return String(this.value);
+    },
+    enumerable: false,
+    configurable: false,
+  });
+
+  return reactive(target, effect) as Ref<T>;
+}
+
+export function isRef<X>(t: any): t is Ref<X> {
+  return typeof t !== "object" ? false : t && t.__isRef;
+}
+
+export function unref<T>(v: T | Ref<T>): T {
+  return isRef(v) ? v.value : v;
+}
+
+export class ReactiveContext implements ObservableContext {
+  public check: VoidFunction;
+  public suspended = false;
+  public observers: AnyFunction[] = [];
 
   constructor() {
-    this.check = this.check.bind(this);
+    this.check = check.bind(null, this);
   }
 
-  check(): void {
-    if (this.suspended) return;
-
-    for (const w of this.watchers) {
-      w();
-    }
+  watch<T>(getter: () => T, effect?: AnyFunction): void {
+    this.observers.push(effect ? watchValue(getter, effect) : getter);
   }
 
-  watch<T>(exec: () => T, effect?: AnyFunction): void {
-    let lastValue: T | undefined;
-    let fn: AnyFunction;
-
-    if (!effect) {
-      fn = exec;
-    } else {
-      fn = function () {
-        const value = exec();
-
-        if (value !== lastValue && !Number.isNaN(value)) {
-          lastValue = value;
-          effect(value);
-        }
-      };
-    }
-
-    this.watchers.push(fn);
+  ref<T>(initialValue: T | null): Ref<T> {
+    return ref(initialValue, this.check);
   }
 
-  ref<T>(initialValue: T | undefined | null): Ref<T> {
-    const target = { value: initialValue };
-
-    Object.defineProperty(target, "__isRef", {
-      value: true,
-      enumerable: false,
-      configurable: false,
-    });
-    Object.defineProperty(target, "toString", {
-      value: function () {
-        return String(this.value);
-      },
-      enumerable: false,
-      configurable: false,
-    });
-
-    return this.watchDeep(target);
-  }
-
-  watchObject(context: any, callback?: VoidFunction): Ref<any> {
-    if (context.__w) {
-      return context;
-    }
-
-    callback ||= this.check;
-    const scope = this;
-    Object.defineProperty(context, "__w", {
-      value: true,
-      enumerable: false,
-      configurable: false,
-    });
-
-    return new Proxy(context, {
-      set(target, p, value) {
-        if (typeof value === "object" && !value.__w) {
-          value = scope.watchDeep(value, callback);
-        }
-
-        target[p] = value;
-        callback();
-        return true;
-      },
-    });
-  }
-
-  watchDeep(context: any, callback?: VoidFunction): Ref<any> {
-    // wrapping HTML elements with proxies leads to sad panda
-    if (context.__w || context instanceof HTMLElement) {
-      return context;
-    }
-
-    callback ||= this.check;
-    const values = Object.entries(context);
-
-    for (const [key, next] of values) {
-      if (typeof next === "object" && next !== null) {
-        context[key] = this.watchObject(next, callback);
-      }
-    }
-
-    return this.watchObject(context, callback);
+  watchDeep<T extends object>(context: T, callback?: VoidFunction): T {
+    return reactive(context, callback || this.check);
   }
 
   suspend(): void {
@@ -111,12 +111,16 @@ export class Reactive {
   unsuspend(): void {
     this.suspended = false;
   }
+}
 
-  static isRef<X>(t: any): t is Ref<X> {
-    return typeof t !== "object" ? false : t && t.__isRef;
-  }
+function markAsReactive(context: any): void {
+  Object.defineProperty(context, watchedObject, {
+    value: true,
+    enumerable: false,
+    configurable: false,
+  });
+}
 
-  static unref<T>(v: T | Ref<T>): T {
-    return Reactive.isRef(v) ? v.value : v;
-  }
+function isElement(t: any): boolean {
+  return t instanceof Element;
 }
