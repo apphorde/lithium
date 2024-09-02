@@ -2,6 +2,6 @@
   "name": "@lithium/sfc",
   "dependencies": {
     "acorn": "latest",
-    "@lithium/html-parser": "jsr:@lithium/html-parser"
+    "@lithium/html-parser": "file:../html-parser"
   }
 }
