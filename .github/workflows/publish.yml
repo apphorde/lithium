@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: npm i
 
-      - run: cd ${w{ matrix.package }}
+      - run: cd ${{ matrix.package }}
       - run: npm run ci --if-present
 
       - name: Publish package
