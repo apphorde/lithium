@@ -1,6 +1,6 @@
 {
   "name": "@lithium/html-parser",
   "scripts": {
-    "ci": "npx tsx parse.spec.ts && npx tsc || true"
+    "ci": "npx tsx parse.spec.ts"
   }
 }

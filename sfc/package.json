@@ -1,16 +1,7 @@
 {
   "name": "@lithium/sfc",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
-  },
   "dependencies": {
     "acorn": "latest",
-    "@lithium/html-parser": "latest"
-  },
-  "scripts": {
-    "ci": "npx tsc || true"
+    "@lithium/html-parser": "jsr:@lithium/html-parser"
   }
 }
