@@ -10,10 +10,10 @@ jobs:
     strategy:
       matrix:
         package:
+          - html-parser
           - web
           - reactive
           - sfc
-          - html-parser
 
     permissions:
       contents: read
@@ -26,7 +26,16 @@ jobs:
         run: npm i
 
       - run: cd ${{ matrix.package }}
-      - run: npm run ci --if-present
+
+      - name: Bundle
+        run: rollup -c ../rollup.config.mjs
+
+      - name: Publish to AppHorde Registry
+        run: >
+          curl -sS --fail -H "Authorization: ${{ env.CDN_API_KEY }}" -X POST ${{ env.CDN_API_URL }}/library/@lithium/${{ matrix.package }}@latest --data-binary @-
+        env:
+          CDN_API_URL: ${{ secrets.CDN_API_URL }}
+          CDN_API_KEY: ${{ secrets.CDN_API_KEY }}
 
       - name: Publish package
         run: npx jsr publish --allow-slow-types --allow-dirty

@@ -11,7 +11,7 @@ import { parse as parseJS } from "acorn";
 
 const doc: DocumentNode = { type: "document", docType: "html", children: [] };
 
-function findSetupNode(nodes: DocumentNode): ElementNode {
+export function findSetupNode(nodes: DocumentNode): ElementNode {
   return nodes.children.find(
     (n) =>
       n.type === "element" &&
@@ -65,10 +65,6 @@ export function getSetupCode(nodes: DocumentNode): string {
   );
 }
 
-function isElement(node: any): node is ElementNode {
-  return node && "children" in node;
-}
-
 export function getTemplateNodes(nodes: DocumentNode) {
   const template = nodes.children.find(
     (n) => n.type === "element" && n.tag === "template"
@@ -93,16 +89,8 @@ export function getTemplateNodes(nodes: DocumentNode) {
   return JSON.stringify(pack(doc));
 }
 
-export function parseSFC(source: string) {
-  const parsed = normalize(parseHTML(source));
-  const setup = getSetupCode(parsed);
-  const template = getTemplateNodes(parsed);
-
-  return { template, setup };
-}
-
 export function getComponentCode({ template, setup, name }) {
-  const s = `import {createComponent} from "lithium";
+  const s = `import {createComponent} from "@lithium/web";
 ${setup}
 const __t = ${template};
 `;
@@ -136,4 +124,16 @@ export function normalize<T extends ParserNode>(node: T) {
   }
 
   return node;
+}
+
+export function parseSFC(source: string) {
+  const parsed = normalize(parseHTML(source));
+  const setup = getSetupCode(parsed);
+  const template = getTemplateNodes(parsed);
+
+  return { template, setup };
+}
+
+function isElement(node: any): node is ElementNode {
+  return node && "children" in node;
 }

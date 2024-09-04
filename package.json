@@ -2,7 +2,11 @@
   "license": "MIT",
   "devDependencies": {
     "jsr": "^0.13.1",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "rollup": "^2.79.0",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^14.0.1",
+    "@rollup/plugin-typescript": "^8.5.0"
   },
   "workspaces": ["./reactive", "./html-parser", "./sfc", "./web"]
 }

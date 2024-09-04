@@ -3,7 +3,6 @@
   "files": ["./index.ts"],
   "exclude": ["./index.d.ts"],
   "compilerOptions": {
-    "outDir": "./dist",
     "paths": {
       "@lithium/parse-html": ["../parse-html/*"]
     }
