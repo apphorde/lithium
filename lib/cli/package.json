@@ -4,6 +4,6 @@
     "lit": "./index.js"
   },
   "dependencies": {
-    "@lithium/sfc": "file:../sfc/index.ts"
+    "@lithium/sfc": "file:../sfc"
   }
 }
