@@ -31,6 +31,6 @@ jobs:
         env:
           CDN_API_URL: ${{ secrets.CDN_API_URL }}
           CDN_API_KEY: ${{ secrets.CDN_API_KEY }}
-        run: |
-          npx rollup -c
+        run: >
+          npx rollup -c &&
           curl -sS --fail -H "Authorization: ${{ env.CDN_API_KEY }}" -X POST ${{ env.CDN_API_URL }}/library/@lithium/${{ matrix.package }}@latest --data-binary @index.js
