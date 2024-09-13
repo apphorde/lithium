@@ -27,7 +27,7 @@ jobs:
         run: npm ci
 
       - name: Publish to AppHorde Registry
-        working-directory: cd lib/${{ matrix.package }}
+        working-directory: lib/${{ matrix.package }}
         env:
           CDN_API_URL: ${{ secrets.CDN_API_URL }}
           CDN_API_KEY: ${{ secrets.CDN_API_KEY }}
