@@ -25,10 +25,10 @@ jobs:
       - name: Install dependencies
         run: npm i
 
-      - run: cd ${{ matrix.package }}
+      - run: cd lib/${{ matrix.package }}
 
       - name: Bundle
-        run: npx rollup -c rollup.config.mjs
+        run: npx rollup --config ../rollup.config.mjs
 
       - name: Publish to AppHorde Registry
         run: >

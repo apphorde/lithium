@@ -1,7 +1,0 @@
-{
-  "$schema": "https://jsr.io/schema/config-file.v1.json",
-  "name": "@lithium/web",
-  "license": "MIT",
-  "version": "0.2.0",
-  "exports": "./index.ts"
-}

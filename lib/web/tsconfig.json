@@ -2,6 +2,7 @@
   "extends": "../tsconfig.json",
   "files": ["./index.ts"],
   "compilerOptions": {
+    "outDir": ".",
     "paths": {
       "@lithium/reactive": ["../reactive/*"]
     }
