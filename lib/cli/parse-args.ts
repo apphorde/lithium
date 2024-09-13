@@ -1,8 +1,3 @@
-export type Args = {
-  options: Record<string, string | boolean>;
-  args: string[];
-};
-
 export function parseArgs(): Args {
   const argv = process.argv.slice(2);
   const options: Record<string, string | boolean> = {};
@@ -28,4 +23,9 @@ export function parseArgs(): Args {
   }
 
   return { args, options };
+}
+
+export interface Args {
+  options: Record<string, string | boolean>;
+  args: string[];
 }

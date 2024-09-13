@@ -1,6 +1,6 @@
 import { parseSFC } from "@lithium/sfc";
-import { readFileSync, writeFileSync } from "node:fs";
-import type { Args } from "./parse-args.js";
+import type { Args } from "./parse-args";
+import { readFileSync, writeFileSync } from "fs";
 
 export default async function (args: Args) {
   const [inputFile = "-", outputFile = "-"] = args.args;

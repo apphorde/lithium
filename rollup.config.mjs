@@ -11,8 +11,8 @@ export default {
     format: "es",
   },
   plugins: [
+    typescript({ exclude: ["**/*.spec.ts"] }),
     json(),
-    typescript({ module: "esnext", exclude: ["**/*.spec.ts"] }),
     resolve(),
     terser({
       compress: true,

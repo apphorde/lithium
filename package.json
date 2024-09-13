@@ -1,18 +1,19 @@
 {
   "license": "MIT",
   "devDependencies": {
-    "@rollup/plugin-json": "^6.0.0",
-    "@rollup/plugin-node-resolve": "^14.0.1",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^8.5.0",
-    "jsr": "^0.13.1",
-    "rollup": "^2.79.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@types/node": "^22.5.4",
+    "rollup": "^4.21.3",
     "tslib": "^2.7.0",
     "typescript": "^5.5.4"
   },
   "workspaces": [
-    "./lib/reactive",
+    "./lib/cli",
     "./lib/html-parser",
+    "./lib/reactive",
     "./lib/sfc",
     "./lib/web"
   ]

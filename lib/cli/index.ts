@@ -1,5 +1,5 @@
-import { parseArgs } from "./parse-args.js";
-import compile from "./compile.js";
+import { parseArgs } from "./parse-args";
+import compile from "./compile";
 
 async function main() {
   const args = parseArgs();

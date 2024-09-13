@@ -3,8 +3,7 @@
   "bin": {
     "lit": "./index.js"
   },
-  "exports": "./index.js",
   "dependencies": {
-    "@lithium/sfc": "file:../sfc"
+    "@lithium/sfc": "file:../sfc/index.ts"
   }
 }
