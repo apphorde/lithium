@@ -28,7 +28,7 @@ jobs:
       - run: cd ${{ matrix.package }}
 
       - name: Bundle
-        run: npx rollup -c ../rollup.config.mjs
+        run: npx rollup -c rollup.config.mjs
 
       - name: Publish to AppHorde Registry
         run: >
@@ -36,6 +36,3 @@ jobs:
         env:
           CDN_API_URL: ${{ secrets.CDN_API_URL }}
           CDN_API_KEY: ${{ secrets.CDN_API_KEY }}
-
-      - name: Publish package
-        run: npx jsr publish --allow-slow-types --allow-dirty
