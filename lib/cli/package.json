@@ -1,0 +1,10 @@
+{
+  "name": "@lithium/cli",
+  "bin": {
+    "lit": "./index.js"
+  },
+  "exports": "./index.js",
+  "dependencies": {
+    "@lithium/sfc": "file:../sfc"
+  }
+}
