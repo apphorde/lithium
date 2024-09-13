@@ -4,7 +4,7 @@ import json from "@rollup/plugin-json";
 import terser from "@rollup/plugin-terser";
 
 export default {
-  input: "index.ts",
+  input: "./index.ts",
   external: [],
   output: {
     dir: ".",
