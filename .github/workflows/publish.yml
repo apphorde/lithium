@@ -29,7 +29,7 @@ jobs:
       - run: cd lib/${{ matrix.package }}
 
       - name: Bundle
-        run: npx rollup --config ../rollup.config.mjs
+        run: npx rollup -c
 
       - name: Publish to AppHorde Registry
         run: >
