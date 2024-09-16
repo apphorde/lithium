@@ -4,7 +4,7 @@
     "build": {},
     "test": {
       "options": {
-        "command": "npx tsx index.spec.ts"
+        "command": "npx tsx {projectRoot}/index.spec.ts"
       }
     }
   }
