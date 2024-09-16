@@ -11,6 +11,7 @@
     },
     "test": {
       "executor": "nx:run-commands",
+      "cwd": "{projectRoot}",
       "options": {
         "command": "echo true"
       }
