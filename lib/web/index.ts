@@ -105,9 +105,10 @@ export class DOM {
   }
 
   static defineEvent(el: Element, name: string): void {
-    let handler: any;
+    const property = "on" + name.toLowerCase();
+    let handler: AnyFunction = el[property];
 
-    Object.defineProperty(el, "on" + name.toLowerCase(), {
+    Object.defineProperty(el, property, {
       get() {
         return handler;
       },
@@ -518,11 +519,10 @@ export function defineEvents(
 export function defineProps(props: {}): any {
   const keys = !Array.isArray(props) ? Object.keys(props) : props;
   const $el = getCurrentInstance();
-  const element = $el.element;
-  const $state = $el.$state;
+  const { element, $state } = $el;
 
   for (const property of keys) {
-    const $ref = ref(element[property]);
+    const $ref = $el.reactive.ref(element[property]);
     $state[property] = $ref;
 
     Object.defineProperty(element, property, {
