@@ -1,14 +1,12 @@
 {
-  "workspaceLayout": { "libsDir": "lib" },
+  "workspaceLayout": { "libsDir": "./lib", "appsDir": "./lib" },
+  "plugins": ["@nx/rollup/plugin"],
   "targetDefaults": {
     "build": {
       "dependsOn": ["^build"],
-      "executor": "nx:run-commands",
-      "defaultConfiguration": "rollup",
-      "configurations": {
-        "rollup": {
-          "command": "npx rollup -c {projectRoot}/rollup.config.mjs -i {projectRoot}/index.ts"
-        }
+      "executor": "@nx/rollup:rollup",
+      "options": {
+        "rollupConfig": "{projectRoot}/rollup.config.mjs"
       }
     }
   }

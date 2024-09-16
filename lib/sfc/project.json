@@ -1,4 +1,5 @@
 {
+  "name": "@lithium/sfc",
   "targets": {
     "build": {}
   }

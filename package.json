@@ -1,6 +1,8 @@
 {
+  "name": "@lithium/monorepo",
   "license": "MIT",
   "devDependencies": {
+    "@nx/rollup": "^19.7.3",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",

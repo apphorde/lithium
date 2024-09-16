@@ -1,4 +1,5 @@
 {
+  "name": "@lithium/reactive",
   "targets": {
     "build": {}
   }
