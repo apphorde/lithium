@@ -19,11 +19,10 @@ jobs:
           npm ci && npx nx run-many -t build
 
       - name: Publish to AppHorde Registry
-        working-directory: lib/${{ matrix.package }}
         env:
           CDN_API_URL: ${{ secrets.CDN_API_URL }}
           CDN_API_KEY: ${{ secrets.CDN_API_KEY }}
         run: |
-          for package in (html-parser web reactive sfc cli); do
-            curl -sS --fail -H "Authorization: ${{ env.CDN_API_KEY }}" -X POST ${{ env.CDN_API_URL }}/library/@lithium/${{ $package }}@latest --data-binary @lib/$package/index.js
+          for pkg in (html-parser web reactive sfc cli); do
+            curl -sS --fail -H "Authorization: ${{ env.CDN_API_KEY }}" -X POST ${{ env.CDN_API_URL }}/library/@lithium/$pkg@latest --data-binary @lib/$pkg/index.js
           done
