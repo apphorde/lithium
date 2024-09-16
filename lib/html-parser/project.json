@@ -1,6 +1,11 @@
 {
   "name": "@lithium/html-parser",
   "targets": {
-    "build": {}
+    "build": {},
+    "test": {
+      "options": {
+        "command": "npx tsx index.spec.ts"
+      }
+    }
   }
 }

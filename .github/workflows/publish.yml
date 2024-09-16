@@ -16,7 +16,7 @@ jobs:
 
       - name: Build packages
         run: |
-          npm ci && npx nx run-many -t build
+          npm ci && npx nx run-many -t build,test
 
       - name: Publish to AppHorde Registry
         env:
