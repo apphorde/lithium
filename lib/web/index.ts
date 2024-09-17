@@ -82,8 +82,15 @@ export class DOM {
     );
   }
 
-  static emitEvent(element: Element, event: string, detail: any): void {
-    element.dispatchEvent(new CustomEvent(event, { detail }));
+  static emitEvent(element: Element, eventName: string, detail: any): void {
+    const event = new CustomEvent(eventName, { detail });
+    const property = "on" + eventName;
+
+    element.dispatchEvent(event);
+
+    if (typeof element[property] === "function") {
+      element[property](event);
+    }
   }
 
   static setProperty(el: Element, property: string, value: any): void {
