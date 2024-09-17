@@ -9,6 +9,11 @@ async function main() {
     compile(args);
     return;
   }
+
+  if (command === "publish") {
+    compile(args);
+    return;
+  }
 }
 
 main();
