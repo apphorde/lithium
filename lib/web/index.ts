@@ -523,14 +523,18 @@ export function defineEvents(
   return (e, d) => DOM.emitEvent(el, e, d);
 }
 
-export function defineProps(props: {}): any {
-  const keys = !Array.isArray(props) ? Object.keys(props) : props;
+export function defineProps(definitions: {}): any {
+  const keys = !Array.isArray(definitions)
+    ? Object.keys(definitions)
+    : definitions;
   const $el = getCurrentInstance();
   const { element, $state } = $el;
+  const props = {};
 
   for (const property of keys) {
     const $ref = $el.reactive.ref(element[property]);
     $state[property] = $ref;
+    props[property] = $ref;
 
     Object.defineProperty(element, property, {
       get() {
@@ -547,7 +551,19 @@ export function defineProps(props: {}): any {
     {
       get(_t, p) {
         if (p === "__w") return true;
-        return $el.$state[p].value;
+
+        if (props[p]) {
+          return props[p].value;
+        }
+      },
+      set(_t, p, value) {
+        if (props[p] && props[p].value !== value) {
+          $el.reactive.suspend();
+          props[p].value = value;
+          $el.reactive.unsuspend();
+        }
+
+        return true;
       },
     }
   );
