@@ -526,7 +526,8 @@ export function defineProps(definitions: {}): any {
   const props = {};
 
   for (const property of keys) {
-    const $ref = $el.reactive.ref(element[property]);
+    const initialValue = element.hasOwnProperty(property) ? element[property] : element.getAttribute(property);
+    const $ref = $el.reactive.ref(initialValue);
     $state[property] = $ref;
     props[property] = $ref;
 
