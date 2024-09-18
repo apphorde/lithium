@@ -324,7 +324,7 @@ export class Runtime {
         continue;
       }
 
-      if (attribute.charAt(0) === "@") {
+      if (attribute.charAt(0) === "@" || attribute.startsWith("on-")) {
         Runtime.createElementNodeEventBinding(
           context,
           el,
@@ -364,16 +364,13 @@ export class Runtime {
   static createElementNodeEventBinding(
     context: any,
     el: any,
-    attribute: {
-      slice: (arg0: number) => {
-        (): any;
-        new (): any;
-        split: { (arg0: string): [any, ...any[]]; new (): any };
-      };
-    },
+    attribute: string,
     expression: any
   ): void {
-    const [eventName, ...flags] = attribute.slice(1).split(".");
+    const normalized = attribute.startsWith("@")
+      ? attribute.slice(1)
+      : attribute.replace("on-", "");
+    const [eventName, ...flags] = normalized.split(".");
     const { $stateKeys, $stateArgs } = getCurrentInstance();
     const exec = DOM.compileExpression(expression, [
       ...$stateKeys,
@@ -418,7 +415,7 @@ export class Runtime {
     attribute: string,
     expression: any
   ): void {
-    const classNames = attribute.replace(".class.", "");
+    const classNames = attribute.replace(".class.", "").replace("class-", "");
     const fn = Runtime.compileExpression(expression, context);
     watch(wrapTryCatch(expression, fn), (v?: any) =>
       DOM.setClassName(el, classNames, v)
@@ -442,7 +439,9 @@ export class Runtime {
     attribute: string,
     expression: any
   ): void {
-    const name = attribute.slice(1);
+    const name = attribute.startsWith("@")
+      ? attribute.slice(1)
+      : attribute.replace("bind-", "");
     const fn = Runtime.compileExpression(expression, context);
 
     watch(wrapTryCatch(expression, fn), (v: any) =>
