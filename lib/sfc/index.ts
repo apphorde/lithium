@@ -22,13 +22,14 @@ export function findSetupNode(nodes: DocumentNode): ElementNode {
   ) as ElementNode;
 }
 
-export function getSetupCode(nodes: DocumentNode): string {
+export function getSetupCode(nodes: DocumentNode): { setup: string, shadowDom: boolean } {
   const setupNode = findSetupNode(nodes);
+  const shadowDom = setupNode.attributes.some(a => a.name === 'shadow-dom');
   const setupSource =
     setupNode?.children.find((s: ChildNode) => s.type === "text").text ?? "";
 
   if (!setupSource) {
-    return "export default function defineComponent(){ return {}; }";
+    return { setup: "export default function defineComponent(){ return {}; }", shadowDom: false };
   }
 
   const ast = parseJS(setupSource, {
@@ -55,7 +56,8 @@ export function getSetupCode(nodes: DocumentNode): string {
       ? (<FunctionDeclaration>node).id.name
       : (<VariableDeclaration>node).declarations.map((d) => (<any>d).id.name)
   );
-  return (
+
+  const combinedCode = (
     imports +
     "\nexport default function defineComponent($el, $dom) {  \n" +
     setupCode.trim() +
@@ -63,6 +65,8 @@ export function getSetupCode(nodes: DocumentNode): string {
     ids.join(", ") +
     " };}"
   );
+
+  return { setup: combinedCode, shadowDom };
 }
 
 export function getTemplateNodes(nodes: DocumentNode) {
@@ -89,23 +93,24 @@ export function getTemplateNodes(nodes: DocumentNode) {
   return JSON.stringify(pack(doc));
 }
 
-export function getComponentCode({ template, setup, name }) {
+export function getComponentCode(name, { template, setup, shadowDom }) {
   const s = `import {createComponent} from "@lithium/web";
 ${setup}
+const __s = ${!!shadowDom};
 const __t = ${template};
 `;
 
   if (name) {
     return (
       s +
-      `createComponent('${name}', { setup: defineComponent, template: __t });`
+      `createComponent('${name}', { setup: defineComponent, template: __t, shadowDom: __s });`
     );
   }
 
   return (
     s +
     `export function register(name) {
-    createComponent(name, { setup: defineComponent, template: __t });
+    createComponent(name, { setup: defineComponent, template: __t, shadowDom: __s });
   }
 `
   );
@@ -128,10 +133,10 @@ export function normalize<T extends ParserNode>(node: T) {
 
 export function parseSFC(source: string) {
   const parsed = normalize(parseHTML(source));
-  const setup = getSetupCode(parsed);
+  const { setup, shadowDom } = getSetupCode(parsed);
   const template = getTemplateNodes(parsed);
 
-  return { template, setup };
+  return { template, setup, shadowDom };
 }
 
 function isElement(node: any): node is ElementNode {
