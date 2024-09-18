@@ -20,7 +20,10 @@ export function check(target: ObservableContext): void {
   }
 }
 
-export function watchValue<T>(valueGetter: () => T, effect: (value: T) => void): VoidFunction {
+export function watchValue<T>(
+  valueGetter: () => T,
+  effect: (value: T) => void
+): VoidFunction {
   let lastValue: T | undefined;
 
   return function () {
@@ -33,9 +36,16 @@ export function watchValue<T>(valueGetter: () => T, effect: (value: T) => void):
   };
 }
 
-export function reactive<T extends object>(object: T, callback: VoidFunction): T {
+export function reactive<T extends object>(
+  object: T,
+  callback: VoidFunction
+): T {
   // wrapping HTML elements with proxies leads to sad panda
-  if ((object === null && object !== undefined) || watchedObject in object || isElement(object)) {
+  if (
+    (object === null && object !== undefined) ||
+    watchedObject in object ||
+    isElement(object)
+  ) {
     return object;
   }
 
@@ -93,6 +103,14 @@ export class ReactiveContext implements ObservableContext {
   }
 
   watch<T>(getter: () => T, effect?: AnyFunction): void {
+    if (typeof getter !== "function") {
+      throw new Error("Watched expression must be a function");
+    }
+
+    if (effect && typeof getter !== "function") {
+      throw new Error("Watcher effect must be a function");
+    }
+
     this.observers.push(effect ? watchValue(getter, effect) : getter);
   }
 

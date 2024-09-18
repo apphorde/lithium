@@ -1,5 +1,6 @@
 {
   "name": "@lithium/html-parser",
+  "exports": "./index.js",
   "targets": {
     "build": {},
     "test": {
