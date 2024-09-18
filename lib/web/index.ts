@@ -1,6 +1,7 @@
 import { ReactiveContext, Ref, unref, isRef } from "@lithium/reactive";
 
 export interface RuntimeInfo {
+  shadowDom: ShadowRootInit | boolean;
   reactive: ReactiveContext;
   element: Element;
   $state: any;
@@ -36,8 +37,9 @@ export function createComponent(
     $el: RuntimeInfo;
 
     connectedCallback() {
-      const { setup, template } = Component[DefineComponent];
+      const { setup, template, shadowDom } = Component[DefineComponent];
       const $el = {
+        shadowDom,
         element: this,
         componentSetup: setup,
         nodes: template,
@@ -248,14 +250,23 @@ export class Runtime {
   }
 
   static createDom(): void {
-    const { element, nodes, $state } = getCurrentInstance();
+    const { element, nodes, shadowDom, $state } = getCurrentInstance();
     const dom = DOM.materialize(
       nodes,
       (el, attrs) => Runtime.createBindings($state, el, attrs),
       {}
     );
+
     element.innerHTML = "";
-    element.append(dom);
+
+    if (!shadowDom) {
+      element.append(dom);
+      return;
+    }
+
+    const shadowRootInit = typeof shadowDom === "boolean" ? "open" : shadowDom;
+    element.attachShadow(shadowRootInit as ShadowRootInit);
+    element.shadowRoot.append(dom);
   }
 
   static compileExpression(expression: string, context: any): AnyFunction {
@@ -526,7 +537,9 @@ export function defineProps(definitions: {}): any {
   const props = {};
 
   for (const property of keys) {
-    const initialValue = element.hasOwnProperty(property) ? element[property] : element.getAttribute(property);
+    const initialValue = element.hasOwnProperty(property)
+      ? element[property]
+      : element.getAttribute(property);
     const $ref = $el.reactive.ref(initialValue);
     $state[property] = $ref;
     props[property] = $ref;
