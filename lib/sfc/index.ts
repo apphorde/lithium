@@ -7,7 +7,7 @@ import type {
 } from "@lithium/html-parser";
 import type { FunctionDeclaration, VariableDeclaration } from "acorn";
 import { parse as parseHTML, pack } from "@lithium/html-parser";
-import { parse as parseJS } from "acorn@8.12.1";
+import { parse as parseJS } from "acorn";
 
 const doc: DocumentNode = { type: "document", docType: "html", children: [] };
 
