@@ -1,5 +1,6 @@
 import { parseArgs } from "./parse-args";
 import compile from "./compile";
+import publish from "./publish";
 
 async function main() {
   const args = parseArgs();
@@ -11,7 +12,7 @@ async function main() {
   }
 
   if (command === "publish") {
-    compile(args);
+    publish(args);
     return;
   }
 }
