@@ -71,6 +71,14 @@ export function reactive<T extends object>(
   });
 }
 
+export function debounce(fn, timeout) {
+  let timer;
+  return function (...args) {
+    clearTimeout(timer);
+    setTimeout(update, timeout, ...args);
+  };
+}
+
 export interface RefOptions {
   debounce: number;
 }
