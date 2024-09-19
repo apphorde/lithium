@@ -63,6 +63,8 @@ export function mount(element, definitions) {
     shadowDom,
     element,
     componentSetup: setup,
+    stylesheets: [],
+    scripts: [],
     nodes: template,
     $state: {},
     $stateKeys: [],
