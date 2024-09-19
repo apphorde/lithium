@@ -71,18 +71,47 @@ export function reactive<T extends object>(
   });
 }
 
-export function ref<T>(initialValue: T | null, effect: AnyFunction): Ref<T> {
-  const target: Ref<T | null> = { __isRef: true, value: initialValue };
+export interface RefOptions {
+  debounce: number;
+}
 
-  Object.defineProperty(target, "toString", {
-    value: function () {
+function refDebounce<T>(initialValue: T | null, options: RefOptions) {
+  let v: T | null = initialValue;
+  const set = debounce((newValue) => (v = newValue), options.debounce);
+
+  return {
+    __isRef: true,
+    get value() {
+      return v;
+    },
+    set value(v) {
+      return set(v);
+    },
+    toString() {
       return String(this.value);
     },
-    enumerable: false,
-    configurable: false,
-  });
+  };
+}
 
-  return reactive(target, effect) as Ref<T>;
+export function ref<T>(
+  initialValue: T | null,
+  effect: AnyFunction,
+  options?: RefOptions
+): Ref<T> {
+  if (options?.debounce) {
+    return reactive(refDebounce(initialValue, options), effect) as Ref<T>;
+  }
+
+  return reactive(
+    {
+      __isRef: true,
+      value: initialValue,
+      toString() {
+        return String(this.value);
+      },
+    },
+    effect
+  ) as Ref<T>;
 }
 
 export function isRef<X>(t: any): t is Ref<X> {
@@ -114,8 +143,8 @@ export class ReactiveContext implements ObservableContext {
     this.observers.push(effect ? watchValue(getter, effect) : getter);
   }
 
-  ref<T>(initialValue: T | null): Ref<T> {
-    return ref(initialValue, this.check);
+  ref<T>(initialValue: T | null, options?: RefOptions): Ref<T> {
+    return ref(initialValue, this.check, options);
   }
 
   watchDeep<T extends object>(context: T, callback?: VoidFunction): T {
