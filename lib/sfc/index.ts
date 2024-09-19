@@ -22,14 +22,20 @@ export function findSetupNode(nodes: DocumentNode): ElementNode {
   ) as ElementNode;
 }
 
-export function getSetupCode(nodes: DocumentNode): { setup: string, shadowDom: boolean } {
+export function getSetupCode(nodes: DocumentNode): {
+  setup: string;
+  shadowDom: boolean;
+} {
   const setupNode = findSetupNode(nodes);
-  const shadowDom = setupNode.attributes.some(a => a.name === 'shadow-dom');
+  const shadowDom = setupNode.attributes.some((a) => a.name === "shadow-dom");
   const setupSource =
     setupNode?.children.find((s: ChildNode) => s.type === "text").text ?? "";
 
   if (!setupSource) {
-    return { setup: "export default function defineComponent(){ return {}; }", shadowDom: false };
+    return {
+      setup: "export default function defineComponent(){ return {}; }",
+      shadowDom: false,
+    };
   }
 
   const ast = parseJS(setupSource, {
@@ -57,14 +63,13 @@ export function getSetupCode(nodes: DocumentNode): { setup: string, shadowDom: b
       : (<VariableDeclaration>node).declarations.map((d) => (<any>d).id.name)
   );
 
-  const combinedCode = (
+  const combinedCode =
     imports +
     "\nexport default function defineComponent($el, $dom) {  \n" +
     setupCode.trim() +
     "\nreturn { " +
     ids.join(", ") +
-    " };}"
-  );
+    " };}";
 
   return { setup: combinedCode, shadowDom };
 }
@@ -94,26 +99,16 @@ export function getTemplateNodes(nodes: DocumentNode) {
 }
 
 export function getComponentCode(name, { template, setup, shadowDom }) {
-  const s = `import {createComponent} from "@lithium/web";
+  return `import {createComponent} from "@lithium/web";
 ${setup}
+
 const __s = ${!!shadowDom};
 const __t = ${template};
+const __c = { setup: defineComponent, template: __t, shadowDom: __s };
+
+createComponent('${name}', __c);
+export default __c;
 `;
-
-  if (name) {
-    return (
-      s +
-      `createComponent('${name}', { setup: defineComponent, template: __t, shadowDom: __s });`
-    );
-  }
-
-  return (
-    s +
-    `export function register(name) {
-    createComponent(name, { setup: defineComponent, template: __t, shadowDom: __s });
-  }
-`
-  );
 }
 
 export function normalize<T extends ParserNode>(node: T) {
