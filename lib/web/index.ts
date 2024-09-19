@@ -595,8 +595,8 @@ export function watch(expression: AnyFunction, effect?: AnyFunction): void {
   return getCurrentInstance().reactive.watch(expression, effect);
 }
 
-export function ref<T>(value?: T): Ref<T> {
-  return getCurrentInstance().reactive.ref(value);
+export function ref<T>(value?: T, options?): Ref<T> {
+  return getCurrentInstance().reactive.ref(value, options);
 }
 
 export function html(text: string) {
@@ -618,11 +618,11 @@ export function html(text: string) {
   return ["#", "html", tree];
 }
 
+//////////////////// end of public api
+
 function getAttributes(node: Element) {
   return Array.from(node.attributes).map((a) => [a.localName, a.value]);
 }
-
-//////////////////// end of public api
 
 function mapTree(
   tree: ChildNode | Document | DocumentFragment,
