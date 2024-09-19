@@ -326,11 +326,11 @@ export class Runtime {
       element.shadowRoot.append(dom);
     }
 
-    for ([a, b, c] of stylesheets) {
+    for (const [a, b, c] of stylesheets) {
       DOM.loadCss(element, a, b, c);
     }
 
-    for ([a, b, c] of scripts) {
+    for (const [a, b, c] of scripts) {
       DOM.loadScript(element, a, b, c);
     }
   }
