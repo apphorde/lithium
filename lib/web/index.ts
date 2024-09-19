@@ -4,15 +4,22 @@ export interface RuntimeInfo {
   shadowDom: ShadowRootInit | boolean;
   reactive: ReactiveContext;
   element: Element;
+  props: any;
   stylesheets: string[];
   scripts: string[];
   $state: any;
   $stateKeys: string[];
   $stateArgs: any[];
-  nodes: any;
-  componentSetup: Function;
+  template: any[];
+  setup: Function;
   init: VoidFunction | null;
   destroy: VoidFunction | null;
+}
+
+interface RuntimeDefinitions {
+  setup: Function;
+  template: any[];
+  shadowDom: any;
 }
 
 type AnyFunction = (...args: any) => any;
@@ -26,34 +33,29 @@ const stack: RuntimeInfo[] = [];
 export const noop = () => {};
 export const DefineComponent = Symbol("@@def");
 
-export function createComponent(
-  name: string,
-  { setup, template }: { setup: AnyFunction; template: any }
-): void {
+export function createComponent(name: string, def: RuntimeDefinitions): void {
   if (customElements.get(name)) {
-    customElements.get(name)![DefineComponent] = { name, setup, template };
+    customElements.get(name)![DefineComponent] = def;
     return;
   }
 
   class Component extends HTMLElement {
-    $el: RuntimeInfo;
-
     connectedCallback() {
       mount(this, Component[DefineComponent]);
     }
 
     disconnectedCallback() {
-      if (!this.isConnected && this.$el.destroy) {
-        queueMicrotask(this.$el.destroy);
+      if (!this.isConnected && this.__destroy) {
+        queueMicrotask(this.__destroy);
       }
     }
   }
 
-  Component[DefineComponent] = { name, setup, template };
+  Component[DefineComponent] = def;
   customElements.define(name, Component);
 }
 
-export function mount(element, definitions) {
+export function mount(element, definitions, props?) {
   if (typeof element === "string") {
     element = document.querySelector(element);
   }
@@ -62,7 +64,8 @@ export function mount(element, definitions) {
   const $el = {
     shadowDom,
     element,
-    componentSetup: setup,
+    props,
+    setup,
     stylesheets: [],
     scripts: [],
     nodes: template,
@@ -74,8 +77,8 @@ export function mount(element, definitions) {
     reactive: new ReactiveContext(),
   };
 
-  element.$el = $el;
   queueMicrotask(() => Runtime.init($el));
+
   return $el;
 }
 
@@ -288,6 +291,10 @@ export class Runtime {
       reactive.unsuspend();
       reactive.check();
 
+      if ($el.destroy) {
+        element.__destroy = $el.destroy;
+      }
+
       if ($el.init) {
         await $el.init();
       }
@@ -302,10 +309,14 @@ export class Runtime {
     // API
     // import { onInit, onDestroy, computed, defineEvents, defineProps, ref, watch, loadCss, loadScript } from 'lithium';
     const $el = getCurrentInstance();
-    const componentData = $el.componentSetup($el, $el.element);
+    const componentData = $el.setup($el, $el.element);
     $el.$state = $el.reactive.watchDeep({ ...componentData, ...$el.$state });
     $el.$stateKeys = Object.keys($el.$state);
     $el.$stateArgs = $el.$stateKeys.map((key) => $el.$state[key]);
+
+    if ($el.props) {
+      Object.assign($el.$state, $el.props);
+    }
   }
 
   static createDom(): void {
