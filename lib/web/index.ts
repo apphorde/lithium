@@ -52,7 +52,7 @@ export function createComponent(
 }
 
 export function mount(element, definitions) {
-  if (typeof element === 'string') {
+  if (typeof element === "string") {
     element = document.querySelector(element);
   }
 
@@ -72,6 +72,7 @@ export function mount(element, definitions) {
 
   element.$el = $el;
   queueMicrotask(() => Runtime.init($el));
+  return $el;
 }
 
 export class DOM {
@@ -272,8 +273,7 @@ export class Runtime {
       return;
     }
 
-    const shadowRootInit = typeof shadowDom === "boolean" ? "open" : shadowDom;
-    element.attachShadow(shadowRootInit as ShadowRootInit);
+    element.attachShadow(shadowDom as ShadowRootInit);
     element.shadowRoot.append(dom);
   }
 
@@ -487,8 +487,12 @@ export function loadCss(href: string, id: string, condition: boolean): void {
     tag.id = "css-" + id;
   }
 
-  // TODO attach to shadowRoot
-  document.head.append(tag);
+  const { shadowDom, element } = getCurrentInstance();
+  if (shadowDom && element.shadowRoot) {
+    element.shadowRoot.appendChild(tag);
+  } else {
+    document.head.append(tag);
+  }
 }
 
 export function loadScript(src: string, id: string, condition: boolean): void {
@@ -506,8 +510,12 @@ export function loadScript(src: string, id: string, condition: boolean): void {
     tag.id = "js-" + id;
   }
 
-  // TODO attach to shadowRoot
-  document.head.append(tag);
+  const { shadowDom, element } = getCurrentInstance();
+  if (shadowDom && element.shadowRoot) {
+    element.shadowRoot.appendChild(tag);
+  } else {
+    document.head.append(tag);
+  }
 }
 
 export function onInit(fn: VoidFunction): void {
