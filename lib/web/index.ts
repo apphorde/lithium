@@ -315,7 +315,7 @@ export class Runtime {
     $el.$stateArgs = $el.$stateKeys.map((key) => $el.$state[key]);
 
     if ($el.props) {
-      Object.assign($el.$state, $el.props);
+      Object.assign($el.element, $el.props);
     }
   }
 
