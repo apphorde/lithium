@@ -37,7 +37,7 @@ export function createComponent(
     $el: RuntimeInfo;
 
     connectedCallback() {
-      const { setup, template, shadowDom } = Component[DefineComponent];
+      const { setup, template, shadowDom = false } = Component[DefineComponent];
       const $el = {
         shadowDom,
         element: this,
@@ -590,8 +590,7 @@ export function ref<T>(value?: T): Ref<T> {
 
 export function html(text: string) {
   const dom = new DOMParser().parseFromString(text, "text/html");
-
-  return mapTree(dom, (element) => {
+  const tree = mapTree(dom.body, (element) => {
     if (element.nodeType === element.TEXT_NODE) {
       return (element as Text).textContent;
     }
@@ -604,6 +603,8 @@ export function html(text: string) {
       ];
     }
   });
+
+  return ['#', 'html', tree];
 }
 
 function getAttributes(node: Element) {
