@@ -75,7 +75,7 @@ export function debounce(fn, timeout) {
   let timer;
   return function (...args) {
     clearTimeout(timer);
-    timer = setTimeout(update, timeout, ...args);
+    timer = setTimeout(fn, timeout, ...args);
   };
 }
 
