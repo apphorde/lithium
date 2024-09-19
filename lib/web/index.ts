@@ -318,7 +318,7 @@ export class Runtime {
       const attribute = attr[0].trim();
       const expression = attr[1].trim();
 
-      if (attribute.charAt(0) === ":" || attribute.startsWith('bind-')) {
+      if (attribute.charAt(0) === ":" || attribute.startsWith("bind-")) {
         Runtime.createElementNodePropertyBinding(
           context,
           el,
@@ -445,7 +445,10 @@ export class Runtime {
   ): void {
     const name = attribute.startsWith("@")
       ? attribute.slice(1)
-      : attribute.replace("bind-", "");
+      : attribute
+          .replace("bind-", "")
+          .replace(/([-]{1}[a-z]{1})+/g, (s) => s.slice(1).toUpperCase());
+
     const fn = Runtime.compileExpression(expression, context);
 
     watch(wrapTryCatch(expression, fn), (v: any) =>
@@ -604,7 +607,7 @@ export function html(text: string) {
     }
   });
 
-  return ['#', 'html', tree];
+  return ["#", "html", tree];
 }
 
 function getAttributes(node: Element) {
@@ -624,7 +627,7 @@ function mapTree(
       parsed[2] = mapTree(next, mapper);
     }
 
-    return parsed || '';
+    return parsed || "";
   });
 }
 
