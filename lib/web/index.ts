@@ -37,22 +37,7 @@ export function createComponent(
     $el: RuntimeInfo;
 
     connectedCallback() {
-      const { setup, template, shadowDom = false } = Component[DefineComponent];
-      const $el = {
-        shadowDom,
-        element: this,
-        componentSetup: setup,
-        nodes: template,
-        $state: {},
-        $stateKeys: [],
-        $stateArgs: [],
-        init: null,
-        destroy: null,
-        reactive: new ReactiveContext(),
-      };
-
-      this.$el = $el;
-      queueMicrotask(() => Runtime.init($el));
+      mount(this, Component[DefineComponent]);
     }
 
     disconnectedCallback() {
@@ -64,6 +49,29 @@ export function createComponent(
 
   Component[DefineComponent] = { name, setup, template };
   customElements.define(name, Component);
+}
+
+export function mount(element, definitions) {
+  if (typeof element === 'string') {
+    element = document.querySelector(element);
+  }
+
+  const { setup, template, shadowDom = false } = definitions;
+  const $el = {
+    shadowDom,
+    element,
+    componentSetup: setup,
+    nodes: template,
+    $state: {},
+    $stateKeys: [],
+    $stateArgs: [],
+    init: null,
+    destroy: null,
+    reactive: new ReactiveContext(),
+  };
+
+  element.$el = $el;
+  queueMicrotask(() => Runtime.init($el));
 }
 
 export class DOM {
