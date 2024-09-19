@@ -528,7 +528,7 @@ export function getCurrentInstance(): RuntimeInfo {
 }
 
 export function loadCss(url: string, id: string, condition: boolean): void {
-  getCurrentInstance().stylesheet.push([url, id, condition]);
+  getCurrentInstance().stylesheets.push([url, id, condition]);
 }
 
 export function loadScript(url: string, id: string, condition: boolean): void {
