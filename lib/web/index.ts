@@ -279,7 +279,7 @@ export class Runtime {
 
   static createBindings(
     state: any,
-    element: { nodeType: any; TEXT_NODE: any; ELEMENT_NODE: any },
+    element: Element | Text,
     attributes: any
   ): void {
     if (element.nodeType === element.TEXT_NODE) {
@@ -288,7 +288,7 @@ export class Runtime {
     }
 
     if (element.nodeType === element.ELEMENT_NODE) {
-      Runtime.createElementNodeBindings(state, element, attributes);
+      Runtime.createElementNodeBindings(state, <Element>element, attributes);
       return;
     }
   }
@@ -309,12 +309,16 @@ export class Runtime {
     }
   }
 
-  static createElementNodeBindings(context: any, el: any, attrs: any): void {
+  static createElementNodeBindings(
+    context: any,
+    el: Element,
+    attrs: any
+  ): void {
     for (const attr of attrs) {
       const attribute = attr[0].trim();
       const expression = attr[1].trim();
 
-      if (attribute.charAt(0) === ":") {
+      if (attribute.charAt(0) === ":" || attribute.startsWith('bind-')) {
         Runtime.createElementNodePropertyBinding(
           context,
           el,
@@ -584,7 +588,44 @@ export function ref<T>(value?: T): Ref<T> {
   return getCurrentInstance().reactive.ref(value);
 }
 
+export function html(text: string) {
+  const dom = new DOMParser().parseFromString(text, "text/html");
+
+  return mapTree(dom, (element) => {
+    if (element.nodeType === element.TEXT_NODE) {
+      return (element as Text).textContent;
+    }
+
+    if (element.nodeType === element.ELEMENT_NODE) {
+      return [
+        element.nodeName.toLowerCase(),
+        getAttributes(element as Element),
+        [],
+      ];
+    }
+  });
+}
+
+function getAttributes(node: Element) {
+  return Array.from(node.attributes).map((a) => [a.localName, a.value]);
+}
+
 //////////////////// end of public api
+
+function mapTree(
+  tree: ChildNode | Document | DocumentFragment,
+  mapper: (node: ChildNode) => any
+) {
+  return Array.from(tree.childNodes).map((next) => {
+    const parsed = mapper(next);
+
+    if (next.childNodes?.length) {
+      parsed[2] = mapTree(next, mapper);
+    }
+
+    return parsed || '';
+  });
+}
 
 function wrapTryCatch(exp: string, fn: AnyFunction) {
   return () => {
