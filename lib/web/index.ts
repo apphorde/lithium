@@ -4,6 +4,8 @@ export interface RuntimeInfo {
   shadowDom: ShadowRootInit | boolean;
   reactive: ReactiveContext;
   element: Element;
+  stylesheets: string[];
+  scripts: string[];
   $state: any;
   $stateKeys: string[];
   $stateArgs: any[];
@@ -223,6 +225,52 @@ export class DOM {
 
     el.setAttribute(attribute, String(value));
   }
+
+  static loadCss(el: Element, href: string, id: string, condition: boolean) {
+    const parent = el.shadowRoot || document.head;
+
+    if (
+      false === condition ||
+      (id && parent.querySelector(`[id="css-${id}"]`))
+    ) {
+      return;
+    }
+
+    const tag = document.createElement("link");
+    tag.rel = "stylesheet";
+    tag.href = href;
+
+    if (id) {
+      tag.id = "css-" + id;
+    }
+
+    parent.appendChild(tag);
+  }
+
+  static loadScript(el: Element, href: string, id: string, condition: boolean) {
+    const parent = el.shadowRoot || document.head;
+
+    if (
+      false === condition ||
+      (id && parent.querySelector(`[id="js-${id}"]`))
+    ) {
+      return;
+    }
+
+    const tag = document.createElement("script");
+    tag.src = src;
+
+    if (id) {
+      tag.id = "js-" + id;
+    }
+
+    const { shadowDom, element } = getCurrentInstance();
+    if (shadowDom && element.shadowRoot) {
+      element.shadowRoot.appendChild(tag);
+    } else {
+      parent.append(tag);
+    }
+  }
 }
 
 export class Runtime {
@@ -259,7 +307,8 @@ export class Runtime {
   }
 
   static createDom(): void {
-    const { element, nodes, shadowDom, $state } = getCurrentInstance();
+    const { element, nodes, shadowDom, stylesheets, scripts, $state } =
+      getCurrentInstance();
     const dom = DOM.materialize(
       nodes,
       (el, attrs) => Runtime.createBindings($state, el, attrs),
@@ -270,11 +319,18 @@ export class Runtime {
 
     if (!shadowDom) {
       element.append(dom);
-      return;
+    } else {
+      element.attachShadow(shadowDom as ShadowRootInit);
+      element.shadowRoot.append(dom);
     }
 
-    element.attachShadow(shadowDom as ShadowRootInit);
-    element.shadowRoot.append(dom);
+    for ([a, b, c] of stylesheets) {
+      DOM.loadCss(element, a, b, c);
+    }
+
+    for ([a, b, c] of scripts) {
+      DOM.loadScript(element, a, b, c);
+    }
   }
 
   static compileExpression(expression: string, context: any): AnyFunction {
@@ -471,51 +527,12 @@ export function getCurrentInstance(): RuntimeInfo {
   return stack[stack.length - 1];
 }
 
-export function loadCss(href: string, id: string, condition: boolean): void {
-  if (
-    false === condition ||
-    (id && document.head.querySelector(`[id="css-${id}"]`))
-  ) {
-    return;
-  }
-
-  const tag = document.createElement("link");
-  tag.rel = "stylesheet";
-  tag.href = href;
-
-  if (id) {
-    tag.id = "css-" + id;
-  }
-
-  const { shadowDom, element } = getCurrentInstance();
-  if (shadowDom && element.shadowRoot) {
-    element.shadowRoot.appendChild(tag);
-  } else {
-    document.head.append(tag);
-  }
+export function loadCss(url: string, id: string, condition: boolean): void {
+  getCurrentInstance().stylesheet.push([url, id, condition]);
 }
 
-export function loadScript(src: string, id: string, condition: boolean): void {
-  if (
-    false === condition ||
-    (id && document.head.querySelector(`[id="js-${id}"]`))
-  ) {
-    return;
-  }
-
-  const tag = document.createElement("script");
-  tag.src = src;
-
-  if (id) {
-    tag.id = "js-" + id;
-  }
-
-  const { shadowDom, element } = getCurrentInstance();
-  if (shadowDom && element.shadowRoot) {
-    element.shadowRoot.appendChild(tag);
-  } else {
-    document.head.append(tag);
-  }
+export function loadScript(url: string, id: string, condition: boolean): void {
+  getCurrentInstance().scripts.push([url, id, condition]);
 }
 
 export function onInit(fn: VoidFunction): void {
