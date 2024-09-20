@@ -20,14 +20,11 @@ export function check(target: ObservableContext): void {
   }
 }
 
-export function watchValue<T>(
-  valueGetter: () => T,
-  effect: (value: T) => void
-): VoidFunction {
+export function watchValue<T>(valueGetter: Ref<T> | (() => T), effect: (value: T) => void): VoidFunction {
   let lastValue: T | undefined;
 
   return function () {
-    const value = valueGetter();
+    const value = isRef<T>(valueGetter) ? unref(valueGetter) : valueGetter();
 
     if (value !== lastValue && !Number.isNaN(value)) {
       lastValue = value;
@@ -36,16 +33,9 @@ export function watchValue<T>(
   };
 }
 
-export function reactive<T extends object>(
-  object: T,
-  callback: VoidFunction
-): T {
+export function reactive<T extends object>(object: T, callback: VoidFunction): T {
   // wrapping HTML elements with proxies leads to sad panda
-  if (
-    (object === null && object !== undefined) ||
-    watchedObject in object ||
-    isElement(object)
-  ) {
+  if ((object === null && object !== undefined) || watchedObject in object || isElement(object)) {
     return object;
   }
 
@@ -101,11 +91,7 @@ function refDebounce<T>(initialValue: T | null, options: RefOptions) {
   };
 }
 
-export function ref<T>(
-  initialValue: T | null,
-  effect: AnyFunction,
-  options?: RefOptions
-): Ref<T> {
+export function ref<T>(initialValue: T | null, effect: AnyFunction, options?: RefOptions): Ref<T> {
   if (options?.debounce) {
     return reactive(refDebounce(initialValue, options), effect) as Ref<T>;
   }
@@ -139,8 +125,8 @@ export class ReactiveContext implements ObservableContext {
     this.check = check.bind(null, this);
   }
 
-  watch<T>(getter: () => T, effect?: AnyFunction): void {
-    if (typeof getter !== "function") {
+  watch<T>(getter: Ref<T> | (() => T), effect?: AnyFunction): void {
+    if (typeof getter !== "function" && !isRef(getter)) {
       throw new Error("Watched expression must be a function");
     }
 
@@ -148,7 +134,7 @@ export class ReactiveContext implements ObservableContext {
       throw new Error("Watcher effect must be a function");
     }
 
-    this.observers.push(effect ? watchValue(getter, effect) : getter);
+    this.observers.push(effect ? watchValue(getter, effect) : (getter as any));
   }
 
   ref<T>(initialValue: T | null, options?: RefOptions): Ref<T> {
