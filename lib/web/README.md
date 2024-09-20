@@ -53,7 +53,6 @@ function setup() {
 
 At runtime, the `html` helper function can help with parsing an HTML text, as long as the "long form" syntax is used for bindings and events.
 
-
 ```ts
 import { html, createComponent, defineProps } from '@lithium/web';
 
