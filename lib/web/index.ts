@@ -307,14 +307,14 @@ function ensureDisplayBlock(name: string) {
   }
 }
 
-export function compileExpression(expression: string, context: any, args: string[] = []): AnyFunction {
+export function compileExpression(expression: string, args: string[] = []): AnyFunction {
   const { state, stateKeys } = getCurrentInstance();
   const code = `const {${stateKeys.filter((k) => expression.includes(k)).join(",")}} = $state;\nreturn ${expression}`;
   const parsed = domParser.parseFromString(code, "text/html");
-  const final = parsed.body.innerText.trim();
+  const finalCode = parsed.body.innerText.trim();
   const functionType = expression.includes("await ") ? AsyncFunction : Function;
 
-  return functionType(...["$state", ...args], `return ${final}`).bind(context, state);
+  return functionType(...["$state", ...args], finalCode).bind(state, state);
 }
 
 ////////// Custom Elements API
@@ -401,7 +401,7 @@ export function createTextNodeBinding(state: any, el: Text): void {
     const expression =
       "`" + text.replace(/\{\{([\s\S]+?)}}/g, (_: any, inner: string) => "${ " + inner.trim() + " }") + "`";
     el.textContent = "";
-    const fn = compileExpression(expression, state);
+    const fn = compileExpression(expression);
     watch(wrapTryCatch(expression, fn), (v?: any) => setText(el, v));
   }
 }
@@ -438,10 +438,10 @@ export function createElementNodeBindings(state: any, el: Element, attrs: any): 
   }
 }
 
-export function createElementNodeEventBinding(context: any, el: any, attribute: string, expression: any): void {
+export function createElementNodeEventBinding(state: any, el: Element, attribute: string, expression: string): void {
   const normalized = attribute.startsWith("@") ? attribute.slice(1) : attribute.replace("on-", "");
   const [eventName, ...flags] = normalized.split(".");
-  const exec = compileExpression(expression, context, ["$event"]);
+  const exec = compileExpression(expression, ["$event"]);
   const options = {};
 
   for (const flag of eventFlags) {
@@ -475,24 +475,24 @@ export function createElementNodeRefBinding(
   }
 }
 
-export function createElementNodeClassBinding(context: any, el: any, attribute: string, expression: any): void {
+export function createElementNodeClassBinding(state: any, el: any, attribute: string, expression: string): void {
   const classNames = attribute.replace(".class.", "").replace("class-", "");
-  const fn = compileExpression(expression, context);
+  const fn = compileExpression(expression);
   watch(wrapTryCatch(expression, fn), (v?: any) => setClassName(el, classNames, v));
 }
 
-export function createElementNodeStyleBinding(context: any, el: any, attribute: string, expression: any): void {
+export function createElementNodeStyleBinding(state: any, el: any, attribute: string, expression: string): void {
   const style = attribute.replace(".style.", "");
-  const fn = compileExpression(expression, context);
+  const fn = compileExpression(expression);
   watch(wrapTryCatch(expression, fn), (v: any) => setStyle(el, style, v));
 }
 
-export function createElementNodePropertyBinding(context: any, el: any, attribute: string, expression: any): void {
+export function createElementNodePropertyBinding(state: any, el: any, attribute: string, expression: string): void {
   const name = attribute.startsWith("@")
     ? attribute.slice(1)
     : attribute.replace("bind-", "").replace(/([-]{1}[a-z]{1})+/g, (s) => s.slice(1).toUpperCase());
 
-  const fn = compileExpression(expression, context);
+  const fn = compileExpression(expression);
 
   watch(wrapTryCatch(expression, fn), (v: any) => setProperty(el, name, v));
 }
@@ -503,7 +503,7 @@ function wrapTryCatch(exp: string, fn: AnyFunction) {
       const v = fn();
       return unref(v);
     } catch (e) {
-      console.log(exp, e);
+      console.log("Error: " + exp, e);
     }
   };
 }
