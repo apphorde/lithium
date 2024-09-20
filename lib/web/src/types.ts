@@ -1,7 +1,7 @@
 import type { ReactiveContext } from "@lithium/reactive";
 
 export interface RuntimeInfo {
-  shadowDom: ShadowRootInit | boolean;
+  shadowDom?: ShadowRootInit;
   reactive: ReactiveContext;
   element: Element;
   props: any;
@@ -19,7 +19,7 @@ export interface RuntimeInfo {
 export interface RuntimeDefinitions {
   setup: Function;
   template: any[];
-  shadowDom: any;
+  shadowDom?: ShadowRootInit;
 }
 
 export type AnyFunction = (...args: any) => any;

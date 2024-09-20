@@ -1,10 +1,14 @@
-import { Ref, unref, isRef } from "@lithium/reactive";
-import type { AnyFunction, RuntimeInfo } from "./types.js";
-import { DOM } from "./dom.js";
+import { Ref, unref, isRef, ReactiveContext } from "@lithium/reactive";
+import type { AnyFunction, RuntimeDefinitions, RuntimeInfo } from "./types.js";
 
 const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
 const domParser = new DOMParser();
+const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
 const stack: RuntimeInfo[] = [];
+
+export type EventEmitter = (event: string, detail: any) => void;
+
+///// Setup API
 
 export function getCurrentInstance(): RuntimeInfo {
   return stack[stack.length - 1];
@@ -38,8 +42,7 @@ export function computed<T>(fn: () => T): Ref<T> {
   return $ref;
 }
 
-export type EventEmitterFn = (event: string, detail: any) => void;
-export function defineEvents(eventNames: any): EventEmitterFn {
+export function defineEvents(eventNames: any): EventEmitter {
   const el = getCurrentInstance().element;
 
   for (const event of eventNames) {
@@ -213,8 +216,7 @@ export function createState($el: RuntimeInfo): void {
 export function createDom($el: RuntimeInfo): void {
   $el ||= getCurrentInstance();
   const { element, template, shadowDom, stylesheets, scripts, state } = $el;
-
-  const dom = DOM.materialize(template, (el, attrs) => createBindings(state, el, attrs), {});
+  const dom = materialize(template, (el, attrs) => createBindings(state, el, attrs), {});
 
   element.innerHTML = "";
 
@@ -226,11 +228,11 @@ export function createDom($el: RuntimeInfo): void {
   }
 
   for (const [a, b, c] of stylesheets) {
-    DOM.loadCss(element, a, b, c);
+    injectCssIntoElement(element, a, b, c);
   }
 
   for (const [a, b, c] of scripts) {
-    DOM.loadScript(element, a, b, c);
+    injectScriptIntoElement(element, a, b, c);
   }
 }
 
@@ -255,7 +257,62 @@ export function compileExpression(expression: string, context: any, args: string
   return parseText(expression, [...stateKeys, ...args]).bind(context, ...stateArgs);
 }
 
-/////////// Runtime API
+////////// Custom Elements API
+
+export const noop = () => {};
+export const DefineComponent = Symbol("@@def");
+
+export function createComponent(name: string, def: RuntimeDefinitions): void {
+  if (customElements.get(name)) {
+    customElements.get(name)![DefineComponent] = def;
+    // TODO propagate updates to all instances
+    return;
+  }
+
+  class Component extends HTMLElement {
+    private __destroy: AnyFunction;
+
+    connectedCallback() {
+      mount(this, Component[DefineComponent]);
+    }
+
+    disconnectedCallback() {
+      if (!this.isConnected && this.__destroy) {
+        queueMicrotask(this.__destroy);
+      }
+    }
+  }
+
+  Component[DefineComponent] = def;
+  customElements.define(name, Component);
+}
+
+export function mount(element: Element | string, def: RuntimeDefinitions, props?) {
+  if (typeof element === "string") {
+    element = document.querySelector(element);
+  }
+
+  const { setup, template, shadowDom } = def;
+  const $el = {
+    shadowDom,
+    element,
+    props,
+    setup,
+    stylesheets: [],
+    scripts: [],
+    template,
+    state: {},
+    stateKeys: [],
+    stateArgs: [],
+    init: null,
+    destroy: null,
+    reactive: new ReactiveContext(),
+  };
+
+  return Promise.resolve($el).then(createInstance);
+}
+
+///// Runtime API
 
 const eventFlags = ["capture", "once", "passive", "stop", "prevent"];
 
@@ -279,7 +336,7 @@ export function createTextNodeBinding(state: any, el: Text): void {
       "`" + text.replace(/\{\{([\s\S]+?)}}/g, (_: any, inner: string) => "${ " + inner.trim() + " }") + "`";
     el.textContent = "";
     const fn = compileExpression(expression, state);
-    watch(wrapTryCatch(expression, fn), (v?: any) => DOM.setText(el, v));
+    watch(wrapTryCatch(expression, fn), (v?: any) => setText(el, v));
   }
 }
 
@@ -325,7 +382,7 @@ export function createElementNodeEventBinding(context: any, el: any, attribute: 
     options[flag] = flags.includes(flag);
   }
 
-  DOM.attachHandler(
+  setEventHandler(
     el,
     eventName,
     (e: any) => {
@@ -355,13 +412,13 @@ export function createElementNodeRefBinding(
 export function createElementNodeClassBinding(context: any, el: any, attribute: string, expression: any): void {
   const classNames = attribute.replace(".class.", "").replace("class-", "");
   const fn = compileExpression(expression, context);
-  watch(wrapTryCatch(expression, fn), (v?: any) => DOM.setClassName(el, classNames, v));
+  watch(wrapTryCatch(expression, fn), (v?: any) => setClassName(el, classNames, v));
 }
 
 export function createElementNodeStyleBinding(context: any, el: any, attribute: string, expression: any): void {
   const style = attribute.replace(".style.", "");
   const fn = compileExpression(expression, context);
-  watch(wrapTryCatch(expression, fn), (v: any) => DOM.setStyle(el, style, v));
+  watch(wrapTryCatch(expression, fn), (v: any) => setStyle(el, style, v));
 }
 
 export function createElementNodePropertyBinding(context: any, el: any, attribute: string, expression: any): void {
@@ -371,7 +428,7 @@ export function createElementNodePropertyBinding(context: any, el: any, attribut
 
   const fn = compileExpression(expression, context);
 
-  watch(wrapTryCatch(expression, fn), (v: any) => DOM.setProperty(el, name, v));
+  watch(wrapTryCatch(expression, fn), (v: any) => setProperty(el, name, v));
 }
 
 function wrapTryCatch(exp: string, fn: AnyFunction) {
@@ -383,4 +440,150 @@ function wrapTryCatch(exp: string, fn: AnyFunction) {
       console.log(exp, e);
     }
   };
+}
+
+////// DOM updates
+
+export function setProperty(el: Element, property: string, value: any): void {
+  el[property] = unref(value);
+}
+
+export function setEventHandler(el: EventTarget, eventName: string, handler: AnyFunction, options?: any): void {
+  el.addEventListener(
+    eventName,
+    (event: { stopPropagation: () => any; preventDefault: () => any }) => {
+      options.stop && event.stopPropagation();
+      options.prevent && event.preventDefault();
+      handler(event);
+    },
+    options
+  );
+}
+
+export function setClassName(el: Element, classNames: string, value: any): void {
+  for (const cls of classNames.split(".")) {
+    el.classList.toggle(cls, value);
+  }
+}
+
+export function setStyle(el: HTMLElement, key: string, value: any): void {
+  el.style[key] = value;
+}
+
+export function setText(el: Text, text: any): void {
+  el.textContent = String(text);
+}
+
+export function setAttribute(el: Element, attribute: string, value: boolean): void {
+  if (!validAttribute.test(attribute)) {
+    return;
+  }
+
+  if (typeof value === "boolean" && value === false) {
+    el.removeAttribute(attribute);
+    return;
+  }
+
+  el.setAttribute(attribute, String(value));
+}
+
+export function injectCssIntoElement(el: Element, href: string, id: string, condition: boolean) {
+  const parent = el.shadowRoot || document.head;
+
+  if (false === condition || (id && parent.querySelector(`[id="css-${id}"]`))) {
+    return;
+  }
+
+  const tag = document.createElement("link");
+  tag.rel = "stylesheet";
+  tag.href = href;
+
+  if (id) {
+    tag.id = "css-" + id;
+  }
+
+  parent.appendChild(tag);
+}
+
+export function injectScriptIntoElement(el: Element, src: string, id: string, condition: boolean) {
+  const parent = el.shadowRoot || document.head;
+
+  if (false === condition || (id && parent.querySelector(`[id="js-${id}"]`))) {
+    return;
+  }
+
+  const tag = document.createElement("script");
+  tag.src = src;
+
+  if (id) {
+    tag.id = "js-" + id;
+  }
+
+  parent.append(tag);
+}
+
+export function materialize(
+  node: any,
+  visitor: (el: any, attr?: any) => void,
+  context?: { ns?: any }
+): Element | Text | DocumentFragment | Comment {
+  // text
+  if (typeof node === "string") {
+    const txt = document.createTextNode(node);
+    visitor(txt);
+    return txt;
+  }
+
+  const [t, attributes = 0, children = []] = node;
+
+  // document
+  // node = ['#d', 0, [...]]
+  if ("#" === t) {
+    const doc = document.createDocumentFragment();
+
+    if (Array.isArray(children) && children.length) {
+      doc.append(...children.map((next) => materialize(next, visitor, context)));
+    }
+
+    return doc;
+  }
+
+  // comment
+  // node = ['!', 'text']
+  if ("!" === t) {
+    return document.createComment(attributes);
+  }
+
+  // element
+  // node = [tag, attrs, children]
+  if ("svg" === t) {
+    context.ns = "http://www.w3.org/2000/svg";
+  }
+
+  const el = context.ns ? document.createElementNS(context.ns, t) : document.createElement(t);
+  visitor(el, attributes);
+
+  if (attributes) {
+    for (const attr of attributes) {
+      setAttribute(el, attr[0], attr[1]);
+    }
+  }
+
+  // single child, a text node
+  if (typeof children === "string") {
+    el.append(materialize([children], visitor));
+  }
+
+  // a mix of nodes and string
+  if (Array.isArray(children) && children.length) {
+    for (const next of children) {
+      el.append(materialize(next, visitor, context));
+    }
+  }
+
+  if ("svg" === t) {
+    context.ns = "";
+  }
+
+  return el;
 }

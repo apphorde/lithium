@@ -1,6 +1,6 @@
-import { parseArgs } from "./parse-args";
-import compile from "./compile";
-import publish from "./publish";
+import { parseArgs } from "./src/parse-args.js";
+import compile from "./src/compile.js";
+import publish from "./src/publish.js";
 
 async function main() {
   const args = parseArgs();

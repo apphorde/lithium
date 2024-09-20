@@ -1,26 +1,21 @@
-import type {
-  ChildNode,
-  DocumentNode,
-  ElementNode,
-  ParserNode,
-  TextNode,
-} from "@lithium/html-parser";
+import type { ChildNode, DocumentNode, ElementNode, ParserNode, TextNode } from "@lithium/html-parser";
 import type { FunctionDeclaration, VariableDeclaration } from "acorn";
 import { parse as parseHTML, pack } from "@lithium/html-parser";
 import { parse as parseJS } from "acorn";
 
 const doc: DocumentNode = { type: "document", docType: "html", children: [] };
 const NO_SETUP = "export default function defineComponent(){return {};}";
-const EMPTY_NODE = { type: "element", tag: "", children: [], attributes: [] };
-const EMPTY_TEMPLATE = JSON.stringify(pack({ ...doc, children: [["div"]] }));
+const EMPTY_NODE: ElementNode = { type: "element", selfClose: false, tag: "", children: [], attributes: [] };
+const EMPTY_TEMPLATE = JSON.stringify(
+  pack({ ...doc, children: [{ type: "element", children: [], attributes: [], selfClose: false, tag: "div" }] })
+);
 
 export function findNode(nodes: DocumentNode, tag: string): ElementNode {
-  return nodes.children.find((n) => n.type === "element" && n.tag === tag);
+  return nodes.children.find((n) => n.type === "element" && n.tag === tag) as ElementNode;
 }
 
 export function getSetupCode(setupNode: ElementNode): string {
-  const setupSource =
-    setupNode.children.find((s) => s.type === "text").text || "";
+  const setupSource = setupNode.children.find((s) => s.type === "text").text || "";
 
   if (!setupSource) {
     return NO_SETUP;
@@ -31,19 +26,13 @@ export function getSetupCode(setupNode: ElementNode): string {
     sourceType: "module",
   });
 
-  const startOfSetupCode = ast.body.reduce(
-    (at, n) => (n.type === "ImportDeclaration" ? Math.max(at, n.end) : at),
-    0
-  );
+  const startOfSetupCode = ast.body.reduce((at, n) => (n.type === "ImportDeclaration" ? Math.max(at, n.end) : at), 0);
   const imports = setupSource.slice(0, startOfSetupCode);
   const setupCode = setupSource.slice(startOfSetupCode);
 
-  const topLevelNodes: Array<FunctionDeclaration | VariableDeclaration> =
-    ast.body.filter(
-      (node) =>
-        node.type == "VariableDeclaration" ||
-        node.type === "FunctionDeclaration"
-    );
+  const topLevelNodes: Array<FunctionDeclaration | VariableDeclaration> = ast.body.filter(
+    (node) => node.type == "VariableDeclaration" || node.type === "FunctionDeclaration"
+  );
 
   const ids = topLevelNodes.flatMap((node) =>
     "id" in node
@@ -110,9 +99,7 @@ export function parseSFC(source: string) {
 
   const setup = getSetupCode(setupNode);
   const template = getTemplateCode(templateNode);
-  const shadowDomOption = templateNode.attributes.find(
-    (a) => a.name === "shadow-dom"
-  );
+  const shadowDomOption = templateNode.attributes.find((a) => a.name === "shadow-dom");
 
   const shadowDom = !shadowDomOption
     ? false
