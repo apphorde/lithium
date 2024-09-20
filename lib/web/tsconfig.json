@@ -4,7 +4,8 @@
   "compilerOptions": {
     "outDir": ".",
     "paths": {
-      "@lithium/reactive": ["../reactive/*"]
+      "@lithium/reactive": ["../reactive/*"],
+      "@lithium/html-parser": ["../html-parser/*"]
     }
   }
 }

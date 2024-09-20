@@ -3,6 +3,7 @@
   "exports": "./index.js",
   "targets": {
     "build": {},
+    "tsc": {},
     "test": {
       "options": {
         "command": "npx tsx {projectRoot}/index.spec.ts"

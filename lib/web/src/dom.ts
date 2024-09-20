@@ -1,10 +1,10 @@
+import type { AnyFunction } from "./types";
+import { unref } from "@lithium/reactive";
+
+const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
+
 export class DOM {
-  static attachHandler(
-    el: EventTarget,
-    eventName: string,
-    handler: AnyFunction,
-    options?: any
-  ): void {
+  static attachHandler(el: EventTarget, eventName: string, handler: AnyFunction, options?: any): void {
     el.addEventListener(
       eventName,
       (event: { stopPropagation: () => any; preventDefault: () => any }) => {
@@ -14,11 +14,6 @@ export class DOM {
       },
       options
     );
-  }
-
-  static emitEvent(element: Element, eventName: string, detail: any): void {
-    const event = new CustomEvent(eventName, { detail });
-    element.dispatchEvent(event);
   }
 
   static setProperty(el: Element, property: string, value: any): void {
@@ -37,33 +32,6 @@ export class DOM {
 
   static setText(el: Text, text: any): void {
     el.textContent = String(text);
-  }
-
-  static defineEvent(el: Element, name: string): void {
-    const property = "on" + name.toLowerCase();
-    let handler: AnyFunction = el[property];
-
-    Object.defineProperty(el, property, {
-      get() {
-        return handler;
-      },
-      set(v) {
-        handler = v;
-      },
-    });
-  }
-
-  static compileExpression(
-    expression: string,
-    args: string[] = []
-  ): AnyFunction {
-    const parsed = domParser.parseFromString(expression, "text/html");
-    const code = parsed.body.innerText.trim();
-
-    return (expression.startsWith("await") ? AsyncFunction : Function)(
-      ...args,
-      `return ${code}`
-    );
   }
 
   static materialize(
@@ -86,9 +54,7 @@ export class DOM {
       const doc = document.createDocumentFragment();
 
       if (Array.isArray(children) && children.length) {
-        doc.append(
-          ...children.map((next) => DOM.materialize(next, visitor, context))
-        );
+        doc.append(...children.map((next) => DOM.materialize(next, visitor, context)));
       }
 
       return doc;
@@ -106,9 +72,7 @@ export class DOM {
       context.ns = "http://www.w3.org/2000/svg";
     }
 
-    const el = context.ns
-      ? document.createElementNS(context.ns, t)
-      : document.createElement(t);
+    const el = context.ns ? document.createElementNS(context.ns, t) : document.createElement(t);
     visitor(el, attributes);
 
     if (attributes) {
@@ -150,10 +114,7 @@ export class DOM {
   static loadCss(el: Element, href: string, id: string, condition: boolean) {
     const parent = el.shadowRoot || document.head;
 
-    if (
-      false === condition ||
-      (id && parent.querySelector(`[id="css-${id}"]`))
-    ) {
+    if (false === condition || (id && parent.querySelector(`[id="css-${id}"]`))) {
       return;
     }
 
@@ -168,13 +129,10 @@ export class DOM {
     parent.appendChild(tag);
   }
 
-  static loadScript(el: Element, href: string, id: string, condition: boolean) {
+  static loadScript(el: Element, src: string, id: string, condition: boolean) {
     const parent = el.shadowRoot || document.head;
 
-    if (
-      false === condition ||
-      (id && parent.querySelector(`[id="js-${id}"]`))
-    ) {
+    if (false === condition || (id && parent.querySelector(`[id="js-${id}"]`))) {
       return;
     }
 
@@ -185,11 +143,6 @@ export class DOM {
       tag.id = "js-" + id;
     }
 
-    const { shadowDom, element } = getCurrentInstance();
-    if (shadowDom && element.shadowRoot) {
-      element.shadowRoot.appendChild(tag);
-    } else {
-      parent.append(tag);
-    }
+    parent.append(tag);
   }
 }

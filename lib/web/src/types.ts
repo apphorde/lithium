@@ -1,10 +1,12 @@
+import type { ReactiveContext } from "@lithium/reactive";
+
 export interface RuntimeInfo {
   shadowDom: ShadowRootInit | boolean;
   reactive: ReactiveContext;
   element: Element;
   props: any;
-  stylesheets: string[];
-  scripts: string[];
+  stylesheets: Array<[string, string, boolean]>;
+  scripts: Array<[string, string, boolean]>;
   state: any;
   stateKeys: string[];
   stateArgs: any[];
@@ -20,3 +22,4 @@ export interface RuntimeDefinitions {
   shadowDom: any;
 }
 
+export type AnyFunction = (...args: any) => any;

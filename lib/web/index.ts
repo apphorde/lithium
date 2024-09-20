@@ -1,17 +1,9 @@
-import { ReactiveContext, Ref, unref, isRef } from "@lithium/reactive";
-import { Runtime } from "./runtime.js";
-import type { RuntimeDefinitions } from "./types";
+import { ReactiveContext } from "@lithium/reactive";
+import { createInstance } from "./src/setup.js";
+import type { AnyFunction, RuntimeDefinitions } from "./src/types";
 
-export * from "./runtime.js";
-export * from "./dom.js";
-export * from "./setup.js";
-
-type AnyFunction = (...args: any) => any;
-
-const eventFlags = ["capture", "once", "passive", "stop", "prevent"];
-const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
-const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
-const domParser = new DOMParser();
+export * from "./src/dom.js";
+export * from "./src/setup.js";
 
 export const noop = () => {};
 export const DefineComponent = Symbol("@@def");
@@ -24,6 +16,8 @@ export function createComponent(name: string, def: RuntimeDefinitions): void {
   }
 
   class Component extends HTMLElement {
+    private __destroy: AnyFunction;
+
     connectedCallback() {
       mount(this, Component[DefineComponent]);
     }

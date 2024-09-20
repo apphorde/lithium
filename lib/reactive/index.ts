@@ -93,7 +93,7 @@ function refDebounce<T>(initialValue: T | null, options: RefOptions) {
       return v;
     },
     set value(v) {
-      return set(v);
+      set(v);
     },
     toString() {
       return String(this.value);
