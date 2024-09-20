@@ -2,8 +2,14 @@
   "workspaceLayout": { "libsDir": "./lib", "appsDir": "./lib" },
   "plugins": ["@nx/rollup/plugin"],
   "targetDefaults": {
+    "tsc": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx tsc -p {projectRoot}/tsconfig.json"
+      }
+    },
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "tsc"],
       "executor": "@nx/rollup:rollup",
       "options": {
         "rollupConfig": "{projectRoot}/rollup.config.mjs"
