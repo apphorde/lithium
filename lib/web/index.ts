@@ -77,9 +77,7 @@ export function mount(element, definitions, props?) {
     reactive: new ReactiveContext(),
   };
 
-  queueMicrotask(() => Runtime.init($el));
-
-  return $el;
+  return Promise.resolve($el).then(Runtime.init);
 }
 
 export class DOM {
@@ -303,6 +301,7 @@ export class Runtime {
     }
 
     stack.pop();
+    return $el;
   }
 
   static createInstance(): void {
@@ -568,9 +567,8 @@ export function computed<T>(fn: () => T): Ref<T> {
   return $ref;
 }
 
-export function defineEvents(
-  eventNames: any
-): (event: string, detail: any) => void {
+export type EventEmitterFn = (event: string, detail: any) => void;
+export function defineEvents(eventNames: any): EventEmitterFn {
   const el = getCurrentInstance().element;
 
   for (const event of eventNames) {
@@ -602,6 +600,10 @@ export function defineProps(definitions: {}): any {
     const $ref = $el.reactive.ref(initialValue);
     $state[property] = $ref;
     props[property] = $ref;
+
+    if (element.nodeType !== element.ELEMENT_NODE) {
+      return;
+    }
 
     Object.defineProperty(element, property, {
       get() {
