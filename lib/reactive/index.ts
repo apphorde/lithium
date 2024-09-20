@@ -130,7 +130,7 @@ export class ReactiveContext implements ObservableContext {
       throw new Error("Watched expression must be a function");
     }
 
-    if (effect && typeof getter !== "function") {
+    if (effect && typeof effect !== "function") {
       throw new Error("Watcher effect must be a function");
     }
 
