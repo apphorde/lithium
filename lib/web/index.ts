@@ -158,7 +158,11 @@ export function ref<T>(value?: T, options?): Ref<T> {
 
 export function html(text: string) {
   const dom = new DOMParser().parseFromString(text, "text/html");
-  const tree = mapTree(dom.body, (element) => {
+  return parseDomTree(dom.body);
+}
+
+export function parseDomTree(tree) {
+  const children = mapTree(tree, (element) => {
     if (element.nodeType === element.TEXT_NODE) {
       return (element as Text).textContent;
     }
@@ -168,7 +172,7 @@ export function html(text: string) {
     }
   });
 
-  return ["#", "html", tree];
+  return ["#", "html", children];
 }
 
 function mapTree(tree: ChildNode | Document | DocumentFragment, mapper: (node: ChildNode) => any) {
