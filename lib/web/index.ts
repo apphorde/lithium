@@ -265,12 +265,13 @@ export function createState($el: RuntimeInfo): void {
   $el ||= getCurrentInstance();
   const componentData = $el.setup($el, $el.element);
   $el.state = $el.reactive.watchDeep({ ...componentData, ...$el.state });
+  $el.stateKeys = Object.keys($el.state);
 
   if ($el.parent) {
     $el.state = createObjectDelegate($el.parent, $el.state, $el.reactive.check);
+    $el.stateKeys = $el.stateKeys.concat($el.parent.stateKeys);
   }
 
-  $el.stateKeys = Object.keys($el.state);
   $el.stateArgs = $el.stateKeys.map((key) => $el.state[key]);
 }
 
