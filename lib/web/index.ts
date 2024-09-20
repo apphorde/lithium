@@ -307,16 +307,14 @@ function ensureDisplayBlock(name: string) {
   }
 }
 
-function parseText(expression: string, args: string[] = []): AnyFunction {
-  const parsed = domParser.parseFromString(expression, "text/html");
-  const code = parsed.body.innerText.trim();
-
-  return (expression.startsWith("await") ? AsyncFunction : Function)(...args, `return ${code}`);
-}
-
 export function compileExpression(expression: string, context: any, args: string[] = []): AnyFunction {
-  const { stateKeys, stateArgs } = getCurrentInstance();
-  return parseText(expression, [...stateKeys, ...args]).bind(context, ...stateArgs);
+  const { state, stateKeys } = getCurrentInstance();
+  const code = `const {${stateKeys.filter((k) => expression.includes(k)).join(",")}} = $state;\nreturn ${expression}`;
+  const parsed = domParser.parseFromString(code, "text/html");
+  const final = parsed.body.innerText.trim();
+  const functionType = expression.includes("await ") ? AsyncFunction : Function;
+
+  return functionType(...["$state", ...args], `return ${final}`).bind(context, state);
 }
 
 ////////// Custom Elements API
