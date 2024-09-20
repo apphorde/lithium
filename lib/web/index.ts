@@ -10,7 +10,6 @@ export interface RuntimeInfo {
   state: any;
   parent: any;
   stateKeys: string[];
-  stateArgs: any[];
   template: any[];
   setup: Function;
   init: VoidFunction | null;
@@ -252,7 +251,7 @@ export function createObjectDelegate(base: any, delegate: any, callback = noop) 
   );
 }
 export function forkState(parentContext, newContext) {
-  const newState = createObjectDelegate(parentContext, newContext, parentContext.reactive.check);
+  const newState = createObjectDelegate(parentContext.state, newContext, parentContext.reactive.check);
   const stateKeys = parentContext.stateKeys.concat(Object.keys(newContext));
 
   return {
@@ -268,11 +267,9 @@ export function createState($el: RuntimeInfo): void {
   $el.stateKeys = Object.keys($el.state);
 
   if ($el.parent) {
-    $el.state = createObjectDelegate($el.parent, $el.state, $el.reactive.check);
+    $el.state = createObjectDelegate($el.parent.state, $el.state, $el.reactive.check);
     $el.stateKeys = $el.stateKeys.concat($el.parent.stateKeys);
   }
-
-  $el.stateArgs = $el.stateKeys.map((key) => $el.state[key]);
 }
 
 export function createDom($el: RuntimeInfo): void {
@@ -369,7 +366,6 @@ export function mount(element: Element | string, def: ComponentDefinitions, opti
     template,
     state: {},
     stateKeys: [],
-    stateArgs: [],
     init: null,
     destroy: null,
     reactive: new ReactiveContext(),
