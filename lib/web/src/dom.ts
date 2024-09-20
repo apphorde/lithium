@@ -88,7 +88,9 @@ export class DOM {
 
     // a mix of nodes and string
     if (Array.isArray(children) && children.length) {
-      el.append(...children.map((n) => DOM.materialize(n, visitor, context)));
+      for (const n of children) {
+        el.append(DOM.materialize(n, visitor, context));
+      }
     }
 
     if ("svg" === t) {

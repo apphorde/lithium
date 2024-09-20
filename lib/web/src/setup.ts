@@ -180,8 +180,8 @@ export async function createInstance($el: RuntimeInfo): Promise<RuntimeInfo> {
     const { reactive } = $el;
     ensureDisplayBlock($el.element.nodeName);
     reactive.suspend();
-    createState();
-    createDom();
+    createState($el);
+    createDom($el);
     reactive.unsuspend();
     reactive.check();
 
@@ -201,16 +201,18 @@ export async function createInstance($el: RuntimeInfo): Promise<RuntimeInfo> {
   return $el;
 }
 
-export function createState(): void {
-  const $el = getCurrentInstance();
+export function createState($el: RuntimeInfo): void {
+  $el ||= getCurrentInstance();
   const componentData = $el.setup($el, $el.element);
   $el.state = $el.reactive.watchDeep({ ...componentData, ...$el.state });
   $el.stateKeys = Object.keys($el.state);
   $el.stateArgs = $el.stateKeys.map((key) => $el.state[key]);
+  ($el.element as any).$state = $el.state;
 }
 
-export function createDom(): void {
-  const { element, template, shadowDom, stylesheets, scripts, state } = getCurrentInstance();
+export function createDom($el: RuntimeInfo): void {
+  $el ||= getCurrentInstance();
+  const { element, template, shadowDom, stylesheets, scripts, state } = $el;
 
   const dom = DOM.materialize(template, (el, attrs) => createBindings(state, el, attrs), {});
 
