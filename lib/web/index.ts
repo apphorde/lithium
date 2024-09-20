@@ -279,7 +279,9 @@ export function createState($el: RuntimeInfo): void {
 export function createDom($el: RuntimeInfo): void {
   $el ||= getCurrentInstance();
   const { element, template, shadowDom, stylesheets, scripts, state } = $el;
-  const dom = materialize(template, (el, attrs) => createBindings(state, el, attrs), {});
+  const dom = materialize(template);
+  const visitor = createBindings.bind(null, state);
+  traverseDom(dom, visitor);
 
   element.innerHTML = "";
 
@@ -588,15 +590,30 @@ export function injectScriptIntoElement(el: Element, src: string, id: string, co
   parent.append(tag);
 }
 
+export function traverseDom(dom: any, visitor: AnyFunction) {
+  const stack = [dom];
+
+  while (stack.length) {
+    const next = stack.pop();
+
+    if (next.childNodes?.length) {
+      stack.push(...Array.from(next.childNodes));
+    }
+
+    visitor(next, next[Attributes]);
+  }
+}
+
+export const Attributes = Symbol("@@");
 export function materialize(
   node: any,
-  visitor: (el: any, attr?: any) => void,
+  // visitor: (el: any, attr?: any) => void,
   context?: { ns?: any }
 ): Element | Text | DocumentFragment | Comment {
   // text
   if (typeof node === "string") {
     const txt = document.createTextNode(node);
-    visitor(txt);
+    // visitor(txt);
     return txt;
   }
 
@@ -604,12 +621,16 @@ export function materialize(
 
   // document
   // node = ['#d', 0, [...]]
-  if ("#" === t) {
-    const doc = document.createDocumentFragment();
+  if ("#" === t || "template" === t) {
+    const isDoc = "#" === t;
+    const doc = isDoc ? document.createDocumentFragment() : document.createElement("template");
+    const container = isDoc ? doc : (doc as HTMLTemplateElement).content;
 
     if (Array.isArray(children) && children.length) {
-      doc.append(...children.map((next) => materialize(next, visitor, context)));
+      container.append(...children.map((next) => materialize(next, /*visitor,*/ context)));
     }
+
+    doc[Attributes] = attributes;
 
     return doc;
   }
@@ -627,7 +648,8 @@ export function materialize(
   }
 
   const el = context.ns ? document.createElementNS(context.ns, t) : document.createElement(t);
-  visitor(el, attributes);
+  el[Attributes] = attributes;
+  // visitor(el, attributes);
 
   if (attributes) {
     for (const attr of attributes) {
@@ -637,13 +659,13 @@ export function materialize(
 
   // single child, a text node
   if (typeof children === "string") {
-    el.append(materialize([children], visitor));
+    el.append(materialize([children] /*, visitor*/));
   }
 
   // a mix of nodes and string
   if (Array.isArray(children) && children.length) {
     for (const next of children) {
-      el.append(materialize(next, visitor, context));
+      el.append(materialize(next, /*visitor,*/ context));
     }
   }
 
