@@ -4,7 +4,7 @@ import type { RuntimeDefinitions } from "./types";
 
 export * from "./runtime.js";
 export * from "./dom.js";
-export * from "./public.js";
+export * from "./setup.js";
 
 type AnyFunction = (...args: any) => any;
 
@@ -19,6 +19,7 @@ export const DefineComponent = Symbol("@@def");
 export function createComponent(name: string, def: RuntimeDefinitions): void {
   if (customElements.get(name)) {
     customElements.get(name)![DefineComponent] = def;
+    // TODO propagate updates to all instances
     return;
   }
 
@@ -38,12 +39,16 @@ export function createComponent(name: string, def: RuntimeDefinitions): void {
   customElements.define(name, Component);
 }
 
-export function mount(element: Element | string, definitions, props?) {
+export function mount(
+  element: Element | string,
+  def: RuntimeDefinitions,
+  props?
+) {
   if (typeof element === "string") {
     element = document.querySelector(element);
   }
 
-  const { setup, template, shadowDom } = definitions;
+  const { setup, template, shadowDom } = def;
   const $el = {
     shadowDom,
     element,
