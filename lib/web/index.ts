@@ -384,7 +384,12 @@ export function mount(element: Element | string, def: ComponentDefinitions, opti
 
 const eventFlags = ["capture", "once", "passive", "stop", "prevent"];
 
-export function createBindings(state: any, element: Element | Text, attributes: any): void {
+interface Attribute {
+  name: string;
+  value: string;
+}
+
+export function createBindings(state: any, element: Element | Text, attributes: Array<Attribute>): void {
   if (element.nodeType === element.TEXT_NODE) {
     createTextNodeBinding(state, <Text>element);
     return;
@@ -605,15 +610,10 @@ export function traverseDom(dom: any, visitor: AnyFunction) {
 }
 
 export const Attributes = Symbol("@@");
-export function materialize(
-  node: any,
-  // visitor: (el: any, attr?: any) => void,
-  context?: { ns?: any }
-): Element | Text | DocumentFragment | Comment {
+export function materialize(node: any, context: { ns?: any } = {}): Element | Text | DocumentFragment | Comment {
   // text
   if (typeof node === "string") {
     const txt = document.createTextNode(node);
-    // visitor(txt);
     return txt;
   }
 
@@ -627,7 +627,7 @@ export function materialize(
     const container = isDoc ? doc : (doc as HTMLTemplateElement).content;
 
     if (Array.isArray(children) && children.length) {
-      container.append(...children.map((next) => materialize(next, /*visitor,*/ context)));
+      container.append(...children.map((next) => materialize(next, context)));
     }
 
     doc[Attributes] = attributes;
@@ -649,7 +649,6 @@ export function materialize(
 
   const el = context.ns ? document.createElementNS(context.ns, t) : document.createElement(t);
   el[Attributes] = attributes;
-  // visitor(el, attributes);
 
   if (attributes) {
     for (const attr of attributes) {
@@ -659,13 +658,13 @@ export function materialize(
 
   // single child, a text node
   if (typeof children === "string") {
-    el.append(materialize([children] /*, visitor*/));
+    el.append(materialize([children]));
   }
 
   // a mix of nodes and string
   if (Array.isArray(children) && children.length) {
     for (const next of children) {
-      el.append(materialize(next, /*visitor,*/ context));
+      el.append(materialize(next, context));
     }
   }
 
