@@ -161,6 +161,12 @@ export function html(text: string) {
   return parseDomTree(dom.body);
 }
 
+export function tpl(text: string) {
+  const template = document.createElement("template");
+  template.innerHTML = text;
+  return template;
+}
+
 export function parseDomTree(tree) {
   const children = mapTree(tree, (element) => {
     if (element.nodeType === element.TEXT_NODE) {
@@ -196,7 +202,7 @@ function mapTree<T extends ChildNode | Document | DocumentFragment | HTMLTemplat
     .filter((node) => node !== undefined);
 }
 
-function getAttributes(node: Element) {
+export function getAttributes(node: Element) {
   return node.attributes ? Array.from(node.attributes).map((a) => [a.localName, a.value]) : [];
 }
 
@@ -246,7 +252,7 @@ export async function createInstance($el: RuntimeInfo): Promise<RuntimeInfo> {
   return $el;
 }
 
-export function createObjectDelegate(base: any, delegate: any, callback = noop) {
+export function fork(base: any, delegate: any, callback: AnyFunction) {
   return new Proxy(
     {},
     {
@@ -254,28 +260,17 @@ export function createObjectDelegate(base: any, delegate: any, callback = noop) 
         return base.hasOwnProperty(p) ? base[p] : delegate[p];
       },
       set(_t, p, v) {
-        if (base.hasOwnProperty(p)) {
-          base[p] = v;
-        } else {
+        if (delegate.hasOwnProperty(p)) {
           delegate[p] = v;
+        } else {
+          base[p] = v;
         }
 
         callback();
-
         return true;
       },
     }
   );
-}
-
-export function forkState(parentContext, newContext) {
-  const newState = createObjectDelegate(parentContext.state, newContext, parentContext.reactive.check);
-  const stateKeys = parentContext.stateKeys.concat(Object.keys(newContext));
-
-  return {
-    state: newState,
-    stateKeys: stateKeys,
-  };
 }
 
 export function createState($el: RuntimeInfo): void {
@@ -285,11 +280,12 @@ export function createState($el: RuntimeInfo): void {
   $el.stateKeys = Object.keys($el.state);
 
   if ($el.parent) {
-    $el.state = createObjectDelegate($el.parent.state, $el.state, $el.reactive.check);
-    $el.stateKeys = $el.stateKeys.concat($el.parent.stateKeys);
+    $el.state = fork($el.parent.state, $el.state, $el.reactive.check);
+    $el.stateKeys = Object.keys($el.state).concat($el.parent.stateKeys);
   }
 
   Object.freeze($el.state);
+  Object.freeze($el.stateKeys);
 }
 
 export function createDom($el: RuntimeInfo): void {
