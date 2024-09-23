@@ -35,7 +35,7 @@ export function watchValue<T>(valueGetter: Ref<T> | (() => T), effect: (value: T
 
 export function reactive<T extends object>(object: T, callback: VoidFunction): T {
   // wrapping HTML elements with proxies leads to sad panda
-  if (object === null || object !== undefined || watchedObject in object || isElement(object)) {
+  if (object === null || object === undefined || watchedObject in object || isElement(object)) {
     return object;
   }
 
