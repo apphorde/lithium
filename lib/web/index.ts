@@ -797,31 +797,32 @@ export async function templateForOf(template: HTMLTemplateElement, $el?: Runtime
 
   const previousNodes = [];
 
-  async function updateDom(list) {
-    const parent = template.parentNode;
-
-    if (!parent) {
-      return;
-    }
-
-    list = unref(list);
-
+  function remove() {
     for (const next of previousNodes) {
       next.remove();
     }
 
     previousNodes.length = 0;
-    if (!Array.isArray(list)) {
+  }
+
+  async function add(list) {
+    const frag = await repeatTemplate($el, template, list, key, index);
+    previousNodes.push(...Array.from(frag.childNodes));
+    template.parentNode.insertBefore(frag, template);
+  }
+
+  async function updateDom(list) {
+    list = unref(list);
+    remove();
+
+    if (!template.parentNode || !Array.isArray(list)) {
       return;
     }
 
-    const frag = await repeatTemplate($el, template, list, key, index);
-    previousNodes.push(...Array.from(frag.childNodes));
-    parent.insertBefore(frag, template);
+    add(list);
   }
 
   $el.reactive.watch(() => $el.state[source], updateDom);
-  await updateDom($el.state[source]);
 }
 
 async function repeatTemplate(
