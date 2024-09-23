@@ -651,8 +651,9 @@ export function materialize(node: any, context: { ns?: any } = {}): Element | Te
     return document.createComment(attributes);
   }
 
-  // document
+  // document or template
   // node = ['#d', 0, [...]]
+  // node = ['template', 0, [...]]
   if ("#" === t || "template" === t) {
     const isDocument = "#" === t;
     const doc = isDocument ? document.createDocumentFragment() : document.createElement("template");
