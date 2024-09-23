@@ -329,7 +329,7 @@ export function createDom($el: RuntimeInfo): void {
     injectScriptIntoElement(element, a, b, c);
   }
 
-  const templates: HTMLTemplateElement[] = Array.from((element['shadowRoot'] || element).querySelectorAll("template"));
+  const templates: HTMLTemplateElement[] = Array.from((element["shadowRoot"] || element).querySelectorAll("template"));
   const templateLoops = templates.filter((t) => t.hasAttribute("for"));
   for (const t of templateLoops) {
     templateForOf(t, $el);
@@ -767,7 +767,7 @@ export async function templateIf(template, $el) {
     const fragment = document.createDocumentFragment();
     await mount(fragment, { template }, { parent: $el });
     previousNodes.push(...Array.from(fragment.childNodes));
-    template.parentElement.insertBefore(fragment, template);
+    template.parentNode.insertBefore(fragment, template);
   }
 
   function updateDom(value) {
