@@ -17,7 +17,7 @@ export interface RuntimeInfo {
 }
 
 export interface ComponentDefinitions {
-  setup: Function;
+  setup?: Function;
   template: any[];
   shadowDom?: ShadowRootInit;
 }
@@ -90,7 +90,7 @@ function getPropValue($el: RuntimeInfo, property: string, definition: any) {
     return $el.element.getAttribute(property);
   }
 
-  if (definition && definition.hasOwnProperty('default')) {
+  if (definition && definition.hasOwnProperty("default")) {
     if (typeof definition.default === "function") {
       return definition.default();
     }
@@ -744,38 +744,26 @@ const fnCache = new Map();
 
 ///// Template Behaviours
 
-export async function templateIf(template: HTMLTemplateElement, $el?: RuntimeInfo) {
+export async function templateIf(template, $el) {
   $el ||= getCurrentInstance();
 
   const expression = template.getAttribute("if");
-  const getter = compileExpression(expression);
+  const getter = compileExpression("Boolean(" + expression + ")");
   const previousNodes = [];
 
-  async function updateDom(value: any) {
-    const parent = template.parentElement;
-
-    // template is detached
-    if (!parent) {
-      for (const next of previousNodes) {
-        next.parentNode && parent.remove();
-      }
-      return;
+  function remove() {
+    for (const next of previousNodes) {
+      next.parentNode && next.remove();
     }
+    previousNodes.length = 0;
+  }
 
-    if (!unref(value)) {
-      for (const next of previousNodes) {
-        next.remove();
-      }
-      previousNodes.length = 0;
-      return;
-    }
-
+  async function add() {
     const fragment = document.createDocumentFragment();
     await mount(
       fragment,
       {
-        setup() {},
-        template: template.content.cloneNode(true) as any,
+        template: template.content.cloneNode(true),
       },
       {
         parent: $el,
@@ -783,11 +771,23 @@ export async function templateIf(template: HTMLTemplateElement, $el?: RuntimeInf
     );
 
     previousNodes.push(...Array.from(fragment.childNodes));
-    parent.insertBefore(fragment, template);
+    template.parentElement.insertBefore(fragment, template);
+  }
+
+  function updateDom(value) {
+    console.log(value);
+
+    if (!template.parentElement || !unref(value)) {
+      remove();
+      return;
+    }
+
+    if (!previousNodes.length) {
+      add();
+    }
   }
 
   $el.reactive.watch(getter, updateDom);
-  await updateDom(getter());
 }
 
 export async function templateForOf(template: HTMLTemplateElement, $el?: RuntimeInfo) {
