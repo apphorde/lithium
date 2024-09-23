@@ -175,11 +175,12 @@ export function parseDomTree(tree) {
   return ["#", "html", children];
 }
 
-function mapTree(tree: ChildNode | Document | DocumentFragment, mapper: (node: ChildNode) => any) {
-  return Array.from(tree.childNodes).map((next) => {
+function mapTree<T extends ChildNode | Document | DocumentFragment | HTMLTemplateElement>(tree: T, mapper: (node: T) => any) {
+  const nodes: T[] = tree['content'] ? tree['content'].childNodes : tree;
+  return Array.from(nodes).map((next) => {
     const parsed = mapper(next);
-
-    if (next.childNodes?.length) {
+    const nodes = next['content'] ? next['content'].childNodes : next;
+    if (nodes && nodes.length) {
       parsed[2] = mapTree(next, mapper);
     }
 
