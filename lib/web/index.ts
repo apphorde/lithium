@@ -771,7 +771,7 @@ export async function templateIf(template, $el) {
   }
 
   function updateDom(value) {
-    if (!template.parentElement || !value) {
+    if (!template.parentNode || !value) {
       remove();
       return;
     }
@@ -798,7 +798,7 @@ export async function templateForOf(template: HTMLTemplateElement, $el?: Runtime
   const previousNodes = [];
 
   async function updateDom(list) {
-    const parent = template.parentElement;
+    const parent = template.parentNode;
 
     if (!parent) {
       return;
