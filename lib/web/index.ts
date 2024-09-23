@@ -90,7 +90,7 @@ function getPropValue($el: RuntimeInfo, property: string, definition: any) {
     return $el.element.getAttribute(property);
   }
 
-  if (definition && definition.default) {
+  if (definition && definition.hasOwnProperty('default')) {
     if (typeof definition.default === "function") {
       return definition.default();
     }
