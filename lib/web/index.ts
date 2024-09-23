@@ -748,7 +748,7 @@ export async function templateIf(template, $el) {
   $el ||= getCurrentInstance();
 
   const expression = template.getAttribute("if");
-  const getter = compileExpression("Boolean(" + expression + ")");
+  const getter = compileExpression(expression);
   const previousNodes = [];
 
   function remove() {
