@@ -451,9 +451,7 @@ export function createElementNodeBindings(state: any, el: Element, attrs: any): 
     }
 
     if (attribute.startsWith(".style.")) {
-
-
-      \createElementNodeStyleBinding(state, el, attribute, expression);
+      createElementNodeStyleBinding(state, el, attribute, expression);
       continue;
     }
 
@@ -624,7 +622,7 @@ export function traverseDom(dom: any, visitor: AnyFunction) {
       stack.push(...Array.from(next.childNodes));
     }
 
-    visitor(next, next[Attributes] || []);
+    visitor(next, next[Attributes] || getAttributes(next));
   }
 }
 
