@@ -182,12 +182,12 @@ function mapTree<T extends ChildNode | Document | DocumentFragment | HTMLTemplat
   const nodes: T[] = (tree['content'] || tree).childNodes;
   return Array.from(nodes).map((next) => {
     const parsed = mapper(next);
-    const nodes: T[] = (next['content'] || next).childNodes;
+    const nodes: T[] = parsed ? (next['content'] || next).childNodes : undefined;
     if (nodes && nodes.length) {
       parsed[2] = mapTree(next, mapper);
     }
 
-    return parsed || "";
+    return parsed;
   }).filter(node => node !== undefined);
 }
 
