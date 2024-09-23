@@ -112,7 +112,7 @@ export function defineProps(definitions: string[] | Record<string, any>): any {
     props[property] = $ref;
 
     if (element.nodeType !== element.ELEMENT_NODE) {
-      return;
+      continue;
     }
 
     Object.defineProperty(element, property, {
@@ -288,6 +288,8 @@ export function createState($el: RuntimeInfo): void {
     $el.state = createObjectDelegate($el.parent.state, $el.state, $el.reactive.check);
     $el.stateKeys = $el.stateKeys.concat($el.parent.stateKeys);
   }
+
+  Object.freeze($el.state);
 }
 
 export function createDom($el: RuntimeInfo): void {
