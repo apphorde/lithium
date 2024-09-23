@@ -10,7 +10,7 @@ export interface RuntimeInfo {
   state: any;
   parent: any;
   stateKeys: string[];
-  template: any[];
+  template: HTMLTemplateElement | any[];
   setup: Function;
   init: VoidFunction | null;
   destroy: VoidFunction | null;
@@ -299,7 +299,16 @@ export function clearElement(element: Element | DocumentFragment) {
 export function createDom($el: RuntimeInfo): void {
   $el ||= getCurrentInstance();
   const { element, template, shadowDom, stylesheets, scripts, state } = $el;
-  const dom = Array.isArray(template) ? materialize(template) : template;
+  let dom: any = template;
+
+  if (Array.isArray(template)) {
+    dom = materialize(template);
+  }
+
+  if (template["content"]) {
+    dom = template["content"].cloneNode(true);
+  }
+
   const visitor = createBindings.bind(null, state);
 
   traverseDom(dom, visitor);
@@ -434,7 +443,7 @@ interface Attribute {
 
 export function createBindings(state: any, element: Element | Text, attributes: Array<Attribute>): void {
   if (element.nodeType === element.TEXT_NODE) {
-    createTextNodeBinding(state, <Text>element);
+    createTextNodeBinding(<Text>element);
     return;
   }
 
@@ -444,7 +453,7 @@ export function createBindings(state: any, element: Element | Text, attributes: 
   }
 }
 
-export function createTextNodeBinding(state: any, el: Text): void {
+export function createTextNodeBinding(el: Text): void {
   const text = el.textContent;
 
   if (text.includes("${") || text.includes("{{")) {
@@ -514,16 +523,11 @@ export function createElementNodeEventBinding(state: any, el: Element, attribute
   );
 }
 
-export function createElementNodeRefBinding(
-  context: { [x: string]: { value: any } },
-  el: unknown,
-  _attribute: any,
-  expression: string
-): void {
+export function createElementNodeRefBinding(state: any, el: unknown, _attribute: any, expression: string): void {
   const ref = expression.trim();
 
-  if (isRef(context[ref])) {
-    context[ref].value = el;
+  if (isRef(state[ref])) {
+    state[ref].value = el;
   }
 }
 
@@ -761,16 +765,7 @@ export async function templateIf(template, $el) {
 
   async function add() {
     const fragment = document.createDocumentFragment();
-    await mount(
-      fragment,
-      {
-        template: template.content.cloneNode(true),
-      },
-      {
-        parent: $el,
-      }
-    );
-
+    await mount(fragment, { template }, { parent: $el });
     previousNodes.push(...Array.from(fragment.childNodes));
     template.parentElement.insertBefore(fragment, template);
   }
@@ -805,7 +800,6 @@ export async function templateForOf(template: HTMLTemplateElement, $el?: Runtime
   async function updateDom(list) {
     const parent = template.parentElement;
 
-    // template is detached
     if (!parent) {
       return;
     }
