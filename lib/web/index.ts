@@ -3,7 +3,7 @@ import { Ref, unref, isRef, ReactiveContext } from "@lithium/reactive";
 export interface RuntimeInfo {
   shadowDom?: ShadowRootInit;
   reactive: ReactiveContext;
-  element: Element;
+  element: Element | DocumentFragment;
   props: any;
   stylesheets: Array<[string, string, boolean]>;
   scripts: Array<[string, string, boolean]>;
@@ -68,8 +68,10 @@ export function computed<T>(fn: () => T): Ref<T> {
 export function defineEvents(eventNames: any): EventEmitter {
   const el = getCurrentInstance().element;
 
-  for (const event of eventNames) {
-    defineEventOnElement(el, event);
+  if (isElement(el)) {
+    for (const event of eventNames) {
+      defineEventOnElement(el, event);
+    }
   }
 
   return emitEvent.bind(null, el);
@@ -84,7 +86,7 @@ function getPropValue($el: RuntimeInfo, property: string, definition: any) {
     return $el.element[property];
   }
 
-  if ($el.element.getAttribute && $el.element.hasAttribute(property)) {
+  if (isElement($el.element) && $el.element.hasAttribute(property)) {
     return $el.element.getAttribute(property);
   }
 
@@ -98,9 +100,8 @@ function getPropValue($el: RuntimeInfo, property: string, definition: any) {
 }
 
 export function defineProps(definitions: string[] | Record<string, any>): any {
-  const keys = !Array.isArray(definitions) ? Object.keys(definitions) : definitions;
-
   const $el = getCurrentInstance();
+  const keys = !Array.isArray(definitions) ? Object.keys(definitions) : definitions;
   const { element, state } = $el;
   const props = {};
 
@@ -111,7 +112,7 @@ export function defineProps(definitions: string[] | Record<string, any>): any {
     state[property] = $ref;
     props[property] = $ref;
 
-    if (element.nodeType !== element.ELEMENT_NODE) {
+    if (!isElement(element)) {
       continue;
     }
 
@@ -176,8 +177,8 @@ export function parseDomTree(tree) {
       return text.trim() || undefined;
     }
 
-    if (element.nodeType === element.ELEMENT_NODE) {
-      return [element.nodeName.toLowerCase(), getAttributes(element as Element), []];
+    if (isElement(element)) {
+      return [element.nodeName.toLowerCase(), getAttributes(element), []];
     }
   });
 
@@ -238,8 +239,7 @@ export async function createInstance($el: RuntimeInfo): Promise<RuntimeInfo> {
       await $el.init();
     }
 
-    const stateNode =
-      $el.element.nodeType === $el.element.DOCUMENT_FRAGMENT_NODE ? $el.element.firstElementChild : $el.element;
+    const stateNode = isFragment($el.element) ? $el.element.firstElementChild : $el.element;
     if (stateNode) {
       (stateNode as any).$state = $el.state;
     }
@@ -287,6 +287,15 @@ export function createState($el: RuntimeInfo): void {
   Object.freeze($el.stateKeys);
 }
 
+export function clearElement(element: Element | DocumentFragment) {
+  if (isFragment(element)) {
+    element.childNodes.forEach((e) => e.remove());
+    return;
+  }
+
+  element.innerHTML = "";
+}
+
 export function createDom($el: RuntimeInfo): void {
   $el ||= getCurrentInstance();
   const { element, template, shadowDom, stylesheets, scripts, state } = $el;
@@ -294,9 +303,9 @@ export function createDom($el: RuntimeInfo): void {
   const visitor = createBindings.bind(null, state);
 
   traverseDom(dom, visitor);
-  element.innerHTML = "";
+  clearElement(element);
 
-  if (!shadowDom) {
+  if (!shadowDom || isFragment(element)) {
     element.append(dom);
   } else {
     element.attachShadow(shadowDom as ShadowRootInit);
@@ -309,6 +318,17 @@ export function createDom($el: RuntimeInfo): void {
 
   for (const [a, b, c] of scripts) {
     injectScriptIntoElement(element, a, b, c);
+  }
+
+  const templates = Array.from(element.querySelectorAll("template"));
+  const templateLoops = templates.filter((t) => t.hasAttribute("for"));
+  for (const t of templateLoops) {
+    templateForOf(t, $el);
+  }
+
+  const templateConditions = templates.filter((t) => t.hasAttribute("if"));
+  for (const t of templateConditions) {
+    templateIf(t, $el);
   }
 }
 
@@ -326,19 +346,17 @@ export function compileExpression(expression: string, args: string[] = []): AnyF
   const usedKeys = stateKeys.filter((k) => expression.includes(k));
   const code = (usedKeys.length ? `const {${usedKeys.join(",")}} = $state;` : "") + `\nreturn ${expression}`;
   const cacheKey = code + args;
-  const cached = fnCache.get(cacheKey);
+  let fn = fnCache.get(cacheKey);
 
-  if (!cached) {
+  if (!fn) {
     const parsed = domParser.parseFromString(code, "text/html");
     const finalCode = parsed.body.innerText.trim();
     const functionType = expression.includes("await ") ? AsyncFunction : Function;
-    const toCache = functionType(...["$state", ...args], finalCode).bind(state, state);
-    fnCache.set(cacheKey, toCache);
-
-    return toCache;
+    fn = functionType(...["$state", ...args], finalCode);
+    fnCache.set(cacheKey, fn);
   }
 
-  return cached;
+  return fn.bind(state, state);
 }
 
 ////////// Custom Elements API
@@ -376,12 +394,16 @@ export interface MountOptions {
   parent?: any;
 }
 
-export function mount(element: Element | string, def: ComponentDefinitions, options?: MountOptions) {
+export function mount(element: DocumentFragment | Element | string, def: ComponentDefinitions, options?: MountOptions) {
   if (typeof element === "string") {
     element = document.querySelector(element);
   }
 
-  const { setup, template, shadowDom } = def;
+  if (!element) {
+    throw new Error("Target element not found");
+  }
+
+  const { setup = noop, template, shadowDom } = def;
   const $el = {
     shadowDom,
     element,
@@ -416,7 +438,7 @@ export function createBindings(state: any, element: Element | Text, attributes: 
     return;
   }
 
-  if (element.nodeType === element.ELEMENT_NODE) {
+  if (isElement(element)) {
     createElementNodeBindings(state, <Element>element, attributes);
     return;
   }
@@ -583,8 +605,8 @@ export function setAttribute(el: Element, attribute: string, value: boolean): vo
   el.setAttribute(attribute, String(value));
 }
 
-export function injectCssIntoElement(el: Element, href: string, id: string, condition: boolean) {
-  const parent = el.shadowRoot || document.head;
+export function injectCssIntoElement(el: Element | DocumentFragment, href: string, id: string, condition: boolean) {
+  const parent = el["shadowRoot"] || document.head;
 
   if (false === condition || (id && parent.querySelector(`[id="css-${id}"]`))) {
     return;
@@ -601,8 +623,8 @@ export function injectCssIntoElement(el: Element, href: string, id: string, cond
   parent.appendChild(tag);
 }
 
-export function injectScriptIntoElement(el: Element, src: string, id: string, condition: boolean) {
-  const parent = el.shadowRoot || document.head;
+export function injectScriptIntoElement(el: Element | DocumentFragment, src: string, id: string, condition: boolean) {
+  const parent = el["shadowRoot"] || document.head;
 
   if (false === condition || (id && parent.querySelector(`[id="js-${id}"]`))) {
     return;
@@ -710,4 +732,138 @@ export function materialize(node: any, context: { ns?: any } = {}): Element | Te
   return el;
 }
 
+function isElement(node: any): node is Element {
+  return node && node.nodeType === node.ELEMENT_NODE;
+}
+
+function isFragment(node: any): node is DocumentFragment {
+  return node && node.nodeType === node.DOCUMENT_FRAGMENT_NODE;
+}
+
 const fnCache = new Map();
+
+///// Template Behaviours
+
+export async function templateIf(template: HTMLTemplateElement, $el?: RuntimeInfo) {
+  $el ||= getCurrentInstance();
+
+  const expression = template.getAttribute("if");
+  const getter = compileExpression(expression);
+  const previousNodes = [];
+
+  async function updateDom(value: any) {
+    const parent = template.parentElement;
+
+    // template is detached
+    if (!parent) {
+      for (const next of previousNodes) {
+        next.parentNode && parent.remove();
+      }
+      return;
+    }
+
+    if (!unref(value)) {
+      for (const next of previousNodes) {
+        next.remove();
+      }
+      previousNodes.length = 0;
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    await mount(
+      fragment,
+      {
+        setup() {},
+        template: template.content.cloneNode(true) as any,
+      },
+      {
+        parent: $el,
+      }
+    );
+
+    previousNodes.push(...Array.from(fragment.childNodes));
+    parent.insertBefore(fragment, template);
+  }
+
+  $el.reactive.watch(getter, updateDom);
+  await updateDom(getter());
+}
+
+export async function templateForOf(template: HTMLTemplateElement, $el?: RuntimeInfo) {
+  $el ||= getCurrentInstance();
+  const expression = template.getAttribute("for");
+  const [iteration, source] = expression.split("of").map((s) => s.trim());
+  const [key, index] = iteration.includes("[")
+    ? iteration
+        .slice(1, -1)
+        .split(",")
+        .map((s) => s.trim())
+    : [iteration, "index"];
+
+  const previousNodes = [];
+
+  async function updateDom(list) {
+    const parent = template.parentElement;
+
+    // template is detached
+    if (!parent) {
+      return;
+    }
+
+    list = unref(list);
+
+    for (const next of previousNodes) {
+      next.remove();
+    }
+
+    previousNodes.length = 0;
+    if (!Array.isArray(list)) {
+      return;
+    }
+
+    const frag = await repeatTemplate($el, template, list, key, index);
+    previousNodes.push(...Array.from(frag.childNodes));
+    parent.insertBefore(frag, template);
+  }
+
+  $el.reactive.watch(() => $el.state[source], updateDom);
+  await updateDom($el.state[source]);
+}
+
+async function repeatTemplate(
+  parent: RuntimeInfo,
+  template: HTMLTemplateElement,
+  items: any[],
+  itemName: string,
+  indexName: string
+) {
+  function setup() {
+    defineProps([itemName, indexName]);
+  }
+
+  const fragment = document.createDocumentFragment();
+  const results = items.map(async (item, index) => {
+    const itemFragment = document.createDocumentFragment();
+    await mount(
+      itemFragment,
+      {
+        setup,
+        template: template.content.cloneNode(true) as any,
+      },
+      {
+        parent,
+        props: {
+          [itemName]: item,
+          [indexName]: index,
+        },
+      }
+    );
+
+    fragment.append(itemFragment);
+  });
+
+  await Promise.all(results);
+
+  return fragment;
+}
