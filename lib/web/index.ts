@@ -253,24 +253,21 @@ export async function createInstance($el: RuntimeInfo): Promise<RuntimeInfo> {
 }
 
 export function fork(base: any, delegate: any, callback: AnyFunction) {
-  return new Proxy(
-    delegate,
-    {
-      get(_t, p) {
-        return base.hasOwnProperty(p) ? base[p] : delegate[p];
-      },
-      set(_t, p, v) {
-        if (delegate.hasOwnProperty(p)) {
-          delegate[p] = v;
-        } else {
-          base[p] = v;
-        }
+  return new Proxy(delegate, {
+    get(_t, p) {
+      return base.hasOwnProperty(p) ? base[p] : delegate[p];
+    },
+    set(_t, p, v) {
+      if (delegate.hasOwnProperty(p)) {
+        delegate[p] = v;
+      } else {
+        base[p] = v;
+      }
 
-        callback();
-        return true;
-      },
-    }
-  );
+      callback();
+      return true;
+    },
+  });
 }
 
 export function createState($el: RuntimeInfo): void {
@@ -328,11 +325,20 @@ export function compileExpression(expression: string, args: string[] = []): AnyF
   const { state, stateKeys } = getCurrentInstance();
   const usedKeys = stateKeys.filter((k) => expression.includes(k));
   const code = (usedKeys.length ? `const {${usedKeys.join(",")}} = $state;` : "") + `\nreturn ${expression}`;
-  const parsed = domParser.parseFromString(code, "text/html");
-  const finalCode = parsed.body.innerText.trim();
-  const functionType = expression.includes("await ") ? AsyncFunction : Function;
+  const cacheKey = code + args;
+  const cached = fnCache.get(cacheKey);
 
-  return functionType(...["$state", ...args], finalCode).bind(state, state);
+  if (!cached) {
+    const parsed = domParser.parseFromString(code, "text/html");
+    const finalCode = parsed.body.innerText.trim();
+    const functionType = expression.includes("await ") ? AsyncFunction : Function;
+    const toCache = functionType(...["$state", ...args], finalCode).bind(state, state);
+    fnCache.set(cacheKey, toCache);
+
+    return toCache;
+  }
+
+  return cached;
 }
 
 ////////// Custom Elements API
@@ -703,3 +709,5 @@ export function materialize(node: any, context: { ns?: any } = {}): Element | Te
 
   return el;
 }
+
+const fnCache = new Map();
