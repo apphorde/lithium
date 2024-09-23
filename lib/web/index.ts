@@ -176,10 +176,10 @@ export function parseDomTree(tree) {
 }
 
 function mapTree<T extends ChildNode | Document | DocumentFragment | HTMLTemplateElement>(tree: T, mapper: (node: T) => any) {
-  const nodes: T[] = tree['content'] ? tree['content'].childNodes : tree;
+  const nodes: T[] = (tree['content'] || tree).childNodes;
   return Array.from(nodes).map((next) => {
     const parsed = mapper(next);
-    const nodes = next['content'] ? next['content'].childNodes : next;
+    const nodes = (next['content'] || next).childNodes;
     if (nodes && nodes.length) {
       parsed[2] = mapTree(next, mapper);
     }
