@@ -666,7 +666,7 @@ export function materialize(node: any, context: { ns?: any } = {}): Element | Te
 
     if (!isDocument) {
       doc[Attributes] = attributes;
-      applyAttributes(container as HTMLTemplateElement);
+      applyAttributes(doc as HTMLTemplateElement);
     }
 
     return doc;
