@@ -429,6 +429,8 @@ export function createTextNodeBinding(state: any, el: Text): void {
 }
 
 export function createElementNodeBindings(state: any, el: Element, attrs: any): void {
+  if (!Array.isArray(attrs) && attrs.length) return;
+
   for (const attr of attrs) {
     const attribute = attr[0].trim();
     const expression = attr[1].trim();
@@ -449,7 +451,9 @@ export function createElementNodeBindings(state: any, el: Element, attrs: any): 
     }
 
     if (attribute.startsWith(".style.")) {
-      createElementNodeStyleBinding(state, el, attribute, expression);
+
+
+      \createElementNodeStyleBinding(state, el, attribute, expression);
       continue;
     }
 
@@ -620,7 +624,7 @@ export function traverseDom(dom: any, visitor: AnyFunction) {
       stack.push(...Array.from(next.childNodes));
     }
 
-    visitor(next, next[Attributes]);
+    visitor(next, next[Attributes] || []);
   }
 }
 
