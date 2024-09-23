@@ -312,7 +312,8 @@ function ensureDisplayBlock(name: string) {
 
 export function compileExpression(expression: string, args: string[] = []): AnyFunction {
   const { state, stateKeys } = getCurrentInstance();
-  const code = `const {${stateKeys.filter((k) => expression.includes(k)).join(",")}} = $state;\nreturn ${expression}`;
+  const usedKeys = stateKeys.filter((k) => expression.includes(k));
+  const code = (usedKeys.length ? `const {${usedKeys.join(",")}} = $state;` : "") + `\nreturn ${expression}`;
   const parsed = domParser.parseFromString(code, "text/html");
   const finalCode = parsed.body.innerText.trim();
   const functionType = expression.includes("await ") ? AsyncFunction : Function;
@@ -627,7 +628,9 @@ export function materialize(node: any, context: { ns?: any } = {}): Element | Te
     const container = isDoc ? doc : (doc as HTMLTemplateElement).content;
 
     if (Array.isArray(children) && children.length) {
-      container.append(...children.map((next) => materialize(next, context)));
+      for (const next of children) {
+        container.append(materialize(next, context));
+      }
     }
 
     doc[Attributes] = attributes;
