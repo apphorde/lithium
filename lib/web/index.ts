@@ -164,7 +164,10 @@ export function html(text: string) {
 export function parseDomTree(tree) {
   const children = mapTree(tree, (element) => {
     if (element.nodeType === element.TEXT_NODE) {
-      return (element as Text).textContent;
+      const text = (element as Text).textContent;
+
+      // TODO think about pre/code content
+      return text.trim() || undefined;
     }
 
     if (element.nodeType === element.ELEMENT_NODE) {
@@ -179,13 +182,13 @@ function mapTree<T extends ChildNode | Document | DocumentFragment | HTMLTemplat
   const nodes: T[] = (tree['content'] || tree).childNodes;
   return Array.from(nodes).map((next) => {
     const parsed = mapper(next);
-    const nodes = (next['content'] || next).childNodes;
+    const nodes: T[] = (next['content'] || next).childNodes;
     if (nodes && nodes.length) {
       parsed[2] = mapTree(next, mapper);
     }
 
     return parsed || "";
-  });
+  }).filter(node => node !== undefined);
 }
 
 function getAttributes(node: Element) {
