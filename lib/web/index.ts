@@ -282,6 +282,7 @@ export function createState($el: RuntimeInfo): void {
   if ($el.parent) {
     const keys = Object.keys($el.state);
     $el.state = fork($el.parent.state, $el.state, $el.reactive.check);
+    // TODO unique keys
     $el.stateKeys = keys.concat($el.parent.stateKeys);
   }
 

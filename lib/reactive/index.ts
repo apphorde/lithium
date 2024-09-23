@@ -24,7 +24,7 @@ export function watchValue<T>(valueGetter: Ref<T> | (() => T), effect: (value: T
   let lastValue: T | undefined;
 
   return function () {
-    const value = isRef<T>(valueGetter) ? unref(valueGetter) : valueGetter();
+    const value = isRef<T>(valueGetter) ? unref(valueGetter) : unref(valueGetter());
 
     if (value !== lastValue && !Number.isNaN(value)) {
       lastValue = value;
