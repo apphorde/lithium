@@ -197,7 +197,7 @@ function mapTree<T extends ChildNode | Document | DocumentFragment | HTMLTemplat
 }
 
 function getAttributes(node: Element) {
-  return Array.from(node.attributes).map((a) => [a.localName, a.value]);
+  return node.attributes ? Array.from(node.attributes).map((a) => [a.localName, a.value]) : [];
 }
 
 export function defineEventOnElement(el: Element, name: string): void {
