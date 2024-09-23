@@ -178,17 +178,22 @@ export function parseDomTree(tree) {
   return ["#", "html", children];
 }
 
-function mapTree<T extends ChildNode | Document | DocumentFragment | HTMLTemplateElement>(tree: T, mapper: (node: T) => any) {
-  const nodes: T[] = (tree['content'] || tree).childNodes;
-  return Array.from(nodes).map((next) => {
-    const parsed = mapper(next);
-    const nodes: T[] = parsed ? (next['content'] || next).childNodes : undefined;
-    if (nodes && nodes.length) {
-      parsed[2] = mapTree(next, mapper);
-    }
+function mapTree<T extends ChildNode | Document | DocumentFragment | HTMLTemplateElement>(
+  tree: T,
+  mapper: (node: T) => any
+) {
+  const nodes: T[] = (tree["content"] || tree).childNodes;
+  return Array.from(nodes)
+    .map((next) => {
+      const parsed = mapper(next);
+      const nodes: T[] = parsed ? (next["content"] || next).childNodes : undefined;
+      if (nodes && nodes.length) {
+        parsed[2] = mapTree(next, mapper);
+      }
 
-    return parsed;
-  }).filter(node => node !== undefined);
+      return parsed;
+    })
+    .filter((node) => node !== undefined);
 }
 
 function getAttributes(node: Element) {
@@ -262,6 +267,7 @@ export function createObjectDelegate(base: any, delegate: any, callback = noop) 
     }
   );
 }
+
 export function forkState(parentContext, newContext) {
   const newState = createObjectDelegate(parentContext.state, newContext, parentContext.reactive.check);
   const stateKeys = parentContext.stateKeys.concat(Object.keys(newContext));
@@ -289,8 +295,8 @@ export function createDom($el: RuntimeInfo): void {
   const { element, template, shadowDom, stylesheets, scripts, state } = $el;
   const dom = Array.isArray(template) ? materialize(template) : template;
   const visitor = createBindings.bind(null, state);
-  traverseDom(dom, visitor);
 
+  traverseDom(dom, visitor);
   element.innerHTML = "";
 
   if (!shadowDom) {
@@ -618,22 +624,39 @@ export function traverseDom(dom: any, visitor: AnyFunction) {
   }
 }
 
-export const Attributes = Symbol("@@");
+export const Attributes = Symbol("@@attr");
+export function applyAttributes(element: Element, attributes?: Attribute[]) {
+  attributes ||= element[Attributes];
+
+  if (!attributes) {
+    return;
+  }
+
+  for (const attr of attributes) {
+    setAttribute(element, attr[0], attr[1]);
+  }
+}
+
 export function materialize(node: any, context: { ns?: any } = {}): Element | Text | DocumentFragment | Comment {
   // text
   if (typeof node === "string") {
-    const txt = document.createTextNode(node);
-    return txt;
+    return document.createTextNode(node);
   }
 
   const [t, attributes = 0, children = []] = node;
 
+  // comment
+  // node = ['!', 'text']
+  if ("!" === t) {
+    return document.createComment(attributes);
+  }
+
   // document
   // node = ['#d', 0, [...]]
   if ("#" === t || "template" === t) {
-    const isDoc = "#" === t;
-    const doc = isDoc ? document.createDocumentFragment() : document.createElement("template");
-    const container = isDoc ? doc : (doc as HTMLTemplateElement).content;
+    const isDocument = "#" === t;
+    const doc = isDocument ? document.createDocumentFragment() : document.createElement("template");
+    const container = isDocument ? doc : (doc as HTMLTemplateElement).content;
 
     if (Array.isArray(children) && children.length) {
       for (const next of children) {
@@ -641,15 +664,12 @@ export function materialize(node: any, context: { ns?: any } = {}): Element | Te
       }
     }
 
-    doc[Attributes] = attributes;
+    if (!isDocument) {
+      doc[Attributes] = attributes;
+      applyAttributes(container as HTMLTemplateElement);
+    }
 
     return doc;
-  }
-
-  // comment
-  // node = ['!', 'text']
-  if ("!" === t) {
-    return document.createComment(attributes);
   }
 
   // element
@@ -660,12 +680,7 @@ export function materialize(node: any, context: { ns?: any } = {}): Element | Te
 
   const el = context.ns ? document.createElementNS(context.ns, t) : document.createElement(t);
   el[Attributes] = attributes;
-
-  if (attributes) {
-    for (const attr of attributes) {
-      setAttribute(el, attr[0], attr[1]);
-    }
-  }
+  applyAttributes(el);
 
   // single child, a text node
   if (typeof children === "string") {
