@@ -18,7 +18,7 @@ export interface RuntimeInfo {
 
 export interface ComponentDefinitions {
   setup?: Function;
-  template: any[];
+  template: any[] | HTMLTemplateElement;
   shadowDom?: ShadowRootInit;
 }
 
@@ -843,7 +843,7 @@ async function repeatTemplate(
       itemFragment,
       {
         setup,
-        template: template.content.cloneNode(true) as any,
+        template,
       },
       {
         parent,
