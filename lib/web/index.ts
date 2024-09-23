@@ -329,7 +329,7 @@ export function createDom($el: RuntimeInfo): void {
     injectScriptIntoElement(element, a, b, c);
   }
 
-  const templates = Array.from(element.querySelectorAll("template"));
+  const templates: HTMLTemplateElement[] = Array.from((element['shadowRoot'] || element).querySelectorAll("template"));
   const templateLoops = templates.filter((t) => t.hasAttribute("for"));
   for (const t of templateLoops) {
     templateForOf(t, $el);
