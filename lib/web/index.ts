@@ -254,7 +254,7 @@ export async function createInstance($el: RuntimeInfo): Promise<RuntimeInfo> {
 
 export function fork(base: any, delegate: any, callback: AnyFunction) {
   return new Proxy(
-    {},
+    delegate,
     {
       get(_t, p) {
         return base.hasOwnProperty(p) ? base[p] : delegate[p];
@@ -280,8 +280,9 @@ export function createState($el: RuntimeInfo): void {
   $el.stateKeys = Object.keys($el.state);
 
   if ($el.parent) {
+    const keys = Object.keys($el.state);
     $el.state = fork($el.parent.state, $el.state, $el.reactive.check);
-    $el.stateKeys = Object.keys($el.state).concat($el.parent.stateKeys);
+    $el.stateKeys = keys.concat($el.parent.stateKeys);
   }
 
   Object.freeze($el.state);
