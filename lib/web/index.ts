@@ -223,7 +223,11 @@ export async function createInstance($el: RuntimeInfo): Promise<RuntimeInfo> {
       await $el.init();
     }
 
-    ($el.element as any).$state = $el.state;
+    const stateNode =
+      $el.element.nodeType === $el.element.DOCUMENT_FRAGMENT_NODE ? $el.element.firstElementChild : $el.element;
+    if (stateNode) {
+      (stateNode as any).$state = $el.state;
+    }
   } catch (error) {
     console.log("Failed to initialize component!", this, error);
   }
@@ -279,7 +283,7 @@ export function createState($el: RuntimeInfo): void {
 export function createDom($el: RuntimeInfo): void {
   $el ||= getCurrentInstance();
   const { element, template, shadowDom, stylesheets, scripts, state } = $el;
-  const dom = materialize(template);
+  const dom = Array.isArray(template) ? materialize(template) : template;
   const visitor = createBindings.bind(null, state);
   traverseDom(dom, visitor);
 
