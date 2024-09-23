@@ -755,6 +755,7 @@ export async function templateIf(template, $el) {
     for (const next of previousNodes) {
       next.parentNode && next.remove();
     }
+
     previousNodes.length = 0;
   }
 
@@ -775,9 +776,7 @@ export async function templateIf(template, $el) {
   }
 
   function updateDom(value) {
-    console.log(value);
-
-    if (!template.parentElement || !unref(value)) {
+    if (!template.parentElement || !value) {
       remove();
       return;
     }
