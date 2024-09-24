@@ -4,7 +4,7 @@ export interface Ref<T> {
 }
 
 type AnyFunction = (...args: any) => any;
-const watchedObject = "__w";
+const reactiveTag = "__w";
 
 export interface ObservableContext {
   check: VoidFunction;
@@ -33,28 +33,32 @@ export function watchValue<T>(valueGetter: Ref<T> | (() => T), effect: (value: T
   };
 }
 
-export function reactive<T extends object>(object: T, callback: VoidFunction): T {
-  // wrapping HTML elements with proxies leads to sad panda
-  if (object === null || object === undefined || watchedObject in object || isElement(object)) {
+export interface ReactiveOptions {
+  shallow?: boolean
+}
+export function reactive<T extends object>(object: T, callback: VoidFunction, options?: ReactiveOptions): T {
+  if (object === null || object === undefined || reactiveTag in object) {
     return object;
   }
 
   markAsReactive(object);
 
-  const values = Object.entries(object);
-  for (const [key, next] of values) {
-    if (typeof next === "object" && next !== null) {
-      (<any>object)[key] = reactive(next, callback);
+  if (!options?.shallow) {
+    const values = Object.entries(object);
+    for (const [key, next] of values) {
+      if (typeof next === "object" && next !== null) {
+        (<any>object)[key] = reactive(next, callback);
+      }
     }
   }
 
   return new Proxy(object, {
     set(target, p, value) {
-      if (typeof value === "object" && value !== null) {
-        value = reactive(value, callback);
+      if (typeof value === "object" && value !== null && !options?.shallow) {
+        value = reactive(value, callback, options);
       }
 
-      (<any>target)[p] = value;
+      (target as any)[p] = value;
       callback();
       return true;
     },
@@ -71,6 +75,7 @@ export function debounce(fn, timeout) {
 
 export interface RefOptions {
   debounce: number;
+  shallow: boolean;
 }
 
 function refDebounce<T>(initialValue: T | null, options: RefOptions) {
@@ -93,7 +98,7 @@ function refDebounce<T>(initialValue: T | null, options: RefOptions) {
 
 export function ref<T>(initialValue: T | null, effect: AnyFunction, options?: RefOptions): Ref<T> {
   if (options?.debounce) {
-    return reactive(refDebounce(initialValue, options), effect) as Ref<T>;
+    return reactive(refDebounce(initialValue, options), effect, options) as Ref<T>;
   }
 
   return reactive(
@@ -104,7 +109,8 @@ export function ref<T>(initialValue: T | null, effect: AnyFunction, options?: Re
         return String(this.value);
       },
     },
-    effect
+    effect,
+    options,
   ) as Ref<T>;
 }
 
@@ -154,14 +160,10 @@ export class ReactiveContext implements ObservableContext {
   }
 }
 
-function markAsReactive(context: any): void {
-  Object.defineProperty(context, watchedObject, {
+export function markAsReactive(context: any): void {
+  Object.defineProperty(context, reactiveTag, {
     value: true,
     enumerable: false,
     configurable: false,
   });
-}
-
-function isElement(t: any): boolean {
-  return t instanceof Element;
 }
