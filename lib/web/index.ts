@@ -159,6 +159,10 @@ export function ref<T>(value?: T, options?): Ref<T> {
   return getCurrentInstance().reactive.ref(value, options);
 }
 
+export function shallowRef<T>(value?: T, options = {}): Ref<T> {
+  return ref(value, { ...options, shallow: true });
+}
+
 export function html(text: string) {
   const dom = new DOMParser().parseFromString(text, "text/html");
   return parseDomTree(dom.body);
