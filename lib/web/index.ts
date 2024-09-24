@@ -1,5 +1,7 @@
 import { Ref, unref, isRef, ReactiveContext, markAsReactive } from "@lithium/reactive";
 
+export { unref, isRef } from '@lithium/reactive';
+
 export interface RuntimeInfo {
   shadowDom?: ShadowRootInit;
   reactive: ReactiveContext;
