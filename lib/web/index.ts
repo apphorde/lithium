@@ -230,7 +230,6 @@ export async function createInstance($el: RuntimeInfo): Promise<RuntimeInfo> {
 
   try {
     const { reactive } = $el;
-    ensureDisplayBlock($el.element.nodeName);
     reactive.suspend();
     createState($el);
     createDom($el);
@@ -344,15 +343,6 @@ export function createDom($el: RuntimeInfo): void {
   const templateConditions = templates.filter((t) => t.hasAttribute("if"));
   for (const t of templateConditions) {
     templateIf(t, $el);
-  }
-}
-
-function ensureDisplayBlock(name: string) {
-  if (name && !document.head.querySelector(`[id="ce-${name}"]`)) {
-    const css = document.createElement("style");
-    css.id = "ce-" + name;
-    css.innerText = name.toLowerCase() + "{display:block}";
-    document.head.append(css);
   }
 }
 
