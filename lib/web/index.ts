@@ -1,4 +1,4 @@
-import { Ref, unref, isRef, ReactiveContext } from "@lithium/reactive";
+import { Ref, unref, isRef, ReactiveContext, markAsReactive } from "@lithium/reactive";
 
 export interface RuntimeInfo {
   shadowDom?: ShadowRootInit;
@@ -54,7 +54,7 @@ export function onDestroy(fn: VoidFunction): void {
 }
 
 export function computed<T>(fn: () => T): Ref<T> {
-  const $ref = ref<T>();
+  const $ref = ref<T>(null, { shallow: true });
   watch(() => {
     const v = fn();
     if ($ref.value !== v) {
@@ -398,6 +398,8 @@ export function createComponent(name: string, def: ComponentDefinitions): void {
   customElements.define(name, Component);
 }
 
+///// Runtime API
+
 export interface MountOptions {
   props?: any;
   parent?: any;
@@ -432,8 +434,6 @@ export function mount(element: DocumentFragment | Element | string, def: Compone
   return Promise.resolve($el).then(createInstance);
 }
 
-///// Runtime API
-
 const eventFlags = ["capture", "once", "passive", "stop", "prevent"];
 
 interface Attribute {
@@ -465,10 +465,10 @@ export function createTextNodeBinding(el: Text): void {
   }
 }
 
-export function createElementNodeBindings(state: any, el: Element, attrs: any): void {
-  if (!Array.isArray(attrs) && attrs.length) return;
+export function createElementNodeBindings(state: any, el: Element, attributes: Array<Attribute>): void {
+  if (!Array.isArray(attributes) && attributes.length) return;
 
-  for (const attr of attrs) {
+  for (const attr of attributes) {
     const attribute = attr[0].trim();
     const expression = attr[1].trim();
 
@@ -523,10 +523,11 @@ export function createElementNodeEventBinding(state: any, el: Element, attribute
   );
 }
 
-export function createElementNodeRefBinding(state: any, el: unknown, _attribute: any, expression: string): void {
+export function createElementNodeRefBinding(state: any, el: any, _attribute: any, expression: string): void {
   const ref = expression.trim();
 
   if (isRef(state[ref])) {
+    markAsReactive(el);
     state[ref].value = el;
   }
 }
