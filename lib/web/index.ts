@@ -349,7 +349,7 @@ export function createDom($el: RuntimeInfo): void {
 export function compileExpression(expression: string, args: string[] = []): AnyFunction {
   const { state, stateKeys } = getCurrentInstance();
   const usedKeys = stateKeys.filter((k) => expression.includes(k));
-  const code = (usedKeys.length ? `const {${usedKeys.join(",")}} = $state;` : "") + `\nreturn ${expression}`;
+  const code = (usedKeys.length ? usedKeys.map(k => `const ${k} = __u(__s.${k})`).join(';') + ';' : "") + `\nreturn ${expression}`;
   const cacheKey = code + args;
   let fn = fnCache.get(cacheKey);
 
@@ -357,11 +357,11 @@ export function compileExpression(expression: string, args: string[] = []): AnyF
     const parsed = domParser.parseFromString(code, "text/html");
     const finalCode = parsed.body.innerText.trim();
     const functionType = expression.includes("await ") ? AsyncFunction : Function;
-    fn = functionType(...["$state", ...args], finalCode);
+    fn = functionType(...["__s", "__u", ...args], finalCode);
     fnCache.set(cacheKey, fn);
   }
 
-  return fn.bind(state, state);
+  return fn.bind(state, state, unref);
 }
 
 ////////// Custom Elements API
