@@ -23,8 +23,8 @@ export function check(target: ObservableContext): void {
 export function watchValue<T>(valueGetter: Ref<T> | (() => T), effect: (value: T) => void): VoidFunction {
   let lastValue: T | undefined;
 
-  return function () {
-    const value = isRef<T>(valueGetter) ? unref(valueGetter) : unref(valueGetter());
+  return async function () {
+    let value = isRef<T>(valueGetter) ? await unref(valueGetter) : unref(await valueGetter());
 
     if (value !== lastValue && !Number.isNaN(value)) {
       lastValue = value;
