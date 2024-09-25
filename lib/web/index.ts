@@ -478,12 +478,12 @@ export function createElementNodeBindings(state: any, el: Element, attributes: A
       continue;
     }
 
-    if (attribute.startsWith(".class.")) {
+    if (attribute.startsWith(".class.") || attribute.startsWith("class-")) {
       createElementNodeClassBinding(state, el, attribute, expression);
       continue;
     }
 
-    if (attribute.startsWith(".style.")) {
+    if (attribute.startsWith(".style.") || attribute.startsWith("style-")) {
       createElementNodeStyleBinding(state, el, attribute, expression);
       continue;
     }
@@ -535,7 +535,7 @@ export function createElementNodeClassBinding(state: any, el: any, attribute: st
 }
 
 export function createElementNodeStyleBinding(state: any, el: any, attribute: string, expression: string): void {
-  const style = attribute.replace(".style.", "");
+  const style = attribute.replace(".style.", "").replace("style-", "");
   const fn = compileExpression(expression);
   watch(wrapTryCatch(expression, fn), (v: any) => setStyle(el, style, v));
 }
