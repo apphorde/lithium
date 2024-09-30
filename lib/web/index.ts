@@ -858,3 +858,14 @@ async function repeatTemplate(
 
   return fragment;
 }
+
+export function domReady() {
+  return new Promise((next) => {
+    if (document.readyState == "complete") {
+      next(null);
+      return;
+    }
+
+    window.addEventListener("DOMContentLoaded", () => next(null));
+  });
+}
