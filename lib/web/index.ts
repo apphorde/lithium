@@ -243,11 +243,6 @@ export async function createInstance($el: RuntimeInfo): Promise<RuntimeInfo> {
     if ($el.init) {
       await $el.init();
     }
-
-    const stateNode = isFragment($el.element) ? $el.element.firstElementChild : $el.element;
-    if (stateNode) {
-      (stateNode as any).$state = $el.state;
-    }
   } catch (error) {
     console.log("Failed to initialize component!", this, error);
   }
