@@ -168,6 +168,35 @@ export function html(text: string) {
   return parseDomTree(dom.body);
 }
 
+type InjectionEvent<T> = CustomEvent & { result?: T };
+
+export function provide<T>(token: Symbol, provider): void {
+  const fn = typeof provider === 'function' ? provider: () => provider;
+  const { element } = getCurrentInstance();
+
+  element.addEventListener('$inject', (e: InjectionEvent<T>) => {
+    if (e.detail === token) {
+      e.result = fn();
+      e.stopPropagation();
+    }
+  });
+}
+
+export function inject<T>(token: any) {
+  const { element } = getCurrentInstance();
+  const event = new CustomEvent('$inject', { detail: token, bubbles: true }) as CustomEvent & { result: T };
+
+  element.dispatchEvent(event);
+
+  const result = event.result;
+
+  if (!result) {
+    throw new Error('Injectable not found: ' + token);
+  }
+
+  return result;
+}
+
 export function tpl(text: string) {
   const template = document.createElement("template");
   template.innerHTML = text;
@@ -241,7 +270,7 @@ export async function createInstance($el: RuntimeInfo): Promise<RuntimeInfo> {
     }
 
     if ($el.init) {
-      await $el.init();
+      $el.init();
     }
   } catch (error) {
     console.log("Failed to initialize component!", this, error);
