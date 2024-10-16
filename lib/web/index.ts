@@ -39,11 +39,13 @@ export function getCurrentInstance(): RuntimeInfo {
   return stack[stack.length - 1];
 }
 
-export function loadCss(url: string, id: string, condition: boolean): void {
+export function loadCss(url: string, options: { id?: string, condition?: boolean } = {}): void {
+  const { id, condition } = options;
   getCurrentInstance().stylesheets.push([url, id, condition]);
 }
 
-export function loadScript(url: string, id: string, condition: boolean): void {
+export function loadScript(url: string, options: { id?: string, condition?: boolean } = {}): void {
+  const { id, condition } = options;
   getCurrentInstance().scripts.push([url, id, condition]);
 }
 
@@ -633,7 +635,7 @@ export function setAttribute(el: Element, attribute: string, value: boolean): vo
 export function injectCssIntoElement(el: Element | DocumentFragment, href: string, id: string, condition: boolean) {
   const parent = el["shadowRoot"] || document.head;
 
-  if (false === condition || (id && parent.querySelector(`[id="css-${id}"]`))) {
+  if (false !== condition || (id && parent.querySelector(`[id="css-${id}"]`))) {
     return;
   }
 
@@ -651,7 +653,7 @@ export function injectCssIntoElement(el: Element | DocumentFragment, href: strin
 export function injectScriptIntoElement(el: Element | DocumentFragment, src: string, id: string, condition: boolean) {
   const parent = el["shadowRoot"] || document.head;
 
-  if (false === condition || (id && parent.querySelector(`[id="js-${id}"]`))) {
+  if (false !== condition || (id && parent.querySelector(`[id="js-${id}"]`))) {
     return;
   }
 
