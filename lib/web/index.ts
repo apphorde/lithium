@@ -635,7 +635,7 @@ export function setAttribute(el: Element, attribute: string, value: boolean): vo
 export function injectCssIntoElement(el: Element | DocumentFragment, href: string, id: string, condition: boolean) {
   const parent = el["shadowRoot"] || document.head;
 
-  if (!condition || (id && parent.querySelector(`[id="css-${id}"]`))) {
+  if ((condition !== undefined && !condition) || (id && parent.querySelector(`[id="css-${id}"]`))) {
     return;
   }
 
@@ -647,13 +647,13 @@ export function injectCssIntoElement(el: Element | DocumentFragment, href: strin
     tag.id = "css-" + id;
   }
 
-  parent.appendChild(tag);
+  parent.append(tag);
 }
 
 export function injectScriptIntoElement(el: Element | DocumentFragment, src: string, id: string, condition: boolean) {
   const parent = el["shadowRoot"] || document.head;
 
-  if (!condition || (id && parent.querySelector(`[id="js-${id}"]`))) {
+  if ((condition !== undefined && !condition) || (id && parent.querySelector(`[id="js-${id}"]`))) {
     return;
   }
 
