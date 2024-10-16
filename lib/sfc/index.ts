@@ -42,7 +42,7 @@ export function getSetupCode(setupNode: ElementNode): string {
 
   const combinedCode =
     imports +
-    "\nexport default function defineComponent($el, $dom) {  \n" +
+    "\nexport function defineComponent($el, $dom) {  \n" +
     setupCode.trim() +
     "\nreturn { " +
     ids.join(", ") +
