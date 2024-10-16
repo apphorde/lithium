@@ -19,6 +19,7 @@ async function main() {
       console.error(String(error));
       process.exit(1);
     }
+    return;
   }
 
   throw new Error("Invalid command: " + command);
