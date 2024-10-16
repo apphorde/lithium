@@ -33,9 +33,13 @@ export default async function publish(args: Args) {
     throw new Error("Empty source");
   }
 
-  return fetch(new URL(`${scope}/${name}@${version}`, publishUrl), {
+  const req = await fetch(new URL(`${scope}/${name}@${version}`, publishUrl), {
     body: source,
     method: "POST",
     headers: { Authorization: publishToken },
   });
+
+  if (!req.ok) {
+    throw new Error('Failed to publish ' + name + ': ' + req.statusText);
+  }
 }
