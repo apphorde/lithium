@@ -1,5 +1,6 @@
-import type { Args } from "./parse-args";
+import { getComponentCode } from "@lithium/sfc";
 import { readFileSync } from "node:fs";
+import type { Args } from "./parse-args";
 
 const publishUrl = process.env.PUBLISH_REGISTRY;
 const publishToken = process.env.PUBLISH_TOKEN;
@@ -7,7 +8,7 @@ const types = ['component', 'library'];
 
 export default async function publish(args: Args) {
   const [inputFile = "-"] = args.args;
-  const { scope, name, version = "latest", type = '' } = args.options;
+  const { scope, name, version = "0.0.0", type = '' } = args.options;
 
   if (types.includes(String(type)) === false) {
     throw new Error('Invalid type! Must be one of: ' + types.join(', '));
@@ -39,8 +40,11 @@ export default async function publish(args: Args) {
     throw new Error("Empty source");
   }
 
+  const sfc = JSON.parse(source);
+  const code = getComponentCode(name, sfc);
+
   const req = await fetch(new URL(`${type}/${scope}/${name}@${version}`, publishUrl), {
-    body: source,
+    body: code,
     method: "POST",
     headers: { Authorization: publishToken },
   });
