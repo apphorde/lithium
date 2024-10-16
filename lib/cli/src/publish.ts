@@ -3,10 +3,16 @@ import { readFileSync } from "node:fs";
 
 const publishUrl = process.env.PUBLISH_REGISTRY;
 const publishToken = process.env.PUBLISH_TOKEN;
+const types = ['component', 'library'];
 
 export default async function publish(args: Args) {
   const [inputFile = "-"] = args.args;
-  const { scope, name, version = "latest" } = args.options;
+  const { scope, name, version = "latest", type = '' } = args.options;
+
+  if (types.includes(String(type)) === false) {
+    throw new Error('Invalid type! Must be one of: ' + types.join(', '));
+  }
+
   const source = (
     inputFile === "-"
       ? Buffer.concat(await process.stdin.toArray())
@@ -33,7 +39,7 @@ export default async function publish(args: Args) {
     throw new Error("Empty source");
   }
 
-  const req = await fetch(new URL(`${scope}/${name}@${version}`, publishUrl), {
+  const req = await fetch(new URL(`${type}/${scope}/${name}@${version}`, publishUrl), {
     body: source,
     method: "POST",
     headers: { Authorization: publishToken },
