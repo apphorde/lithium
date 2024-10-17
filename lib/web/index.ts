@@ -856,7 +856,7 @@ async function repeatTemplate(
   indexName: string
 ) {
   function setup() {
-    defineProps([itemName, indexName]);
+    defineProps([itemName, indexName, '$first', '$last', '$odd', '$even']);
   }
 
   const fragment = document.createDocumentFragment();
@@ -873,6 +873,10 @@ async function repeatTemplate(
         props: {
           [itemName]: item,
           [indexName]: index,
+          $first: index === 0,
+          $last: index === items.length - 1,
+          $odd: index % 2 === 1,
+          $even: index % 2 === 0,
         },
       }
     );
