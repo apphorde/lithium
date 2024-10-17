@@ -102,9 +102,6 @@ export function ref<T>(initialValue: T | null, effect: AnyFunction, options?: Re
     {
       __isRef: true,
       value: initialValue,
-      toString() {
-        return String(this.value);
-      },
     },
     effect,
     options,
