@@ -606,7 +606,7 @@ export function setEventHandler(el: EventTarget, eventName: string, handler: Any
 }
 
 export function setClassName(el: Element, classNames: string, value: any): void {
-  for (const cls of classNames.split(".")) {
+  for (const cls of classNames.split(".").filter(Boolean)) {
     el.classList.toggle(cls, value);
   }
 }
