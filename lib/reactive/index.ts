@@ -79,8 +79,8 @@ export interface RefOptions {
 }
 
 function refDebounce<T>(initialValue: T | null, options: RefOptions) {
-  let v: T | null = initialValue;
-  const set = debounce((newValue) => (v = newValue), options.debounce);
+  let v: T | null = unref(initialValue);
+  const set = debounce((newValue) => (v = unref(newValue)), options.debounce);
 
   return {
     __isRef: true,
@@ -89,9 +89,6 @@ function refDebounce<T>(initialValue: T | null, options: RefOptions) {
     },
     set value(v) {
       set(v);
-    },
-    toString() {
-      return String(this.value);
     },
   };
 }
