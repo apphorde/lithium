@@ -27,9 +27,10 @@ export function getSetupCode(setupNode: ElementNode): string {
   });
 
   const startOfSetupCode = ast.body.reduce((at, n) => (n.type === "ImportDeclaration" ? Math.max(at, n.end) : at), 0);
-  const endOfSetupCode = ast.body.reduce((at, n) => (n.type === "ExportNamedDeclaration" ? Math.max(at, n.end) : at), 0);
+  const endOfSetupCode = ast.body.find(n => n.type === "ExportNamedDeclaration")?.start || 0;
   const imports = setupSource.slice(0, startOfSetupCode);
-  const setupCode = setupSource.slice(startOfSetupCode, endOfSetupCode);
+  const setupCode = endOfSetupCode ? setupSource.slice(startOfSetupCode, endOfSetupCode) : setupSource.slice(startOfSetupCode);
+  const exports = endOfSetupCode ? setupSource.slice(endOfSetupCode) : '';
 
   const topLevelNodes: Array<FunctionDeclaration | VariableDeclaration> = ast.body.filter(
     (node) => node.type == "VariableDeclaration" || node.type === "FunctionDeclaration"
@@ -47,7 +48,8 @@ export function getSetupCode(setupNode: ElementNode): string {
     setupCode.trim() +
     "\nreturn { " +
     ids.join(", ") +
-    " };}";
+    " };}" +
+    exports;
 
   return combinedCode;
 }
