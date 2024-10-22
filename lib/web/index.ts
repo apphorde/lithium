@@ -90,7 +90,7 @@ function getPropValue($el: RuntimeInfo, property: string, definition: any) {
     return $el.element[property];
   }
 
-  if (isElement($el.element) && $el.element.hasAttribute(property)) {
+  if (isElement($el.element) && $el.element.hasAttribute(property.toLowerCase())) {
     return $el.element.getAttribute(property);
   }
 
@@ -488,7 +488,7 @@ export function createTextNodeBinding(el: Text): void {
 }
 
 export function createElementNodeBindings(state: any, el: Element, attributes: Array<Attribute>): void {
-  if (!Array.isArray(attributes) && attributes.length) return;
+  if (!(Array.isArray(attributes) && attributes.length)) return;
 
   for (const attr of attributes) {
     const attribute = attr[0].trim();
@@ -569,11 +569,19 @@ export function createElementNodeStyleBinding(state: any, el: any, attribute: st
 export function createElementNodePropertyBinding(state: any, el: any, attribute: string, expression: string): void {
   const name = attribute.startsWith("@")
     ? attribute.slice(1)
-    : attribute.replace("bind-", "").replace(/([-]{1}[a-z]{1})+/g, (s) => s.slice(1).toUpperCase());
+    : dashToCamelCase(attribute.replace("bind-", ""));
 
   const fn = compileExpression(expression);
 
   watch(wrapTryCatch(expression, fn), (v: any) => setProperty(el, name, v));
+}
+
+function dashToUpperCase(s: string) {
+  return s.slice(1).toUpperCase();
+}
+
+export function dashToCamelCase(s: string) {
+  return s.replace(/([-]{1}[a-z]{1})+/g, dashToUpperCase);
 }
 
 function wrapTryCatch(exp: string, fn: AnyFunction) {
@@ -694,6 +702,12 @@ export function applyAttributes(element: Element, attributes?: Attribute[]) {
   }
 }
 
+/**
+ * materialize(['text'])
+ * materialize(['!', 'comment'])
+ * materialize(['#', 0, ['document-fragment-children']])
+ * materialize(['div', [['attr', 'value']], ['children']])
+ */
 export function materialize(node: any, context: { ns?: any } = {}): Element | Text | DocumentFragment | Comment {
   // text
   if (typeof node === "string") {
@@ -703,13 +717,12 @@ export function materialize(node: any, context: { ns?: any } = {}): Element | Te
   const [t, attributes = 0, children = []] = node;
 
   // comment
-  // node = ['!', 'text']
   if ("!" === t) {
     return document.createComment(attributes);
   }
 
   // document or template
-  // node = ['#d', 0, [...]]
+  // node = ['#', 0, [...]]
   // node = ['template', 0, [...]]
   if ("#" === t || "template" === t) {
     const isDocument = "#" === t;
