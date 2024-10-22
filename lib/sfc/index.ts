@@ -6,9 +6,7 @@ import { parse as parseJS } from "acorn";
 const doc: DocumentNode = { type: "document", docType: "html", children: [] };
 const NO_SETUP = "export default function defineComponent(){return {};}";
 const EMPTY_NODE: ElementNode = { type: "element", selfClose: false, tag: "", children: [], attributes: [] };
-const EMPTY_TEMPLATE = JSON.stringify(
-  pack({ ...doc, children: [{ type: "element", children: [], attributes: [], selfClose: false, tag: "div" }] })
-);
+const EMPTY_TEMPLATE = JSON.stringify(pack(doc));
 
 export function findNode(nodes: DocumentNode, tag: string): ElementNode {
   return nodes.children.find((n) => n.type === "element" && n.tag === tag) as ElementNode;

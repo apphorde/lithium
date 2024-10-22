@@ -303,7 +303,7 @@ export function fork(base: any, delegate: any, callback: AnyFunction) {
 
 export function createState($el: RuntimeInfo): void {
   $el ||= getCurrentInstance();
-  const componentData = $el.setup($el, $el.element);
+  const componentData = $el.setup($el, $el.element) || {};
   $el.state = $el.reactive.watchDeep({ ...componentData, ...$el.state });
   $el.stateKeys = Object.keys($el.state);
 
