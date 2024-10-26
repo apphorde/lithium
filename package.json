@@ -18,6 +18,7 @@
     "./lib/html-parser",
     "./lib/reactive",
     "./lib/sfc",
+    "./lib/store",
     "./lib/web"
   ]
 }

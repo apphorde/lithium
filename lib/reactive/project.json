@@ -2,6 +2,8 @@
   "name": "@lithium/reactive",
   "targets": {
     "build": {},
-    "tsc": {}
+    "tsc": {},
+    "tdd": {},
+    "test": {}
   }
 }

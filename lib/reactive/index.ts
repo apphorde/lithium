@@ -1,163 +1,113 @@
-export interface Ref<T> {
-  value: T;
-  __isRef: true;
+const reactiveTag = Symbol("@react");
+const refTag = Symbol("@ref");
+
+interface AsyncVoidFunction {
+  (): Promise<void>;
 }
 
-type AnyFunction = (...args: any) => any;
-const reactiveTag = "__w";
-
-export interface ObservableContext {
-  check: VoidFunction;
-  suspended: boolean;
-  observers: AnyFunction[];
+export interface ReactiveOptions {
+  shallow?: boolean;
+  observers?: VoidFunction[];
 }
 
-export function check(target: ObservableContext): void {
-  if (target.suspended) return;
+export interface ReactiveTarget {
+  [reactiveTag]: VoidFunction[];
+}
 
-  for (const w of target.observers) {
-    w();
+function setProperty(target: object, property: any, value: any, observers: VoidFunction[], shallow: boolean) {
+  if (shallow) {
+    target[property] = value;
+  } else {
+    target[property] =
+      typeof value === "object" && value && !value[reactiveTag] ? reactive(value, { shallow, observers }) : value;
   }
+
+  for (const o of observers) o();
+
+  return true;
 }
 
-export function watchValue<T>(valueGetter: Ref<T> | (() => T), effect: (value: T) => void): VoidFunction {
+export function reactive<T extends Object>(target: T, options?: ReactiveOptions): T & ReactiveTarget {
+  const observers = options?.observers || [];
+  const shallow = !!options?.shallow;
+
+  if (!shallow) {
+    const entries = Object.entries(target);
+
+    for (const [key, value] of entries) {
+      if (typeof value === "object" && value) {
+        target[key] = reactive(value, { observers, shallow: false });
+      }
+    }
+  }
+
+  const proxy = new Proxy(target, {
+    set(t, p, v) {
+      return setProperty(t, p, v, observers, shallow);
+    },
+
+    get(t, p) {
+      if (p === reactiveTag) {
+        return observers;
+      }
+
+      return t[p];
+    },
+  });
+
+  return proxy as T & ReactiveTarget;
+}
+
+export function observe(target: ReactiveTarget, effect: VoidFunction): void {
+  if (!target[reactiveTag]) {
+    throw new Error("Target is not reactive");
+  }
+
+  target[reactiveTag].push(effect);
+}
+
+export interface Ref<T> extends ReactiveTarget {
+  value: T;
+}
+
+function internalRef<T>(v: T | null | undefined, shallow: boolean): Ref<T> {
+  const t = { value: v };
+  Object.defineProperty(t, refTag, { value: true, configurable: false, enumerable: false, writable: false });
+  return reactive(t, { shallow });
+}
+
+export function ref<T>(v: T | null | undefined): Ref<T> {
+  return internalRef(v, false);
+}
+
+export function shallowRef<T>(v: T | null | undefined): Ref<T> {
+  return internalRef(v, true);
+}
+
+export function isRef<T>(t: any): t is Ref<T> {
+  return t && t[refTag] === true;
+}
+
+export function unref(t: any) {
+  if (isRef(t)) {
+    return t.value;
+  }
+
+  return t;
+}
+
+export function diffWatcher<T>(
+  valueGetter: Ref<T> | (() => T),
+  effect: (value: T, lastValue: T | undefined) => void
+): AsyncVoidFunction {
   let lastValue: T | undefined;
 
   return async function () {
     let value = isRef<T>(valueGetter) ? await unref(valueGetter) : unref(await valueGetter());
 
     if (value !== lastValue && !Number.isNaN(value)) {
+      effect(value, lastValue);
       lastValue = value;
-      effect(value);
     }
   };
-}
-
-export interface ReactiveOptions {
-  shallow?: boolean
-}
-export function reactive<T extends object>(object: T, callback: VoidFunction, options?: ReactiveOptions): T {
-  if (object === null || object === undefined || reactiveTag in object) {
-    return object;
-  }
-
-  markAsReactive(object);
-
-  if (!options?.shallow) {
-    const values = Object.entries(object);
-    for (const [key, next] of values) {
-      if (typeof next === "object" && next !== null) {
-        (<any>object)[key] = reactive(next, callback);
-      }
-    }
-  }
-
-  return new Proxy(object, {
-    set(target, p, value) {
-      if (typeof value === "object" && value !== null && !options?.shallow) {
-        value = reactive(value, callback, options);
-      }
-
-      (target as any)[p] = value;
-      callback();
-      return true;
-    },
-  });
-}
-
-export function debounce(fn, timeout) {
-  let timer;
-  return function (...args) {
-    clearTimeout(timer);
-    timer = setTimeout(fn, timeout, ...args);
-  };
-}
-
-export interface RefOptions {
-  debounce: number;
-  shallow: boolean;
-}
-
-function refDebounce<T>(initialValue: T | null, options: RefOptions) {
-  let v: T | null = unref(initialValue);
-  const set = debounce((newValue) => (v = unref(newValue)), options.debounce);
-
-  return {
-    __isRef: true,
-    get value() {
-      return v;
-    },
-    set value(v) {
-      set(v);
-    },
-  };
-}
-
-export function ref<T>(initialValue: T | null, effect: AnyFunction, options?: RefOptions): Ref<T> {
-  if (options?.debounce) {
-    return reactive(refDebounce(initialValue, options), effect, options) as Ref<T>;
-  }
-
-  return reactive(
-    {
-      __isRef: true,
-      value: initialValue,
-    },
-    effect,
-    options,
-  ) as Ref<T>;
-}
-
-export function isRef<X>(t: any): t is Ref<X> {
-  return typeof t !== "object" ? false : t && t.__isRef;
-}
-
-export function unref<T>(v: T | Ref<T>): T {
-  return isRef(v) ? v.value : v;
-}
-
-export class ReactiveContext implements ObservableContext {
-  public check: VoidFunction;
-  public suspended = false;
-  public observers: AnyFunction[] = [];
-
-  constructor() {
-    this.check = check.bind(null, this);
-  }
-
-  watch<T>(getter: Ref<T> | (() => T), effect?: AnyFunction): void {
-    if (typeof getter !== "function" && !isRef(getter)) {
-      throw new Error("Watched expression must be a function");
-    }
-
-    if (effect && typeof effect !== "function") {
-      throw new Error("Watcher effect must be a function");
-    }
-
-    this.observers.push(effect ? watchValue(getter, effect) : (getter as any));
-  }
-
-  ref<T>(initialValue: T | null, options?: RefOptions): Ref<T> {
-    return ref(initialValue, this.check, options);
-  }
-
-  watchDeep<T extends object>(context: T, callback?: VoidFunction): T {
-    return reactive(context, callback || this.check);
-  }
-
-  suspend(): void {
-    this.suspended = true;
-  }
-
-  unsuspend(): void {
-    this.suspended = false;
-  }
-}
-
-export function markAsReactive(context: any): void {
-  Object.defineProperty(context, reactiveTag, {
-    value: true,
-    enumerable: false,
-    configurable: false,
-  });
 }

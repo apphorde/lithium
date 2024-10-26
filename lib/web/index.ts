@@ -2,16 +2,71 @@ import { Ref, unref, isRef, ReactiveContext, markAsReactive } from "@lithium/rea
 
 export { unref, isRef } from '@lithium/reactive';
 
-export interface RuntimeInfo {
-  shadowDom?: ShadowRootInit;
-  reactive: ReactiveContext;
+export interface ObservableContext {
+  check: VoidFunction;
+  suspended: boolean;
+  observers: AnyFunction[];
+}
+
+export function check(target: ObservableContext): void {
+  if (target.suspended) return;
+
+  for (const w of target.observers) {
+    w();
+  }
+}
+
+export class ReactiveContext implements ObservableContext {
+  public check: VoidFunction;
+  public suspended = false;
+  public observers: AnyFunction[] = [];
+
+  constructor() {
+    this.check = check.bind(null, this);
+  }
+
+  watch<T>(getter: Ref<T> | (() => T), effect?: AnyFunction): void {
+    if (typeof getter !== "function" && !isRef(getter)) {
+      throw new Error("Watched expression must be a function");
+    }
+
+    if (effect && typeof effect !== "function") {
+      throw new Error("Watcher effect must be a function");
+    }
+
+    this.observers.push(effect ? watchValue(getter, effect) : (getter as any));
+  }
+
+  ref<T>(initialValue: T | null, options?: RefOptions): Ref<T> {
+    return ref(initialValue, this.check, options);
+  }
+
+  watchDeep<T extends object>(context: T, callback?: VoidFunction): T {
+    return reactive(context, callback || this.check);
+  }
+
+  suspend(): void {
+    this.suspended = true;
+  }
+
+  unsuspend(): void {
+    this.suspended = false;
+  }
+}
+
+export interface ComponentRuntime {
+  observers: VoidFunction[];
   element: Element | DocumentFragment;
+  state: any;
+  stateKeys: string[];
+  parent: any;
+}
+
+export interface ComponentInitialization {
+  shadowDom?: ShadowRootInit;
   props: any;
   stylesheets: Array<[string, string, boolean]>;
   scripts: Array<[string, string, boolean]>;
-  state: any;
-  parent: any;
-  stateKeys: string[];
   template: HTMLTemplateElement | any[];
   setup: Function;
   init: VoidFunction | null;
@@ -29,13 +84,13 @@ export type AnyFunction = (...args: any) => any;
 const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
 const domParser = new DOMParser();
 const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
-const stack: RuntimeInfo[] = [];
+const stack: ComponentInitialization[] = [];
 
 export type EventEmitter = (event: string, detail: any) => void;
 
 ///// Setup API
 
-export function getCurrentInstance(): RuntimeInfo {
+export function getCurrentInstance(): ComponentInitialization {
   return stack[stack.length - 1];
 }
 
@@ -81,7 +136,7 @@ export function defineEvents(eventNames: any): EventEmitter {
   return emitEvent.bind(null, el);
 }
 
-function getPropValue($el: RuntimeInfo, property: string, definition: any) {
+function getPropValue($el: ComponentInitialization, property: string, definition: any) {
   if ($el.props && property in $el.props) {
     return $el.props[property];
   }
@@ -256,7 +311,7 @@ export function emitEvent(element: Element, eventName: string, detail: any): voi
   element.dispatchEvent(event);
 }
 
-export async function createInstance($el: RuntimeInfo): Promise<RuntimeInfo> {
+export async function createInstance($el: ComponentInitialization): Promise<ComponentInitialization> {
   stack.push($el);
 
   try {
@@ -301,7 +356,7 @@ export function fork(base: any, delegate: any, callback: AnyFunction) {
   });
 }
 
-export function createState($el: RuntimeInfo): void {
+export function createState($el: ComponentInitialization): void {
   $el ||= getCurrentInstance();
   const componentData = $el.setup($el, $el.element) || {};
   $el.state = $el.reactive.watchDeep({ ...componentData, ...$el.state });
@@ -327,7 +382,7 @@ export function clearElement(element: Element | DocumentFragment) {
   element.innerHTML = "";
 }
 
-export function createDom($el: RuntimeInfo): void {
+export function createDom($el: ComponentInitialization): void {
   $el ||= getCurrentInstance();
   const { element, template, shadowDom, stylesheets, scripts, state } = $el;
   let dom: any = template;
@@ -820,7 +875,7 @@ export async function templateIf(template, $el) {
   $el.reactive.watch(getter, updateDom);
 }
 
-export async function templateForOf(template: HTMLTemplateElement, $el?: RuntimeInfo) {
+export async function templateForOf(template: HTMLTemplateElement, $el?: ComponentInitialization) {
   $el ||= getCurrentInstance();
   const expression = template.getAttribute("for");
   const [iteration, source] = expression.split("of").map((s) => s.trim());
@@ -862,7 +917,7 @@ export async function templateForOf(template: HTMLTemplateElement, $el?: Runtime
 }
 
 async function repeatTemplate(
-  parent: RuntimeInfo,
+  parent: ComponentInitialization,
   template: HTMLTemplateElement,
   items: any[],
   itemName: string,
@@ -911,4 +966,12 @@ export function domReady() {
 
     window.addEventListener("DOMContentLoaded", () => next(null));
   });
+}
+
+export function debounce(fn, timeout) {
+  let timer;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(fn, timeout, ...args);
+  };
 }

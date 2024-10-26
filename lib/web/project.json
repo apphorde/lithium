@@ -2,6 +2,8 @@
   "name": "@lithium/web",
   "targets": {
     "build": {},
-    "tsc": {}
+    "tsc": {},
+    "tdd": {},
+    "test": {}
   }
 }
