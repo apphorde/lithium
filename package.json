@@ -8,6 +8,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/node": "^22.5.4",
+    "jsdom": "^25.0.1",
     "nx": "^19.7.3",
     "rollup": "^4.21.3",
     "tslib": "^2.7.0",
