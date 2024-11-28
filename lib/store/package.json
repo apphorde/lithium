@@ -1,0 +1,6 @@
+{
+  "name": "@lithium/store",
+  "dependencies": {
+    "@lithium/reactive": "workspace:*"
+  }
+}

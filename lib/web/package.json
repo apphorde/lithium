@@ -1,7 +1,7 @@
 {
   "name": "@lithium/web",
   "dependencies": {
-    "@lithium/reactive": "file:../reactive",
-    "@lithium/html-parser": "file:../html-parser"
+    "@lithium/reactive": "workspace:*",
+    "@lithium/html-parser": "workspace:*"
   }
 }

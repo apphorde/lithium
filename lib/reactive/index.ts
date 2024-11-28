@@ -20,7 +20,7 @@ export function check(target: ObservableContext): void {
   }
 }
 
-export function watchValue<T>(valueGetter: Ref<T> | (() => T), effect: (value: T) => void): VoidFunction {
+export function observer<T>(valueGetter: Ref<T> | (() => T), effect: (value: T) => void): VoidFunction {
   let lastValue: T | undefined;
 
   return async function () {
@@ -36,6 +36,7 @@ export function watchValue<T>(valueGetter: Ref<T> | (() => T), effect: (value: T
 export interface ReactiveOptions {
   shallow?: boolean
 }
+
 export function reactive<T extends object>(object: T, callback: VoidFunction, options?: ReactiveOptions): T {
   if (object === null || object === undefined || reactiveTag in object) {
     return object;
@@ -134,7 +135,7 @@ export class ReactiveContext implements ObservableContext {
       throw new Error("Watcher effect must be a function");
     }
 
-    this.observers.push(effect ? watchValue(getter, effect) : (getter as any));
+    this.observers.push(effect ? observer(getter, effect) : (getter as any));
   }
 
   ref<T>(initialValue: T | null, options?: RefOptions): Ref<T> {

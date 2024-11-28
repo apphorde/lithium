@@ -103,6 +103,24 @@ function getPropValue($el: RuntimeInfo, property: string, definition: any) {
   }
 }
 
+export function getInternals($el: RuntimeInfo) {
+  $el ||= getCurrentInstance();
+
+  return new Proxy({}, {
+    get(_t, key) {
+      if (key === 'element') {
+        return ($el.element as Element).shadowRoot || $el.element;
+      }
+
+      if (key === 'template') {
+        return $el.template;
+      }
+
+      return null;
+    }
+  });
+}
+
 export function defineProps(definitions: string[] | Record<string, any>): any {
   const $el = getCurrentInstance();
   const keys = !Array.isArray(definitions) ? Object.keys(definitions) : definitions;
