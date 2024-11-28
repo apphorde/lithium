@@ -5,7 +5,7 @@ import terser from "@rollup/plugin-terser";
 
 export default {
   input: "./index.ts",
-  external: [],
+  external: [/@lithium\/.*/],
   output: {
     dir: ".",
     format: "es",

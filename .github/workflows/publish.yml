@@ -16,6 +16,7 @@ jobs:
 
       - name: Build packages
         run: |
+          set -e
           which pnpm && echo 'pnpm OK' || npm i -g pnpm
           pnpm i && pnpx nx run-many -t build,test
 
