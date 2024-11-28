@@ -16,7 +16,8 @@ jobs:
 
       - name: Build packages
         run: |
-          npm ci && npx nx run-many -t build,test
+          which pnpm && echo 'pnpm OK' || npm i -g pnpm
+          pnpm i && pnpx nx run-many -t build,test
 
       - name: Publish to AppHorde Registry
         env:
