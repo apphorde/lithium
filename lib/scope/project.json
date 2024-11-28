@@ -1,0 +1,7 @@
+{
+  "name": "@lithium/scope",
+  "targets": {
+    "build": {},
+    "tsc": {}
+  }
+}

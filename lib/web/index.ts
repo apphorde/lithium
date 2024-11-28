@@ -2,19 +2,22 @@ import { Ref, unref, isRef, ReactiveContext, markAsReactive } from "@lithium/rea
 
 export { unref, isRef } from '@lithium/reactive';
 
-export interface RuntimeInfo {
+export interface RuntimeProperties {
+  element: Element | DocumentFragment;
+  state: any;
+  template: HTMLTemplateElement | any[];
+}
+
+export interface RuntimeInternals extends RuntimeProperties {
   shadowDom?: ShadowRootInit;
   reactive: ReactiveContext;
-  element: Element | DocumentFragment;
   props: any;
   stylesheets: Array<[string, string, boolean]>;
   scripts: Array<[string, string, boolean]>;
-  state: any;
   parent: any;
   stateKeys: string[];
-  template: HTMLTemplateElement | any[];
   setup: Function;
-  init: VoidFunction | null;
+  init: (runtime: RuntimeProperties) => void | null;
   destroy: VoidFunction | null;
 }
 
@@ -29,13 +32,13 @@ export type AnyFunction = (...args: any) => any;
 const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
 const domParser = new DOMParser();
 const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
-const stack: RuntimeInfo[] = [];
+const stack: RuntimeInternals[] = [];
 
 export type EventEmitter = (event: string, detail: any) => void;
 
 ///// Setup API
 
-export function getCurrentInstance(): RuntimeInfo {
+export function getCurrentInstance(): RuntimeInternals {
   return stack[stack.length - 1];
 }
 
@@ -81,7 +84,7 @@ export function defineEvents(eventNames: any): EventEmitter {
   return emitEvent.bind(null, el);
 }
 
-function getPropValue($el: RuntimeInfo, property: string, definition: any) {
+function getPropValue($el: RuntimeInternals, property: string, definition: any) {
   if ($el.props && property in $el.props) {
     return $el.props[property];
   }
@@ -103,17 +106,18 @@ function getPropValue($el: RuntimeInfo, property: string, definition: any) {
   }
 }
 
-export function getInternals($el: RuntimeInfo) {
-  $el ||= getCurrentInstance();
+export function defineQuery(selector: string) {
+  const $el = getCurrentInstance();
+  const root = ($el.element as Element).shadowRoot || $el.element;
 
   return new Proxy({}, {
     get(_t, key) {
-      if (key === 'element') {
-        return ($el.element as Element).shadowRoot || $el.element;
+      if (key === 'one') {
+        return root.querySelector(selector);
       }
 
-      if (key === 'template') {
-        return $el.template;
+      if (key === 'many') {
+        return root.querySelectorAll(selector);
       }
 
       return null;
@@ -274,7 +278,7 @@ export function emitEvent(element: Element, eventName: string, detail: any): voi
   element.dispatchEvent(event);
 }
 
-export async function createInstance($el: RuntimeInfo): Promise<RuntimeInfo> {
+export async function createInstance($el: RuntimeInternals): Promise<RuntimeInternals> {
   stack.push($el);
 
   try {
@@ -290,7 +294,7 @@ export async function createInstance($el: RuntimeInfo): Promise<RuntimeInfo> {
     }
 
     if ($el.init) {
-      $el.init();
+      $el.init($el);
     }
   } catch (error) {
     console.log("Failed to initialize component!", this, error);
@@ -319,7 +323,7 @@ export function fork(base: any, delegate: any, callback: AnyFunction) {
   });
 }
 
-export function createState($el: RuntimeInfo): void {
+export function createState($el: RuntimeInternals): void {
   $el ||= getCurrentInstance();
   const componentData = $el.setup($el, $el.element) || {};
   $el.state = $el.reactive.watchDeep({ ...componentData, ...$el.state });
@@ -345,7 +349,7 @@ export function clearElement(element: Element | DocumentFragment) {
   element.innerHTML = "";
 }
 
-export function createDom($el: RuntimeInfo): void {
+export function createDom($el: RuntimeInternals): void {
   $el ||= getCurrentInstance();
   const { element, template, shadowDom, stylesheets, scripts, state } = $el;
   let dom: any = template;
@@ -838,7 +842,7 @@ export async function templateIf(template, $el) {
   $el.reactive.watch(getter, updateDom);
 }
 
-export async function templateForOf(template: HTMLTemplateElement, $el?: RuntimeInfo) {
+export async function templateForOf(template: HTMLTemplateElement, $el?: RuntimeInternals) {
   $el ||= getCurrentInstance();
   const expression = template.getAttribute("for");
   const [iteration, source] = expression.split("of").map((s) => s.trim());
@@ -880,7 +884,7 @@ export async function templateForOf(template: HTMLTemplateElement, $el?: Runtime
 }
 
 async function repeatTemplate(
-  parent: RuntimeInfo,
+  parent: RuntimeInternals,
   template: HTMLTemplateElement,
   items: any[],
   itemName: string,
