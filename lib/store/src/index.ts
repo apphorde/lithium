@@ -26,7 +26,7 @@ export function useStore<T, A extends Action>(initialState: T, options?: StoreOp
       action = { type: action, payload } as A;
     }
 
-    let nextState = structuredClone(state.value);
+    let nextState = { ...state.value };
 
     try {
       for (const reducer of reducers) {
@@ -80,7 +80,7 @@ export function useStore<T, A extends Action>(initialState: T, options?: StoreOp
     events.addEventListener("dispatch", check);
 
     return {
-      unref() {
+      detach() {
         observers.length = 0;
         events.removeEventListener("dispatch", check);
       },
