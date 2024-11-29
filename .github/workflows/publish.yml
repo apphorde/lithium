@@ -25,7 +25,7 @@ jobs:
           CDN_API_URL: ${{ secrets.CDN_API_URL }}
           CDN_API_KEY: ${{ secrets.CDN_API_KEY }}
         run: |
-          for pkg in html-parser web reactive sfc cli scope store; do
+          for pkg in cli html-parser reactive scope sfc store web; do
             echo -n $pkg...
             curl -sS --fail -H "Authorization: ${{ env.CDN_API_KEY }}" -X POST ${{ env.CDN_API_URL }}/library/@lithium/$pkg@0.0.0 --data-binary @lib/$pkg/dist/index.js
           done
