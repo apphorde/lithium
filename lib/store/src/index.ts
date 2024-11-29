@@ -1,6 +1,7 @@
 import { observer, ref, Ref } from "@lithium/reactive";
 
 const noop = () => {};
+const identity = (s) => s;
 
 export interface Action<T = any> {
   type: string;
@@ -9,49 +10,36 @@ export interface Action<T = any> {
 
 export type Reducer<A, T> = (action: A, state: T) => T;
 export type Effect<A, T> = (action: A, state: T) => void | Promise<void>;
+export interface StoreOptions {
+  reducers?: Record<string, Reducer<any, any>>;
+  effects?: Record<string, Reducer<any, any>>;
+}
 
-export function useStore<T, A extends Action>(initialState: T) {
+export function useStore<T, A extends Action>(initialState: T, options?: StoreOptions) {
   const events = new EventTarget();
-
-  function check() {
-    for (const f of observers) f();
-  }
-
-  const observers = [];
   const reducers = [];
   const effects = [];
-  const state = ref<T>(initialState, check);
-  const selectAll = (state) => state;
+  const state = { value: initialState };
 
-  function select<V>(selector: (state: T) => V = selectAll): Ref<V> {
-    const v = selector(state.value);
-    const s = ref(v, noop);
+  function dispatch(action: A | string, payload?: any) {
+    if (typeof action === "string") {
+      action = { type: action, payload } as A;
+    }
 
-    const o = observer(
-      () => selector(state.value),
-      (value) => (s.value = value)
-    );
-
-    observers.push(o);
-
-    return s;
-  }
-
-  function dispatch(action: A) {
-    let next = structuredClone(state.value);
+    let nextState = structuredClone(state.value);
 
     try {
       for (const reducer of reducers) {
         if (reducer[0] === action.type) {
-          next = reducer[1](next, action);
+          nextState = reducer[1](nextState, action) ?? nextState;
         }
       }
 
-      state.value = next;
+      state.value = nextState;
 
       for (const effect of effects) {
         if (effect[0] === action.type) {
-          effect[1](next, action);
+          effect[1](nextState, action);
         }
       }
     } catch (error) {
@@ -62,13 +50,55 @@ export function useStore<T, A extends Action>(initialState: T) {
     events.dispatchEvent(new CustomEvent("dispatch", { detail: action }));
   }
 
-  function withReducer(type: string, fn: Reducer<A, T>) {
+  function addReducer(type: string, fn: Reducer<A, T>) {
     reducers.push([type, fn]);
   }
 
-  function withEffect(type: string, fn: Effect<A, T>) {
+  function addEffect(type: string, fn: Effect<A, T>) {
     effects.push([type, fn]);
   }
 
-  return { events, select, dispatch, withReducer, withEffect };
+  if (options?.reducers) {
+    for (const next of Object.entries(options?.reducers)) {
+      addReducer(next[0], next[1]);
+    }
+  }
+
+  if (options?.effects) {
+    for (const next of Object.entries(options?.effects)) {
+      addEffect(next[0], next[1]);
+    }
+  }
+
+  function useSelectors() {
+    const observers = [];
+
+    function check() {
+      for (const f of observers) f();
+    }
+
+    events.addEventListener("dispatch", check);
+
+    return {
+      unref() {
+        observers.length = 0;
+        events.removeEventListener("dispatch", check);
+      },
+
+      select<V>(selector: (state: T) => V = identity): Ref<V> {
+        const value = selector(state.value);
+        const valueRef = ref(value, noop);
+        const o = observer(
+          () => selector(state.value),
+          (value) => (valueRef.value = value)
+        );
+
+        observers.push(o);
+
+        return valueRef;
+      },
+    };
+  }
+
+  return { events, useSelectors, dispatch, addReducer, addEffect };
 }
