@@ -9,7 +9,7 @@ import { addProperties, addExpression, createScope, compile, bind } from '@lithi
 const scope = createScope();
 
 // declare properties that are expected to be available in the context
-addProperties(scope, ["counter"]);
+addProperties(scope, ["counter", "increase"]);
 
 // add JS expressions
 const counter = addExpression(scope, `'Counter is at ' + counter + '.'`);

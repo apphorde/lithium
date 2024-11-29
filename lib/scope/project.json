@@ -2,6 +2,11 @@
   "name": "@lithium/scope",
   "targets": {
     "build": {},
-    "tsc": {}
+    "tsc": {},
+    "test": {
+      "options": {
+        "command": "npx tsx {projectRoot}/index.spec.ts"
+      }
+    }
   }
 }
