@@ -1,5 +1,4 @@
-import { observer, ref } from "@lithium/reactive";
-import type { Ref } from "@lithium/reactive";
+import { observer, ref, Ref } from "@lithium/reactive";
 
 const noop = () => {};
 

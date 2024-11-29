@@ -1,3 +1,9 @@
 {
-  "name": "@lithium/reactive"
+  "name": "@lithium/reactive",
+  "exports": {
+    ".": {
+      "default": "./index.js",
+      "types": "./dist/index.d.ts"
+    }
+  }
 }

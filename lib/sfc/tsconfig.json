@@ -1,11 +1,7 @@
 {
   "extends": "../../tsconfig.json",
-  "files": ["./index.ts"],
   "exclude": ["./index.d.ts"],
   "compilerOptions": {
-    "outDir": ".",
-    "paths": {
-      "@lithium/html-parser": ["../html-parser/*"]
-    }
+    "outDir": "./dist"
   }
 }

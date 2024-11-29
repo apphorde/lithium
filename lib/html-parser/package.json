@@ -1,3 +1,9 @@
 {
-  "name": "@lithium/html-parser"
+  "name": "@lithium/html-parser",
+  "exports": {
+    ".": {
+      "default": "./index.js",
+      "types": "./dist/index.d.ts"
+    }
+  }
 }

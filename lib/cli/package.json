@@ -1,9 +1,15 @@
 {
   "name": "@lithium/cli",
+  "exports": {
+    ".": {
+      "default": "./index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "bin": {
     "lit": "./index.js"
   },
   "dependencies": {
-    "@lithium/sfc": "file:../sfc"
+    "@lithium/sfc": "workspace:*"
   }
 }

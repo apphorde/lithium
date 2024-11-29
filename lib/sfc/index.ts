@@ -1,4 +1,4 @@
-import type { ChildNode, DocumentNode, ElementNode, ParserNode, TextNode } from "@lithium/html-parser";
+import type { DocumentNode, ElementNode, ParserNode, TextNode } from "@lithium/html-parser";
 import type { FunctionDeclaration, VariableDeclaration } from "acorn";
 import { parse as parseHTML, pack } from "@lithium/html-parser";
 import { parse as parseJS } from "acorn";
@@ -36,8 +36,8 @@ export function getSetupCode(setupNode: ElementNode): string {
 
   const ids = topLevelNodes.flatMap((node) =>
     "id" in node
-      ? (<FunctionDeclaration>node).id.name
-      : (<VariableDeclaration>node).declarations.map((d) => (<any>d).id.name)
+      ? (node as FunctionDeclaration).id.name
+      : (node as VariableDeclaration).declarations.map((d) => (d as any).id.name)
   );
 
   const combinedCode =

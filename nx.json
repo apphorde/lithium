@@ -1,5 +1,8 @@
 {
-  "workspaceLayout": { "libsDir": "./lib", "appsDir": "./lib" },
+  "workspaceLayout": {
+    "libsDir": "./lib",
+    "appsDir": "./lib"
+  },
   "targetDefaults": {
     "tsc": {
       "executor": "nx:run-commands",
@@ -9,9 +12,9 @@
     },
     "build": {
       "dependsOn": ["^build", "tsc"],
-      "executor": "@nx/rollup:rollup",
+      "executor": "nx:run-commands",
       "options": {
-        "rollupConfig": "{projectRoot}/rollup.config.mjs"
+        "command": "rollup -c {projectRoot}/rollup.config.js"
       }
     },
     "test": {

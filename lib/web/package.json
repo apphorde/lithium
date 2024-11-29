@@ -1,5 +1,11 @@
 {
   "name": "@lithium/web",
+  "exports": {
+    ".": {
+      "default": "./index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "dependencies": {
     "@lithium/reactive": "workspace:*",
     "@lithium/html-parser": "workspace:*"

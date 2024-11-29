@@ -1,11 +1,6 @@
 {
   "extends": "../../tsconfig.json",
-  "files": ["./index.ts"],
   "compilerOptions": {
-    "outDir": ".",
-    "paths": {
-      "@lithium/reactive": ["../reactive/*"],
-      "@lithium/html-parser": ["../html-parser/*"]
-    }
+    "outDir": "./dist"
   }
 }

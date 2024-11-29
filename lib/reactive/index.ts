@@ -48,7 +48,7 @@ export function reactive<T extends object>(object: T, callback: VoidFunction, op
     const values = Object.entries(object);
     for (const [key, next] of values) {
       if (typeof next === "object" && next !== null) {
-        (<any>object)[key] = reactive(next, callback);
+        (object as any)[key] = reactive(next, callback);
       }
     }
   }

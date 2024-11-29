@@ -487,7 +487,7 @@ interface Attribute {
 
 export function createBindings(state: any, element: Element | Text, attributes: Array<Attribute>): void {
   if (element.nodeType === element.TEXT_NODE) {
-    createTextNodeBinding(<Text>element);
+    createTextNodeBinding(element as Text);
     return;
   }
 
