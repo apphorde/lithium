@@ -1,3 +1,5 @@
 dist/
 node_modules/
 .nx/
+lib/**/index.d.ts
+lib/**/index.js
