@@ -1,4 +1,4 @@
-import type { DocumentNode, ElementNode, ParserNode, TextNode } from "@lithium/html-parser";
+import type { DocumentNode, ElementNode, ParserNode } from "@lithium/html-parser";
 import type { FunctionDeclaration, VariableDeclaration } from "acorn";
 import { parse as parseHTML, pack } from "@lithium/html-parser";
 import { parse as parseJS } from "acorn";

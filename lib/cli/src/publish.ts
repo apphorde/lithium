@@ -1,6 +1,6 @@
 import { getComponentCode } from "@lithium/sfc";
 import { readFileSync } from "node:fs";
-import type { Args } from "./parse-args";
+import type { Args } from "./parse-args.js";
 
 const publishUrl = process.env.PUBLISH_REGISTRY;
 const publishToken = process.env.PUBLISH_TOKEN;

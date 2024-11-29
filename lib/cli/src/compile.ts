@@ -1,5 +1,5 @@
 import { parseSFC } from "@lithium/sfc";
-import type { Args } from "./parse-args";
+import type { Args } from "./parse-args.js";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 

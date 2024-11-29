@@ -5,19 +5,21 @@ const terser = require("@rollup/plugin-terser");
 const { join } = require("path");
 
 module.exports = (projectRoot) => ({
-  input: join(projectRoot, "index.ts"),
+  input: join(projectRoot, "src", "index.ts"),
   external: [/@lithium\/.*/],
   output: {
     dir: projectRoot,
     format: "esm",
   },
   plugins: [
+    resolve(),
     typescript({
       tsconfig: join(projectRoot, "tsconfig.json"),
       exclude: ["**/*.spec.ts"],
+      noEmit: false,
+      declaration: true,
     }),
     json(),
-    resolve(),
     terser({
       compress: true,
       ecma: 2020,

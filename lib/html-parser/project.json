@@ -5,7 +5,7 @@
     "tsc": {},
     "test": {
       "options": {
-        "command": "npx tsx {projectRoot}/index.spec.ts"
+        "command": "npx tsx {projectRoot}/src/index.spec.ts"
       }
     }
   }
