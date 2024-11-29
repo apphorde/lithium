@@ -2,22 +2,15 @@
   "name": "@lithium/monorepo",
   "license": "MIT",
   "devDependencies": {
-    "@nx/rollup": "^19.7.3",
+    "@nx/rollup": "20.1.4",
     "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-node-resolve": "^15.3.0",
     "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^11.0.0",
-    "@types/node": "^22.5.4",
-    "nx": "^19.7.3",
-    "rollup": "^4.21.3",
-    "tslib": "^2.7.0",
-    "typescript": "^5.5.4"
-  },
-  "workspaces": [
-    "./lib/cli",
-    "./lib/html-parser",
-    "./lib/reactive",
-    "./lib/sfc",
-    "./lib/web"
-  ]
+    "@rollup/plugin-typescript": "^12.1.1",
+    "@types/node": "^22.10.1",
+    "nx": "20.1.4",
+    "rollup": "^4.27.4",
+    "tslib": "^2.8.1",
+    "typescript": "^5.7.2"
+  }
 }

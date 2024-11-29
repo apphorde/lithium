@@ -1,6 +1,5 @@
 {
   "workspaceLayout": { "libsDir": "./lib", "appsDir": "./lib" },
-  "plugins": ["@nx/rollup/plugin"],
   "targetDefaults": {
     "tsc": {
       "executor": "nx:run-commands",
