@@ -203,7 +203,7 @@ export class Parser {
 
     this.iterate(() => {
       const char = this.getCurrent();
-      if (char === newLine || char === space || char === equals || char === forwardSlash) {
+      if (char === newLine || char === space || char === equals || char === forwardSlash || char === endTag) {
         return true;
       }
 

@@ -292,4 +292,42 @@ describe("pack and unpack nodes", () => {
       parse(`text content`)
     );
   });
+
+  it('should parse attributes without a value', () => {
+    const doc = parse(`<input checked readonly /><script nomodule></script>`);
+    expect(doc).toEqual({
+      "type": "document",
+      "docType": "html",
+      "children": [
+        {
+          "type": "element",
+          "tag": "input",
+          "selfClose": true,
+          "attributes": [
+            {
+              "name": "checked",
+              "value": ""
+            },
+            {
+              "name": "readonly",
+              "value": ""
+            }
+          ],
+          "children": []
+        },
+        {
+          "type": "element",
+          "tag": "script",
+          "selfClose": false,
+          "attributes": [
+            {
+              "name": "nomodule",
+              "value": ""
+            }
+          ],
+          "children": []
+        }
+      ]
+    })
+  });
 });
