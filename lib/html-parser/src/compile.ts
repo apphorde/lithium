@@ -52,8 +52,8 @@ p=(t,a)=>t.append(...a);
     }
 
     const bs = options?.beforeSetAttribute;
-    for (let a of node.attributes) {
-      const b = bs ? bs(id, a) : a;
+    for (const a of node.attributes) {
+      const b = bs ? bs(id, node, a) : a;
 
       if (!b) continue;
 
