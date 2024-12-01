@@ -21,21 +21,21 @@ export function compile(node, options, children?, context = { ns: "", vars: [] }
     docChildren.length && code.push(`p(${id},[${docChildren.join(",")}]);`);
 
     _uid = 1;
-    return (
-      `const _d=document,
+    return {
+      rootElement: id,
+      code:
+        `const _d=document,
 e=x=>_d.createElement(x),
 ne=(x,n)=>_d.createElementNS(n=='s'?'http://www.w3.org/2000/svg':'',x),
 t=x=>_d.createTextNode(x),
 a=(e,a,b='')=>e.setAttribute(a,b),
 p=(t,a)=>t.append(...a);
 ` +
-      "let " +
-      context.vars.join(",") +
-      ";\n" +
-      code.join("\n") +
-      "return " +
-      id
-    );
+        "let " +
+        context.vars.join(",") +
+        ";\n" +
+        code.join("\n"),
+    };
   }
 
   if (node.type === "element") {
