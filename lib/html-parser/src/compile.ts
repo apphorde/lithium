@@ -4,21 +4,21 @@ function uid() {
   return "u" + _uid++;
 }
 
-export function compile(node, children, context = { ns: "", vars: [] }) {
+export function compile(node, options, children?, context = { ns: "", vars: [] }) {
   const code = [];
 
   if (node.type === "document") {
     const id = uid();
     context.vars.push(`${id}=document.createDocumentFragment()`);
 
-    const h = [];
-    let n;
+    const docChildren = [];
+    let next;
     for (const c of node.children) {
-      n = compile(c, h, context);
-      n && code.push(n);
+      next = compile(c, options, docChildren, context);
+      next && code.push(next);
     }
 
-    h.length && code.push(`p(${id},[${h.join(",")}]);`);
+    docChildren.length && code.push(`p(${id},[${docChildren.join(",")}]);`);
 
     _uid = 1;
     return (
@@ -51,7 +51,13 @@ p=(t,a)=>t.append(...a);
       context.vars.push(`${id}=e("${node.tag}")`);
     }
 
-    for (const { name, value } of node.attributes) {
+    const bs = options?.beforeSetAttribute;
+    for (let a of node.attributes) {
+      const b = bs ? bs(id, a) : a;
+
+      if (!b) continue;
+
+      const { name, value } = b;
       if (value) {
         code.push(`a(${id},"${name}",\`${value}\`)`);
       } else {
@@ -60,15 +66,16 @@ p=(t,a)=>t.append(...a);
     }
 
     children.push(id);
+
     if (node.children.length) {
-      const h = [];
-      let n;
+      const elChildren = [];
+      let next;
       for (const c of node.children) {
-        n = compile(c, h, context);
-        n && code.push(n);
+        next = compile(c, options, elChildren, context);
+        next && code.push(next);
       }
 
-      h.length && code.push(`p(${id},[${h.join(",")}])`);
+      elChildren.length && code.push(`p(${id},[${elChildren.join(",")}])`);
     }
 
     if (node.tag === "svg") {
