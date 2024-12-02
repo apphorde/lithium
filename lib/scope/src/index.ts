@@ -33,7 +33,11 @@ export function createScope(parent?: Scope): Scope {
   ) as Scope;
 }
 
-export function addExpression(scope: Scope, expression: string, args?: string[]) {
+export function addExpression(
+  scope: Scope,
+  expression: string,
+  args?: string[]
+) {
   const name = "f" + uid++;
   const e = scope[$expressions];
   e[name] = [expression, args];
@@ -64,23 +68,17 @@ export function compile(scope: Scope): void {
       .map((ref) => `const ${ref} = __u(__s.${ref});`)
       .join(",");
 
-    code.push(`${fn.includes("await") ? "async " : ""} function ${fn} (${args}) { ${accessors} return ${exp} } `);
+    code.push(
+      `${
+        fn.includes("await") ? "async " : ""
+      } function ${fn} (${args}) { ${accessors} return ${exp} } `
+    );
   }
 
   code.push(`return { ${keys.join(",")} }; }`);
-  let fn;
-
-  if (typeof globalThis.document !== "undefined") {
-    const el = globalThis.document.createElement("script");
-    el.innerText = code.join("\n");
-    globalThis.head.append(el);
-    fn = (self as any)[name];
-    el.remove();
-  } else {
-    fn = Function("return " + code.join("\n"))();
-  }
-
+  const fn = Function("return " + code.join("\n"))();
   scope[$source].fn = fn;
+  scope[$source].source = code.join("\n");
 }
 
 export function configure(scope: Scope, options: { unwrap: any }) {
@@ -90,4 +88,8 @@ export function configure(scope: Scope, options: { unwrap: any }) {
 export function bind(scope: Scope, context: any) {
   const scopeSource = scope[$source];
   return scopeSource.fn(context, scopeSource.unwrap || identity);
+}
+
+export function getSource(scope: Scope) {
+  return scope[$source].source;
 }
