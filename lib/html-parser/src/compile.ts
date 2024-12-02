@@ -82,7 +82,7 @@ p=(t,a)=>t.append(...a);
       context.ns = "";
     }
 
-    return code.join("\n");
+    return code.join(";");
   }
 
   if (node.type === "text" && node.text.trim()) {
