@@ -46,9 +46,9 @@ p=(t,a)=>t.append(...a);
     }
 
     if (context.ns) {
-      context.vars.push(`${id}=ne("${node.tag}","${context.ns}");`);
+      context.vars.push(`${id}=ne("${node.tag}","${context.ns}")`);
     } else {
-      context.vars.push(`${id}=e("${node.tag}");`);
+      context.vars.push(`${id}=e("${node.tag}")`);
     }
 
     const bs = options?.beforeSetAttribute;
