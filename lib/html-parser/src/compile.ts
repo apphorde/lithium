@@ -34,7 +34,7 @@ p=(t,a)=>t.append(...a);
         "let " +
         context.vars.join(",") +
         ";\n" +
-        code.join("\n"),
+        code.join(";"),
     };
   }
 
@@ -46,9 +46,9 @@ p=(t,a)=>t.append(...a);
     }
 
     if (context.ns) {
-      context.vars.push(`${id}=ne("${node.tag}","${context.ns}")`);
+      context.vars.push(`${id}=ne("${node.tag}","${context.ns}");`);
     } else {
-      context.vars.push(`${id}=e("${node.tag}")`);
+      context.vars.push(`${id}=e("${node.tag}");`);
     }
 
     const bs = options?.beforeSetAttribute;
@@ -59,9 +59,9 @@ p=(t,a)=>t.append(...a);
 
       const { name, value } = b;
       if (value) {
-        code.push(`a(${id},"${name}",\`${value}\`)`);
+        code.push(`a(${id},"${name}",\`${value}\`);`);
       } else {
-        code.push(`a(${id},"${name}")`);
+        code.push(`a(${id},"${name}");`);
       }
     }
 
@@ -75,14 +75,14 @@ p=(t,a)=>t.append(...a);
         next && code.push(next);
       }
 
-      elChildren.length && code.push(`p(${id},[${elChildren.join(",")}])`);
+      elChildren.length && code.push(`p(${id},[${elChildren.join(",")}]);`);
     }
 
     if (node.tag === "svg") {
       context.ns = "";
     }
 
-    return code.join(";");
+    return code.join("");
   }
 
   if (node.type === "text" && node.text.trim()) {
