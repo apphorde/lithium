@@ -38,7 +38,7 @@ export function addExpression(
   expression: string,
   args?: string[]
 ) {
-  const name = "f" + uid++;
+  const name = "__" + uid++;
   const e = scope[$expressions];
   e[name] = [expression, args];
 
@@ -76,8 +76,7 @@ export function compile(scope: Scope): void {
   }
 
   code.push(`return { ${keys.join(",")} }; }`);
-  const fn = Function("return " + code.join("\n"))();
-  scope[$source].fn = fn;
+  scope[$source].fn = Function("return " + code.join("\n"))();
   scope[$source].source = code.join("\n");
 }
 
