@@ -4,7 +4,12 @@ function uid() {
   return "u" + _uid++;
 }
 
-export function compile(node, options, children?, context = { ns: "", vars: [] }) {
+export function compile(
+  node,
+  options,
+  children?,
+  context = { ns: "", vars: [] }
+) {
   const code = [];
 
   if (node.type === "document") {
@@ -23,18 +28,14 @@ export function compile(node, options, children?, context = { ns: "", vars: [] }
     _uid = 1;
     return {
       rootElement: id,
-      code:
-        `const _d=document,
+      code: `const _d=document,
 e=x=>_d.createElement(x),
 ne=(x,n)=>_d.createElementNS(n=='s'?'http://www.w3.org/2000/svg':'',x),
 t=x=>_d.createTextNode(x),
 a=(e,a,b='')=>e.setAttribute(a,b),
 p=(t,a)=>t.append(...a);
-` +
-        "let " +
-        context.vars.join(",") +
-        ";\n" +
-        code.join(";"),
+let ${context.vars.join(",")};
+${code.join("")}`,
     };
   }
 
