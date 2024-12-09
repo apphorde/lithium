@@ -365,10 +365,15 @@ export function createDom($el: RuntimeInternals): void {
   const visitor = createBindings.bind(null, state);
 
   traverseDom(dom, visitor);
-  clearElement(element);
+  const previousContent = Array.from(element.childNodes);
+
+  if (!shadowDom) {
+    clearElement(element);
+  }
 
   if (!shadowDom || isFragment(element)) {
     element.append(dom);
+    element.querySelector('slot')?.append(...previousContent);
   } else {
     element.attachShadow(shadowDom as ShadowRootInit);
     element.shadowRoot.append(dom);
