@@ -5,22 +5,21 @@ import { watch } from "../layer-0/reactive.js";
 
 plugins.use({
   applyAttribute(_, node, attribute, value) {
-    if (!isElement(node)) {
-      return;
-    }
-
     if (attribute.startsWith(".class.") || attribute.startsWith("class-")) {
-      createClassBinding(node, attribute, value);
+      createClassBinding(
+        node,
+        attribute.replace(".class.", "").replace("class-", ""),
+        value
+      );
     }
   },
 });
 
 export function createClassBinding(
   el: any,
-  attribute: string,
+  classNames: string,
   expression: string
 ): void {
-  const classNames = attribute.replace(".class.", "").replace("class-", "");
   const fn = compileExpression(expression);
 
   watch(wrapTryCatch(expression, fn), (v?: any) =>

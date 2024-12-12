@@ -5,23 +5,26 @@ import { watch } from "../layer-0/reactive.js";
 
 plugins.use({
   applyAttribute(_$el, node, attribute, value) {
-    if (attribute.charAt(0) === ":" || attribute.startsWith("bind-")) {
-      createPropertyBinding(node, attribute, value);
+    if (attribute.charAt(0) === ":") {
+      createPropertyBinding(node, attribute.slice(1), value);
+    }
+
+    if (attribute.startsWith("bind-")) {
+      createPropertyBinding(
+        node,
+        dashToCamelCase(attribute.replace("bind-", "")),
+        value
+      );
     }
   },
 });
 
 export function createPropertyBinding(
   el: any,
-  attribute: string,
+  name: string,
   expression: string
 ): void {
-  const name = attribute.startsWith("@")
-    ? attribute.slice(1)
-    : dashToCamelCase(attribute.replace("bind-", ""));
-
   const fn = compileExpression(expression);
-
   watch(wrapTryCatch(expression, fn), (v: any) => setProperty(el, name, v));
 }
 

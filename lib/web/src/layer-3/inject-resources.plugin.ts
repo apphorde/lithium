@@ -2,7 +2,7 @@ import { plugins } from "../layer-0/plugin.js";
 import type { RuntimeInternals } from "../layer-0/types.js";
 
 plugins.use({
-  createDom($el: RuntimeInternals) {
+  appendDom($el: RuntimeInternals) {
     const { element, stylesheets, scripts } = $el;
 
     for (const [a, b, c] of stylesheets) {

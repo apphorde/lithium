@@ -6,8 +6,12 @@ const eventFlags = ["capture", "once", "passive", "stop", "prevent"];
 
 plugins.use({
   applyAttribute(_$el, node: Element, attribute: string, value: string) {
-    if (attribute.charAt(0) === "@" || attribute.startsWith("on-")) {
-      createEventBinding(node, attribute, value);
+    if (attribute.charAt(0) === "@") {
+      createEventBinding(node, attribute.slice(1), value);
+    }
+
+    if (attribute.startsWith("on-")) {
+      createEventBinding(node, attribute.replace("on-", ""), value);
     }
   },
 });
@@ -17,11 +21,7 @@ export function createEventBinding(
   attribute: string,
   expression: string
 ): void {
-  const normalized = attribute.startsWith("@")
-    ? attribute.slice(1)
-    : attribute.replace("on-", "");
-
-  const [eventName, ...flags] = normalized.split(".");
+  const [eventName, ...flags] = attribute.split(".");
   const exec = compileExpression(expression, ["$event"]);
   const options = {};
 

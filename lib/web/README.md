@@ -112,16 +112,16 @@ createComponent('x-tab', { setup: tab });
 
 ## Component lifecycle
 
+When `mount(rootElement, { setup, template })` is called, these lifecycle events are executed:
+
 ```mermaid
 graph TD
-    a(mount) ==> b((setup))
-    b == props/refs/events defined ==> c((createDom))
-    c -. then for each element .-> d((applyAttribute))
-    d -. then run all bindings once .-> f((init))
-    f ==> g(check)
-    g == prop/ref changes ==> h(re-render)
-    h ==> g
-    h == context will unmount ==> i((destroy))
+    A(setup) --> B(createDom)
+    B -- for each DOM node --> C(createElement)
+    C -- for each HTMLElement attribute --> D(applyAttribute)
+    D -- DOM structure is connected  --> E(appendDom)
+    E -- component starts  --> F(init)
+    F -- before DOM disconnects --> G(destroy)
 ```
 
 ## Plugins
@@ -131,19 +131,26 @@ import { plugins } from '@lithium/web';
 
 plugins.use({
   setup(state) {
-    // right after component state is computed
+    // right after component state is created
   },
-  createDom(rootElement) {
-    // when all elements are created
+  createDom($el, domTree) {
+    // when all elements are created, but not appended yet
   },
-  applyAttribute(element, attribute) {
-    // when an attribute is being applied to an element
+  createElement($el, domNode) {
+    // for each node in the new dom tree
+  },
+  applyAttribute($el, element, attribute, value) {
+    // when an attribute is being applied to an HTMLElement
+  },
+  appendDom({ element }) {
+    // when the new dom tree is appended to the root element
   },
   init({ element }) {
     // when all bindings are ready
   },
   destroy({ element }) {
     // right before a node is detached from DOM and destroyed
+    // only works with custom elements using `disconnectedCallback` hook
   },
 });
 

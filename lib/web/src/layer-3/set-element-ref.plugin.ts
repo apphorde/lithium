@@ -8,9 +8,13 @@ plugins.use({
       return;
     }
 
-    if (isRef($el.state[refName])) {
-      markAsReactive(node);
-      $el.state[refName].value = node;
-    }
+    setElementRefValue($el, node, refName);
   },
 });
+
+function setElementRefValue($el, node, refName) {
+  if (isRef($el.state[refName])) {
+    markAsReactive(node);
+    $el.state[refName].value = node;
+  }
+}
