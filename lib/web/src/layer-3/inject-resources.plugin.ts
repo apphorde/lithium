@@ -1,6 +1,20 @@
 import { plugins } from "../layer-0/plugin.js";
 import type { RuntimeInternals } from "../layer-0/types.js";
 
+plugins.use({
+  createDom($el: RuntimeInternals) {
+    const { element, stylesheets, scripts } = $el;
+
+    for (const [a, b, c] of stylesheets) {
+      injectCssIntoElement(element, a, b, c);
+    }
+
+    for (const [a, b, c] of scripts) {
+      injectScriptIntoElement(element, a, b, c);
+    }
+  },
+});
+
 export function injectCssIntoElement(
   el: Element | DocumentFragment,
   href: string,
@@ -51,17 +65,3 @@ export function injectScriptIntoElement(
 
   parent.append(tag);
 }
-
-plugins.use({
-  createDom($el: RuntimeInternals) {
-    const { element, stylesheets, scripts } = $el;
-
-    for (const [a, b, c] of stylesheets) {
-      injectCssIntoElement(element, a, b, c);
-    }
-
-    for (const [a, b, c] of scripts) {
-      injectScriptIntoElement(element, a, b, c);
-    }
-  },
-});

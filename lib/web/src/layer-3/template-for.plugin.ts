@@ -1,64 +1,22 @@
 import { plugins } from "../layer-0/plugin.js";
 import { getCurrentInstance } from "../layer-0/stack.js";
-import { compileExpression } from "../layer-1/expressions.js";
 import { mount } from "../layer-2/mount.js";
 import { defineProps } from "../layer-1/props.js";
-import { unref } from "@lithium/reactive";
+import { unref } from "../layer-0/reactive.js";
 import type { RuntimeInternals } from "../layer-0/types.js";
 
 plugins.use({
-  createDom($el: RuntimeInternals) {
+  appendDom($el: RuntimeInternals) {
     const { element } = $el;
     const templates: HTMLTemplateElement[] = Array.from(
-      (element["shadowRoot"] || element).querySelectorAll("template")
+      (element["shadowRoot"] || element).querySelectorAll("template[for]")
     );
-    const templateLoops = templates.filter((t) => t.hasAttribute("for"));
-    for (const t of templateLoops) {
-      templateForOf(t, $el);
-    }
 
-    const templateConditions = templates.filter((t) => t.hasAttribute("if"));
-    for (const t of templateConditions) {
-      templateIf(t, $el);
+    for (const t of templates) {
+      templateForOf(t, $el);
     }
   },
 });
-
-export async function templateIf(template, $el) {
-  $el ||= getCurrentInstance();
-
-  const expression = template.getAttribute("if");
-  const getter = compileExpression(expression);
-  const previousNodes = [];
-
-  function remove() {
-    for (const next of previousNodes) {
-      next.parentNode && next.remove();
-    }
-
-    previousNodes.length = 0;
-  }
-
-  async function add() {
-    const fragment = document.createDocumentFragment();
-    await mount(fragment, { template }, { parent: $el });
-    previousNodes.push(...Array.from(fragment.childNodes));
-    template.parentNode.insertBefore(fragment, template);
-  }
-
-  function updateDom(value) {
-    if (!template.parentNode || !value) {
-      remove();
-      return;
-    }
-
-    if (!previousNodes.length) {
-      add();
-    }
-  }
-
-  $el.reactive.watch(getter, updateDom);
-}
 
 export async function templateForOf(
   template: HTMLTemplateElement,
@@ -101,6 +59,7 @@ export async function templateForOf(
     add(list);
   }
 
+  // TODO compile source to an expression
   $el.reactive.watch(() => $el.state[source], updateDom);
 }
 

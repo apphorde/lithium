@@ -1,10 +1,10 @@
-import { isElement, setEventHandler } from "../layer-1/dom.js";
+import { setEventHandler } from "../layer-1/dom.js";
 import { compileExpression } from "../layer-1/expressions.js";
 import { plugins } from "../layer-0/plugin.js";
 
 const eventFlags = ["capture", "once", "passive", "stop", "prevent"];
 
-/* dead
+/*
 export function defineEvents(eventNames: any): EventEmitter {
   const el = getCurrentInstance().element;
 
@@ -32,24 +32,17 @@ export function defineEventOnElement(el: Element, name: string): void {
     Object.defineProperty(el, property, { value: null });
   }
 }
-
-// -- dead
 */
 
 plugins.use({
-  applyAttribute($el, node, attribute, value) {
-    if (!isElement(node)) {
-      return;
-    }
-
+  applyAttribute(_$el, node: Element, attribute: string, value: string) {
     if (attribute.charAt(0) === "@" || attribute.startsWith("on-")) {
-      createElementNodeEventBinding($el.state, node, attribute, value);
+      createEventBinding(node, attribute, value);
     }
   },
 });
 
-export function createElementNodeEventBinding(
-  _state: any,
+export function createEventBinding(
   el: Element,
   attribute: string,
   expression: string
@@ -57,6 +50,7 @@ export function createElementNodeEventBinding(
   const normalized = attribute.startsWith("@")
     ? attribute.slice(1)
     : attribute.replace("on-", "");
+
   const [eventName, ...flags] = normalized.split(".");
   const exec = compileExpression(expression, ["$event"]);
   const options = {};

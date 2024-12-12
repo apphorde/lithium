@@ -1,4 +1,4 @@
-import { isElement, setClassName } from "../layer-1/dom.js";
+import { isElement, setStyle } from "../layer-1/dom.js";
 import { compileExpression, wrapTryCatch } from "../layer-1/expressions.js";
 import { plugins } from "../layer-0/plugin.js";
 import { watch } from "../layer-0/reactive.js";
@@ -10,20 +10,18 @@ plugins.use({
     }
 
     if (attribute.startsWith(".class.") || attribute.startsWith("class-")) {
-      createClassBinding(node, attribute, value);
+      createStyleBinding(node, attribute, value);
     }
   },
 });
 
-export function createClassBinding(
+export function createStyleBinding(
   el: any,
   attribute: string,
   expression: string
 ): void {
-  const classNames = attribute.replace(".class.", "").replace("class-", "");
+  const style = attribute.replace(".style.", "").replace("style-", "");
   const fn = compileExpression(expression);
 
-  watch(wrapTryCatch(expression, fn), (v?: any) =>
-    setClassName(el, classNames, v)
-  );
+  watch(wrapTryCatch(expression, fn), (v: any) => setStyle(el, style, v));
 }

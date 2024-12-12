@@ -268,7 +268,7 @@ export function createDom($el: RuntimeInternals): void {
   traverseDom(dom, (node, attributes) => {
     plugins.apply("createElement", [$el, node]);
 
-    if (!(Array.isArray(attributes) && attributes.length)) {
+    if (!isElement(node) || !(Array.isArray(attributes) && attributes.length)) {
       return;
     }
 
@@ -292,4 +292,6 @@ export function createDom($el: RuntimeInternals): void {
     element.attachShadow(shadowDom as ShadowRootInit);
     element.shadowRoot.append(dom);
   }
+
+  plugins.apply("appendDom", [$el]);
 }
