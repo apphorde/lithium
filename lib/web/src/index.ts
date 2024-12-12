@@ -1,3 +1,6 @@
+import { domReady, html, tpl } from "./layer-1/dom.js";
+import { mount } from "./layer-2/mount.js";
+
 export * from "./layer-0/types.js";
 export * from "./layer-0/plugin.js";
 export * from "./layer-0/reactive.js";
@@ -20,3 +23,15 @@ export * from "./layer-3/set-style.plugin.js";
 export * from "./layer-3/template-for.plugin.js";
 export * from "./layer-3/template-if.plugin.js";
 export * from "./layer-3/text-template.plugin.js";
+
+domReady(function () {
+  document.querySelectorAll("[lit-app]").forEach((node) => {
+    mount(node, {
+      template: tpl(node.outerHTML),
+      setup() {
+        const init = node.getAttribute("lit-app");
+        return init ? JSON.parse(init) : {};
+      },
+    });
+  });
+});

@@ -9,6 +9,7 @@ import type {
 } from "../layer-0/types.js";
 
 export const noop = () => {};
+const mounted = Symbol();
 
 export interface MountOptions {
   props?: any;
@@ -28,6 +29,12 @@ export function mount(
     throw new Error("Target element not found");
   }
 
+  if (element[mounted]) {
+    console.warn("Tried to mount an element twice", element);
+    return;
+  }
+
+  element[mounted] = true;
   const { setup = noop, template, shadowDom } = def;
   const $el = {
     shadowDom,

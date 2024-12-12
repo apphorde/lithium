@@ -1,7 +1,6 @@
 import { mount } from "./mount.js";
 import type { AnyFunction, ComponentDefinitions } from "../layer-0/types.js";
 
-const mounted = Symbol();
 export const DefineComponent = Symbol("@@def");
 
 export function createComponent(name: string, def: ComponentDefinitions): void {
@@ -15,10 +14,7 @@ export function createComponent(name: string, def: ComponentDefinitions): void {
     private __destroy: AnyFunction;
 
     connectedCallback() {
-      if (!this[mounted]) {
-        mount(this, Component[DefineComponent]);
-        this[mounted] = true;
-      }
+      mount(this, Component[DefineComponent]);
     }
 
     disconnectedCallback() {

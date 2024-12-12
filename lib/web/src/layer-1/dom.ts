@@ -230,14 +230,16 @@ export function materialize(
   return el;
 }
 
-export function domReady() {
-  return new Promise((next) => {
-    if (document.readyState == "complete") {
-      next(null);
-      return;
-    }
+export function domReady(fn?) {
+  if (document.readyState === "complete") {
+    return fn ? fn() : Promise.resolve(null);
+  }
 
-    window.addEventListener("DOMContentLoaded", () => next(null));
+  return new Promise((next) => {
+    window.addEventListener("DOMContentLoaded", () => {
+      fn && fn();
+      next(null);
+    });
   });
 }
 
