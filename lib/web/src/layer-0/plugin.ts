@@ -1,5 +1,3 @@
-import { RuntimeInternals } from "./types";
-
 export class PluginDispatcher {
   private hooks: Record<string, any[]>;
 
@@ -28,7 +26,5 @@ export class PluginDispatcher {
   }
 }
 
-const plugins = new PluginDispatcher();
-plugins.setHooks(["setup", "createDom", "applyAttribute", "init", "destroy"]);
-
-export default plugins;
+export const plugins = new PluginDispatcher();
+plugins.setHooks(["setup", "createDom", "createElement", "applyAttribute", "init", "destroy"]);

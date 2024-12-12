@@ -27,3 +27,8 @@ export interface ComponentDefinitions {
 
 export type EventEmitter = (event: string, detail: any) => void;
 export type AnyFunction = (...args: any) => any;
+
+export interface Attribute {
+  name: string;
+  value: string;
+}

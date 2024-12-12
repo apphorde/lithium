@@ -110,7 +110,7 @@ createComponent('x-tab', { setup: tab });
 </x-tabcontainer>
 ```
 
-## Component lifecycles
+## Component lifecycle
 
 ```mermaid
 graph TD
@@ -145,6 +145,6 @@ plugins.use({
   destroy({ element }) {
     // right before a node is detached from DOM and destroyed
   },
-})
+});
 
 ```
