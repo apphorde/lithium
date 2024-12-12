@@ -4,36 +4,6 @@ import { plugins } from "../layer-0/plugin.js";
 
 const eventFlags = ["capture", "once", "passive", "stop", "prevent"];
 
-/*
-export function defineEvents(eventNames: any): EventEmitter {
-  const el = getCurrentInstance().element;
-
-  if (isElement(el)) {
-    for (const event of eventNames) {
-      defineEventOnElement(el, event);
-    }
-  }
-
-  return emitEvent.bind(null, el);
-}
-
-export function emitEvent(
-  element: Element,
-  eventName: string,
-  detail: any
-): void {
-  const event = new CustomEvent(eventName, { detail });
-  element.dispatchEvent(event);
-}
-
-export function defineEventOnElement(el: Element, name: string): void {
-  const property = "on" + name.toLowerCase();
-  if (!el.hasOwnProperty(property)) {
-    Object.defineProperty(el, property, { value: null });
-  }
-}
-*/
-
 plugins.use({
   applyAttribute(_$el, node: Element, attribute: string, value: string) {
     if (attribute.charAt(0) === "@" || attribute.startsWith("on-")) {

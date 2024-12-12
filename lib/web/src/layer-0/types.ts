@@ -25,7 +25,7 @@ export interface ComponentDefinitions {
   shadowDom?: ShadowRootInit;
 }
 
-export type EventEmitter = (event: string, detail: any) => void;
+export type EventEmitFunction = (event: string, detail: any) => void;
 export type AnyFunction = (...args: any) => any;
 
 export interface Attribute {

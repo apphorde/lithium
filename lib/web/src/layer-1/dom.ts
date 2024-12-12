@@ -295,3 +295,10 @@ export function createDom($el: RuntimeInternals): void {
 
   plugins.apply("appendDom", [$el]);
 }
+
+export function defineEventOnElement(el: Element, name: string): void {
+  const property = "on" + name.toLowerCase();
+  if (!el.hasOwnProperty(property)) {
+    Object.defineProperty(el, property, { value: null });
+  }
+}

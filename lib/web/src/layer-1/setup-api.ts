@@ -1,4 +1,6 @@
 import { getCurrentInstance } from "../layer-0/stack.js";
+import { EventEmitFunction } from "../layer-0/types.js";
+import { defineEventOnElement, isElement } from "./dom.js";
 
 export function loadCss(
   url: string,
@@ -44,4 +46,25 @@ export function defineQuery(selector: string) {
       },
     }
   );
+}
+
+export function defineEvents(eventNames: any): EventEmitFunction {
+  const el = getCurrentInstance().element;
+
+  if (isElement(el)) {
+    for (const event of eventNames) {
+      defineEventOnElement(el, event);
+    }
+  }
+
+  return emitEvent.bind(null, el);
+}
+
+export function emitEvent(
+  element: Element,
+  eventName: string,
+  detail: any
+): void {
+  const event = new CustomEvent(eventName, { detail });
+  element.dispatchEvent(event);
 }
