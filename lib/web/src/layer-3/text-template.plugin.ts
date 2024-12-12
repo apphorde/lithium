@@ -4,7 +4,7 @@ import { plugins } from "../layer-0/plugin.js";
 import { watch } from "../layer-0/reactive.js";
 
 plugins.use({
-  createElement(node: Text) {
+  createElement(_, node: Text) {
     if (node.nodeType !== node.TEXT_NODE) {
       return;
     }
