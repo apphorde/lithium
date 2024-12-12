@@ -1,40 +1,16 @@
 import { Ref, unref, isRef, ReactiveContext, markAsReactive } from "@lithium/reactive";
+import plugins from './plugin.js';
+import type { AnyFunction, EventEmitter, RuntimeProperties, RuntimeInternals, ComponentDefinitions } from './types.js';
+export type { AnyFunction, EventEmitter, RuntimeProperties, RuntimeInternals, ComponentDefinitions };
 
 export { unref, isRef } from '@lithium/reactive';
-
-export interface RuntimeProperties {
-  element: Element | DocumentFragment;
-  state: any;
-  template: HTMLTemplateElement | any[];
-}
-
-export interface RuntimeInternals extends RuntimeProperties {
-  shadowDom?: ShadowRootInit;
-  reactive: ReactiveContext;
-  props: any;
-  stylesheets: Array<[string, string, boolean]>;
-  scripts: Array<[string, string, boolean]>;
-  parent: any;
-  stateKeys: string[];
-  setup: Function;
-  init: (runtime: RuntimeProperties) => void | null;
-  destroy: VoidFunction | null;
-}
-
-export interface ComponentDefinitions {
-  setup?: Function;
-  template: any[] | HTMLTemplateElement;
-  shadowDom?: ShadowRootInit;
-}
-
-export type AnyFunction = (...args: any) => any;
+export { PluginDispatcher } from './plugin.js';
+export { plugin }
 
 const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
 const domParser = new DOMParser();
 const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
 const stack: RuntimeInternals[] = [];
-
-export type EventEmitter = (event: string, detail: any) => void;
 
 ///// Setup API
 
@@ -192,6 +168,12 @@ export function html(text: string) {
   return parseDomTree(dom.body);
 }
 
+export function tpl(text: string) {
+  const template = document.createElement("template");
+  template.innerHTML = text;
+  return template;
+}
+
 type InjectionEvent<T> = CustomEvent & { result?: T };
 
 export function provide<T>(token: Symbol, provider): void {
@@ -219,12 +201,6 @@ export function inject<T>(token: any) {
   }
 
   return result;
-}
-
-export function tpl(text: string) {
-  const template = document.createElement("template");
-  template.innerHTML = text;
-  return template;
 }
 
 export function parseDomTree(tree) {
@@ -285,13 +261,18 @@ export async function createInstance($el: RuntimeInternals): Promise<RuntimeInte
     const { reactive } = $el;
     reactive.suspend();
     createState($el);
+    plugins.apply('setup', [$el]);
     createDom($el);
+    plugins.apply('createDom', [$el]);
     reactive.unsuspend();
     reactive.check();
 
-    if ($el.destroy) {
-      ($el.element as any).__destroy = $el.destroy;
+    ($el.element as any).__destroy = () => {
+      plugins.apply('destroy', [$el]);
+      $el.destroy && $el.destroy();
     }
+
+    plugins.apply('init', [$el]);
 
     if ($el.init) {
       $el.init($el);
@@ -422,6 +403,8 @@ export function compileExpression(expression: string, args: string[] = []): AnyF
 export const noop = () => {};
 export const DefineComponent = Symbol("@@def");
 
+const mounted = Symbol();
+
 export function createComponent(name: string, def: ComponentDefinitions): void {
   if (customElements.get(name)) {
     customElements.get(name)![DefineComponent] = def;
@@ -433,7 +416,10 @@ export function createComponent(name: string, def: ComponentDefinitions): void {
     private __destroy: AnyFunction;
 
     connectedCallback() {
-      mount(this, Component[DefineComponent]);
+      if (!this[mounted]) {
+        mount(this, Component[DefineComponent]);
+        this[mounted] = true;
+      }
     }
 
     disconnectedCallback() {

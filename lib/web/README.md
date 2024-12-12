@@ -109,3 +109,42 @@ createComponent('x-tab', { setup: tab });
   <x-tab tabid="two"></x-tab>
 </x-tabcontainer>
 ```
+
+## Component lifecycles
+
+```mermaid
+graph TD
+    a(mount) ==> b((setup))
+    b == props/refs/events defined ==> c((createDom))
+    c -. then for each element .-> d((applyAttribute))
+    d -. then run all bindings once .-> f((init))
+    f ==> g(check)
+    g == prop/ref changes ==> h(re-render)
+    h ==> g
+    h == context will unmount ==> i((destroy))
+```
+
+## Plugins
+
+```js
+import { plugins } from '@lithium/web';
+
+plugins.use({
+  setup(state) {
+    // right after component state is computed
+  },
+  createDom(rootElement) {
+    // when all elements are created
+  },
+  applyAttribute(element, attribute) {
+    // when an attribute is being applied to an element
+  },
+  init({ element }) {
+    // when all bindings are ready
+  },
+  destroy({ element }) {
+    // right before a node is detached from DOM and destroyed
+  },
+})
+
+```
