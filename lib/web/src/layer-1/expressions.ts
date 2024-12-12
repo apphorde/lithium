@@ -11,12 +11,10 @@ export function compileExpression(
   args: string[] = []
 ): AnyFunction {
   const { state, stateKeys } = getCurrentInstance();
-  const usedKeys = stateKeys.filter((k) => expression.includes(k));
-  const propertiesFromState = usedKeys.length
-    ? usedKeys
-        .map((stateKey) => `const ${stateKey} = __u(__s.${stateKey})`)
-        .join(";") + ";"
-    : "";
+  const propertiesFromState =
+    stateKeys
+      .map((stateKey) => `const ${stateKey} = __u(__s.${stateKey})`)
+      .join(";") + ";";
 
   const code = propertiesFromState + `\nreturn ${expression}`;
   const cacheKey = code + args;
