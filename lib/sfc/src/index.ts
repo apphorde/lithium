@@ -60,7 +60,7 @@ export function getTemplateCode(template: ElementNode) {
   return JSON.stringify(pack({ ...doc, children: [...template.children] }));
 }
 
-export function getComponentCode(name, { template, setup, shadowDom }) {
+export function getComponentCode(name, { template, setup, shadowDom }, withExport = true) {
   return `import {createComponent} from "@lithium/web";
 ${setup}
 
@@ -69,7 +69,7 @@ const __t = ${template};
 const __c = { setup: defineComponent, template: __t, shadowDom: __s };
 
 createComponent('${name}', __c);
-export default __c;
+${ withExport ? 'export default __c;' : ''}
 `;
 }
 
@@ -109,4 +109,21 @@ export function parseSFC(source: string) {
     : { mode: shadowDomOption.value };
 
   return { template, setup, shadowDom };
+}
+
+export async function loadComponent(name, url: string | URL) {
+  const req = await fetch(url);
+
+  if (!req.ok) {
+    throw new Error(`Failed to load component at ${url}`);
+  }
+
+  const source = await req.text();
+  const parsed = parseSFC(source);
+  const component = getComponentCode(name, parsed, false);
+  const tag = document.createElement('script');
+  tag.type = 'module';
+  tag.innerText = component;
+  document.head.appendChild(tag);
+  
 }

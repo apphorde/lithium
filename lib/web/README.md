@@ -1,6 +1,6 @@
 # @lithium/web
 
-Run-time API for running custom elements with live bindings, props, custom events and whatnot.
+A customisable runtime library for writing web components
 
 ## Template Syntax
 

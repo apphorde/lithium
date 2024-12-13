@@ -7,6 +7,7 @@ import type {
   ComponentDefinitions,
   RuntimeInternals,
 } from "../layer-0/types.js";
+import { getOption } from "../layer-0/options.js";
 
 export const noop = () => {};
 const mounted = Symbol();
@@ -52,7 +53,12 @@ export function mount(
     reactive: new ReactiveContext(),
   };
 
-  return Promise.resolve($el).then(createInstance);
+  if (getOption("asyncMount")) {
+    return Promise.resolve($el).then(createInstance);
+  }
+
+  createInstance($el);
+  return $el;
 }
 
 export async function createInstance(
