@@ -154,6 +154,6 @@ function updateStateOfCacheEntries(context: Context, list: any[]) {
   let index = 0;
 
   for (const item of list) {
-    nodeCache[index++].$el.state[itemName] = item;
+    nodeCache[index++].$el.state[itemName].value = item;
   }
 }
