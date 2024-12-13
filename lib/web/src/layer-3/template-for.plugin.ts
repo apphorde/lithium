@@ -56,8 +56,8 @@ export function templateForOf(
       return;
     }
 
-    const newNodes = await resize(context, list.length);
-    updateStateOfCacheEntry(context, list);
+    const newNodes = await resize(context, list.length, list);
+    updateStateOfCacheEntries(context, list);
 
     if (!newNodes) {
       return;
@@ -78,13 +78,14 @@ export function templateForOf(
   $el.reactive.watch(() => $el.state[source], onListChange);
 }
 
-async function resize(context: Context, newLength: number) {
+async function resize(context: Context, newLength: number, list?: any[]) {
   const { nodeCache } = context;
 
   if (newLength === nodeCache.length) {
     return;
   }
 
+  // remove excess of nodes
   if (newLength < nodeCache.length) {
     const nodesToRemove = nodeCache.slice(nodeCache.length - newLength);
     nodeCache.length = newLength;
@@ -98,32 +99,40 @@ async function resize(context: Context, newLength: number) {
     return;
   }
 
-  let index = nodeCache.length;
-  const length = newLength - 1;
-  const { indexName } = context;
+  // add nodes to cache and return them
+  const maxLength = newLength - 1;
+  const baseLength = nodeCache.length;
+  const { indexName, itemName } = context;
   const newElements = document.createDocumentFragment();
-  const nodes = await Promise.all(
+
+  await Promise.all(
     Array(newLength - nodeCache.length)
       .fill(0)
-      .map(() => createCacheEntry(context))
-  );
+      .map(async (_, at) => {
+        const index = baseLength + at;
+        const props = {
+          [itemName]: list[index],
+          [indexName]: index,
+          $first: index === 0,
+          $last: index === maxLength,
+          $odd: index % 2 === 1,
+          $even: index % 2 === 0,
+        };
 
-  for (const entry of nodes) {
-    nodeCache.push(entry);
-    newElements.append(...entry.nodes);
-    const state = entry.$el.state;
-    state[indexName] = index;
-    state.$first = index === 0;
-    state.$last = index === length;
-    state.$odd = index % 2 === 1;
-    state.$even = index % 2 === 0;
-    index++;
-  }
+        const entry = await createCacheEntry(context, props);
+
+        nodeCache.push(entry);
+        newElements.append(...entry.nodes);
+      })
+  );
 
   return newElements;
 }
 
-async function createCacheEntry(context: Context): Promise<NodeCacheEntry> {
+async function createCacheEntry(
+  context: Context,
+  props: any
+): Promise<NodeCacheEntry> {
   const { $el, template, itemName, indexName } = context;
 
   function setup() {
@@ -134,13 +143,13 @@ async function createCacheEntry(context: Context): Promise<NodeCacheEntry> {
   const childState = await mount(
     itemFragment,
     { setup, template },
-    { parent: $el }
+    { parent: $el, props }
   );
 
   return { nodes: Array.from(itemFragment.childNodes), $el: childState };
 }
 
-function updateStateOfCacheEntry(context: Context, list: any[]) {
+function updateStateOfCacheEntries(context: Context, list: any[]) {
   const { nodeCache, itemName } = context;
   let index = 0;
 
