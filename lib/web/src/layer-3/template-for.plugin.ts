@@ -68,14 +68,28 @@ export function templateForOf(
       return;
     }
 
-    const lastCacheEntry = nodeCache[nodeCache.length - 1].nodes;
-    const lastNode = lastCacheEntry[lastCacheEntry.length - 1] || template;
+    const lastNode = findLastNode(nodeCache) || template;
     template.parentNode.insertBefore(newNodes, lastNode);
     $el.reactive.check();
   }
 
   // TODO compile source to an expression
   $el.reactive.watch(() => $el.state[source], onListChange);
+}
+
+function findLastNode(nodeCache: NodeCacheEntry[]) {
+  let index = nodeCache.length - 1;
+
+  while (index >= 0) {
+    const nodes = nodeCache[index].nodes;
+    const last = nodes[nodes.length - 1];
+
+    if (last.isConnected) {
+      return last;
+    }
+
+    index--;
+  }
 }
 
 async function resize(context: Context, newLength: number, list?: any[]) {
