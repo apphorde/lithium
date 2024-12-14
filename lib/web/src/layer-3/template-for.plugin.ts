@@ -69,7 +69,7 @@ export function templateForOf(
     }
 
     const lastCacheEntry = nodeCache[nodeCache.length - 1].nodes;
-    const lastNode = lastCacheEntry[lastCacheEntry.length - 1];
+    const lastNode = lastCacheEntry[lastCacheEntry.length - 1] || template;
     template.parentNode.insertBefore(newNodes, lastNode);
     $el.reactive.check();
   }
