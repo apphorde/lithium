@@ -1,5 +1,5 @@
 const options = {
-  asyncMount: true,
+  asyncMount: false,
 };
 
 export function setOption<T extends keyof typeof options>(
