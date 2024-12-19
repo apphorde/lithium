@@ -29,33 +29,8 @@ export function compileExpression(
 
   const parsed = domParser.parseFromString(code, "text/html");
   const finalCode = parsed.body.innerText.trim();
-
-  if (getOption("exportedExpressions")) {
-    const functionName = "__f" + uid++;
-    const parts = [
-      "window." + functionName + " = ",
-      expression.includes("await ") ? "async " : "",
-      `function (`,
-      ["__s", "__u", ...args].join(","),
-      ") {",
-      finalCode,
-      "}",
-    ];
-
-    const tag = document.createElement("script");
-    tag.append(document.createTextNode(parts.join("")));
-    document.head.append(tag);
-
-    return (...args) => {
-      const fn = window[functionName];
-      delete window[functionName];
-      fnCache.set(cacheKey, fn);
-
-      return fn.call(state, state, unref, ...args);
-    };
-  }
-
   const functionType = expression.includes("await ") ? AsyncFunction : Function;
+
   fn = functionType(...["__s", "__u", ...args], finalCode);
   fnCache.set(cacheKey, fn);
 
