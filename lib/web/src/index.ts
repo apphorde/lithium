@@ -1,5 +1,5 @@
-import { setOption } from './layer-0/options.js';
-import { domReady, html, tpl } from "./layer-1/dom.js";
+import { getOption, setOption } from "./layer-0/options.js";
+import { domReady, tpl } from "./layer-1/dom.js";
 import { mount } from "./layer-2/mount.js";
 
 export * from "./layer-0/types.js";
@@ -40,4 +40,5 @@ domReady(function () {
 
 window["Lithium"] = {
   setOption,
+  getOption,
 };
