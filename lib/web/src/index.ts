@@ -27,22 +27,30 @@ export * from "./layer-3/template-if.plugin.js";
 export * from "./layer-3/text-template.plugin.js";
 
 domReady(function () {
-  document.querySelectorAll("[lit-app]").forEach((node) => {
+  document.querySelectorAll("[lit-app]").forEach(async (node) => {
+    async function initialize() {
+      const init = node.getAttribute("lit-app");
+
+      if (init.charAt(0) === "{" || init.charAt(0) === "[") {
+        return JSON.parse(init);
+      }
+
+      if (window[init]) {
+        return window[init]();
+      }
+
+      try {
+        const mod = await import(init);
+        return (mod.setup || mod.default)();
+      } catch {
+        return {};
+      }
+    }
+
+    const model = await initialize();
     mount(node, {
       template: tpl(node.outerHTML),
-      setup() {
-        const init = node.getAttribute("lit-app");
-
-        if (init.charAt(0) === "{" || init.charAt(0) === "[") {
-          return JSON.parse(init);
-        }
-
-        if (window[init]) {
-          return window[init]();
-        }
-
-        return {};
-      },
+      setup: () => model,
     });
   });
 });
