@@ -32,7 +32,16 @@ domReady(function () {
       template: tpl(node.outerHTML),
       setup() {
         const init = node.getAttribute("lit-app");
-        return init ? JSON.parse(init) : {};
+
+        if (init.charAt(0) === "{" || init.charAt(0) === "[") {
+          return JSON.parse(init);
+        }
+
+        if (window[init]) {
+          return window[init]();
+        }
+
+        return {};
       },
     });
   });
