@@ -26,30 +26,34 @@ export * from "./layer-3/template-for.plugin.js";
 export * from "./layer-3/template-if.plugin.js";
 export * from "./layer-3/text-template.plugin.js";
 
+async function loadInitializer(init) {
+  if (init.charAt(0) === "{" || init.charAt(0) === "[") {
+    return () => JSON.parse(init);
+  }
+
+  if (window[init]) {
+    return window[init];
+  }
+
+  try {
+    const mod = await import(init);
+    const setup = mod.setup || mod.default;
+
+    if (typeof setup !== "function") {
+      console.warn("Invalid setup module at " + init);
+      throw new Error();
+    }
+
+    return setup;
+  } catch {}
+
+  return () => ({});
+}
+
 domReady(function () {
   document.querySelectorAll("[lit-app]").forEach(async (node) => {
     const init = node.getAttribute("lit-app");
-    let setup;
-
-    if (init.charAt(0) === "{" || init.charAt(0) === "[") {
-      setup = () => JSON.parse(init);
-    }
-
-    if (window[init]) {
-      setup = window[init];
-    }
-
-    try {
-      const mod = await import(init);
-      setup = mod.setup || mod.default;
-
-      if (typeof setup !== "function") {
-        console.warn("Invalid setup module at " + init);
-        throw new Error();
-      }
-    } catch {
-      setup = () => ({});
-    }
+    const setup = await loadInitializer(init);
 
     mount(node, {
       template: tpl(node.outerHTML),
