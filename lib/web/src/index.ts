@@ -28,29 +28,32 @@ export * from "./layer-3/text-template.plugin.js";
 
 domReady(function () {
   document.querySelectorAll("[lit-app]").forEach(async (node) => {
-    async function initialize() {
-      const init = node.getAttribute("lit-app");
+    const init = node.getAttribute("lit-app");
+    let setup;
 
-      if (init.charAt(0) === "{" || init.charAt(0) === "[") {
-        return JSON.parse(init);
-      }
-
-      if (window[init]) {
-        return window[init]();
-      }
-
-      try {
-        const mod = await import(init);
-        return (mod.setup || mod.default)();
-      } catch {
-        return {};
-      }
+    if (init.charAt(0) === "{" || init.charAt(0) === "[") {
+      setup = () => JSON.parse(init);
     }
 
-    const model = await initialize();
+    if (window[init]) {
+      setup = window[init];
+    }
+
+    try {
+      const mod = await import(init);
+      setup = mod.setup || mod.default;
+
+      if (typeof setup !== "function") {
+        console.warn("Invalid setup module at " + init);
+        throw new Error();
+      }
+    } catch {
+      setup = () => ({});
+    }
+
     mount(node, {
       template: tpl(node.outerHTML),
-      setup: () => model,
+      setup: () => setup(),
     });
   });
 });
