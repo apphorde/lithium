@@ -28,16 +28,20 @@ export function shallowRef<T>(value?: T, options = {}): Ref<T> {
   return ref(value, { ...options, shallow: true });
 }
 
-export function fork(base: any, delegate: any, callback: AnyFunction) {
-  return new Proxy(delegate, {
+export function fork(parent: any, child: any, callback: AnyFunction) {
+  return new Proxy(child, {
     get(_t, p) {
-      return base.hasOwnProperty(p) ? base[p] : delegate[p];
+      if (child[p] !== undefined) {
+        return child[p];
+      }
+
+      return parent[p];
     },
     set(_t, p, v) {
-      if (delegate.hasOwnProperty(p)) {
-        delegate[p] = v;
+      if (child.hasOwnProperty(p)) {
+        child[p] = v;
       } else {
-        base[p] = v;
+        parent[p] = v;
       }
 
       callback();
