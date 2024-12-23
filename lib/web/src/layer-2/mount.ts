@@ -10,6 +10,7 @@ import type {
 import { getOption } from "../layer-0/options.js";
 
 export const noop = () => {};
+export const VM = Symbol('@@VM');
 const mounted = Symbol();
 
 export interface MountOptions {
@@ -84,6 +85,10 @@ export async function createInstance(
 
     if ($el.init) {
       $el.init($el);
+    }
+
+    if (getOption('debugEnabled')) {
+      $el.element[VM] = $el;
     }
   } catch (error) {
     console.log("Failed to initialize component!", this, error);
