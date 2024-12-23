@@ -50,16 +50,18 @@ async function loadInitializer(init) {
   return () => ({});
 }
 
-domReady(function () {
-  document.querySelectorAll("[lit-app]").forEach(async (node) => {
-    const init = node.getAttribute("lit-app");
-    const setup = await loadInitializer(init);
+export async function bootstrap(node: HTMLElement) {
+  const init = node.getAttribute("lit-app");
+  const setup = await loadInitializer(init);
 
-    mount(node, {
-      template: tpl(node.outerHTML),
-      setup: () => setup(),
-    });
+  mount(node, {
+    template: tpl(node.innerHTML),
+    setup: () => setup(),
   });
+}
+
+domReady(function () {
+  document.querySelectorAll("[lit-app]").forEach(bootstrap);
 });
 
 window["Lithium"] = {
