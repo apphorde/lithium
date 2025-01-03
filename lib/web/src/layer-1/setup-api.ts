@@ -19,11 +19,11 @@ export function loadScript(
 }
 
 export function onInit(fn: VoidFunction): void {
-  getCurrentInstance().init = fn;
+  getCurrentInstance().init.push(fn)
 }
 
 export function onDestroy(fn: VoidFunction): void {
-  getCurrentInstance().destroy = fn;
+  getCurrentInstance().destroy.push(fn);
 }
 
 export function defineQuery(selector: string) {

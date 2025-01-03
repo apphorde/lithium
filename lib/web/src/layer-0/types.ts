@@ -15,8 +15,8 @@ export interface RuntimeInternals extends RuntimeProperties {
   parent: any;
   stateKeys: string[];
   setup: Function;
-  init: (runtime: RuntimeProperties) => void | null;
-  destroy: VoidFunction | null;
+  init: Array<(runtime: RuntimeProperties) => void>;
+  destroy: Array<(runtime: RuntimeProperties) => void>;
 }
 
 export interface ComponentDefinitions {

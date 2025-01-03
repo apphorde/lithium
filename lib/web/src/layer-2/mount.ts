@@ -10,7 +10,7 @@ import type {
 import { getOption } from "../layer-0/options.js";
 
 export const noop = () => {};
-export const VM = Symbol('@@VM');
+export const VM = Symbol("@@VM");
 const mounted = Symbol();
 
 export interface MountOptions {
@@ -49,8 +49,8 @@ export function mount(
     template,
     state: {},
     stateKeys: [],
-    init: null,
-    destroy: null,
+    init: [],
+    destroy: [],
     reactive: new ReactiveContext(),
   };
 
@@ -78,20 +78,17 @@ export async function createInstance(
 
     ($el.element as any).__destroy = () => {
       plugins.apply("destroy", [$el]);
-      $el.destroy && $el.destroy();
+      $el.destroy.forEach((f) => f($el));
     };
 
     plugins.apply("init", [$el]);
+    $el.init.forEach((f) => f($el));
 
-    if ($el.init) {
-      $el.init($el);
-    }
-
-    if (getOption('debugEnabled')) {
+    if (getOption("debugEnabled")) {
       $el.element[VM] = $el;
     }
   } catch (error) {
-    console.log("Failed to initialize component!", this, error);
+    console.log("Failed to initialize component!", $el, error);
   }
 
   pop();
