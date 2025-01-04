@@ -100,7 +100,7 @@ export function parseSFC(source: string) {
 
   const setup = getSetupCode(setupNode);
   const template = getTemplateCode(templateNode);
-  const shadowDomOption = templateNode.attributes.find((a) => a.name === "shadow-dom");
+  const shadowDomOption = templateNode.attributes.find((a) => a.name === "shadow-dom" || a.name === "shadowdom");
 
   const shadowDom = !shadowDomOption
     ? false
@@ -125,5 +125,5 @@ export async function loadComponent(name, url: string | URL) {
   tag.type = 'module';
   tag.innerText = component;
   document.head.appendChild(tag);
-  
+
 }
