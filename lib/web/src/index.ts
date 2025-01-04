@@ -29,3 +29,7 @@ window["Lithium"] = {
   setOption,
   getOption,
 };
+
+if (window.name === "debug") {
+  setOption("debugEnabled", true);
+}
