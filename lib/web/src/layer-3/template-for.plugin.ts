@@ -82,6 +82,11 @@ export function templateForOf(
 
   // TODO compile source to an expression
   $el.reactive.watch(() => $el.state[source], onListChange);
+  $el.reactive.watch(() => {
+    for (const next of nodeCache) {
+      next.$el.reactive.check();
+    }
+  })
 }
 
 function findLastNode(nodeCache: NodeCacheEntry[]) {
