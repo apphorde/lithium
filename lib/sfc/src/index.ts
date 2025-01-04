@@ -64,7 +64,7 @@ export function getComponentCode(name, { template, setup, shadowDom }, withExpor
   return `import {createComponent} from "@lithium/web";
 ${setup}
 
-const __s = ${!!shadowDom};
+const __s = ${shadowDom || false};
 const __t = ${template};
 const __c = { setup: defineComponent, template: __t, shadowDom: __s };
 
