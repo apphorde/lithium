@@ -74,6 +74,10 @@ export function templateForOf(
     const lastNode = findLastNode(nodeCache) || template;
     template.parentNode.insertBefore(newNodes, lastNode);
     $el.reactive.check();
+
+    if (getOption("debugEnabled")) {
+      template[VM] = nodeCache;
+    }
   }
 
   // TODO compile source to an expression
@@ -172,11 +176,6 @@ function updateStateOfCacheEntries(context: Context, list: any[]) {
 
   for (const item of list) {
     nodeCache[index].$el.state[itemName].value = item;
-
-    if (getOption("debugEnabled")) {
-      nodeCache[index].nodes[0][VM] = nodeCache[index].$el;
-    }
-
     index++;
   }
 }
