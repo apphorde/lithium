@@ -1,5 +1,5 @@
 import { getCurrentInstance } from "../layer-0/stack.js";
-import { AnyFunction } from "../layer-0/types.js";
+import { AnyFunction, RuntimeInternals } from "../layer-0/types.js";
 import { unref } from "../layer-0/reactive.js";
 import { getOption } from "../layer-0/options.js";
 
@@ -7,13 +7,13 @@ const fnCache = new Map();
 const domParser = new DOMParser();
 const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
 
-let uid = 1;
-
 export function compileExpression(
   expression: string,
-  args: string[] = []
+  args: string[] = [],
+  $el?: RuntimeInternals,
 ): AnyFunction {
-  const { state, stateKeys } = getCurrentInstance();
+  $el ||= getCurrentInstance();
+  const { state, stateKeys } = $el;
   const propertiesFromState =
     stateKeys
       .map((stateKey) => `const ${stateKey} = __u(__s.${stateKey})`)

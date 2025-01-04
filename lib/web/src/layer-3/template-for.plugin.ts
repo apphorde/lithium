@@ -2,9 +2,10 @@ import { plugins } from "../layer-0/plugin.js";
 import { getCurrentInstance } from "../layer-0/stack.js";
 import { mount } from "../layer-2/mount.js";
 import { defineProps } from "../layer-1/props.js";
-import { unref } from "../layer-0/reactive.js";
+import { unref, watch } from "../layer-0/reactive.js";
 import type { RuntimeInternals } from "../layer-0/types.js";
-import { getOption } from "../layer-0/options";
+import { getOption } from "../layer-0/options.js";
+import { compileExpression, wrapTryCatch } from "../layer-1/expressions.js";
 
 const VM = Symbol("@@FOR");
 
@@ -80,13 +81,13 @@ export function templateForOf(
     }
   }
 
-  // TODO compile source to an expression
-  $el.reactive.watch(() => $el.state[source], onListChange);
+  const getter = compileExpression(source, [], $el);
+  $el.reactive.watch(wrapTryCatch(source, getter), onListChange);
   $el.reactive.watch(() => {
     for (const next of nodeCache) {
       next.$el.reactive.check();
     }
-  })
+  });
 }
 
 function findLastNode(nodeCache: NodeCacheEntry[]) {
