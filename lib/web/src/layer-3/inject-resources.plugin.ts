@@ -43,7 +43,7 @@ export async function adoptStyleSheet(
   }
 
   const stylesheet = stylesheetCache.get(href);
-  (target["shadowRoot"] || target).adoptedStyleSheets.push(stylesheet);
+  (target["shadowRoot"] || document).adoptedStyleSheets.push(stylesheet);
 }
 
 const scriptCache = new Map<string, any>();
