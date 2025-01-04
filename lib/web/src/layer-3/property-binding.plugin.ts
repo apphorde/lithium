@@ -1,4 +1,4 @@
-import { setProperty } from "../layer-1/dom.js";
+import { setAttribute, setProperty } from "../layer-1/dom.js";
 import { compileExpression, wrapTryCatch } from "../layer-1/expressions.js";
 import { plugins } from "../layer-0/plugin.js";
 import { watch } from "../layer-0/reactive.js";
@@ -16,6 +16,14 @@ plugins.use({
         value
       );
     }
+
+    if (attribute.startsWith("attr-")) {
+      createAttributeBinding(
+        node,
+        dashToCamelCase(attribute.replace("attr-", "")),
+        value
+      );
+    }
   },
 });
 
@@ -26,6 +34,15 @@ export function createPropertyBinding(
 ): void {
   const fn = compileExpression(expression);
   watch(wrapTryCatch(expression, fn), (v: any) => setProperty(el, name, v));
+}
+
+export function createAttributeBinding(
+  el: any,
+  name: string,
+  expression: string
+): void {
+  const fn = compileExpression(expression);
+  watch(wrapTryCatch(expression, fn), (v: any) => setAttribute(el, name, v));
 }
 
 const wellKnownProperties = {
