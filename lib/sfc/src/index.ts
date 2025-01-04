@@ -64,7 +64,7 @@ export function getComponentCode(name, { template, setup, shadowDom }, withExpor
   return `import {createComponent} from "@lithium/web";
 ${setup}
 
-const __s = ${shadowDom || false};
+const __s = ${shadowDom || 'false'};
 const __t = ${template};
 const __c = { setup: defineComponent, template: __t, shadowDom: __s };
 
@@ -108,7 +108,7 @@ export function parseSFC(source: string) {
     ? JSON.parse(shadowDomOption.value)
     : { mode: shadowDomOption.value };
 
-  return { template, setup, shadowDom };
+  return { template, setup, shadowDom: shadowDom ? JSON.stringify(shadowDom) : 'false' };
 }
 
 export async function loadComponent(name, url: string | URL) {
