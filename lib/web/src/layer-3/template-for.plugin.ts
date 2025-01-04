@@ -4,6 +4,9 @@ import { mount } from "../layer-2/mount.js";
 import { defineProps } from "../layer-1/props.js";
 import { unref } from "../layer-0/reactive.js";
 import type { RuntimeInternals } from "../layer-0/types.js";
+import { getOption } from "../layer-0/options";
+
+const VM = Symbol("@@FOR");
 
 interface NodeCacheEntry {
   $el: RuntimeInternals;
@@ -168,6 +171,12 @@ function updateStateOfCacheEntries(context: Context, list: any[]) {
   let index = 0;
 
   for (const item of list) {
-    nodeCache[index++].$el.state[itemName].value = item;
+    nodeCache[index].$el.state[itemName].value = item;
+
+    if (getOption("debugEnabled")) {
+      nodeCache[index].nodes[0][VM] = nodeCache[index].$el;
+    }
+
+    index++;
   }
 }
