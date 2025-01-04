@@ -2,7 +2,7 @@ import { plugins } from "../layer-0/plugin.js";
 import { getCurrentInstance } from "../layer-0/stack.js";
 import { mount } from "../layer-2/mount.js";
 import { defineProps } from "../layer-1/props.js";
-import { unref, watch } from "../layer-0/reactive.js";
+import { unref } from "../layer-0/reactive.js";
 import type { RuntimeInternals } from "../layer-0/types.js";
 import { getOption } from "../layer-0/options.js";
 import { compileExpression, wrapTryCatch } from "../layer-1/expressions.js";
@@ -60,6 +60,10 @@ export function templateForOf(
       return;
     }
 
+    if (!getOption('cachedTemplateFor')) {
+      resize(context, 0);
+    }
+
     const newNodes = await resize(context, list.length, list);
     updateStateOfCacheEntries(context, list);
 
@@ -114,7 +118,7 @@ async function resize(context: Context, newLength: number, list?: any[]) {
 
   // remove excess of nodes
   if (newLength < nodeCache.length) {
-    const nodesToRemove = nodeCache.slice(nodeCache.length - newLength);
+    const nodesToRemove = nodeCache.slice(newLength);
     nodeCache.length = newLength;
 
     for (const cacheEntry of nodesToRemove) {

@@ -1,4 +1,5 @@
 const options = {
+  cachedTemplateFor: false,
   asyncMount: false,
   debugEnabled: false,
 };
