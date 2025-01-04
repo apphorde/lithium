@@ -10,8 +10,8 @@ export interface RuntimeInternals extends RuntimeProperties {
   shadowDom?: ShadowRootInit;
   reactive: ReactiveContext;
   props: any;
-  stylesheets: Array<[string, string, boolean]>;
-  scripts: Array<[string, string, boolean]>;
+  stylesheets: Array<string>;
+  scripts: Array<string>;
   parent: any;
   stateKeys: string[];
   setup: Function;

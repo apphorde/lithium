@@ -2,24 +2,16 @@ import { getCurrentInstance } from "../layer-0/stack.js";
 import { EventEmitFunction } from "../layer-0/types.js";
 import { defineEventOnElement, isElement } from "./dom.js";
 
-export function loadCss(
-  url: string,
-  options: { id?: string; condition?: boolean } = {}
-): void {
-  const { id, condition } = options;
-  getCurrentInstance().stylesheets.push([url, id, condition]);
+export function loadCss(url: string): void {
+  getCurrentInstance().stylesheets.push(url);
 }
 
-export function loadScript(
-  url: string,
-  options: { id?: string; condition?: boolean } = {}
-): void {
-  const { id, condition } = options;
-  getCurrentInstance().scripts.push([url, id, condition]);
+export function loadScript(url: string): void {
+  getCurrentInstance().scripts.push(url);
 }
 
 export function onInit(fn: VoidFunction): void {
-  getCurrentInstance().init.push(fn)
+  getCurrentInstance().init.push(fn);
 }
 
 export function onDestroy(fn: VoidFunction): void {

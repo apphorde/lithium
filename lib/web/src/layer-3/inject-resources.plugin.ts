@@ -5,63 +5,58 @@ plugins.use({
   appendDom($el: RuntimeInternals) {
     const { element, stylesheets, scripts } = $el;
 
-    for (const [a, b, c] of stylesheets) {
-      injectCssIntoElement(element, a, b, c);
+    for (const url of stylesheets) {
+      adoptStyleSheet(element as HTMLElement, url);
     }
 
-    for (const [a, b, c] of scripts) {
-      injectScriptIntoElement(element, a, b, c);
+    for (const a of scripts) {
+      addScriptToPage(a);
     }
   },
 });
 
-export function injectCssIntoElement(
-  el: Element | DocumentFragment,
-  href: string,
-  id: string,
-  condition: boolean
+export function injectStylesheetOnElement(
+  el: HTMLElement | DocumentFragment,
+  href: string
 ) {
-  const parent = el["shadowRoot"] || document.head;
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = href;
+  link.disabled = true;
+  link.crossOrigin = "anonymous";
+  link.addEventListener("load", () => (link["loaded"] = true));
 
-  if (
-    (condition !== undefined && !condition) ||
-    (id && parent.querySelector(`[id="css-${id}"]`))
-  ) {
-    return;
-  }
+  el.append(link);
 
-  const tag = document.createElement("link");
-  tag.rel = "stylesheet";
-  tag.href = href;
-
-  if (id) {
-    tag.id = "css-" + id;
-  }
-
-  parent.append(tag);
+  return link;
 }
 
-export function injectScriptIntoElement(
-  el: Element | DocumentFragment,
-  src: string,
-  id: string,
-  condition: boolean
-) {
-  const parent = el["shadowRoot"] || document.head;
+const stylesheetCache = new Map<string, CSSStyleSheet>();
 
-  if (
-    (condition !== undefined && !condition) ||
-    (id && parent.querySelector(`[id="js-${id}"]`))
-  ) {
-    return;
+export async function adoptStyleSheet(
+  target: HTMLElement | Document,
+  href: string
+) {
+  if (!stylesheetCache.has(href)) {
+    const mod = await import(href, { with: { type: "css" } });
+    stylesheetCache.set(href, mod.default);
+  }
+
+  const stylesheet = stylesheetCache.get(href);
+  (target["shadowRoot"] || target).adoptedStyleSheets.push(stylesheet);
+}
+
+const scriptCache = new Map<string, any>();
+
+export function addScriptToPage(src: string) {
+  if (scriptCache.has(src)) {
+    return scriptCache.get(src);
   }
 
   const tag = document.createElement("script");
   tag.src = src;
+  scriptCache.set(src, tag);
+  document.head.append(tag);
 
-  if (id) {
-    tag.id = "js-" + id;
-  }
-
-  parent.append(tag);
+  return src;
 }
