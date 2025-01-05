@@ -26,6 +26,9 @@ export async function templateIf(
   const expression = template.getAttribute("if");
   const getter = compileExpression($el, expression);
   const previousNodes = [];
+  let childContext;
+
+  $el.reactive.watch(() => childContext && childContext.reactive.check());
 
   function remove() {
     for (const next of previousNodes) {
@@ -33,11 +36,12 @@ export async function templateIf(
     }
 
     previousNodes.length = 0;
+    childContext = null;
   }
 
   async function add() {
     const fragment = document.createDocumentFragment();
-    await mount(fragment, { template }, { parent: $el });
+    childContext = await mount(fragment, { template }, { parent: $el });
     previousNodes.push(...Array.from(fragment.childNodes));
     template.parentNode.insertBefore(fragment, template);
   }
