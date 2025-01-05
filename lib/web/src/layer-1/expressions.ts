@@ -29,6 +29,8 @@ export function compileExpression(
   return compileExpressionEval($el, expression, args);
 }
 
+const modCache = new Map();
+
 export function compileExpressionBlob(
   $el: RuntimeInternals,
   expression: string,
@@ -42,8 +44,15 @@ export function compileExpressionBlob(
     return ${expression};
   }`;
 
-  const blob = new Blob([code], { type: "text/javascript" });
-  const mod = import(URL.createObjectURL(blob));
+  if (!modCache.has(code)) {
+    const blob = new Blob([code], { type: "text/javascript" });
+    const url = URL.createObjectURL(blob);
+    const modPromise = import(url);
+    modCache.set(code, modPromise);
+    modPromise.then(() => URL.revokeObjectURL(url));
+  }
+
+  const mod = modCache.get(code);
 
   return async function (...args: any[]) {
     const fn = await mod;
