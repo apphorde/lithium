@@ -18,10 +18,10 @@ export class PluginDispatcher {
     }
   }
 
-  apply(hook: string, args: any[] = []) {
+  async apply(hook: string, args: any[] = []) {
     const plugins = this.hooks[hook];
     for (const plugin of plugins) {
-      plugin[hook](...args);
+      await plugin[hook](...args);
     }
   }
 }

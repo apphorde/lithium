@@ -2,16 +2,13 @@ import { plugins } from "../layer-0/plugin.js";
 import type { RuntimeInternals } from "../layer-0/types.js";
 
 plugins.use({
-  appendDom($el: RuntimeInternals) {
+  async appendDom($el: RuntimeInternals) {
     const { element, stylesheets, scripts } = $el;
 
-    for (const url of stylesheets) {
-      adoptStyleSheet(element as HTMLElement, url);
-    }
-
-    for (const a of scripts) {
-      addScriptToPage(a);
-    }
+    await Promise.all([
+      ...stylesheets.map((url) => adoptStyleSheet(element as HTMLElement, url)),
+      ...scripts.map((src) => addScriptToPage(src)),
+    ]);
   },
 });
 
@@ -58,5 +55,7 @@ export function addScriptToPage(src: string) {
   scriptCache.set(src, tag);
   document.head.append(tag);
 
-  return src;
+  return new Promise((resolve) => {
+    tag.onload = () => resolve(tag);
+  });
 }
