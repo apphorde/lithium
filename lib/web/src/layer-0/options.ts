@@ -3,7 +3,7 @@ const options = {
   asyncMount: false,
   debugEnabled: false,
   useDomParser: false,
-  useModuleExpressions: false,
+  useModuleExpressions: true,
 };
 
 export function setOption<T extends keyof typeof options>(
