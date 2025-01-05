@@ -1,4 +1,4 @@
-import { getCurrentInstance } from "./stack";
+import { getCurrentInstance } from "./stack.js";
 import type { AnyFunction, RuntimeInternals } from "./types";
 import type { Ref } from "@lithium/reactive";
 

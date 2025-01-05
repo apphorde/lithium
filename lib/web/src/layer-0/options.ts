@@ -2,6 +2,8 @@ const options = {
   cachedTemplateFor: false,
   asyncMount: false,
   debugEnabled: false,
+  useDomParser: false,
+  useModuleExpressions: false,
 };
 
 export function setOption<T extends keyof typeof options>(
