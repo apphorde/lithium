@@ -85,7 +85,7 @@ export function templateForOf(
     }
   }
 
-  const getter = compileExpression(source, [], $el);
+  const getter = compileExpression($el, source);
   $el.reactive.watch(wrapTryCatch(source, getter), onListChange);
   $el.reactive.watch(() => {
     for (const next of nodeCache) {

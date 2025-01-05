@@ -1,40 +1,47 @@
 import { getCurrentInstance } from "../layer-0/stack.js";
 import { AnyFunction, RuntimeInternals } from "../layer-0/types.js";
 import { unref } from "../layer-0/reactive.js";
-import { getOption } from "../layer-0/options.js";
 
 const fnCache = new Map();
 const domParser = new DOMParser();
 const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
 
-export function compileExpression(
-  expression: string,
-  args: string[] = [],
-  $el?: RuntimeInternals,
-): AnyFunction {
-  $el ||= getCurrentInstance();
-  const { state, stateKeys } = $el;
-  const propertiesFromState =
-    stateKeys
-      .map((stateKey) => `const ${stateKey} = __u(__s.${stateKey})`)
-      .join(";") + ";";
+function unwrap(state) {
+  const entries = Object.entries(state);
+  const unwrapped = Object.create(null);
 
-  const code = propertiesFromState + `\nreturn ${expression}`;
+  for (const entry of entries) {
+    unwrapped[entry[0]] = unref(entry[1]);
+  }
+
+  return unwrapped;
+}
+
+export function compileExpression(
+  $el: RuntimeInternals,
+  expression: string,
+  args: string[] = []
+): AnyFunction {
+  const { state, stateKeys } = $el;
+  const code = `
+  const {${stateKeys.join(", ")}} = __u(__s);
+  return ${expression}
+  `;
   const cacheKey = code + args;
   let fn = fnCache.get(cacheKey);
 
-  if (fn) {
-    return fn.bind(state, state, unref);
+  if (!fn) {
+    const parsed = domParser.parseFromString(code, "text/html");
+    const finalCode = parsed.body.innerText.trim();
+    const functionType = expression.includes("await ")
+      ? AsyncFunction
+      : Function;
+
+    fn = functionType(...["__s", "__u", ...args], finalCode);
+    fnCache.set(cacheKey, fn);
   }
 
-  const parsed = domParser.parseFromString(code, "text/html");
-  const finalCode = parsed.body.innerText.trim();
-  const functionType = expression.includes("await ") ? AsyncFunction : Function;
-
-  fn = functionType(...["__s", "__u", ...args], finalCode);
-  fnCache.set(cacheKey, fn);
-
-  return fn.bind(state, state, unref);
+  return fn.bind(state, state, unwrap);
 }
 
 export function wrapTryCatch(exp: string, fn: AnyFunction) {

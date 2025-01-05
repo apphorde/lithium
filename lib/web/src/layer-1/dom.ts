@@ -40,7 +40,7 @@ export function setClassName(
   }
 }
 
-export function setStyle(el: HTMLElement, key: string, value: any): void {
+export function setStyle(el: any, key: string, value: any): void {
   el.style[key] = value;
 }
 

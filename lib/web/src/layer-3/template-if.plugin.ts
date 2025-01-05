@@ -19,12 +19,12 @@ plugins.use({
 
 export async function templateIf(
   template: HTMLTemplateElement,
-  $el: RuntimeInternals
+  $el?: RuntimeInternals
 ) {
   $el ||= getCurrentInstance();
 
   const expression = template.getAttribute("if");
-  const getter = compileExpression(expression);
+  const getter = compileExpression($el, expression);
   const previousNodes = [];
 
   function remove() {

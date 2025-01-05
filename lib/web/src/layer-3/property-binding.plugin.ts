@@ -2,15 +2,17 @@ import { setAttribute, setProperty } from "../layer-1/dom.js";
 import { compileExpression, wrapTryCatch } from "../layer-1/expressions.js";
 import { plugins } from "../layer-0/plugin.js";
 import { watch } from "../layer-0/reactive.js";
+import { RuntimeInternals } from "../layer-0/types";
 
 plugins.use({
-  applyAttribute(_$el, node, attribute, value) {
+  applyAttribute($el, node, attribute, value) {
     if (attribute.charAt(0) === ":") {
-      createPropertyBinding(node, attribute.slice(1), value);
+      createPropertyBinding($el, node, attribute.slice(1), value);
     }
 
     if (attribute.startsWith("bind-")) {
       createPropertyBinding(
+        $el,
         node,
         dashToCamelCase(attribute.replace("bind-", "")),
         value
@@ -19,6 +21,7 @@ plugins.use({
 
     if (attribute.startsWith("attr-")) {
       createAttributeBinding(
+        $el,
         node,
         dashToCamelCase(attribute.replace("attr-", "")),
         value
@@ -28,21 +31,27 @@ plugins.use({
 });
 
 export function createPropertyBinding(
-  el: any,
+  $el: RuntimeInternals,
+  element: Element,
   name: string,
   expression: string
 ): void {
-  const fn = compileExpression(expression);
-  watch(wrapTryCatch(expression, fn), (v: any) => setProperty(el, name, v));
+  const fn = compileExpression($el, expression);
+  watch(wrapTryCatch(expression, fn), (v: any) =>
+    setProperty(element, name, v)
+  );
 }
 
 export function createAttributeBinding(
-  el: any,
+  $el: RuntimeInternals,
+  element: Element,
   name: string,
   expression: string
 ): void {
-  const fn = compileExpression(expression);
-  watch(wrapTryCatch(expression, fn), (v: any) => setAttribute(el, name, v));
+  const fn = compileExpression($el, expression);
+  watch(wrapTryCatch(expression, fn), (v: any) =>
+    setAttribute(element, name, v)
+  );
 }
 
 const wellKnownProperties = {
