@@ -6,12 +6,14 @@ const fnCache = new Map();
 const domParser = new DOMParser();
 const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
 
-function unwrap(state) {
-  return new Proxy(state, {
-    get(target, p) {
-      return unref(target[p]);
-    },
-  });
+function unwrap(stateKeys, state) {
+  const unwrapped = Object.create(null);
+
+  for (const key of stateKeys) {
+    unwrapped[key] = unref(state[key]);
+  }
+
+  return unwrapped;
 }
 
 export function compileExpression(
@@ -38,7 +40,7 @@ export function compileExpression(
     fnCache.set(cacheKey, fn);
   }
 
-  return fn.bind(state, state, unwrap);
+  return fn.bind(state, state, unwrap.bind(null, stateKeys));
 }
 
 export function wrapTryCatch(exp: string, fn: AnyFunction) {
