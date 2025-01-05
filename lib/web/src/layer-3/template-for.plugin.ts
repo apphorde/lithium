@@ -165,9 +165,10 @@ async function createCacheEntry(
   props: any
 ): Promise<NodeCacheEntry> {
   const { $el, template, itemName, indexName } = context;
+  const contextProperties = [itemName, indexName, "$first", "$last", "$odd", "$even"];
 
   function setup() {
-    defineProps([itemName, indexName, "$first", "$last", "$odd", "$even"]);
+    defineProps(contextProperties);
   }
 
   const itemFragment = document.createDocumentFragment();

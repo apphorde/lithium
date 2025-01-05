@@ -7,14 +7,11 @@ const domParser = new DOMParser();
 const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
 
 function unwrap(state) {
-  const entries = Object.entries(state);
-  const unwrapped = Object.create(null);
-
-  for (const entry of entries) {
-    unwrapped[entry[0]] = unref(entry[1]);
-  }
-
-  return unwrapped;
+  return new Proxy(state, {
+    get(target, p) {
+      return unref(target[p]);
+    },
+  });
 }
 
 export function compileExpression(
