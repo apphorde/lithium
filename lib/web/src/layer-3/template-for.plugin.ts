@@ -89,7 +89,7 @@ export function templateForOf(
   $el.reactive.watch(wrapTryCatch(source, getter), onListChange);
   $el.reactive.watch(() => {
     for (const next of nodeCache) {
-      next.$el.reactive.check();
+      queueMicrotask(next.$el.reactive.check);
     }
   });
 }
