@@ -29,32 +29,25 @@ export function compileExpression(
   return compileExpressionEval($el, expression, args);
 }
 
-let uid = 1;
 export function compileExpressionBlob(
   $el: RuntimeInternals,
   expression: string,
   args: string[] = []
 ) {
   const { state, stateKeys } = $el;
-  const fname = `__f${uid++}`;
   const fargs = ["__s", ...args].join(", ");
   const fasync = expression.includes("await ") ? "async " : "";
-  const code = `window.${fname} = ${fasync}function(${fargs}) {
+  const code = `export default ${fasync}function(${fargs}) {
     const {${stateKeys.join(", ")}} = __s;
     return ${expression};
-  }
-  `;
+  }`;
 
   const blob = new Blob([code], { type: "text/javascript" });
-  const url = URL.createObjectURL(blob);
-  const script = document.createElement("script");
-  script.onload = () => script.remove();
-  script.src = url;
-  script.type = "module";
-  document.head.append(script);
+  const mod = import(URL.createObjectURL(blob));
 
-  return function (...args: any[]) {
-    return window[fname](unwrap(stateKeys, state), ...args);
+  return async function (...args: any[]) {
+    const fn = await mod;
+    return fn.default(unwrap(stateKeys, state), ...args);
   };
 }
 
@@ -92,13 +85,12 @@ export function compileExpressionEval(
 
 export function wrapTryCatch(exp: string, fn: AnyFunction) {
   if (getOption("debugEnabled")) {
-    return () => unref(fn());
+    return () => fn();
   }
 
   return () => {
     try {
-      const v = fn();
-      return unref(v);
+      return fn();
     } catch (e) {
       console.log("Error: " + exp, e);
     }
