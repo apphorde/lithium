@@ -1,7 +1,6 @@
 import { getOption } from "../internal-api/options";
 import { plugins } from "../internal-api/plugin.js";
-import { isRef } from "../internal-api/reactive.js";
-import { markAsReactive } from "@lithium/reactive";
+import { markAsReactive, isRef } from "@lithium/reactive";
 import { RuntimeInternals } from "../internal-api/types";
 
 plugins.use({

@@ -1,8 +1,7 @@
 import { plugins } from "../internal-api/plugin.js";
-import { getCurrentInstance } from "../internal-api/stack.js";
 import { mount } from "../component-api/mount.js";
 import { defineProps } from "../component-api/setup.js";
-import { unref } from "../internal-api/reactive.js";
+import { unref } from "@lithium/reactive";
 import type { RuntimeInternals } from "../internal-api/types.js";
 import { getOption } from "../internal-api/options.js";
 import {
@@ -40,9 +39,8 @@ plugins.use({
 
 export function templateForOf(
   template: HTMLTemplateElement,
-  $el?: RuntimeInternals
+  $el: RuntimeInternals
 ) {
-  $el ||= getCurrentInstance();
   const nodeCache: NodeCacheEntry[] = [];
   const expression = template.getAttribute("for");
   const [iteration, source] = expression.split("of").map((s) => s.trim());

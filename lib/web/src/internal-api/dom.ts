@@ -3,9 +3,8 @@ import type {
   Attribute,
   RuntimeInternals,
 } from "./types.js";
-import { getCurrentInstance } from "./stack.js";
 import { plugins } from "./plugin.js";
-import { unref } from "./reactive.js";
+import { unref } from "@lithium/reactive";
 
 const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
 
@@ -253,7 +252,6 @@ export function clearElement(element: Element | DocumentFragment) {
 }
 
 export function createDom($el: RuntimeInternals): void {
-  $el ||= getCurrentInstance();
   const { element, template, shadowDom, state } = $el;
   let dom: any = template;
 
@@ -303,4 +301,13 @@ export function defineEventOnElement(el: Element, name: string): void {
   if (!el.hasOwnProperty(property)) {
     Object.defineProperty(el, property, { value: null });
   }
+}
+
+export function emitEvent(
+  element: Element,
+  eventName: string,
+  detail: any
+): void {
+  const event = new CustomEvent(eventName, { detail });
+  element.dispatchEvent(event);
 }

@@ -4,7 +4,7 @@ import {
   wrapTryCatch,
 } from "../internal-api/expressions.js";
 import { plugins } from "../internal-api/plugin.js";
-import { watch } from "../internal-api/reactive.js";
+import { watch } from "../component-api/setup.js";
 import { RuntimeInternals } from "../internal-api/types";
 
 plugins.use({

@@ -1,5 +1,4 @@
 import { plugins } from "../internal-api/plugin.js";
-import { getCurrentInstance } from "../internal-api/stack.js";
 import { compileExpression } from "../internal-api/expressions.js";
 import { mount } from "../component-api/mount.js";
 import type { RuntimeInternals } from "../internal-api/types.js";
@@ -19,10 +18,8 @@ plugins.use({
 
 export async function templateIf(
   template: HTMLTemplateElement,
-  $el?: RuntimeInternals
+  $el: RuntimeInternals
 ) {
-  $el ||= getCurrentInstance();
-
   const expression = template.getAttribute("if");
   const getter = compileExpression($el, expression);
   const previousNodes = [];

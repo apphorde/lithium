@@ -1,8 +1,9 @@
- import { getCurrentInstance } from "../internal-api/stack.js";
+import { getCurrentInstance } from "../internal-api/stack.js";
 import { EventEmitFunction } from "../internal-api/types.js";
-import { defineEventOnElement, isElement } from "../internal-api/dom.js";
-import type { RuntimeInternals } from "../internal-api/types.js";
-
+import { defineEventOnElement, isElement, emitEvent } from "../internal-api/dom.js";
+import type { AnyFunction, RuntimeInternals } from "../internal-api/types.js";
+import type { Ref } from "@lithium/reactive";
+import { getPropValue } from '../internal-api/props.js';
 
 export function loadCss(url: string): void {
   getCurrentInstance().stylesheets.push(url);
@@ -52,15 +53,6 @@ export function defineEvents(eventNames: any): EventEmitFunction {
   }
 
   return emitEvent.bind(null, el);
-}
-
-export function emitEvent(
-  element: Element,
-  eventName: string,
-  detail: any
-): void {
-  const event = new CustomEvent(eventName, { detail });
-  element.dispatchEvent(event);
 }
 
 export function defineProps(definitions: string[] | Record<string, any>): any {
@@ -115,31 +107,26 @@ export function defineProps(definitions: string[] | Record<string, any>): any {
   );
 }
 
-function getPropValue(
-  $el: RuntimeInternals,
-  property: string,
-  definition: any
-) {
-  if ($el.props && property in $el.props) {
-    return $el.props[property];
-  }
+export function watch(expression: AnyFunction, effect?: AnyFunction): void {
+  return getCurrentInstance().reactive.watch(expression, effect);
+}
 
-  if ($el.element.hasOwnProperty(property)) {
-    return $el.element[property];
-  }
-
-  if (
-    isElement($el.element) &&
-    $el.element.hasAttribute(property.toLowerCase())
-  ) {
-    return $el.element.getAttribute(property);
-  }
-
-  if (definition && definition.hasOwnProperty("default")) {
-    if (typeof definition.default === "function") {
-      return definition.default();
+export function computed<T>(fn: () => T): Ref<T> {
+  const $ref = ref<T>(null, { shallow: true });
+  watch(() => {
+    const v = fn();
+    if ($ref.value !== v) {
+      $ref.value = v;
     }
+  });
 
-    return definition.default;
-  }
+  return $ref;
+}
+
+export function ref<T>(value?: T, options?): Ref<T> {
+  return getCurrentInstance().reactive.ref(value, options);
+}
+
+export function shallowRef<T>(value?: T, options = {}): Ref<T> {
+  return ref(value, { ...options, shallow: true });
 }

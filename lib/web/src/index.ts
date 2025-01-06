@@ -24,6 +24,8 @@ export * from "./plugins/template-for.plugin.js";
 export * from "./plugins/template-if.plugin.js";
 export * from "./plugins/text-template.plugin.js";
 
+export { Ref, unref, isRef } from "@lithium/reactive";
+
 window["Lithium"] = {
   setOption,
   getOption,
