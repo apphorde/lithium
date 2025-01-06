@@ -102,7 +102,7 @@ function findLastNode(nodeCache: NodeCacheEntry[]) {
     const nodes = nodeCache[index].nodes;
     const last = nodes[nodes.length - 1];
 
-    if (last.isConnected) {
+    if (last?.isConnected) {
       return last;
     }
 
