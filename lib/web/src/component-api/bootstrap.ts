@@ -26,12 +26,13 @@ async function loadInitializer(init) {
   return () => ({});
 }
 
-export async function bootstrap(node: HTMLElement) {
+export async function bootstrap(node) {
   const init = node.getAttribute("lit-app");
   const setup = await loadInitializer(init);
+  const template = node.querySelector("template") || tpl(node.innerHTML);
 
   mount(node, {
-    template: tpl(node.innerHTML),
+    template,
     setup: () => setup(),
   });
 }
