@@ -7,12 +7,12 @@ export * from "./internal-api/reactive.js";
 export * from "./internal-api/stack.js";
 
 export * from "./internal-api/dom.js";
-export * from "./internal-api/setup.js";
-export * from "./internal-api/inject.js";
+export * from "./component-api/setup.js";
+export * from "./component-api/inject.js";
 
-export * from "./internal-api/custom-elements.js";
-export * from "./internal-api/mount.js";
-export * from "./internal-api/bootstrap.js";
+export * from "./component-api/custom-elements.js";
+export * from "./component-api/mount.js";
+export * from "./component-api/bootstrap.js";
 
 export * from "./plugins/property-binding.plugin.js";
 export * from "./plugins/event-handler.plugin.js";
