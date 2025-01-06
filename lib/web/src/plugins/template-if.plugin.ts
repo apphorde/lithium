@@ -1,8 +1,8 @@
-import { plugins } from "../layer-0/plugin.js";
-import { getCurrentInstance } from "../layer-0/stack.js";
-import { compileExpression } from "../layer-1/expressions.js";
-import { mount } from "../layer-2/mount.js";
-import type { RuntimeInternals } from "../layer-0/types.js";
+import { plugins } from "../internal-api/plugin.js";
+import { getCurrentInstance } from "../internal-api/stack.js";
+import { compileExpression } from "../internal-api/expressions.js";
+import { mount } from "../component-api/mount.js";
+import type { RuntimeInternals } from "../internal-api/types.js";
 
 plugins.use({
   appendDom($el: RuntimeInternals) {

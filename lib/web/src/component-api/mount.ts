@@ -1,13 +1,13 @@
 import { ReactiveContext } from "@lithium/reactive";
-import { plugins } from "../layer-0/plugin.js";
-import { createState } from "../layer-0/reactive.js";
-import { push, pop } from "../layer-0/stack.js";
-import { createDom } from "../layer-1/dom.js";
+import { plugins } from "../internal-api/plugin.js";
+import { createState } from "../internal-api/reactive.js";
+import { push, pop } from "../internal-api/stack.js";
+import { createDom } from "../internal-api/dom.js";
 import type {
   ComponentDefinitions,
   RuntimeInternals,
-} from "../layer-0/types.js";
-import { getOption } from "../layer-0/options.js";
+} from "../internal-api/types.js";
+import { getOption } from "../internal-api/options.js";
 
 export const noop = () => {};
 export const VM = Symbol("@@VM");

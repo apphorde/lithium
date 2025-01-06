@@ -1,5 +1,8 @@
 import { mount } from "./mount.js";
-import type { AnyFunction, ComponentDefinitions } from "../layer-0/types.js";
+import type {
+  AnyFunction,
+  ComponentDefinitions,
+} from "../internal-api/types.js";
 
 export const DefineComponent = Symbol("@@def");
 
@@ -27,4 +30,3 @@ export function createComponent(name: string, def: ComponentDefinitions): void {
   Component[DefineComponent] = def;
   customElements.define(name, Component);
 }
-

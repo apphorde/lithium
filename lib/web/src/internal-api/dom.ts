@@ -2,10 +2,10 @@ import type {
   AnyFunction,
   Attribute,
   RuntimeInternals,
-} from "../layer-0/types.js";
-import { getCurrentInstance } from "../layer-0/stack.js";
-import { plugins } from "../layer-0/plugin.js";
-import { unref } from "../layer-0/reactive.js";
+} from "./types.js";
+import { getCurrentInstance } from "./stack.js";
+import { plugins } from "./plugin.js";
+import { unref } from "./reactive.js";
 
 const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
 

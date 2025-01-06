@@ -1,7 +1,7 @@
-import { setEventHandler } from "../layer-1/dom.js";
-import { compileExpression } from "../layer-1/expressions.js";
-import { plugins } from "../layer-0/plugin.js";
-import { RuntimeInternals } from "../layer-0/types";
+import { setEventHandler } from "../internal-api/dom.js";
+import { compileExpression } from "../internal-api/expressions.js";
+import { plugins } from "../internal-api/plugin.js";
+import { RuntimeInternals } from "../internal-api/types";
 
 const eventFlags = ["capture", "once", "passive", "stop", "prevent"];
 

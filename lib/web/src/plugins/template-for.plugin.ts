@@ -1,11 +1,14 @@
-import { plugins } from "../layer-0/plugin.js";
-import { getCurrentInstance } from "../layer-0/stack.js";
-import { mount } from "../layer-2/mount.js";
-import { defineProps } from "../layer-1/props.js";
-import { unref } from "../layer-0/reactive.js";
-import type { RuntimeInternals } from "../layer-0/types.js";
-import { getOption } from "../layer-0/options.js";
-import { compileExpression, wrapTryCatch } from "../layer-1/expressions.js";
+import { plugins } from "../internal-api/plugin.js";
+import { getCurrentInstance } from "../internal-api/stack.js";
+import { mount } from "../component-api/mount.js";
+import { defineProps } from "../component-api/setup.js";
+import { unref } from "../internal-api/reactive.js";
+import type { RuntimeInternals } from "../internal-api/types.js";
+import { getOption } from "../internal-api/options.js";
+import {
+  compileExpression,
+  wrapTryCatch,
+} from "../internal-api/expressions.js";
 
 const VM = Symbol("@@FOR");
 
@@ -60,7 +63,7 @@ export function templateForOf(
       return;
     }
 
-    if (!getOption('cachedTemplateFor')) {
+    if (!getOption("cachedTemplateFor")) {
       resize(context, 0);
     }
 
@@ -165,7 +168,14 @@ async function createCacheEntry(
   props: any
 ): Promise<NodeCacheEntry> {
   const { $el, template, itemName, indexName } = context;
-  const contextProperties = [itemName, indexName, "$first", "$last", "$odd", "$even"];
+  const contextProperties = [
+    itemName,
+    indexName,
+    "$first",
+    "$last",
+    "$odd",
+    "$even",
+  ];
 
   function setup() {
     defineProps(contextProperties);

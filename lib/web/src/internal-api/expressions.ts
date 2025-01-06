@@ -1,7 +1,6 @@
-import { getCurrentInstance } from "../layer-0/stack.js";
-import { AnyFunction, RuntimeInternals } from "../layer-0/types.js";
-import { unref } from "../layer-0/reactive.js";
-import { getOption } from "../layer-0/options.js";
+import { AnyFunction, RuntimeInternals } from "./types.js";
+import { unref } from "./reactive.js";
+import { getOption } from "./options.js";
 
 const fnCache = new Map();
 const domParser = new DOMParser();

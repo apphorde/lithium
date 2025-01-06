@@ -1,5 +1,5 @@
-import { domReady, tpl } from "../layer-1/dom.js";
-import { mount } from "./mount.js";
+import { domReady, tpl } from "../internal-api/dom.js";
+import { mount } from "../component-api/mount.js";
 
 async function loadInitializer(init) {
   if (init.charAt(0) === "{" || init.charAt(0) === "[") {

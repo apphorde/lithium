@@ -1,8 +1,11 @@
-import { setStyle } from "../layer-1/dom.js";
-import { compileExpression, wrapTryCatch } from "../layer-1/expressions.js";
-import { plugins } from "../layer-0/plugin.js";
-import { watch } from "../layer-0/reactive.js";
-import { RuntimeInternals } from "../layer-0/types";
+import { setStyle } from "../internal-api/dom.js";
+import {
+  compileExpression,
+  wrapTryCatch,
+} from "../internal-api/expressions.js";
+import { plugins } from "../internal-api/plugin.js";
+import { watch } from "../internal-api/reactive.js";
+import { RuntimeInternals } from "../internal-api/types";
 
 plugins.use({
   applyAttribute($el, node, attribute, expression) {

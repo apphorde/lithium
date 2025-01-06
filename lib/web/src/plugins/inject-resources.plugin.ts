@@ -1,5 +1,5 @@
-import { plugins } from "../layer-0/plugin.js";
-import type { RuntimeInternals } from "../layer-0/types.js";
+import { plugins } from "../internal-api/plugin.js";
+import type { RuntimeInternals } from "../internal-api/types.js";
 
 plugins.use({
   async appendDom($el: RuntimeInternals) {
