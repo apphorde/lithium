@@ -23,12 +23,12 @@ export function createInstance(
     reactive: new ReactiveContext(),
   };
 
+  push($el);
+
   try {
     const { reactive } = $el;
     reactive.suspend();
-    push($el);
     createState($el);
-    pop();
     plugins.apply("setup", [$el]);
     createDom($el);
     reactive.unsuspend();
@@ -48,6 +48,8 @@ export function createInstance(
   } catch (error) {
     console.log("Failed to initialize component!", $el, error);
   }
+
+  pop();
 
   return $el;
 }
