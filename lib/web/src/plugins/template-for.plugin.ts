@@ -53,7 +53,7 @@ export function templateForOf(
 
   const context: Context = { itemName, indexName, nodeCache, $el, template };
 
-  async function onListChange(list: any[]) {
+  function onListChange(list: any[]) {
     list = unref(list);
 
     if (!template.parentNode || !Array.isArray(list)) {
@@ -65,7 +65,7 @@ export function templateForOf(
       resize(context, 0);
     }
 
-    const newNodes = await resize(context, list.length, list);
+    const newNodes = resize(context, list.length, list);
     updateStateOfCacheEntries(context, list);
 
     if (!newNodes) {
@@ -90,7 +90,7 @@ export function templateForOf(
   $el.reactive.watch(wrapTryCatch(source, getter), onListChange);
   $el.reactive.watch(() => {
     for (const next of nodeCache) {
-      queueMicrotask(next.$el.reactive.check);
+      next.$el.reactive.check();
     }
   });
 }
@@ -110,7 +110,7 @@ function findLastNode(nodeCache: NodeCacheEntry[]) {
   }
 }
 
-async function resize(context: Context, newLength: number, list?: any[]) {
+function resize(context: Context, newLength: number, list?: any[]) {
   const { nodeCache } = context;
 
   if (newLength === nodeCache.length) {
@@ -137,34 +137,29 @@ async function resize(context: Context, newLength: number, list?: any[]) {
   const { indexName, itemName } = context;
   const newElements = document.createDocumentFragment();
 
-  await Promise.all(
-    Array(newLength - nodeCache.length)
-      .fill(0)
-      .map(async (_, at) => {
-        const index = baseLength + at;
-        const props = {
-          [itemName]: list[index],
-          [indexName]: index,
-          $first: index === 0,
-          $last: index === maxLength,
-          $odd: index % 2 === 1,
-          $even: index % 2 === 0,
-        };
+  Array(newLength - nodeCache.length)
+    .fill(0)
+    .forEach((_, at) => {
+      const index = baseLength + at;
+      const props = {
+        [itemName]: list[index],
+        [indexName]: index,
+        $first: index === 0,
+        $last: index === maxLength,
+        $odd: index % 2 === 1,
+        $even: index % 2 === 0,
+      };
 
-        const entry = await createCacheEntry(context, props);
+      const entry = createCacheEntry(context, props);
 
-        nodeCache.push(entry);
-        newElements.append(...entry.nodes);
-      })
-  );
+      nodeCache.push(entry);
+      newElements.append(...entry.nodes);
+    });
 
   return newElements;
 }
 
-async function createCacheEntry(
-  context: Context,
-  props: any
-): Promise<NodeCacheEntry> {
+function createCacheEntry(context: Context, props: any): NodeCacheEntry {
   const { $el, template, itemName, indexName } = context;
   const contextProperties = [
     itemName,
@@ -180,7 +175,7 @@ async function createCacheEntry(
   }
 
   const itemFragment = document.createDocumentFragment();
-  const childState = await mount(
+  const childState = mount(
     itemFragment,
     { setup, template },
     { parent: $el, props }

@@ -54,17 +54,11 @@ export function mount(
     reactive: new ReactiveContext(),
   };
 
-  if (getOption("asyncMount")) {
-    return Promise.resolve($el).then(createInstance);
-  }
-
   createInstance($el);
   return $el;
 }
 
-export async function createInstance(
-  $el: RuntimeInternals
-): Promise<RuntimeInternals> {
+export function createInstance($el: RuntimeInternals): RuntimeInternals {
   push($el);
 
   try {

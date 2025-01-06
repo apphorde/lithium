@@ -36,9 +36,9 @@ export async function templateIf(
     childContext = null;
   }
 
-  async function add() {
+  function add() {
     const fragment = document.createDocumentFragment();
-    childContext = await mount(fragment, { template }, { parent: $el });
+    childContext = mount(fragment, { template }, { parent: $el });
     previousNodes.push(...Array.from(fragment.childNodes));
     template.parentNode.insertBefore(fragment, template);
   }

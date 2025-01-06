@@ -31,7 +31,7 @@ export async function bootstrap(node) {
   const setup = await loadInitializer(init);
   const template = node.querySelector("template") || tpl(node.innerHTML);
 
-  mount(node, {
+  return mount(node, {
     template,
     setup: () => setup(),
   });

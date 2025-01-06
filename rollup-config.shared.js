@@ -20,10 +20,10 @@ module.exports = (projectRoot) => ({
       declaration: true,
     }),
     json(),
-    terser({
-      compress: true,
-      ecma: 2020,
-      module: true,
-    }),
+    // terser({
+    //   compress: true,
+    //   ecma: 2020,
+    //   module: true,
+    // }),
   ],
 });
