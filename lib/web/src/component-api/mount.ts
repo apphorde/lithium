@@ -1,16 +1,7 @@
-import { ReactiveContext } from "@lithium/reactive";
-import { plugins } from "../internal-api/plugin.js";
-import { createState } from "../internal-api/reactive.js";
-import { push, pop } from "../internal-api/stack.js";
-import { createDom } from "../internal-api/dom.js";
-import type {
-  ComponentDefinitions,
-  RuntimeInternals,
-} from "../internal-api/types.js";
-import { getOption } from "../internal-api/options.js";
+import type { ComponentDefinitions } from "../internal-api/types.js";
+import { createInstance } from "../internal-api/lifecycle.js";
 
 export const noop = () => {};
-export const VM = Symbol("@@VM");
 const mounted = Symbol();
 
 export interface MountOptions {
@@ -38,54 +29,13 @@ export function mount(
 
   element[mounted] = true;
   const { setup = noop, template, shadowDom } = def;
-  const $el = {
-    shadowDom,
+
+  return createInstance({
     element,
+    setup,
+    template,
+    shadowDom,
     props: options?.props,
     parent: options?.parent,
-    setup,
-    stylesheets: [],
-    scripts: [],
-    template,
-    state: {},
-    stateKeys: [],
-    init: [],
-    destroy: [],
-    reactive: new ReactiveContext(),
-  };
-
-  createInstance($el);
-  return $el;
-}
-
-export function createInstance($el: RuntimeInternals): RuntimeInternals {
-  push($el);
-
-  try {
-    const { reactive } = $el;
-    reactive.suspend();
-    createState($el);
-    plugins.apply("setup", [$el]);
-    createDom($el);
-    reactive.unsuspend();
-    reactive.check();
-
-    ($el.element as any).__destroy = () => {
-      plugins.apply("destroy", [$el]);
-      $el.destroy.forEach((f) => f($el));
-    };
-
-    plugins.apply("init", [$el]);
-    $el.init.forEach((f) => f($el));
-
-    if (getOption("debugEnabled")) {
-      $el.element[VM] = $el;
-    }
-  } catch (error) {
-    console.log("Failed to initialize component!", $el, error);
-  }
-
-  pop();
-
-  return $el;
+  });
 }

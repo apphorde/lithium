@@ -1,7 +1,7 @@
 import { getCurrentInstance } from "../internal-api/stack.js";
 import { EventEmitFunction } from "../internal-api/types.js";
 import { defineEventOnElement, isElement, emitEvent } from "../internal-api/dom.js";
-import type { AnyFunction, RuntimeInternals } from "../internal-api/types.js";
+import type { AnyFunction } from "../internal-api/types.js";
 import type { Ref } from "@lithium/reactive";
 import { getPropValue } from '../internal-api/props.js';
 
@@ -15,6 +15,10 @@ export function loadScript(url: string): void {
 
 export function onInit(fn: VoidFunction): void {
   getCurrentInstance().init.push(fn);
+}
+
+export function onUpdate(fn: VoidFunction): void {
+  getCurrentInstance().update.push(fn);
 }
 
 export function onDestroy(fn: VoidFunction): void {
@@ -79,7 +83,9 @@ export function defineProps(definitions: string[] | Record<string, any>): any {
         return $ref.value;
       },
       set(value) {
+        const oldValue = $ref.value;
         $ref.value = value;
+        $el.update.forEach((f) => f($el, property, oldValue, value));
       },
     });
   }

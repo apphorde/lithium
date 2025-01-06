@@ -1,22 +1,38 @@
 import { ReactiveContext } from "@lithium/reactive";
 
-export interface RuntimeProperties {
+export type LifeCycleFunction = (runtime: LifeCycleObject) => void;
+export type UpdateLifeCycleFunction = (
+  runtime: LifeCycleObject,
+  property: string,
+  oldValue: any,
+  newValue: any
+) => void;
+
+export interface LifeCycleObject {
   element: Element | DocumentFragment;
-  state: any;
   template: HTMLTemplateElement | any[];
+  state: any;
 }
 
-export interface RuntimeInternals extends RuntimeProperties {
+export interface CreateInstanceProperties {
+  element: Element | DocumentFragment;
+  setup: Function;
+  template: HTMLTemplateElement | any[];
   shadowDom?: ShadowRootInit;
-  reactive: ReactiveContext;
   props: any;
+  parent: any;
+}
+
+export interface RuntimeInternals extends CreateInstanceProperties {
+  reactive: ReactiveContext;
   stylesheets: Array<string>;
   scripts: Array<string>;
-  parent: any;
   stateKeys: string[];
-  setup: Function;
-  init: Array<(runtime: RuntimeProperties) => void>;
-  destroy: Array<(runtime: RuntimeProperties) => void>;
+  state: any;
+
+  init: Array<LifeCycleFunction>;
+  update: Array<UpdateLifeCycleFunction>;
+  destroy: Array<LifeCycleFunction>;
 }
 
 export interface ComponentDefinitions {

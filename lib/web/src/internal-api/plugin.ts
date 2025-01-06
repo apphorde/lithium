@@ -34,5 +34,6 @@ plugins.setHooks([
   "applyAttribute",
   "appendDom",
   "init",
+  "update",
   "destroy",
 ]);
