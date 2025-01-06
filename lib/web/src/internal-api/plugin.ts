@@ -18,13 +18,21 @@ export class PluginDispatcher {
     }
   }
 
-  async apply(hook: string, args: any[] = []) {
+  apply(hook: string, args: any[] = []) {
     const plugins = this.hooks[hook];
     for (const plugin of plugins) {
-      await plugin[hook](...args);
+      plugin[hook](...args);
     }
   }
 }
 
 export const plugins = new PluginDispatcher();
-plugins.setHooks(["setup", "createDom", "createElement", "applyAttribute", "appendDom", "init", "destroy"]);
+plugins.setHooks([
+  "setup",
+  "createDom",
+  "createElement",
+  "applyAttribute",
+  "appendDom",
+  "init",
+  "destroy",
+]);

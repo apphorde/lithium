@@ -5,10 +5,9 @@ plugins.use({
   async appendDom($el: RuntimeInternals) {
     const { element, stylesheets, scripts } = $el;
 
-    await Promise.all([
-      ...stylesheets.map((url) => adoptStyleSheet(element as HTMLElement, url)),
-      ...scripts.map((src) => addScriptToPage(src)),
-    ]);
+    // TODO wait for scripts and stylesheets before component is mounted
+    stylesheets.map((url) => adoptStyleSheet(element as HTMLElement, url));
+    scripts.map((src) => addScriptToPage(src));
   },
 });
 
