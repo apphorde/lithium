@@ -21,7 +21,7 @@ module.exports = (projectRoot) => ({
     }),
     json(),
     terser({
-      compress: true,
+      compress: false,
       ecma: 2020,
       module: true,
     }),
