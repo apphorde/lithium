@@ -11,7 +11,7 @@ async function loadInitializer(init) {
   }
 
   try {
-    const mod = await import(init);
+    const mod = await import(new URL(init, location.href).toString());
     const setup = mod.setup || mod.default;
 
     if (typeof setup !== "function") {
