@@ -1,5 +1,5 @@
 {
-  "name": "@lithium/cli",
+  "name": "@li3/cli",
   "targets": {
     "build": {},
     "tsc": {}

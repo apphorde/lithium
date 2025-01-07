@@ -1,5 +1,5 @@
 {
-  "name": "@lithium/web",
+  "name": "@li3/web",
   "exports": {
     ".": {
       "default": "./index.js",
@@ -7,7 +7,7 @@
     }
   },
   "dependencies": {
-    "@lithium/reactive": "workspace:*",
-    "@lithium/html-parser": "workspace:*"
+    "@li3/reactive": "workspace:*",
+    "@li3/html-parser": "workspace:*"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@lithium/sfc",
+  "name": "@li3/sfc",
   "exports": {
     ".": {
       "default": "./index.js",
@@ -8,6 +8,6 @@
   },
   "dependencies": {
     "acorn": "latest",
-    "@lithium/html-parser": "workspace:*"
+    "@li3/html-parser": "workspace:*"
   }
 }

@@ -27,5 +27,5 @@ jobs:
         run: |
           for pkg in cli html-parser reactive scope sfc store web; do
             echo -n $pkg...
-            curl -sS --fail -H "Authorization: ${{ env.CDN_API_KEY }}" -X POST ${{ env.CDN_API_URL }}/library/@lithium/$pkg@0.0.0 --data-binary @lib/$pkg/index.js
+            curl -sS --fail -H "Authorization: ${{ env.CDN_API_KEY }}" -X POST ${{ env.CDN_API_URL }}/library/@li3/$pkg@0.0.0 --data-binary @lib/$pkg/index.js
           done

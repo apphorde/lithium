@@ -1,5 +1,5 @@
 {
-  "name": "@lithium/reactive",
+  "name": "@li3/reactive",
   "exports": {
     ".": {
       "default": "./index.js",

@@ -1,10 +1,6 @@
-import type {
-  AnyFunction,
-  Attribute,
-  RuntimeInternals,
-} from "./types.js";
+import type { AnyFunction, Attribute, RuntimeInternals } from "./types.js";
 import { plugins } from "./plugin.js";
-import { unref } from "@lithium/reactive";
+import { unref } from "@li3/reactive";
 
 const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
 

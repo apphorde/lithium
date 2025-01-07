@@ -1,4 +1,4 @@
-# @lithium/scope
+# @li3/scope
 
 A scope is an encapsulation of functions that can later be executed with a dynamic context.
 Once a scope is linked to a context object, each expression is available as a function.

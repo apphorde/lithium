@@ -1,4 +1,4 @@
-import { observer, ref, Ref } from "@lithium/reactive";
+import { observer, ref, Ref } from "@li3/reactive";
 
 const noop = () => {};
 const identity = (s) => s;
@@ -15,7 +15,10 @@ export interface StoreOptions {
   effects?: Record<string, Reducer<any, any>>;
 }
 
-export function useStore<T, A extends Action>(initialState: T, options?: StoreOptions) {
+export function useStore<T, A extends Action>(
+  initialState: T,
+  options?: StoreOptions
+) {
   const events = new EventTarget();
   const reducers = [];
   const effects = [];

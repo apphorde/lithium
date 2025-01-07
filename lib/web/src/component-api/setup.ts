@@ -1,9 +1,13 @@
 import { getCurrentInstance } from "../internal-api/stack.js";
 import { EventEmitFunction } from "../internal-api/types.js";
-import { defineEventOnElement, isElement, emitEvent } from "../internal-api/dom.js";
+import {
+  defineEventOnElement,
+  isElement,
+  emitEvent,
+} from "../internal-api/dom.js";
 import type { AnyFunction } from "../internal-api/types.js";
-import type { Ref } from "@lithium/reactive";
-import { getPropValue } from '../internal-api/props.js';
+import type { Ref } from "@li3/reactive";
+import { getPropValue } from "../internal-api/props.js";
 
 export function loadCss(url: string): void {
   getCurrentInstance().stylesheets.push(url);

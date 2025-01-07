@@ -1,17 +1,17 @@
-# @lithium/cli
+# @li3/cli
 
 ## Installation
 
 For NPM users, add this to `.npmrc`
 
 ```text
-@lithium:registry=https://npm.apphor.de
+@li3:registry=https://npm.apphor.de
 ```
 
 Then install it globally:
 
 ```sh
-npm i -g @lithium/cli
+npm i -g @li3/cli
 ```
 
 ## Usage

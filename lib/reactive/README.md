@@ -1,9 +1,9 @@
-# @lithium/reactive
+# @li3/reactive
 
 ## Usage
 
 ```ts
-import { reactive } from '@lithium/reactive';
+import { reactive } from '@li3/reactive';
 
 const callback = console.log;
 const target = {};

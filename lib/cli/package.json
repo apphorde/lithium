@@ -1,5 +1,5 @@
 {
-  "name": "@lithium/cli",
+  "name": "@li3/cli",
   "exports": {
     ".": {
       "default": "./index.js",
@@ -10,6 +10,6 @@
     "lit": "./index.js"
   },
   "dependencies": {
-    "@lithium/sfc": "workspace:*"
+    "@li3/sfc": "workspace:*"
   }
 }

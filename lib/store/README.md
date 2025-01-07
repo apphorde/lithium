@@ -1,11 +1,11 @@
-# @lithium/store
+# @li3/store
 
 Create a reactive store with an initial state, and dispatch actions
 
 ## Usage
 
 ```js
-import { useStore } from "@lithium/store";
+import { useStore } from "@li3/store";
 
 const reducers = {
   add(state, action) {

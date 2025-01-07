@@ -1,4 +1,4 @@
-import { ReactiveContext } from "@lithium/reactive";
+import { ReactiveContext } from "@li3/reactive";
 import { CreateInstanceProperties, RuntimeInternals } from "./types.js";
 import { plugins } from "./plugin.js";
 import { createState } from "./reactive.js";

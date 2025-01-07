@@ -1,5 +1,5 @@
 {
-  "name": "@lithium/store",
+  "name": "@li3/store",
   "targets": {
     "build": {},
     "tsc": {}

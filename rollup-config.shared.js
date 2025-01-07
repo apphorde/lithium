@@ -6,7 +6,7 @@ const { join } = require("path");
 
 module.exports = (projectRoot) => ({
   input: join(projectRoot, "src", "index.ts"),
-  external: [/@lithium\/.*/],
+  external: [/@li3\/.*/],
   output: {
     dir: projectRoot,
     format: "esm",

@@ -1,11 +1,11 @@
-# @lithium/sfc
+# @li3/sfc
 
 Transform a single-file component into a component definition, or into an executable ES module with a custom element.
 
 ## Usage
 
 ```js
-import { parseSFC, getComponentCode } from '@lithium/sfc';
+import { parseSFC, getComponentCode } from '@li3/sfc';
 
 const sfc = parseSFC('<template><div>hello!</div></template>');
 const code = getComponentCode('hello-world', sfc);
@@ -44,7 +44,7 @@ A component with only setup code:
 
 ```html
 <script>
-  import { onInit } from '@lithium/web';
+  import { onInit } from '@li3/web';
 
   function componentLoaded() {
     // do something
@@ -63,7 +63,7 @@ A component with a template using shadowDom, a script and styles:
 </template>
 
 <script>
-  import { defineProps } from '@lithium/web';
+  import { defineProps } from '@li3/web';
   defineProps(['name']);
 </script>
 
@@ -90,7 +90,7 @@ A component with imports and exports:
   <div>{{color}}</div>
 </template>
 <script>
-  import { defineProps } from '@lithium/web';
+  import { defineProps } from '@li3/web';
 
   const validColors = ['red', 'blue', 'green'];
 

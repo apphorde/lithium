@@ -1,5 +1,5 @@
 import { AnyFunction, RuntimeInternals } from "./types.js";
-import { unref } from "@lithium/reactive";
+import { unref } from "@li3/reactive";
 import { getOption } from "./options.js";
 
 const fnCache = new Map();

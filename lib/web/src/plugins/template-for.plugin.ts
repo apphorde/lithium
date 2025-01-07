@@ -1,7 +1,7 @@
 import { plugins } from "../internal-api/plugin.js";
 import { mount } from "../component-api/mount.js";
 import { defineProps } from "../component-api/setup.js";
-import { unref } from "@lithium/reactive";
+import { unref } from "@li3/reactive";
 import type { RuntimeInternals } from "../internal-api/types.js";
 import { getOption } from "../internal-api/options.js";
 import {

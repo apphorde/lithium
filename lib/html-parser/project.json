@@ -1,5 +1,5 @@
 {
-  "name": "@lithium/html-parser",
+  "name": "@li3/html-parser",
   "targets": {
     "build": {},
     "tsc": {},

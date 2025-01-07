@@ -1,4 +1,4 @@
-# @lithium/web
+# @li3/web
 
 A customisable runtime library for writing web components
 
@@ -41,7 +41,7 @@ This happens in two parts:
 - Setup function side:
 
 ```js
-import { ref } from '@lithium/web';
+import { ref } from '@li3/web';
 
 function setup() {
   const refName = ref();
@@ -54,7 +54,7 @@ function setup() {
 At runtime, the `html` helper function can help with parsing an HTML text, as long as the "long form" syntax is used for bindings and events.
 
 ```ts
-import { html, createComponent, defineProps } from '@lithium/web';
+import { html, createComponent, defineProps } from '@li3/web';
 
 const template = html`<div>Hello, {{name}}!</div>`;
 
@@ -70,7 +70,7 @@ export default createComponent('user-greeting', { setup, template });
 A classic example of tab/tab container:
 
 ```ts
-import { inject, provide, onInit, defineProps } from '@lithium/web';
+import { inject, provide, onInit, defineProps } from '@li3/web';
 
 // common token between components
 export const Controller = Symbol();
@@ -127,7 +127,7 @@ graph TD
 ## Plugins
 
 ```js
-import { plugins } from '@lithium/web';
+import { plugins } from '@li3/web';
 
 plugins.use({
   setup(state) {

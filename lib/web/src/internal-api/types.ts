@@ -1,4 +1,4 @@
-import { ReactiveContext } from "@lithium/reactive";
+import { ReactiveContext } from "@li3/reactive";
 
 export type LifeCycleFunction = (runtime: LifeCycleObject) => void;
 export type UpdateLifeCycleFunction = (

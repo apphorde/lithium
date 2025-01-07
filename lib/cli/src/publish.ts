@@ -1,17 +1,17 @@
-import { getComponentCode } from "@lithium/sfc";
+import { getComponentCode } from "@li3/sfc";
 import { readFileSync } from "node:fs";
 import type { Args } from "./parse-args.js";
 
 const publishUrl = process.env.PUBLISH_REGISTRY;
 const publishToken = process.env.PUBLISH_TOKEN;
-const types = ['component', 'library'];
+const types = ["component", "library"];
 
 export default async function publish(args: Args) {
   const [inputFile = "-"] = args.args;
-  const { scope, name, version = "0.0.0", type = '' } = args.options;
+  const { scope, name, version = "0.0.0", type = "" } = args.options;
 
   if (types.includes(String(type)) === false) {
-    throw new Error('Invalid type! Must be one of: ' + types.join(', '));
+    throw new Error("Invalid type! Must be one of: " + types.join(", "));
   }
 
   const source = (
@@ -43,13 +43,16 @@ export default async function publish(args: Args) {
   const sfc = JSON.parse(source);
   const code = getComponentCode(name, sfc);
 
-  const req = await fetch(new URL(`${type}/${scope}/${name}@${version}`, publishUrl), {
-    body: code,
-    method: "POST",
-    headers: { Authorization: publishToken },
-  });
+  const req = await fetch(
+    new URL(`${type}/${scope}/${name}@${version}`, publishUrl),
+    {
+      body: code,
+      method: "POST",
+      headers: { Authorization: publishToken },
+    }
+  );
 
   if (!req.ok) {
-    throw new Error('Failed to publish ' + name + ': ' + req.statusText);
+    throw new Error("Failed to publish " + name + ": " + req.statusText);
   }
 }
