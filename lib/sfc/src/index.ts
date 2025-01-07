@@ -22,7 +22,7 @@ export function findNode(nodes: DocumentNode, tag: string): ElementNode {
 
 export function getSetupCode(setupNode: ElementNode): string {
   const setupSource =
-    setupNode.children.find((s) => s.type === "text").text || "";
+    setupNode.children.find((s) => s.type === "text")?.text || "";
 
   if (!setupSource) {
     return NO_SETUP;
