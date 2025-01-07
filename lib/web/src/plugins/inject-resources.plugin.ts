@@ -1,3 +1,4 @@
+import { createBlobModule } from "../internal-api/expressions";
 import { plugins } from "../internal-api/plugin.js";
 import type { RuntimeInternals } from "../internal-api/types.js";
 
@@ -28,14 +29,25 @@ export function injectStylesheetOnElement(
 }
 
 const stylesheetCache = new Map<string, CSSStyleSheet>();
+let _importCssModule: any = createBlobModule(
+  'export default function(href) { return import(href, { with: { type: "css" } }) }'
+);
+
+async function importCssModule(href: string) {
+  if (typeof _importCssModule !== "function") {
+    _importCssModule = (await _importCssModule).default;
+  }
+
+  return (await _importCssModule(href)).default;
+}
 
 export async function adoptStyleSheet(
   target: HTMLElement | Document,
   href: string
 ) {
   if (!stylesheetCache.has(href)) {
-    const mod = await import(href, { with: { type: "css" } });
-    stylesheetCache.set(href, mod.default);
+    const mod = await importCssModule(href);
+    stylesheetCache.set(href, mod);
   }
 
   const stylesheet = stylesheetCache.get(href);

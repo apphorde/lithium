@@ -9,7 +9,7 @@ export const DefineComponent = Symbol("@@def");
 export function createComponent(name: string, def: ComponentDefinitions): void {
   if (customElements.get(name)) {
     customElements.get(name)![DefineComponent] = def;
-    // TODO propagate updates to all instances
+    // TODO propagate updates to all instances?
     return;
   }
 

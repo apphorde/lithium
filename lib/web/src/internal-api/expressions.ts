@@ -28,6 +28,14 @@ export function compileExpression(
   return compileExpressionEval($el, expression, args);
 }
 
+export function createBlobModule(code: string, type = "text/javascript") {
+  const blob = new Blob([code], { type });
+  const url = URL.createObjectURL(blob);
+  const modPromise = import(url);
+  modPromise.then(() => URL.revokeObjectURL(url));
+  return modPromise;
+}
+
 const modCache = new Map();
 
 export function compileExpressionBlob(
@@ -44,11 +52,7 @@ export function compileExpressionBlob(
   }`;
 
   if (!modCache.has(code)) {
-    const blob = new Blob([code], { type: "text/javascript" });
-    const url = URL.createObjectURL(blob);
-    const modPromise = import(url);
-    modCache.set(code, modPromise);
-    modPromise.then(() => URL.revokeObjectURL(url));
+    modCache.set(code, createBlobModule(code));
   }
 
   const mod = modCache.get(code);
