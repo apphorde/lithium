@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0">
+  <title>Lithium - The Modern Frontend Framework</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .bg-gradient-primary {
+      background-color: linear-gradient(90deg, #3a7bd5, #00d2ff)
+    }
+  </style>
+</head>
+
+<body class="font-sans text-gray-900 antialiased">
+  <!-- Navigation -->
+  <nav class="flex justify-between items-center px-8 py-4 bg-white shadow-sm">
+    <a href="#"
+      class="text-2xl font-bold text-gray-800">Li³</a>
+    <div class="hidden md:flex gap-8">
+      <a href="#features"
+        class="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
+      <a href="#docs"
+        class="text-gray-600 hover:text-gray-900 transition-colors">Documentation</a>
+      <a href="https://github.com/lithium-framework"
+        target="_blank"
+        class="text-gray-600 hover:text-gray-900 transition-colors">GitHub</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section
+    class="min-h-[80vh] bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col md:flex-row items-center justify-between px-8 py-16 md:py-24">
+    <div class="max-w-2xl">
+      <h1 class="bg-clip-text text-transparent text-5xl md:text-6xl font-bold mb-6">
+        Lithium
+      </h1>
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
+        The Modern Frontend Framework
+      </h2>
+      <p class="text-xl text-gray-600 mb-8">
+        A lightweight, reactive framework that empowers developers to build blazing-fast web applications with ease.
+      </p>
+      <div class="flex flex-wrap gap-4">
+        <a href="#get-started"
+          class="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transform hover:-translate-y-0.5 transition-all">
+          Get Started
+        </a>
+        <a href="https://github.com/lithium-framework"
+          target="_blank"
+          class="px-6 py-3 bg-white text-blue-600 border border-blue-600 rounded-lg font-semibold hover:bg-gray-50 transform hover:-translate-y-0.5 transition-all">
+          View on GitHub
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-12 md:mt-0 bg-gray-900 rounded-2xl p-8 shadow-2xl w-full max-w-md">
+      <pre class="text-green-400 font-mono text-center"></pre>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features"
+    class="py-24 px-8 bg-white">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow">
+        <div class="text-4xl mb-4">⚡</div>
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Lightning Fast</h3>
+        <p class="text-gray-600">
+          Built with performance in mind, Lithium delivers exceptional speed and efficiency out of the box.
+        </p>
+      </div>
+
+      <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow">
+        <div class="text-4xl mb-4">🎯</div>
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Future Proof</h3>
+        <p class="text-gray-600">
+          Use the web platform as much as possible, with an intuitive API to declare components
+        </p>
+      </div>
+
+      <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow">
+        <div class="text-4xl mb-4">🔧</div>
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Modern Tooling</h3>
+        <p class="text-gray-600">
+          Integrated with the latest development tools and practices for the best developer experience.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-50 py-8 px-8 text-center">
+    <p class="text-gray-600">Released under the MIT License</p>
+    <p class="text-gray-600 mt-2">Copyright © 2024 Lithium</p>
+  </footer>
+</body>
+
+</html>

@@ -1,0 +1,21 @@
+on:
+  push:
+    paths:
+      - 'site/**'
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    uses: cloud-cli/workflows/.github/workflows/docker-ghcr-build.yml@main
+    permissions:
+      contents: read
+      packages: write
+    with:
+      baseImage: cloud-cli/node:latest
+      withSha: false
+      withTag: true
+      type: static
+      path: 'site'
