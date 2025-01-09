@@ -3,6 +3,11 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '*.json'
+      - '*.yaml'
+      - '*.js'
+      - 'lib/**'
 
 jobs:
   publish:
