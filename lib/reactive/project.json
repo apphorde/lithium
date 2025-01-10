@@ -2,6 +2,7 @@
   "name": "@li3/reactive",
   "targets": {
     "build": {},
-    "tsc": {}
+    "tsc": {},
+    "publish": {}
   }
 }

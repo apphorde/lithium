@@ -1,7 +1,9 @@
 {
   "name": "@li3/sfc",
+  "version": "0.0.1",
   "targets": {
     "build": {},
-    "tsc": {}
+    "tsc": {},
+    "publish": {}
   }
 }

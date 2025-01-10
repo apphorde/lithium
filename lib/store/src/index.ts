@@ -90,7 +90,7 @@ export function useStore<T, A extends Action>(
 
       select<V>(selector: (state: T) => V = identity): Ref<V> {
         const value = selector(state.value);
-        const valueRef = ref(value, noop);
+        const valueRef = ref(value);
         const o = observer(
           () => selector(state.value),
           (value) => (valueRef.value = value)

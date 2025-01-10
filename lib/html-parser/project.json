@@ -7,6 +7,7 @@
       "options": {
         "command": "npx tsx {projectRoot}/src/index.spec.ts"
       }
-    }
+    },
+    "publish": {}
   }
 }

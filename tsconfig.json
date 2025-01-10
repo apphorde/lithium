@@ -1,9 +1,10 @@
 {
+  "exclude": ["node_modules"],
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["DOM", "ESNext"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "sourceMap": false,
+    "sourceMap": false
   }
 }
