@@ -4,7 +4,7 @@ A scope is an encapsulation of functions that can later be executed with a dynam
 Once a scope is linked to a context object, each expression is available as a function.
 
 ```js
-import { addProperties, addExpression, createScope, compile, bind } from '@lithim/scope';
+import { addProperties, addExpression, createScope, compile, bind } from '@li3/scope';
 
 const scope = createScope();
 
