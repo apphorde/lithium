@@ -1,4 +1,4 @@
-name: Publish to CDN
+name: Publish to NPM
 on:
   push:
     branches:
@@ -12,7 +12,7 @@ on:
       - ".github/**"
 
 jobs:
-  publish-apphorde:
+  publish-npm:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -27,12 +27,12 @@ jobs:
           which pnpm && echo 'pnpm OK' || npm i -g pnpm
           pnpm i && pnpx nx run-many -t build,test
 
-      - name: Publish to AppHorde Registry
+      - name: Publish to NPM
         env:
-          CDN_API_URL: ${{ secrets.CDN_API_URL }}
-          CDN_API_KEY: ${{ secrets.CDN_API_KEY }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          for pkg in cli html-parser reactive scope sfc store web; do
-            echo -n $pkg...
-            curl -sS --fail -H "Authorization: ${{ env.CDN_API_KEY }}" -X POST ${{ env.CDN_API_URL }}/library/@li3/$pkg@0.0.0 --data-binary @lib/$pkg/index.js
-          done
+          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
+          echo "//registry.npmjs.org/:always-auth=true" >> .npmrc
+          # pnpx nx run-many -t publish
+          pnpm publish -r --no-git-checks --access public
+

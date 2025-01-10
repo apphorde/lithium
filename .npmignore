@@ -1,0 +1,5 @@
+src/**
+project.json
+rollup.config.js
+.git
+.github
