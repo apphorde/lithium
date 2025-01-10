@@ -2,10 +2,6 @@ import { execSync } from "child_process";
 import { readFileSync } from "fs";
 import { join } from "path";
 
-const projectRoot = process.argv.slice(2)[0];
-const packageJson = JSON.parse(readFileSync(join(projectRoot, "package.json"), "utf8"));
-const { name, version } = packageJson;
-
 async function getRegistryVersion(packageName) {
   const response = await fetch(`https://registry.npmjs.org/${packageName}`);
   if (!response.ok || response.status > 399) {
@@ -18,11 +14,18 @@ async function getRegistryVersion(packageName) {
 
 async function main() {
   try {
+    const projectRoot = process.argv.slice(2)[0];
+    const packageJson = JSON.parse(readFileSync(join(projectRoot, "package.json"), "utf8"));
+    const { name, version } = packageJson;
     const registryVersion = await getRegistryVersion(name);
+
+    if (!version) {
+      return;
+    }
 
     if (version !== registryVersion) {
       console.log(`Publishing new version: ${version}`);
-      execSync("npm publish", { stdio: "inherit" });
+      execSync("npm publish", { stdio: "inherit", cwd: projectRoot });
     } else {
       console.log(`Version ${version} is already published.`);
     }
