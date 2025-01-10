@@ -4,13 +4,35 @@ on:
     branches:
       - main
     paths:
-      - '*.json'
-      - '*.yaml'
-      - '*.js'
-      - 'lib/**'
+      - "*.json"
+      - "*.yaml"
+      - "*.js"
+      - "*.ts"
+      - "lib/**"
 
 jobs:
-  publish:
+  publish-npm:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build packages
+        run: |
+          set -e
+          which pnpm && echo 'pnpm OK' || npm i -g pnpm
+          pnpm i && pnpx nx run-many -t build,test
+
+      - name: Publish to NPM
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          pnpx nx run-many -t publish
+
+  publish-apphorde:
     runs-on: ubuntu-latest
     permissions:
       contents: read
