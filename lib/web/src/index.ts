@@ -8,6 +8,7 @@ import * as reactive from "./internal-api/reactive.js";
 import * as stack from "./internal-api/stack.js";
 import * as dom from "./internal-api/dom.js";
 
+export { html, tpl, domReady } from "./internal-api/dom.js";
 export * from "./component-api/setup.js";
 export { inject, provide } from "./component-api/inject.js";
 export { createComponent } from "./component-api/custom-elements.js";
@@ -26,7 +27,7 @@ import * as plugin9 from "./plugins/text-template.plugin.js";
 
 export { Ref, unref, isRef } from "@li3/reactive";
 
-export const internals = {
+export const Lithium = {
   ...reactive,
   ...stack,
   ...dom,

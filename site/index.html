@@ -7,16 +7,7 @@
     content="width=device-width, initial-scale=1.0">
   <title>Lithium - The Modern Frontend Framework</title>
   <script type="importmap">
-    {
-      "imports": {
-        "@li3/": "https://--li3.static.apphor.de/",
-        "@sodium/": "https://--sodium.static.apphor.de/",
-        "@lucide/": "https://--lucide.static.apphor.de/"
-      }
-    }
-  </script>
-  <script type="module">
-    import "@li3/web";
+    { "imports": { "@li3/": "https://cdn.li3.dev/@li3/" } }
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -74,9 +65,9 @@
 
   <!-- Features Section -->
   <section id="features"
-    class="py-24 px-8 bg-white">
+    class="py-24 px-8 bg-white min-h-screen flex items-center">
     <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow">
+      <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border">
         <div class="text-4xl mb-4">🧱</div>
         <h3 class="text-xl font-bold text-gray-800 mb-4">Only Building Blocks</h3>
         <p class="text-gray-600">
@@ -84,7 +75,7 @@
         </p>
       </div>
 
-      <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow">
+      <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border">
         <div class="text-4xl mb-4">🎯</div>
         <h3 class="text-xl font-bold text-gray-800 mb-4">Future Proof</h3>
         <p class="text-gray-600">
@@ -92,7 +83,7 @@
         </p>
       </div>
 
-      <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow">
+      <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border">
         <div class="text-4xl mb-4">🔧</div>
         <h3 class="text-xl font-bold text-gray-800 mb-4">It's just web components</h3>
         <p class="text-gray-600">
@@ -103,21 +94,55 @@
   </section>
 
   <section id="get-started"
-    class="h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-24 px-8">
+    class="min-h-screen bg-gray-100 py-24 px-8">
     <div class="max-w-4xl mx-auto">
-      <h1 class="bg-clip-text text-transparent text-5xl md:text-6xl font-bold mb-6">Batteries included</h1>
-      <p class="text-xl text-gray-600 mb-8">Add an import map to any static page and you are ready to start!</p>
-      <div class="mt-12 bg-gray-900 rounded-2xl p-6 shadow-2xl w-full">
-        <pre class="text-green-400 font-mono">
+      <h1 class="text-red-500 text-5xl md:text-6xl font-bold mb-6">Batteries included</h1>
+      <p class="text-xl text-gray-600 mb-8">1. Add an import map to any page</p>
+      <p class="text-xl text-gray-600 mb-8">2. Import the API from <span
+          class="font-mono bg-gray-200 p-1 rounded">@li3/web</span> </p>
+      <p class="text-xl text-gray-600 mb-8">3. mount a component into an element</p>
+      <div class="mt-12 bg-gray-200 rounded-2xl p-6 shadow-2xl w-full">
+        <pre class="text-gray-800 font-mono">
 &lt;script type="importmap"&gt;
-  { "imports": { "@li3/": "https://cdn.li3.dev/" } }
+  { "imports": { "@li3/": "https://cdn.li3.dev/@li3/" } }
 &lt;/script&gt;
 &lt;script type="module"&gt;
-  import { mount } from "@li3/web";
-  // start coding
+  import { ref, tpl, mount } from "@li3/web";
+
+  const template = tpl`&lt;div&gt;
+    &lt;label>Your name:&lt;/label&gt;
+    &lt;input type="text" on-change="setName($event.target.value)" bind-value="name" /&gt;
+    &lt;hr /&gt;
+    &lt;h1&gt;Hello, {{ name }}!&lt;/h1&gt;
+  &lt;/div&gt;`;
+
+  function greeting() {
+    const name = ref('');
+    return { name };
+  }
+  mount('#app', { setup: greeting, template })
 &lt;/script&gt;
         </pre>
       </div>
+
+      <div class="my-4 bg-gray-200 rounded-2xl p-6 shadow-2xl w-full"
+        id="app"></div>
+      <script type="module">
+        import { ref, tpl, mount } from "@li3/web";
+
+        const template = tpl`<div>
+          <label>Your name:</label>
+          <input type="text" on-change="setName($event.target.value)" bind-value="name" />
+          <hr />
+          <h1>Hello, {{ name }}!</h1>
+        </div>`;
+
+        function greeting() {
+          const name = ref('');
+          return { name };
+        }
+        mount('#app', { setup: greeting, template })
+      </script>
       <p class="mt-12 text-xl text-gray-600 mb-8">Now <a class="text-blue-600 underline"
           href="/docs">go to the documentation</a> to see more</p>
     </div>

@@ -63,6 +63,11 @@ export function reactive<T extends object>(object: T, callback: VoidFunction, op
       callback();
       return true;
     },
+    deleteProperty(target, p) {
+      delete target[p];
+      callback();
+      return true;
+    }
   });
 }
 
