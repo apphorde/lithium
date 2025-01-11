@@ -101,8 +101,8 @@
       <p class="text-xl text-gray-600 mb-8">2. Import the API from <span
           class="font-mono bg-gray-200 p-1 rounded">@li3/web</span> </p>
       <p class="text-xl text-gray-600 mb-8">3. mount a component into an element</p>
-      <div class="mt-12 bg-gray-200 rounded-2xl p-6 shadow-2xl w-full">
-        <pre class="text-gray-800 font-mono">
+      <div class="mt-12 bg-white rounded-2xl p-6 shadow-2xl w-full">
+        <pre class="text-gray-800 font-mono p-4">
 &lt;script type="importmap"&gt;
   { "imports": { "@li3/": "https://cdn.li3.dev/@li3/" } }
 &lt;/script&gt;
@@ -111,40 +111,58 @@
 
   const template = tpl`&lt;div&gt;
     &lt;label>Your name:&lt;/label&gt;
-    &lt;input type="text" on-change="setName($event.target.value)" bind-value="name" /&gt;
+    &lt;input type="text" on-input="setName($event.target.value)" bind-value="name" /&gt;
     &lt;hr /&gt;
     &lt;h1&gt;Hello, {{ name }}!&lt;/h1&gt;
   &lt;/div&gt;`;
 
   function greeting() {
     const name = ref('');
-    return { name };
+
+    function setName(v) {
+      name.value = v;
+    }
+
+    return { name, setName };
   }
+
   mount('#app', { setup: greeting, template })
 &lt;/script&gt;
         </pre>
+        <div class="my-6 p-4 border shadow rounded"
+          id="app"></div>
       </div>
 
-      <div class="my-4 bg-gray-200 rounded-2xl p-6 shadow-2xl w-full"
-        id="app"></div>
       <script type="module">
         import { ref, tpl, mount } from "@li3/web";
+        import { load, highlight } from 'https://highlight.jsfn.run/index.mjs';
+
+        load().then(async () => {
+          const pre = document.querySelector('pre');
+          pre.innerHTML = await highlight(pre.innerText, { language: 'html' });
+        });
 
         const template = tpl`<div>
-          <label>Your name:</label>
-          <input type="text" on-change="setName($event.target.value)" bind-value="name" />
-          <hr />
-          <h1>Hello, {{ name }}!</h1>
+          <h1 class="text-xl font-bold">Hello, {{ name }}!</h1>
+          <hr class="border-t my-3" />
+          <label class="py-2">Your name:</label>
+          <input type="text" class="mt-2 p-2 border rounded bg-white w-full" on-input="setName($event.target.value)" bind-value="name" />
         </div>`;
 
         function greeting() {
           const name = ref('');
-          return { name };
+
+          function setName(v) {
+            name.value = v;
+          }
+
+          return { name, setName };
         }
+
         mount('#app', { setup: greeting, template })
       </script>
       <p class="mt-12 text-xl text-gray-600 mb-8">Now <a class="text-blue-600 underline"
-          href="/docs">go to the documentation</a> to see more</p>
+          href="/docs">go to the documentation</a> to see the full API!</p>
     </div>
   </section>
 
