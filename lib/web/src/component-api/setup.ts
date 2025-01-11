@@ -1,13 +1,10 @@
 import { getCurrentInstance } from "../internal-api/stack.js";
 import { EventEmitFunction } from "../internal-api/types.js";
-import {
-  defineEventOnElement,
-  isElement,
-  emitEvent,
-} from "../internal-api/dom.js";
+import { defineEventOnElement, isElement, emitEvent } from "../internal-api/dom.js";
 import type { AnyFunction } from "../internal-api/types.js";
 import type { Ref } from "@li3/reactive";
 import { getPropValue } from "../internal-api/props.js";
+import { plugins } from "../internal-api/plugin.js";
 
 export function loadCss(url: string): void {
   getCurrentInstance().stylesheets.push(url);
@@ -65,9 +62,7 @@ export function defineEvents(eventNames: any): EventEmitFunction {
 
 export function defineProps(definitions: string[] | Record<string, any>): any {
   const $el = getCurrentInstance();
-  const keys = !Array.isArray(definitions)
-    ? Object.keys(definitions)
-    : definitions;
+  const keys = !Array.isArray(definitions) ? Object.keys(definitions) : definitions;
   const { element, state } = $el;
   const props = {};
 
@@ -89,6 +84,7 @@ export function defineProps(definitions: string[] | Record<string, any>): any {
       set(value) {
         const oldValue = $ref.value;
         $ref.value = value;
+        plugins.apply("update", [$el, property, oldValue, value]);
         $el.update.forEach((f) => f($el, property, oldValue, value));
       },
     });
