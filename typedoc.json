@@ -1,0 +1,11 @@
+{
+  "out": "./site/docs",
+  "entryPoints": ["lib/*"],
+  "name": "Li3",
+  "entryPointStrategy": "packages",
+  "includeVersion": false,
+  "packageOptions": {
+    "includeVersion": true,
+    "entryPoints": ["src/index.ts"]
+  }
+}

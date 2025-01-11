@@ -5,7 +5,8 @@ on:
       - main
     paths:
       - ".github/**"
-      - 'site/**'
+      - "site/**"
+      - "lib/**"
 
 concurrency:
   group: ${{ github.ref }}
@@ -22,4 +23,5 @@ jobs:
       withSha: false
       withTag: true
       type: static
-      path: 'site'
+      path: "site"
+      buildCommand: cd .. && npm i -g pnpm && pnpm i && npx nx run-many -t build && npm run docs
