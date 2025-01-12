@@ -99,83 +99,82 @@
     </div>
   </section>
 
-  <section id="get-started"
+  <section id="setup-api"
     class="min-h-screen bg-white py-24 px-8">
     <div class="max-w-4xl mx-auto">
       <h1 class="text-5xl text-red-500 font-bold font-serif">Setup API</h1>
       <h2 class="text-3xl text-gray-700 mt-3 font-semi font-serif">How to declare the API of a component</h2>
 
       <p class="text-xl text-gray-600 mt-8">Declare inputs (props):</p>
-      <div class="bg-white rounded-lg px-4 py-2 mt-6 shadow-lg w-full">
-        <pre language="javascript"
-          class="text-gray-800 font-mono">import { defineProps } from '@li3/web';
+      <code-block language="javascript">
+        <pre>
+          import { defineProps } from '@li3/web';
 
-function setup() {
-  // short form
-  defineProps(['foo', 'bar']);
+          function setup() {
+            // short form
+            defineProps(['foo', 'bar']);
 
-  // long form with defaults
-  defineProps({
-    foo: String,
-    bar: { default: 123 }
-  });
-}
-</pre>
-      </div>
+            // long form with defaults
+            defineProps({
+              foo: String,
+              bar: { default: 123 }
+            });
+          }
+      </pre>
+      </code-block>
 
       <p class="text-xl text-gray-600 mt-8">Declare outputs (events):</p>
-      <div class="bg-white rounded-lg px-4 py-2 mt-6 shadow-lg w-full">
-        <pre language="javascript"
-          class="text-gray-800 font-mono">import { defineEvents } from '@li3/web';
+      <code-block language="javascript">
+        <pre>import { defineEvents } from '@li3/web';
 
-function setup() {
-  const emit = defineEvents['update', 'remove']);
+        function setup() {
+          const emit = defineEvents['update', 'remove']);
 
-  emit('update', { value: 123 });
-}
-</pre>
-      </div>
+          emit('update', { value: 123 });
+        }
+      </pre>
+      </code-block>
 
       <p class="text-xl text-gray-600 mt-8">Create reactive values (ref/computed) and watchers:</p>
-      <div class="bg-white rounded-lg px-4 py-2 mt-6 shadow-lg w-full">
-        <pre language="javascript"
-          class="text-gray-800 font-mono">import { ref, unref, computed, watch } from '@li3/web';
+      <code-block language="javascript">
+        <pre>
+          import { ref, unref, computed, watch } from '@li3/web';
 
-function setup() {
-  const name = ref('Joe');
-  const greeting = computed(() => 'Hello, ' + unref(name));
+          function setup() {
+            const name = ref('Joe');
+            const greeting = computed(() => 'Hello, ' + unref(name));
 
-  function isEmpty() {
-    return !!unref(name);
-  }
+            function isEmpty() {
+              return !!unref(name);
+            }
 
-  watch(() => unref(name), (value) => { /**/ });
+            watch(() => unref(name), (value) => { /**/ });
 
-  return { name, greeting, isEmpty }
-}
-</pre>
-      </div>
+            return { name, greeting, isEmpty }
+          }
+        </pre>
+      </code-block>
 
       <p class="text-xl text-gray-600 mt-8">Lifecycle events:</p>
-      <div class="bg-white rounded-lg px-4 py-2 mt-6 shadow-lg w-full">
-        <pre language="javascript"
-          class="text-gray-800 font-mono">import { onInit, onUpdate, onDestroy } from '@li3/web';
+      <code-block language="javascript">
+        <pre>
+          import { onInit, onUpdate, onDestroy } from '@li3/web';
 
-function setup() {
-  onInit(function() {
-    // called once on mount
-  });
+          function setup() {
+            onInit(function() {
+              // called once on mount
+            });
 
-  onUpdate(function() {
-    // called every time a prop changes
-  });
+            onUpdate(function() {
+              // called every time a prop changes
+            });
 
-  onDestroy(function() {
-    // called once on unmount
-  });
-}
-</pre>
-      </div>
+            onDestroy(function() {
+              // called once on unmount
+            });
+          }
+        </pre>
+      </code-block>
 
       <p class="text-xl text-gray-600 mt-8">Access DOM nodes (.one / .many):</p>
       <code-block language="javascript">
@@ -193,9 +192,8 @@ function setup() {
             }
           </script>
         </template>
-
-        </template>
       </code-block>
+
       <p class="text-xl text-gray-600 mt-8">Load resources:</p>
       <code-block language="javascript">
         <template>
@@ -214,6 +212,33 @@ function setup() {
 
       <p class="mt-12 text-xl text-gray-600 mb-8">Now <a class="text-blue-600 underline"
           href="/docs">go to the documentation</a> to see the full API!</p>
+    </div>
+  </section>
+
+  <section id="setup-api"
+    class="min-h-screen bg-white py-24 px-8">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-5xl text-red-500 font-bold font-serif">Conditionals and loops</h1>
+      <h2 class="text-3xl text-gray-700 mt-3 font-semi font-serif">Repeat a template or add/remove elements based on a
+        condition</h2>
+
+      <p class="text-xl text-gray-600 mt-8">Conditinal with template[if]</p>
+      <code-block language="javascript">
+        <template>
+          <template if="condition">
+            <div>Show me</div>
+          </template>
+        </template>
+      </code-block>
+
+      <p class="text-xl text-gray-600 mt-8">Repeat with template[for]</p>
+      <code-block language="javascript">
+        <template>
+          <template for="item of list">
+            <div>Repeat me</div>
+          </template>
+        </template>
+      </code-block>
     </div>
   </section>
 

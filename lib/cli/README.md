@@ -1,14 +1,8 @@
 # @li3/cli
 
-## Installation
+## Install
 
-For NPM users, add this to `.npmrc`
-
-```text
-@li3:registry=https://npm.apphor.de
-```
-
-Then install it globally:
+From NPM:
 
 ```sh
 npm i -g @li3/cli
@@ -17,6 +11,6 @@ npm i -g @li3/cli
 ## Usage
 
 ```sh
-npx lit compile path/to/file.html path/to/output.js
+npx li3 compile path/to/file.html path/to/output.js
 
 ```

@@ -5,11 +5,10 @@ Transform a single-file component into a component definition, or into an execut
 ## Usage
 
 ```js
-import { parseSFC, getComponentCode } from '@li3/sfc';
+import { parseSFC, getComponentCode } from "@li3/sfc";
 
-const sfc = parseSFC('<template><div>hello!</div></template>');
-const code = getComponentCode('hello-world', sfc);
-
+const sfc = parseSFC("<template><div>hello!</div></template>");
+const code = getComponentCode("hello-world", sfc);
 ```
 
 ## Single-file components
@@ -31,12 +30,11 @@ A `script` tag defines the code executed for every component instance.
 The content inside the script tag is _implicitly_ wrapped by a function, which is then executed every time a new instance of a component
 is initialized.
 
-If a component has any `import` or `export` statement, any code between the _last_ import and the _first_ export is considered as setup code. Because export statements can use values that would be part of the source, in case a component needs to export values, a `setup` function __must__ be defined, and called `defineComponent`. The conversion will fail otherwise.
+If a component has any `import` or `export` statement, any code between the _last_ import and the _first_ export is considered as setup code. Because export statements can use values that would be part of the source, in case a component needs to export values, a `setup` function **must** be defined, and called `defineComponent`. The conversion will fail otherwise.
 
 ## `<style>`
 
 A `style` tag can be defined with styles that will be added to every component instance.
-
 
 ## Examples
 
@@ -44,14 +42,13 @@ A component with only setup code:
 
 ```html
 <script>
-  import { onInit } from '@li3/web';
+  import { onInit } from "@li3/web";
 
   function componentLoaded() {
     // do something
   }
 
   onInit(componentLoaded);
-
 </script>
 ```
 
@@ -63,12 +60,14 @@ A component with a template using shadowDom, a script and styles:
 </template>
 
 <script>
-  import { defineProps } from '@li3/web';
-  defineProps(['name']);
+  import { defineProps } from "@li3/web";
+  defineProps(["name"]);
 </script>
 
 <style>
-  .hello { font-size: 3rem; }
+  .hello {
+    font-size: 3rem;
+  }
 </style>
 ```
 
@@ -79,7 +78,9 @@ A component that has only a template:
   <div>A static text with a tiny font size</div>
 </template>
 <style>
-  div { font-size: 0.25rem; }
+  div {
+    font-size: 0.25rem;
+  }
 </style>
 ```
 
@@ -90,12 +91,12 @@ A component with imports and exports:
   <div>{{color}}</div>
 </template>
 <script>
-  import { defineProps } from '@li3/web';
+  import { defineProps } from "@li3/web";
 
-  const validColors = ['red', 'blue', 'green'];
+  const validColors = ["red", "blue", "green"];
 
   function defineComponent() {
-    defineProps(['color']);
+    defineProps(["color"]);
   }
 
   export { validColors };

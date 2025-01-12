@@ -5,7 +5,7 @@
 ```ts
 import { reactive } from '@li3/reactive';
 
-const callback = console.log;
+const callback = () => console.log('Property changed');
 const target = {};
 const liveObject = reactive(target, callback)
 

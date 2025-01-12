@@ -7,7 +7,7 @@
     }
   },
   "bin": {
-    "lit": "./index.js"
+    "li3": "./index.js"
   },
   "dependencies": {
     "@li3/sfc": "workspace:*"
