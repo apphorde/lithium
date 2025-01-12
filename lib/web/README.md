@@ -12,21 +12,23 @@ A customisable runtime library for writing web components
 
 ### Bind a property to a value
 
-- Short form: `:property="expression"`
-- Long form: `bind-property="expression"`
-- Using dash-case for camelCase properties: `bind-inner-html="expression"`
+`bind-property="expression"`
+
+> Note: Use dash-case for camelCase properties: `bind-inner-html="expression"`
+
+### Bind an attribute to a value
+
+`attr-name="expression"`
 
 ### Toggle a CSS class
 
-- Short form: `.class.font-bold="boolean"`
-- Long form: `class-font-bold="boolean"`
+`class-font-bold="boolean"`
 
 Invalid attribute name characters cannot be used for class bindings.
 
 ### Listen to an event
 
-- Short form: `@click="expression($event)"`
-- Long form: `on-click="expression($event)"`
+`on-click="expression($event)"`
 
 ### Create reference to a node
 
@@ -41,48 +43,48 @@ This happens in two parts:
 - Setup function side:
 
 ```js
-import { ref } from '@li3/web';
+import { ref } from "@li3/web";
 
 function setup() {
   const refName = ref();
-  return {refName};
+  return { refName };
 }
 ```
 
 ## Usage
 
-At runtime, the `html` helper function can help with parsing an HTML text, as long as the "long form" syntax is used for bindings and events.
+At runtime, the `tpl` function can help with parsing an HTML text.
 
 ```ts
-import { html, createComponent, defineProps } from '@li3/web';
+import { tpl, createComponent, defineProps } from "@li3/web";
 
-const template = html`<div>Hello, {{name}}!</div>`;
+const template = tpl`<div>Hello, {{name}}!</div>`;
 
 function setup() {
-  defineProps(['name']);
+  defineProps(["name"]);
 }
 
-export default createComponent('user-greeting', { setup, template });
+export default createComponent("user-greeting", { setup, template });
 ```
 
 ## Dependency Injection and Providers
 
-A classic example of tab/tab container:
+A classic example of tabs and a container:
 
 ```ts
-import { inject, provide, onInit, defineProps } from '@li3/web';
+import { inject, provide, onInit, defineProps } from "@li3/web";
 
 // common token between components
 export const Controller = Symbol();
 
 // children can inject from parent components in the DOM tree
 function tab() {
-  const props = defineProps('tabid');
+  const props = defineProps("tabid");
   const controller = inject(Controller);
 
-  onInit(function() {
+  onInit(function () {
     controller.register(props.tabid);
-  })
+  });
 }
 
 // parents can provide values via Symbols or unique references
@@ -92,15 +94,14 @@ function tabContainer() {
   provide(Controller, {
     register(id) {
       tabs.push(id);
-    }
+    },
   });
 }
 
 // NOTE: the order of registration is important: the parent
 // must be registered first!
-createComponent('x-tabcontainer', { setup: tabContainer });
-createComponent('x-tab', { setup: tab });
-
+createComponent("x-tabcontainer", { setup: tabContainer });
+createComponent("x-tab", { setup: tab });
 ```
 
 ```html
@@ -114,20 +115,30 @@ createComponent('x-tab', { setup: tab });
 
 When `mount(rootElement, { setup, template })` is called, these lifecycle events are executed:
 
-```mermaid
-graph TD
-    A(setup) --> B(createDom)
-    B -- for each DOM node --> C(createElement)
-    C -- for each HTMLElement attribute --> D(applyAttribute)
-    D -- DOM structure is connected  --> E(appendDom)
-    E -- component starts  --> F(init)
-    F -- before DOM disconnects --> G(destroy)
+```text
+component setup is executed (setup)
+     V
+DOM structure creation starts (createDom)
+     V
+check every DOM node (createElement)
+     V
+check every attribute of a node (applyAttribute)
+     V
+append structure to document (appendDom)
+     V
+component starts (init)
+     V
+a property changes (change)
+     V
+component is removed from DOM (destroy)
 ```
 
 ## Plugins
 
+Plugins can hook into any of the lifecycle stages and run side-effects or modify the component
+
 ```js
-import { plugins } from '@li3/web';
+import { plugins } from "@li3/web";
 
 plugins.use({
   setup(state) {
@@ -137,7 +148,7 @@ plugins.use({
     // when all elements are created, but not appended yet
   },
   createElement($el, domNode) {
-    // for each node in the new dom tree
+    // for each node in the new dom tree (element or text node)
   },
   applyAttribute($el, element, attribute, value) {
     // when an attribute is being applied to an HTMLElement
@@ -148,10 +159,12 @@ plugins.use({
   init({ element }) {
     // when all bindings are ready
   },
+  update($el, property, oldValue, newValue) {
+    // a prop has changed
+  },
   destroy({ element }) {
     // right before a node is detached from DOM and destroyed
     // only works with custom elements using `disconnectedCallback` hook
   },
 });
-
 ```
