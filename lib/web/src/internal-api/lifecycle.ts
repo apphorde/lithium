@@ -8,9 +8,7 @@ import { getOption } from "./options.js";
 
 const VM = Symbol("@@Runtime");
 
-export function createInstance(
-  properties: CreateInstanceProperties
-): RuntimeInternals {
+export function createInstance(properties: CreateInstanceProperties): RuntimeInternals {
   const $el: RuntimeInternals = {
     ...properties,
     stylesheets: [],

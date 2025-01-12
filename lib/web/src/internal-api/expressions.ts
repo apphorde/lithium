@@ -16,11 +16,7 @@ function unwrap(stateKeys, state) {
   return unwrapped;
 }
 
-export function compileExpression(
-  $el: RuntimeInternals,
-  expression: string,
-  args: string[] = []
-): AnyFunction {
+export function compileExpression($el: RuntimeInternals, expression: string, args: string[] = []): AnyFunction {
   if (getOption("useModuleExpressions")) {
     return compileExpressionBlob($el, expression, args);
   }
@@ -38,11 +34,7 @@ export function createBlobModule(code: string, type = "text/javascript") {
 
 const modCache = new Map();
 
-export function compileExpressionBlob(
-  $el: RuntimeInternals,
-  expression: string,
-  args: string[] = []
-) {
+export function compileExpressionBlob($el: RuntimeInternals, expression: string, args: string[] = []) {
   const { state, stateKeys } = $el;
   const fargs = ["__s", ...args].join(", ");
   const fasync = expression.includes("await ") ? "async " : "";
@@ -63,11 +55,7 @@ export function compileExpressionBlob(
   };
 }
 
-export function compileExpressionEval(
-  $el: RuntimeInternals,
-  expression: string,
-  args: string[] = []
-): AnyFunction {
+export function compileExpressionEval($el: RuntimeInternals, expression: string, args: string[] = []): AnyFunction {
   const { state, stateKeys } = $el;
   const code = `
   const {${stateKeys.join(", ")}} = __u(__s);
@@ -84,9 +72,7 @@ export function compileExpressionEval(
       finalCode = parsed.body.innerText.trim();
     }
 
-    const functionType = expression.includes("await ")
-      ? AsyncFunction
-      : Function;
+    const functionType = expression.includes("await ") ? AsyncFunction : Function;
 
     fn = functionType(...["__s", "__u", ...args], finalCode);
     fnCache.set(cacheKey, fn);

@@ -1,4 +1,4 @@
-import type { RuntimeInternals } from './types.js';
+import type { RuntimeInternals } from "./types.js";
 
 const stack: RuntimeInternals[] = [];
 

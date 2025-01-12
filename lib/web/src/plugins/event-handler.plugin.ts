@@ -7,10 +7,6 @@ const eventFlags = ["capture", "once", "passive", "stop", "prevent"];
 
 plugins.use({
   applyAttribute($el, node: Element, attribute: string, value: string) {
-    if (attribute.charAt(0) === "@") {
-      createEventBinding($el, node, attribute.slice(1), value);
-    }
-
     if (attribute.startsWith("on-")) {
       createEventBinding($el, node, attribute.replace("on-", ""), value);
     }

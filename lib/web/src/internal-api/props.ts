@@ -1,11 +1,7 @@
-import { isElement } from './dom.js';
-import { RuntimeInternals } from './types.js';
+import { isElement } from "./dom.js";
+import { RuntimeInternals } from "./types.js";
 
-export function getPropValue(
-  $el: RuntimeInternals,
-  property: string,
-  definition: any
-) {
+export function getPropValue($el: RuntimeInternals, property: string, definition: any) {
   if ($el.props && property in $el.props) {
     return $el.props[property];
   }
@@ -14,10 +10,7 @@ export function getPropValue(
     return $el.element[property];
   }
 
-  if (
-    isElement($el.element) &&
-    $el.element.hasAttribute(property.toLowerCase())
-  ) {
+  if (isElement($el.element) && $el.element.hasAttribute(property.toLowerCase())) {
     return $el.element.getAttribute(property);
   }
 

@@ -16,10 +16,7 @@ plugins.use({
   },
 });
 
-export async function templateIf(
-  template: HTMLTemplateElement,
-  $el: RuntimeInternals
-) {
+export async function templateIf(template: HTMLTemplateElement, $el: RuntimeInternals) {
   const expression = template.getAttribute("if");
   const getter = compileExpression($el, expression);
   const previousNodes = [];

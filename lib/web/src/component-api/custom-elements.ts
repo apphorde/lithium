@@ -1,8 +1,5 @@
 import { mount } from "./mount.js";
-import type {
-  AnyFunction,
-  ComponentDefinitions,
-} from "../internal-api/types.js";
+import type { AnyFunction, ComponentDefinitions } from "../internal-api/types.js";
 
 export const DefineComponent = Symbol("@@def");
 

@@ -27,13 +27,4 @@ export class PluginDispatcher {
 }
 
 export const plugins = new PluginDispatcher();
-plugins.setHooks([
-  "setup",
-  "createDom",
-  "createElement",
-  "applyAttribute",
-  "appendDom",
-  "init",
-  "update",
-  "destroy",
-]);
+plugins.setHooks(["setup", "createDom", "createElement", "applyAttribute", "appendDom", "init", "update", "destroy"]);

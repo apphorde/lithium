@@ -4,10 +4,7 @@ import { defineProps } from "../component-api/setup.js";
 import { unref } from "@li3/reactive";
 import type { RuntimeInternals } from "../internal-api/types.js";
 import { getOption } from "../internal-api/options.js";
-import {
-  compileExpression,
-  wrapTryCatch,
-} from "../internal-api/expressions.js";
+import { compileExpression, wrapTryCatch } from "../internal-api/expressions.js";
 
 const VM = Symbol("@@FOR");
 
@@ -37,10 +34,7 @@ plugins.use({
   },
 });
 
-export function templateForOf(
-  template: HTMLTemplateElement,
-  $el: RuntimeInternals
-) {
+export function templateForOf(template: HTMLTemplateElement, $el: RuntimeInternals) {
   const nodeCache: NodeCacheEntry[] = [];
   const expression = template.getAttribute("for");
   const [iteration, source] = expression.split("of").map((s) => s.trim());
@@ -161,25 +155,14 @@ function resize(context: Context, newLength: number, list?: any[]) {
 
 function createCacheEntry(context: Context, props: any): NodeCacheEntry {
   const { $el, template, itemName, indexName } = context;
-  const contextProperties = [
-    itemName,
-    indexName,
-    "$first",
-    "$last",
-    "$odd",
-    "$even",
-  ];
+  const contextProperties = [itemName, indexName, "$first", "$last", "$odd", "$even"];
 
   function setup() {
     defineProps(contextProperties);
   }
 
   const itemFragment = document.createDocumentFragment();
-  const childState = mount(
-    itemFragment,
-    { setup, template },
-    { parent: $el, props }
-  );
+  const childState = mount(itemFragment, { setup, template }, { parent: $el, props });
 
   return { nodes: Array.from(itemFragment.childNodes), $el: childState };
 }

@@ -8,12 +8,7 @@ export function setProperty(el: Element, property: string, value: any): void {
   el[property] = unref(value);
 }
 
-export function setEventHandler(
-  el: EventTarget,
-  eventName: string,
-  handler: AnyFunction,
-  options?: any
-): void {
+export function setEventHandler(el: EventTarget, eventName: string, handler: AnyFunction, options?: any): void {
   el.addEventListener(
     eventName,
     (event: { stopPropagation: () => any; preventDefault: () => any }) => {
@@ -25,11 +20,7 @@ export function setEventHandler(
   );
 }
 
-export function setClassName(
-  el: Element,
-  classNames: string,
-  value: any
-): void {
+export function setClassName(el: Element, classNames: string, value: any): void {
   for (const cls of classNames.split(".").filter(Boolean)) {
     el.classList.toggle(cls, value);
   }
@@ -43,11 +34,7 @@ export function setText(el: Text, text: any): void {
   el.textContent = String(text);
 }
 
-export function setAttribute(
-  el: Element,
-  attribute: string,
-  value: boolean
-): void {
+export function setAttribute(el: Element, attribute: string, value: boolean): void {
   if (!validAttribute.test(attribute)) {
     return;
   }
@@ -88,9 +75,7 @@ export function traverseDom(dom: any, visitor: AnyFunction) {
 }
 
 export function getAttributes(node: Element) {
-  return node.attributes
-    ? Array.from(node.attributes).map((a) => [a.localName, a.value])
-    : [];
+  return node.attributes ? Array.from(node.attributes).map((a) => [a.localName, a.value]) : [];
 }
 
 export function isElement(node: any): node is Element {
@@ -129,16 +114,15 @@ export function parseDomTree(tree) {
   return ["#", "html", children];
 }
 
-function mapTree<
-  T extends ChildNode | Document | DocumentFragment | HTMLTemplateElement
->(tree: T, mapper: (node: T) => any) {
+function mapTree<T extends ChildNode | Document | DocumentFragment | HTMLTemplateElement>(
+  tree: T,
+  mapper: (node: T) => any
+) {
   const nodes: T[] = (tree["content"] || tree).childNodes;
   return Array.from(nodes)
     .map((next) => {
       const parsed = mapper(next);
-      const nodes: T[] = parsed
-        ? (next["content"] || next).childNodes
-        : undefined;
+      const nodes: T[] = parsed ? (next["content"] || next).childNodes : undefined;
       if (nodes && nodes.length) {
         parsed[2] = mapTree(next, mapper);
       }
@@ -154,10 +138,7 @@ function mapTree<
  * materialize(['#', 0, ['document-fragment-children']])
  * materialize(['div', [['attr', 'value']], ['children']])
  */
-export function materialize(
-  node: any,
-  context: { ns?: any } = {}
-): Element | Text | DocumentFragment | Comment {
+export function materialize(node: any, context: { ns?: any } = {}): Element | Text | DocumentFragment | Comment {
   // text
   if (typeof node === "string") {
     return document.createTextNode(node);
@@ -175,9 +156,7 @@ export function materialize(
   // node = ['template', 0, [...]]
   if ("#" === t || "template" === t) {
     const isDocument = "#" === t;
-    const doc = isDocument
-      ? document.createDocumentFragment()
-      : document.createElement("template");
+    const doc = isDocument ? document.createDocumentFragment() : document.createElement("template");
     const container = isDocument ? doc : (doc as HTMLTemplateElement).content;
 
     if (Array.isArray(children) && children.length) {
@@ -200,9 +179,7 @@ export function materialize(
     context.ns = "http://www.w3.org/2000/svg";
   }
 
-  const el = context.ns
-    ? document.createElementNS(context.ns, t)
-    : document.createElement(t);
+  const el = context.ns ? document.createElementNS(context.ns, t) : document.createElement(t);
   el[Attributes] = attributes;
   applyAttributes(el);
 
@@ -299,11 +276,7 @@ export function defineEventOnElement(el: Element, name: string): void {
   }
 }
 
-export function emitEvent(
-  element: Element,
-  eventName: string,
-  detail: any
-): void {
+export function emitEvent(element: Element, eventName: string, detail: any): void {
   const event = new CustomEvent(eventName, { detail });
   element.dispatchEvent(event);
 }

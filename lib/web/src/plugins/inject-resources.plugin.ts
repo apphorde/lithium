@@ -12,10 +12,7 @@ plugins.use({
   },
 });
 
-export function injectStylesheetOnElement(
-  el: HTMLElement | DocumentFragment,
-  href: string
-) {
+export function injectStylesheetOnElement(el: HTMLElement | DocumentFragment, href: string) {
   const link = document.createElement("link");
   link.rel = "stylesheet";
   link.href = href;
@@ -41,10 +38,7 @@ async function importCssModule(href: string) {
   return (await _importCssModule(href)).default;
 }
 
-export async function adoptStyleSheet(
-  target: HTMLElement | Document,
-  href: string
-) {
+export async function adoptStyleSheet(target: HTMLElement | Document, href: string) {
   if (!stylesheetCache.has(href)) {
     const mod = await importCssModule(href);
     stylesheetCache.set(href, mod);
