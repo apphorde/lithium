@@ -28,9 +28,9 @@ import * as plugin9 from "./plugins/text-template.plugin.js";
 export { Ref, unref, isRef } from "@li3/reactive";
 
 export const Lithium = {
-  ...reactive,
-  ...stack,
-  ...dom,
+  reactive,
+  stack,
+  dom,
   ...plugin1,
   ...plugin2,
   ...plugin3,
