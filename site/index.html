@@ -14,23 +14,12 @@
       }
     }
   </script>
+  <script type="module"
+    src="/assets/code-block.mjs"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="font-sans text-gray-900 antialiased">
-  <!-- nav class="flex justify-between items-center px-8 py-4 bg-white shadow-sm sticky top-0">
-    <a href="#"
-      class="text-2xl font-bold text-gray-800">Li³</a>
-    <div class="hidden md:flex gap-8">
-      <a href="#features"
-        class="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
-      <a href="/docs"
-        class="text-gray-600 hover:text-gray-900 transition-colors">Documentation</a>
-      <a href="https://github.com/apphorde/lithium"
-        target="_blank"
-        class="text-gray-600 hover:text-gray-900 transition-colors">GitHub</a>
-    </div>
-  </nav -->
 
   <section class="h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-8">
     <div class="max-w-2xl">
@@ -93,41 +82,46 @@
       <h1 class="text-5xl text-red-500 mr-4 font-bold font-serif">Batteries included</h1>
       <p class="text-xl text-gray-600 mt-6">Add an import map to any page:</p>
 
-      <div class="bg-white rounded-lg px-4 py-2 mt-6 shadow-lg w-full">
-        <pre class="text-gray-800 font-mono">
-&lt;script type="importmap"&gt;
-  { "imports": { "@li3/": "https://cdn.li3.dev/@li3/" } }
-&lt;/script&gt;</pre>
-      </div>
+      <code-block>
+        <template>
+          <script type="importmap">
+          {
+            "imports": {
+              "@li3/": "https://cdn.li3.dev/@li3/"
+            }
+          }
+          </script>
+        </template>
+      </code-block>
       <p class="text-xl text-gray-600 mt-6">Now import the API from <span
           class="font-mono bg-gray-200 p-1 rounded">@li3/web</span> and mount a component into an element</p>
 
-      <div class="mt-6 bg-white rounded-2xl p-6 shadow-2xl w-full">
-        <pre class="text-gray-800 font-mono p-4">
-&lt;script type="module"&gt;
-  import { ref, tpl, mount } from "@li3/web";
+      <code-block>
+        <template>
+          <script type="module">
+            import { ref, tpl, mount } from "@li3/web";
 
-  const template = tpl`&lt;div&gt;
-    &lt;label>Your name:&lt;/label&gt;
-    &lt;input type="text" on-input="setName($event.target.value)" bind-value="name" /&gt;
-    &lt;hr /&gt;
-    &lt;h1&gt;Hello, {{ name }}!&lt;/h1&gt;
-  &lt;/div&gt;`;
+            const template = tpl`<div>
+            <label>Your name:</label>
+            <input type="text" on-input="setName($event.target.value)" bind-value="name" />
+            <hr />
+            <h1>Hello, {{ name }}!</h1>
+            </div>`;
 
-  function greeting() {
-    const name = ref('');
+            function setup() {
+              const name = ref('');
 
-    function setName(v) {
-      name.value = v;
-    }
+              function setName(v) {
+                name.value = v;
+              }
 
-    return { name, setName };
-  }
+              return { name, setName };
+            }
 
-  mount('#app', { setup: greeting, template })
-&lt;/script&gt;
-        </pre>
-      </div>
+            mount('#app', { setup, template })
+          </script>
+        </template>
+      </code-block>
 
       <p class="text-xl text-gray-600 mt-6">And here's the mounted element:</p>
       <div class="bg-white rounded-lg px-4 py-6 mt-6 shadow-lg w-full flex flex-col items-center">
@@ -137,14 +131,6 @@
 
       <script type="module">
         import { ref, tpl, mount } from "@li3/web";
-        import { load, highlight } from 'https://highlight.jsfn.run/index.mjs';
-
-        load().then(async () => {
-          const pre = [...document.querySelectorAll('pre')];
-          for (const next of pre) {
-            next.innerHTML = await highlight(next.innerText, { language: next.getAttribute('language') || 'html' });
-          }
-        });
 
         const template = tpl`<div>
           <h1 class="text-xl font-bold">Hello, {{ name }}!</h1>
@@ -153,7 +139,7 @@
           <input type="text" class="mt-2 p-2 border rounded bg-white w-full" on-input="setName($event.target.value)" bind-value="name" />
         </div>`;
 
-        function greeting() {
+        function setup() {
           const name = ref('');
 
           function setName(v) {
@@ -163,7 +149,7 @@
           return { name, setName };
         }
 
-        mount('#app', { setup: greeting, template })
+        mount('#app', { setup: setup, template })
       </script>
       <p class="mt-12 text-xl text-gray-600 mb-8">Now <a class="text-blue-600 underline"
           href="/docs">go to the documentation</a> to see the full API!</p>

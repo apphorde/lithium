@@ -225,10 +225,10 @@ export function clearElement(element: Element | DocumentFragment) {
 }
 
 export function createDom($el: RuntimeInternals): void {
-  const { element, template, shadowDom, state } = $el;
+  const { element, template, shadowDom } = $el;
   let dom: any = template;
 
-  if (Array.isArray(template)) {
+  if (Array.isArray(template) && template.length) {
     dom = materialize(template);
   }
 

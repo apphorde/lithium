@@ -16,14 +16,16 @@ export interface LifeCycleObject {
 
 export interface CreateInstanceProperties {
   element: Element | DocumentFragment;
-  setup: Function;
-  template: HTMLTemplateElement | any[];
-  shadowDom?: ShadowRootInit;
+  setup?: Function;
+  template?: HTMLTemplateElement | any[];
+  shadowDom?: ShadowRootInit | string;
   props: any;
   parent: any;
 }
 
 export interface RuntimeInternals extends CreateInstanceProperties {
+  setup: Function;
+  template: HTMLTemplateElement | any[];
   reactive: ReactiveContext;
   stylesheets: Array<string>;
   scripts: Array<string>;
@@ -37,7 +39,7 @@ export interface RuntimeInternals extends CreateInstanceProperties {
 
 export interface ComponentDefinitions {
   setup?: Function;
-  template: any[] | HTMLTemplateElement;
+  template?: any[] | HTMLTemplateElement;
   shadowDom?: ShadowRootInit;
 }
 

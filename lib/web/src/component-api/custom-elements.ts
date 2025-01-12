@@ -3,7 +3,11 @@ import type { AnyFunction, ComponentDefinitions } from "../internal-api/types.js
 
 export const DefineComponent = Symbol("@@def");
 
-export function createComponent(name: string, def: ComponentDefinitions): void {
+export function createComponent(name: string, def: ComponentDefinitions | AnyFunction): void {
+  if (typeof def === "function") {
+    def = { setup: def } as ComponentDefinitions;
+  }
+
   if (customElements.get(name)) {
     customElements.get(name)![DefineComponent] = def;
     // TODO propagate updates to all instances?

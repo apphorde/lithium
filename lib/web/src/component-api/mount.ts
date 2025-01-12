@@ -1,7 +1,6 @@
 import type { ComponentDefinitions } from "../internal-api/types.js";
 import { createInstance } from "../internal-api/lifecycle.js";
 
-export const noop = () => {};
 const mounted = Symbol();
 
 export interface MountOptions {
@@ -24,7 +23,7 @@ export function mount(element: DocumentFragment | Element | string, def: Compone
   }
 
   element[mounted] = true;
-  const { setup = noop, template, shadowDom } = def;
+  const { setup, template, shadowDom } = def;
 
   return createInstance({
     element,

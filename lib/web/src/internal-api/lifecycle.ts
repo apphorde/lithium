@@ -3,14 +3,21 @@ import { CreateInstanceProperties, RuntimeInternals } from "./types.js";
 import { plugins } from "./plugin.js";
 import { createState } from "./reactive.js";
 import { push, pop } from "./stack.js";
-import { createDom } from "./dom.js";
+import { createDom, tpl } from "./dom.js";
 import { getOption } from "./options.js";
 
 const VM = Symbol("@@Runtime");
 
+const noop = () => {};
+const EMPTY = tpl("<slot></slot>");
+
 export function createInstance(properties: CreateInstanceProperties): RuntimeInternals {
+  const { setup = noop, template = EMPTY, shadowDom } = properties;
   const $el: RuntimeInternals = {
     ...properties,
+    shadowDom: typeof shadowDom === "string" ? ({ mode: shadowDom } as ShadowRootInit) : shadowDom,
+    setup,
+    template,
     stylesheets: [],
     scripts: [],
     state: {},

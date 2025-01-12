@@ -184,16 +184,14 @@ function setup() {
       </div>
 
       <p class="text-xl text-gray-600 mt-8">Load resources:</p>
-      <div class="bg-white rounded-lg px-4 py-2 mt-6 shadow-lg w-full">
-        <pre language="javascript"
-          class="text-gray-800 font-mono">import { loadCss, loadScript } from '@li3/web';
+      <code-block language="javascript">
+        import { loadCss, loadScript } from '@li3/web';
 
-function setup() {
-  loadCss('http://example.com/main.css');
-  loadScript('http://example.com/index.js');
-}
-</pre>
-      </div>
+        function setup() {
+          loadCss('http://example.com/main.css');
+          loadScript('http://example.com/index.js');
+        }
+      </code-block>
 
       <p class="mt-12 text-xl text-gray-600 mb-8">Now <a class="text-blue-600 underline"
           href="/docs">go to the documentation</a> to see the full API!</p>
@@ -205,16 +203,8 @@ function setup() {
     <p class="text-gray-600">Released under the MIT License</p>
     <p class="text-gray-600 mt-2">Copyright © 2024 Darlan Alves</p>
   </footer>
-  <script type="module">
-    import { load, highlight } from 'https://highlight.jsfn.run/index.mjs';
-
-    load().then(async () => {
-      const pre = [...document.querySelectorAll('pre')];
-      for (const next of pre) {
-        next.innerHTML = await highlight(next.innerText, { language: next.getAttribute('language') || 'html' });
-      }
-    });
-  </script>
+  <script type="module"
+    src="/assets/code-blocks.mjs"></script>
 </body>
 
 </html>
