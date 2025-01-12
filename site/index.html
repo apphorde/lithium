@@ -7,7 +7,12 @@
     content="width=device-width, initial-scale=1.0">
   <title>Lithium - The Modern Frontend Framework</title>
   <script type="importmap">
-    { "imports": { "@li3/": "https://cdn.li3.dev/@li3/" } }
+    {
+      "imports": {
+        "@li3/": "https://cdn.li3.dev/@li3/",
+        "@sodium/": "https://--sodium.static.apphor.de/"
+      }
+    }
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -18,8 +23,7 @@
 </head>
 
 <body class="font-sans text-gray-900 antialiased">
-  <!-- Navigation -->
-  <nav class="flex justify-between items-center px-8 py-4 bg-white shadow-sm sticky top-0">
+  <!-- nav class="flex justify-between items-center px-8 py-4 bg-white shadow-sm sticky top-0">
     <a href="#"
       class="text-2xl font-bold text-gray-800">Li³</a>
     <div class="hidden md:flex gap-8">
@@ -31,21 +35,17 @@
         target="_blank"
         class="text-gray-600 hover:text-gray-900 transition-colors">GitHub</a>
     </div>
-  </nav>
+  </nav -->
 
-  <!-- Hero Section -->
   <section class="h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-8">
     <div class="max-w-2xl">
-      <h1 class="font-bold mb-6">
+      <h1 class="font-bold mb-6 font-serif">
         <span class="text-5xl text-red-500 mr-4">lithium</span><br />
-        <span class="text-md text-gray-500 mr-2 px-2 py-1 bg-gray-200 rounded">noun</span>
-        <span class="text-md">lith·i·um</span>
+        <span class="text-md italic mr-2">(lith·i·um)</span>
+        <span class="text-md text-gray-500 rounded">noun</span>
       </h1>
 
-      <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
-        The last frontend library you will learn
-      </h2>
-      <p class="text-xl text-gray-600 mb-8">
+      <p class="text-xl text-gray-600 mb-8 font-serif">
         A lightweight, reactive element library that fills the last gaps of the web platform and
         empowers developers to build reactive interfaces using only Web API's.
       </p>
@@ -63,7 +63,6 @@
     </div>
   </section>
 
-  <!-- Features Section -->
   <section id="features"
     class="py-24 px-8 bg-white min-h-screen flex items-center">
     <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -96,16 +95,20 @@
   <section id="get-started"
     class="min-h-screen bg-gray-100 py-24 px-8">
     <div class="max-w-4xl mx-auto">
-      <h1 class="text-red-500 text-5xl md:text-6xl font-bold mb-6">Batteries included</h1>
-      <p class="text-xl text-gray-600 mb-8">1. Add an import map to any page</p>
-      <p class="text-xl text-gray-600 mb-8">2. Import the API from <span
-          class="font-mono bg-gray-200 p-1 rounded">@li3/web</span> </p>
-      <p class="text-xl text-gray-600 mb-8">3. mount a component into an element</p>
-      <div class="mt-12 bg-white rounded-2xl p-6 shadow-2xl w-full">
-        <pre class="text-gray-800 font-mono p-4">
+      <h1 class="text-5xl text-red-500 mr-4 font-bold font-serif">Batteries included</h1>
+      <p class="text-xl text-gray-600 mt-6">Add an import map to any page:</p>
+
+      <div class="bg-white rounded-lg px-4 py-2 mt-6 shadow-lg w-full">
+        <pre class="text-gray-800 font-mono">
 &lt;script type="importmap"&gt;
   { "imports": { "@li3/": "https://cdn.li3.dev/@li3/" } }
-&lt;/script&gt;
+&lt;/script&gt;</pre>
+      </div>
+      <p class="text-xl text-gray-600 mt-6">Now import the API from <span
+          class="font-mono bg-gray-200 p-1 rounded">@li3/web</span> and mount a component into an element</p>
+
+      <div class="mt-6 bg-white rounded-2xl p-6 shadow-2xl w-full">
+        <pre class="text-gray-800 font-mono p-4">
 &lt;script type="module"&gt;
   import { ref, tpl, mount } from "@li3/web";
 
@@ -129,8 +132,12 @@
   mount('#app', { setup: greeting, template })
 &lt;/script&gt;
         </pre>
-        <div class="my-6 p-4 border shadow rounded"
-          id="app"></div>
+      </div>
+
+      <p class="text-xl text-gray-600 mt-6">And here's the mounted element:</p>
+      <div class="bg-white rounded-lg px-4 py-6 mt-6 shadow-lg w-full flex flex-col items-center">
+        <div id="app"
+          class="w-full md:w-1/2"></div>
       </div>
 
       <script type="module">
@@ -138,8 +145,10 @@
         import { load, highlight } from 'https://highlight.jsfn.run/index.mjs';
 
         load().then(async () => {
-          const pre = document.querySelector('pre');
-          pre.innerHTML = await highlight(pre.innerText, { language: 'html' });
+          const pre = [...document.querySelectorAll('pre')];
+          for (const next of pre) {
+            next.innerHTML = await highlight(next.innerText, { language: next.getAttribute('language') || 'html' });
+          }
         });
 
         const template = tpl`<div>
