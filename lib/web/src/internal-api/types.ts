@@ -10,14 +10,14 @@ export type UpdateLifeCycleFunction = (
 
 export interface LifeCycleObject {
   element: Element | DocumentFragment;
-  template: HTMLTemplateElement | any[];
+  template: HTMLTemplateElement;
   state: any;
 }
 
 export interface CreateInstanceProperties {
   element: Element | DocumentFragment;
   setup?: Function;
-  template?: HTMLTemplateElement | any[];
+  template?: HTMLTemplateElement | string;
   shadowDom?: ShadowRootInit | string;
   props: any;
   parent: any;
@@ -25,7 +25,7 @@ export interface CreateInstanceProperties {
 
 export interface RuntimeInternals extends CreateInstanceProperties {
   setup: Function;
-  template: HTMLTemplateElement | any[];
+  template: HTMLTemplateElement | null;
   reactive: ReactiveContext;
   stylesheets: Array<string>;
   scripts: Array<string>;
@@ -37,9 +37,9 @@ export interface RuntimeInternals extends CreateInstanceProperties {
   destroy: Array<LifeCycleFunction>;
 }
 
-export interface ComponentDefinitions {
+export interface ComponentDefinition {
   setup?: Function;
-  template?: any[] | HTMLTemplateElement;
+  template?: HTMLTemplateElement | string;
   shadowDom?: ShadowRootInit;
 }
 

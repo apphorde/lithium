@@ -1,11 +1,11 @@
 import { mount } from "./mount.js";
-import type { AnyFunction, ComponentDefinitions } from "../internal-api/types.js";
+import type { AnyFunction, ComponentDefinition } from "../internal-api/types.js";
 
 export const DefineComponent = Symbol("@@def");
 
-export function createComponent(name: string, def: ComponentDefinitions | AnyFunction): void {
+export function createComponent(name: string, def: ComponentDefinition | AnyFunction): void {
   if (typeof def === "function") {
-    def = { setup: def } as ComponentDefinitions;
+    def = { setup: def } as ComponentDefinition;
   }
 
   if (customElements.get(name)) {

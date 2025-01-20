@@ -30,8 +30,7 @@ export function createState($el: RuntimeInternals): void {
   if ($el.parent) {
     const keys = Object.keys($el.state);
     $el.state = fork($el.parent.state, $el.state, $el.reactive.check);
-    // TODO unique keys
-    $el.stateKeys = keys.concat($el.parent.stateKeys);
+    $el.stateKeys = [...new Set(keys.concat($el.parent.stateKeys))];
   }
 
   Object.freeze($el.state);

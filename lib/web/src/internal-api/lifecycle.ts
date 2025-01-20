@@ -6,18 +6,16 @@ import { push, pop } from "./stack.js";
 import { createDom, tpl } from "./dom.js";
 import { getOption } from "./options.js";
 
+const noop = () => {};
 const VM = Symbol("@@Runtime");
 
-const noop = () => {};
-const EMPTY = tpl("<slot></slot>");
-
 export function createInstance(properties: CreateInstanceProperties): RuntimeInternals {
-  const { setup = noop, template = EMPTY, shadowDom } = properties;
+  const { setup = noop, template, shadowDom } = properties;
   const $el: RuntimeInternals = {
     ...properties,
     shadowDom: typeof shadowDom === "string" ? ({ mode: shadowDom } as ShadowRootInit) : shadowDom,
     setup,
-    template,
+    template: !template ? null : typeof template === 'string' ? tpl(template) : template,
     stylesheets: [],
     scripts: [],
     state: {},

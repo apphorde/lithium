@@ -11,7 +11,7 @@ export function setProperty(el: Element, property: string, value: any): void {
 export function setEventHandler(el: EventTarget, eventName: string, handler: AnyFunction, options?: any): void {
   el.addEventListener(
     eventName,
-    (event: { stopPropagation: () => any; preventDefault: () => any }) => {
+    function(event: Event) {
       options.stop && event.stopPropagation();
       options.prevent && event.preventDefault();
       handler(event);
@@ -86,120 +86,10 @@ export function isFragment(node: any): node is DocumentFragment {
   return node && node.nodeType === node.DOCUMENT_FRAGMENT_NODE;
 }
 
-export function html(text: string) {
-  const dom = new DOMParser().parseFromString(text, "text/html");
-  return parseDomTree(dom.body);
-}
-
 export function tpl(text: string) {
   const template = document.createElement("template");
   template.innerHTML = text;
   return template;
-}
-
-export function parseDomTree(tree) {
-  const children = mapTree(tree, (element) => {
-    if (element.nodeType === element.TEXT_NODE) {
-      const text = (element as Text).textContent;
-
-      // TODO think about pre/code content
-      return text.trim() || undefined;
-    }
-
-    if (isElement(element)) {
-      return [element.nodeName.toLowerCase(), getAttributes(element), []];
-    }
-  });
-
-  return ["#", "html", children];
-}
-
-function mapTree<T extends ChildNode | Document | DocumentFragment | HTMLTemplateElement>(
-  tree: T,
-  mapper: (node: T) => any
-) {
-  const nodes: T[] = (tree["content"] || tree).childNodes;
-  return Array.from(nodes)
-    .map((next) => {
-      const parsed = mapper(next);
-      const nodes: T[] = parsed ? (next["content"] || next).childNodes : undefined;
-      if (nodes && nodes.length) {
-        parsed[2] = mapTree(next, mapper);
-      }
-
-      return parsed;
-    })
-    .filter((node) => node !== undefined);
-}
-
-/**
- * materialize(['text'])
- * materialize(['!', 'comment'])
- * materialize(['#', 0, ['document-fragment-children']])
- * materialize(['div', [['attr', 'value']], ['children']])
- */
-export function materialize(node: any, context: { ns?: any } = {}): Element | Text | DocumentFragment | Comment {
-  // text
-  if (typeof node === "string") {
-    return document.createTextNode(node);
-  }
-
-  const [t, attributes = 0, children = []] = node;
-
-  // comment
-  if ("!" === t) {
-    return document.createComment(attributes);
-  }
-
-  // document or template
-  // node = ['#', 0, [...]]
-  // node = ['template', 0, [...]]
-  if ("#" === t || "template" === t) {
-    const isDocument = "#" === t;
-    const doc = isDocument ? document.createDocumentFragment() : document.createElement("template");
-    const container = isDocument ? doc : (doc as HTMLTemplateElement).content;
-
-    if (Array.isArray(children) && children.length) {
-      for (const next of children) {
-        container.append(materialize(next, context));
-      }
-    }
-
-    if (!isDocument) {
-      doc[Attributes] = attributes;
-      applyAttributes(doc as HTMLTemplateElement);
-    }
-
-    return doc;
-  }
-
-  // element
-  // node = [tag, attrs, children]
-  if ("svg" === t) {
-    context.ns = "http://www.w3.org/2000/svg";
-  }
-
-  const el = context.ns ? document.createElementNS(context.ns, t) : document.createElement(t);
-  el[Attributes] = attributes;
-  applyAttributes(el);
-
-  // single child, a text node
-  if (typeof children === "string") {
-    el.append(materialize([children]));
-  }
-
-  // a mix of nodes and string
-  if (Array.isArray(children) && children.length) {
-    for (const next of children) {
-      el.append(materialize(next, context));
-    }
-  }
-
-  if ("svg" === t) {
-    context.ns = "";
-  }
-
-  return el;
 }
 
 export function domReady(fn?) {
@@ -225,16 +115,12 @@ export function clearElement(element: Element | DocumentFragment) {
 }
 
 export function createDom($el: RuntimeInternals): void {
+  if (!$el.template) {
+    return;
+  }
+
   const { element, template, shadowDom } = $el;
-  let dom: any = template;
-
-  if (Array.isArray(template) && template.length) {
-    dom = materialize(template);
-  }
-
-  if (template["content"]) {
-    dom = template["content"].cloneNode(true);
-  }
+  const dom = template.content.cloneNode(true);
 
   plugins.apply("createDom", [$el, dom]);
 

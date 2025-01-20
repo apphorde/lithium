@@ -3,8 +3,6 @@ import { compileExpression } from "../internal-api/expressions.js";
 import { plugins } from "../internal-api/plugin.js";
 import { RuntimeInternals } from "../internal-api/types";
 
-const eventFlags = ["capture", "once", "passive", "stop", "prevent"];
-
 plugins.use({
   applyAttribute($el, node: Element, attribute: string, value: string) {
     if (attribute.startsWith("on-")) {
@@ -20,19 +18,19 @@ export function createEventBinding(
   expression: string
 ): void {
   const [eventName, ...flags] = attribute.split(".");
-  const exec = compileExpression($el, expression, ["$event"]);
+  const exec = compileExpression($el, expression, ["$event", "$flags"]);
   const options = {};
 
-  for (const flag of eventFlags) {
+  for (const flag of flags) {
     options[flag] = flags.includes(flag);
   }
 
   setEventHandler(
     element,
     eventName,
-    (e: any) => {
+    (e: Event) => {
       try {
-        exec(e);
+        exec(e, flags);
       } catch (e) {
         console.error("event failed", expression, e);
       }

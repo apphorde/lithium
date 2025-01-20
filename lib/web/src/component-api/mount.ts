@@ -1,4 +1,4 @@
-import type { ComponentDefinitions } from "../internal-api/types.js";
+import type { ComponentDefinition } from "../internal-api/types.js";
 import { createInstance } from "../internal-api/lifecycle.js";
 
 const mounted = Symbol();
@@ -8,7 +8,7 @@ export interface MountOptions {
   parent?: any;
 }
 
-export function mount(element: DocumentFragment | Element | string, def: ComponentDefinitions, options?: MountOptions) {
+export function mount(element: DocumentFragment | Element | string, def: ComponentDefinition, options?: MountOptions) {
   if (typeof element === "string") {
     element = document.querySelector(element);
   }
