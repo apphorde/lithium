@@ -108,7 +108,7 @@ export function parseSFC(source: string) {
   }
 
   if (templateNode) {
-    sfc.template = JSON.stringify(serialize(templateNode));
+    sfc.template = JSON.stringify(serialize(templateNode.children));
   }
 
   if (shadowDom) {
