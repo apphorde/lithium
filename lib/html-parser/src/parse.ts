@@ -9,7 +9,9 @@ import type {
   PackedElementNode,
   PackedCommentNode,
   PackedAttributes,
+  ParserNode,
 } from "./types";
+
 import { PackedTextNode } from "./types";
 
 const startTag = "<";
@@ -411,4 +413,19 @@ function unpackNode(node: PackedChildNode): ChildNode {
     attributes: node[1] ? (node[1] as PackedAttributes).map((a) => ({ name: a[0], value: a[1] })) : [],
     children: node[2] ? (node[2] as PackedChildNode[]).map(unpackNode) : [],
   };
+}
+
+export function normalize<T extends ParserNode>(node: T) {
+  if ("children" in node) {
+    node.children = node.children.filter((child) => {
+      if (child.type === "text" && child.text.trim() === "") {
+        return false;
+      }
+
+      normalize(child as ElementNode | DocumentNode);
+      return true;
+    });
+  }
+
+  return node;
 }
