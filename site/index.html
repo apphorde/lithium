@@ -20,19 +20,20 @@
 </head>
 
 <body class="font-sans text-gray-900 antialiased">
-  <nav class="flex justify-between items-center px-8 py-4 bg-white shadow-sm sticky top-0">
+  <nav class="flex justify-between items-center px-8 py-4 shadow-xl sticky top-0 z-10"
+    style="background-color: rgba(255, 255, 255, 0.16);backdrop-filter: blur(10px);">
     <a href="/"
       class="text-2xl font-bold text-gray-800">Li³</a>
-    <div class="hidden md:flex gap-8">
+    <div class="hidden md:flex gap-8 font-medium">
       <a href="/docs"
-        class="text-gray-600 hover:text-gray-900 transition-colors">API</a>
+        class="text-gray-600 hover:text-black transition-colors">API</a>
       <a href="https://github.com/apphorde/lithium"
         target="_blank"
-        class="text-gray-600 hover:text-gray-900 transition-colors">GitHub</a>
+        class="text-gray-600 hover:text-black transition-colors">GitHub</a>
     </div>
   </nav>
 
-  <section class="h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-8">
+  <section class="h-screen bg-gray-100 flex items-center justify-center px-8">
     <div class="max-w-2xl">
       <h1 class="font-bold mb-6 font-serif">
         <span class="text-5xl text-red-500 mr-4">lithium</span><br />
@@ -343,11 +344,12 @@
           </template>
         </template>
       </code-block>
+
+      <p class="mt-12 text-xl text-gray-600 mb-8">
+        And that's it!<br />
+        Now <a class="text-blue-600 underline"
+          href="/docs">go to the documentation</a> to see the full API!</p>
     </div>
-    <p class="mt-12 text-xl text-gray-600 mb-8">
-      And that's it!<br />
-      Now <a class="text-blue-600 underline"
-        href="/docs">go to the documentation</a> to see the full API!</p>
   </section>
 
   <!-- Footer -->
