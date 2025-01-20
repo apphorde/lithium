@@ -41,7 +41,7 @@ export default async function publish(args: Args) {
   }
 
   const sfc = JSON.parse(source);
-  const code = getComponentCode(name, sfc);
+  const code = getComponentCode(String(name), sfc);
 
   const req = await fetch(
     new URL(`${type}/${scope}/${name}@${version}`, publishUrl),
