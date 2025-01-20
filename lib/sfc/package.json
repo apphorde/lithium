@@ -1,5 +1,6 @@
 {
   "name": "@li3/sfc",
+  "version": "0.0.1",
   "exports": {
     ".": {
       "default": "./index.js",

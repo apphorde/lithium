@@ -1,31 +1,20 @@
-import type { DocumentNode, ElementNode, ParserNode } from "@li3/html-parser";
+import type { DocumentNode, ElementNode } from "@li3/html-parser";
 import type { FunctionDeclaration, VariableDeclaration } from "acorn";
-import { parse as parseHTML, pack } from "@li3/html-parser";
+import { parse as parseHTML, normalize, serialize } from "@li3/html-parser";
 import { parse as parseJS } from "acorn";
 
-const doc: DocumentNode = { type: "document", docType: "html", children: [] };
-const NO_SETUP = "export default function defineComponent(){return {};}";
-const EMPTY_NODE: ElementNode = {
-  type: "element",
-  selfClose: false,
-  tag: "",
-  children: [],
-  attributes: [],
-};
-const EMPTY_TEMPLATE = JSON.stringify(pack(doc));
-
-export function findNode(nodes: DocumentNode, tag: string): ElementNode {
+function findNode(nodes: DocumentNode, tag: string): ElementNode {
   return nodes.children.find(
     (n) => n.type === "element" && n.tag === tag
   ) as ElementNode;
 }
 
-export function getSetupCode(setupNode: ElementNode): string {
+function getSetupCode(setupNode: ElementNode): string {
   const setupSource =
     setupNode.children.find((s) => s.type === "text")?.text || "";
 
   if (!setupSource) {
-    return NO_SETUP;
+    return "";
   }
 
   const ast = parseJS(setupSource, {
@@ -74,24 +63,16 @@ export function getSetupCode(setupNode: ElementNode): string {
   return combinedCode;
 }
 
-export function getTemplateCode(template: ElementNode) {
-  if (!template.children.length) {
-    return EMPTY_TEMPLATE;
-  }
-
-  return JSON.stringify(pack({ ...doc, children: [...template.children] }));
-}
-
 export function getComponentCode(
-  name,
+  name: string,
   { template, setup, shadowDom },
   withExport = true
 ) {
   return `import {createComponent} from "@li3/web";
-${setup}
+${setup || "const defineComponent = undefined;"}
 
 const __s = ${shadowDom || "false"};
-const __t = ${template};
+const __t = ${template || "''"};
 const __c = { setup: defineComponent, template: __t, shadowDom: __s };
 
 createComponent('${name}', __c);
@@ -99,33 +80,17 @@ ${withExport ? "export default __c;" : ""}
 `;
 }
 
-export function normalize<T extends ParserNode>(node: T) {
-  if ("children" in node) {
-    node.children = node.children.filter((child) => {
-      if (child.type === "text" && child.text.trim() === "") {
-        return false;
-      }
-
-      normalize(child as ElementNode | DocumentNode);
-      return true;
-    });
-  }
-
-  return node;
-}
-
 export function parseSFC(source: string) {
   const parsedHtml = normalize(parseHTML(source));
-  const setupNode = findNode(parsedHtml, "script") || EMPTY_NODE;
-  const templateNode = findNode(parsedHtml, "template") || EMPTY_NODE;
+  const setupNode = findNode(parsedHtml, "script");
+  const templateNode = findNode(parsedHtml, "template");
   const styleNode = findNode(parsedHtml, "style");
 
-  if (styleNode) {
+  if (styleNode && templateNode) {
     templateNode.children.push(styleNode);
   }
 
   const setup = getSetupCode(setupNode);
-  const template = getTemplateCode(templateNode);
   const shadowDomOption = templateNode.attributes.find(
     (a) => a.name === "shadow-dom" || a.name === "shadowdom"
   );
@@ -136,14 +101,24 @@ export function parseSFC(source: string) {
     ? JSON.parse(shadowDomOption.value)
     : { mode: shadowDomOption.value };
 
-  return {
-    template,
-    setup,
-    shadowDom: shadowDom ? JSON.stringify(shadowDom) : "false",
-  };
+  const sfc: any = {};
+
+  if (setup) {
+    sfc.setup = setup;
+  }
+
+  if (templateNode) {
+    sfc.template = JSON.stringify(serialize(templateNode));
+  }
+
+  if (shadowDom) {
+    sfc.shadowDom = JSON.stringify(shadowDom);
+  }
+
+  return sfc;
 }
 
-export async function loadComponent(name, url: string | URL) {
+export async function loadComponent(name: string, url: string | URL) {
   const req = await fetch(url);
 
   if (!req.ok) {
@@ -152,9 +127,6 @@ export async function loadComponent(name, url: string | URL) {
 
   const source = await req.text();
   const parsed = parseSFC(source);
-  const component = getComponentCode(name, parsed, false);
-  const tag = document.createElement("script");
-  tag.type = "module";
-  tag.innerText = component;
-  document.head.appendChild(tag);
+
+  return getComponentCode(name, parsed, false);
 }
