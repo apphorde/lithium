@@ -138,7 +138,7 @@ export function createDom($el: RuntimeInternals): void {
     }
   });
 
-  const previousContent = Array.from(element.childNodes);
+  const previousContent = element.childNodes;
 
   if (!shadowDom) {
     clearElement(element);
@@ -146,7 +146,7 @@ export function createDom($el: RuntimeInternals): void {
 
   if (!shadowDom || isFragment(element)) {
     element.append(dom);
-    element.querySelector("slot")?.append(...previousContent);
+    mapContentToSlots(previousContent, element);
   } else {
     element.attachShadow(shadowDom as ShadowRootInit);
     element.shadowRoot.append(dom);
@@ -165,4 +165,23 @@ export function defineEventOnElement(el: Element, name: string): void {
 export function emitEvent(element: Element, eventName: string, detail: any): void {
   const event = new CustomEvent(eventName, { detail });
   element.dispatchEvent(event);
+}
+
+export function mapContentToSlots(content: NodeListOf<ChildNode>, element: Element | DocumentFragment) {
+  const slots: Record<string, HTMLSlotElement> = {};
+  element.querySelectorAll('slot').forEach(slot => slots[slot.name || 'default'] = slot);
+
+  const frag = document.createDocumentFragment();
+  frag.append(...Array.from(content));
+
+  frag.querySelectorAll('[slot]').forEach(element => {
+    const slotName = element.getAttribute('slot');
+    if (slots[slotName]) {
+      slots[slotName].append(element);
+    }
+  });
+
+  if (slots.default) {
+    slots.default.append(frag);
+  }
 }
