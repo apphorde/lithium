@@ -138,7 +138,7 @@ export function createDom($el: RuntimeInternals): void {
     }
   });
 
-  const previousContent = element.childNodes;
+  const previousContent = Array.from(element.childNodes);
 
   if (!shadowDom) {
     clearElement(element);
@@ -167,12 +167,12 @@ export function emitEvent(element: Element, eventName: string, detail: any): voi
   element.dispatchEvent(event);
 }
 
-export function mapContentToSlots(content: NodeListOf<ChildNode>, element: Element | DocumentFragment) {
+export function mapContentToSlots(content: Array<ChildNode>, element: Element | DocumentFragment) {
   const slots: Record<string, HTMLSlotElement> = {};
   element.querySelectorAll('slot').forEach(slot => slots[slot.name || 'default'] = slot);
 
   const frag = document.createDocumentFragment();
-  frag.append(...Array.from(content));
+  frag.append(...content);
 
   frag.querySelectorAll('[slot]').forEach(element => {
     const slotName = element.getAttribute('slot');
