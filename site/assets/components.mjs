@@ -62,11 +62,11 @@ createComponent("code-block", {
 });
 
 createComponent("auto-toc", {
-  template: `<nav class="flex items-center justify-stretch w-full max-w-4xl p-1 border rounded-lg text-sm shadow-sm mt-2">
+  template: `<div class="flex items-center justify-stretch p-1 border rounded-lg text-sm shadow-sm mt-2 whitespace-nowrap bg-white">
     <template for="link of links">
     <a class="w-full text-center p-2 text-blue-500 font-medium" bind-href="'#' + link.id" on-click.prevent="navigateTo(link.id)">{{link.text}}</a>
     </template>
-  </nav>`,
+  </div>`,
   setup: autoTableOfContent,
 });
 
