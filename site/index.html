@@ -66,34 +66,6 @@
     </div>
   </section>
 
-  <section class="py-24 px-8 bg-white min-h-screen flex items-center">
-    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border">
-        <div class="text-4xl mb-4">🧱</div>
-        <h3 class="text-xl font-bold text-gray-800 mb-4">Only Building Blocks</h3>
-        <p class="text-gray-600">
-          Built with composability in mind, Lithium delivers the building blocks to build an app out-of-the-box.
-        </p>
-      </div>
-
-      <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border">
-        <div class="text-4xl mb-4">🎯</div>
-        <h3 class="text-xl font-bold text-gray-800 mb-4">Future Proof</h3>
-        <p class="text-gray-600">
-          Uses the web platform as much as possible, with an intuitive API to declare components
-        </p>
-      </div>
-
-      <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border">
-        <div class="text-4xl mb-4">🔧</div>
-        <h3 class="text-xl font-bold text-gray-800 mb-4">It's just web components</h3>
-        <p class="text-gray-600">
-          You can Integrate with any other development tools or framework.
-        </p>
-      </div>
-    </div>
-  </section>
-
   <auto-toc class="sticky top-0 z-10 flex justify-center mx-auto"></auto-toc>
 
   <section id="get-started"
@@ -359,6 +331,28 @@
         And that's it!<br />
         Now <a class="text-blue-600 underline"
           href="/docs">go to the documentation</a> to see the full API!</p>
+    </div>
+  </section>
+
+  <section class="py-24 px-8 bg-white min-h-screen flex items-center">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <feature-card>
+        <span slot="icon">🧱</span>
+        <span slot="title">It's All About Building Blocks</span>
+        Built with composability in mind, Lithium delivers the building blocks to build an app out-of-the-box.
+      </feature-card>
+
+      <feature-card>
+        <span slot="icon">🎯</span>
+        <span slot="title">Future Proof</span>
+        Uses the web platform as much as possible, with an intuitive API to declare components
+      </feature-card>
+
+      <feature-card>
+        <span slot="icon">🔧</span>
+        <span slot="title">It's just web components</span>
+        You can Integrate with any other development tools or framework.
+      </feature-card>
     </div>
   </section>
 

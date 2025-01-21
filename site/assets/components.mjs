@@ -39,7 +39,7 @@ function autoTableOfContent() {
   const links = ref([]);
 
   function navigateTo(id) {
-    document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    document.getElementById(id).scrollIntoView({ behavior: "smooth" });
   }
 
   onInit(function () {
@@ -68,4 +68,12 @@ createComponent("auto-toc", {
     </template>
   </nav>`,
   setup: autoTableOfContent,
+});
+
+createComponent("feature-card", {
+  template: `<div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border">
+        <div class="text-4xl mb-4"><slot name="icon"></slot></div>
+        <h3 class="text-xl font-bold text-gray-800 mb-4"><slot name="title"></slot></h3>
+        <p class="text-gray-600"><slot></slot></p>
+      </div>`,
 });
