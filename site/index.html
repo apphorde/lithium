@@ -21,6 +21,10 @@
     :root {
       --color-primary: #ae60be;
     }
+
+    .contents-children>* {
+      display: contents;
+    }
   </style>
 </head>
 
@@ -69,7 +73,7 @@
   <auto-toc class="sticky top-0 z-10 flex justify-center mx-auto"></auto-toc>
 
   <section id="get-started"
-    class="min-h-screen py-24 px-8">
+    class="min-h-screen py-12 px-8">
     <div class="max-w-4xl mx-auto">
       <h2 class="text-5xl text-red-500 mr-4 font-bold font-serif">Batteries included</h2>
       <p class="text-xl text-gray-600 mt-6">Add an import map to any page:</p>
@@ -147,7 +151,7 @@
   </section>
 
   <section id="bindings"
-    class="min-h-screen py-24 px-8">
+    class="min-h-screen py-12 px-8">
     <div class="max-w-4xl mx-auto">
       <h2 class="text-5xl text-red-500 font-bold font-serif">Bindings</h2>
       <h3 class="text-3xl text-gray-700 mt-3 font-semi font-serif">How to bring static HTML to life</h3>
@@ -188,7 +192,7 @@
   </section>
 
   <section id="setup-api"
-    class="min-h-screen py-24 px-8">
+    class="min-h-screen py-12 px-8">
     <div class="max-w-4xl mx-auto">
       <h2 class="text-5xl text-red-500 font-bold font-serif">Setup API</h2>
       <h3 class="text-3xl text-gray-700 mt-3 font-semi font-serif">How to declare the API of a component</h3>
@@ -301,7 +305,7 @@
   </section>
 
   <section id="loops"
-    class="min-h-screen py-24 px-8">
+    class="min-h-screen py-12 px-8">
     <div class="max-w-4xl mx-auto">
       <h2 class="text-5xl text-red-500 font-bold font-serif">Conditionals and loops</h2>
       <h3 class="text-3xl text-gray-700 mt-3 font-semi font-serif">Repeat a template or add/remove elements based on a
@@ -334,8 +338,8 @@
     </div>
   </section>
 
-  <section class="py-24 px-8 bg-white min-h-screen flex items-center">
-    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+  <section class="py-12 px-8 flex items-center">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 contents-children">
       <feature-card>
         <span slot="icon">🧱</span>
         <span slot="title">It's All About Building Blocks</span>
