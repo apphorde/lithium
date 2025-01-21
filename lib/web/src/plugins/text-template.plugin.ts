@@ -10,7 +10,7 @@ plugins.use({
       return;
     }
 
-    if (!node.parentElement.hasAttribute("literal")) {
+    if (!node.parentElement?.hasAttribute("literal")) {
       createTextNodeBinding($el, node);
     }
   },
