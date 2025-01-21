@@ -17,6 +17,11 @@
   <script type="module"
     src="/assets/components.mjs"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --color-primary: #ae60be;
+    }
+  </style>
 </head>
 
 <body class="font-sans text-gray-900 antialiased">
@@ -38,7 +43,7 @@
   <section class="h-screen bg-gray-100 flex items-center justify-center px-8">
     <div class="max-w-2xl">
       <h1 class="font-bold mb-6 font-serif">
-        <span class="text-5xl text-red-500 mr-4">lithium</span><br />
+        <span class="text-5xl text-red-500 mr-4 mb-2 inline-block">lithium</span><br />
         <span class="text-md italic mr-2">(lith·i·um)</span>
         <span class="text-md text-gray-500 rounded">noun</span>
       </h1>
@@ -92,7 +97,7 @@
   <auto-toc class="sticky top-0 z-10 flex justify-center mx-auto"></auto-toc>
 
   <section id="get-started"
-    class="min-h-screen bg-gray-100 py-24 px-8">
+    class="min-h-screen py-24 px-8">
     <div class="max-w-4xl mx-auto">
       <h2 class="text-5xl text-red-500 mr-4 font-bold font-serif">Batteries included</h2>
       <p class="text-xl text-gray-600 mt-6">Add an import map to any page:</p>
@@ -170,7 +175,7 @@
   </section>
 
   <section id="bindings"
-    class="min-h-screen bg-gray-100 py-24 px-8">
+    class="min-h-screen py-24 px-8">
     <div class="max-w-4xl mx-auto">
       <h2 class="text-5xl text-red-500 font-bold font-serif">Bindings</h2>
       <h3 class="text-3xl text-gray-700 mt-3 font-semi font-serif">How to bring static HTML to life</h3>
@@ -211,7 +216,7 @@
   </section>
 
   <section id="setup-api"
-    class="min-h-screen bg-white py-24 px-8">
+    class="min-h-screen py-24 px-8">
     <div class="max-w-4xl mx-auto">
       <h2 class="text-5xl text-red-500 font-bold font-serif">Setup API</h2>
       <h3 class="text-3xl text-gray-700 mt-3 font-semi font-serif">How to declare the API of a component</h3>
@@ -324,13 +329,14 @@
   </section>
 
   <section id="loops"
-    class="min-h-screen bg-white py-24 px-8">
+    class="min-h-screen py-24 px-8">
     <div class="max-w-4xl mx-auto">
       <h2 class="text-5xl text-red-500 font-bold font-serif">Conditionals and loops</h2>
       <h3 class="text-3xl text-gray-700 mt-3 font-semi font-serif">Repeat a template or add/remove elements based on a
         condition</h3>
 
-      <p class="text-xl text-gray-600 mt-8">Conditional elements with <code class="font-mono bg-gray-100 p-1 inline-block">template[if]</code></p>
+      <p class="text-xl text-gray-600 mt-8">Conditional elements with <code
+          class="font-mono bg-gray-100 p-1 inline-block">template[if]</code></p>
       <code-block language="javascript">
         <template>
           <template if="condition">
@@ -339,7 +345,8 @@
         </template>
       </code-block>
 
-      <p class="text-xl text-gray-600 mt-8">Repeat elements with <code class="font-mono bg-gray-100 p-1 inline-block">template[for]</code></p>
+      <p class="text-xl text-gray-600 mt-8">Repeat elements with <code
+          class="font-mono bg-gray-100 p-1 inline-block">template[for]</code></p>
       <code-block language="javascript">
         <template>
           <template for="item of list">
@@ -356,7 +363,7 @@
   </section>
 
   <!-- Footer -->
-  <footer class="bg-gray-50 py-8 px-8 text-center">
+  <footer class="bg-gray-100 py-8 px-8 text-center">
     <p class="text-gray-600">Released under the MIT License</p>
     <p class="text-gray-600 mt-2">Copyright © 2024 Darlan Alves</p>
   </footer>
