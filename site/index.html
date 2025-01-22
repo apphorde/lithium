@@ -71,134 +71,126 @@
     </div>
   </section>
 
-  <section id="get-started"
-    class="py-12 px-8">
-    <div class="max-w-4xl mx-auto">
-      <h2 class="text-5xl text-red-500 mr-4 font-bold font-serif">Batteries included</h2>
-      <p class="text-xl text-gray-600 mt-6">Add an import map to any page:</p>
+  <feature-section id="get-started">
+    <span slot="title">Batteries included</span>
+    <p class="text-xl text-gray-600 mt-6">Add an import map to any page:</p>
 
-      <code-block>
-        <template>
-          <script type="importmap">
+    <code-block>
+      <template>
+        <script type="importmap">
           {
             "imports": {
               "@li3/": "https://cdn.li3.dev/@li3/"
             }
           }
           </script>
-        </template>
-      </code-block>
-      <p class="text-xl text-gray-600 mt-6">Now import the API from <span
-          class="font-mono bg-gray-200 p-1 rounded">@li3/web</span> and mount a component into an element</p>
+      </template>
+    </code-block>
+    <p class="text-xl text-gray-600 mt-6">Now import the API from <span
+        class="font-mono bg-gray-200 p-1 rounded">@li3/web</span> and mount a component into an element</p>
 
-      <code-block>
-        <template>
-          <script type="module">
-            import { ref, tpl, mount } from "@li3/web";
+    <code-block>
+      <template>
+        <script type="module">
+          import { ref, tpl, mount } from "@li3/web";
 
-            const template = tpl`<div>
+          const template = tpl`<div>
             <label>Your name:</label>
             <input type="text" on-input="setName($event.target.value)" bind-value="name" />
             <hr />
             <h1>Hello, {{ name }}!</h1>
             </div>`;
 
-            function setup() {
-              const name = ref('');
+          function setup() {
+            const name = ref('');
 
-              function setName(v) {
-                name.value = v;
-              }
-
-              return { name, setName };
+            function setName(v) {
+              name.value = v;
             }
 
-            mount('#app', { setup, template })
-          </script>
-        </template>
-      </code-block>
+            return { name, setName };
+          }
 
-      <p class="text-xl text-gray-600 mt-6">And here's the mounted element:</p>
-      <div class="bg-white rounded-lg px-4 py-6 mt-6 shadow-lg w-full flex flex-col items-center">
-        <div id="app"
-          class="w-full md:w-1/2"></div>
-      </div>
+          mount('#app', { setup, template })
+        </script>
+      </template>
+    </code-block>
 
-      <script type="module">
-        import { ref, tpl, mount } from "@li3/web";
+    <p class="text-xl text-gray-600 mt-6">And here's the mounted element:</p>
+    <div class="bg-white rounded-lg px-4 py-6 mt-6 shadow-lg w-full flex flex-col items-center">
+      <div id="app"
+        class="w-full md:w-1/2"></div>
+    </div>
 
-        const template = tpl`<div>
+    <script type="module">
+      import { ref, tpl, mount } from "@li3/web";
+
+      const template = tpl`<div>
           <h1 class="text-xl font-bold">Hello, {{ name }}!</h1>
           <hr class="border-t my-3" />
           <label class="py-2">Your name:</label>
           <input type="text" class="mt-2 p-2 border rounded bg-white w-full" on-input="setName($event.target.value)" bind-value="name" />
         </div>`;
 
-        function setup() {
-          const name = ref('');
+      function setup() {
+        const name = ref('');
 
-          function setName(v) {
-            name.value = v;
-          }
-
-          return { name, setName };
+        function setName(v) {
+          name.value = v;
         }
 
-        mount('#app', { setup: setup, template })
-      </script>
-    </div>
-  </section>
+        return { name, setName };
+      }
 
-  <section id="bindings"
-    class="py-12 px-8">
-    <div class="max-w-4xl mx-auto">
-      <h2 class="text-5xl text-red-500 font-bold font-serif">Bindings</h2>
-      <h3 class="text-3xl text-gray-700 mt-3 font-semi font-serif">How to bring static HTML to life</h3>
+      mount('#app', { setup: setup, template })
+    </script>
+  </feature-section>
 
-      <p class="text-xl text-gray-600 mt-8">Bind a property or attribute: </p>
-      <code-block>
-        <template>
-          <button attr-lang="language"
-            bind-disabled="isDisabled"></button>
-        </template>
-      </code-block>
+  <feature-section id="bindings">
+    <span slot="title">Bindings</span>
+    <h3 class="text-3xl text-gray-700 mt-3 font-semi font-serif">How to bring static HTML to life</h3>
 
-      <p class="text-xl text-gray-600 mt-6">Listen to events:</p>
-      <code-block>
-        <template>
-          <form on-submit.prevent.stop="onSubmit($event)"></form>
+    <p class="text-xl text-gray-600 mt-8">Bind a property or attribute: </p>
+    <code-block>
+      <template>
+        <button attr-lang="language"
+          bind-disabled="isDisabled"></button>
+      </template>
+    </code-block>
 
-        </template>
-      </code-block>
-      <small class="mt-3 block">Available modifiers: "capture", "once", "passive", "stop" and "prevent".</small>
+    <p class="text-xl text-gray-600 mt-6">Listen to events:</p>
+    <code-block>
+      <template>
+        <form on-submit.prevent.stop="onSubmit($event)"></form>
 
-      <p class="text-xl text-gray-600 mt-6">Add/remove classes:</p>
-      <code-block>
-        <template>
-          <input class-border-red.bg-yellow="isInvalid()" />
-        </template>
-      </code-block>
-      <small class="mt-3 block">Multiple classes can be separated by a dot (.)</small>
+      </template>
+    </code-block>
+    <small class="mt-3 block">Available modifiers: "capture", "once", "passive", "stop" and "prevent".</small>
 
-      <p class="text-xl text-gray-600 mt-6">Set style:</p>
-      <code-block>
-        <template>
-          <div style-display="shouldBeVisible ? 'block' : 'none'"></div>
-        </template>
-      </code-block>
-      <small class="mt-3 block">Multiple classes can be separated by a dot (.)</small>
-    </div>
-  </section>
+    <p class="text-xl text-gray-600 mt-6">Add/remove classes:</p>
+    <code-block>
+      <template>
+        <input class-border-red.bg-yellow="isInvalid()" />
+      </template>
+    </code-block>
+    <small class="mt-3 block">Multiple classes can be separated by a dot (.)</small>
 
-  <section id="setup-api"
-    class="py-12 px-8">
-    <div class="max-w-4xl mx-auto">
-      <h2 class="text-5xl text-red-500 font-bold font-serif">Setup API</h2>
-      <h3 class="text-3xl text-gray-700 mt-3 font-semi font-serif">How to declare the API of a component</h3>
+    <p class="text-xl text-gray-600 mt-6">Set style:</p>
+    <code-block>
+      <template>
+        <div style-display="shouldBeVisible ? 'block' : 'none'"></div>
+      </template>
+    </code-block>
+    <small class="mt-3 block">Multiple classes can be separated by a dot (.)</small>
+  </feature-section>
 
-      <p class="text-xl text-gray-600 mt-8">Declare inputs (props):</p>
-      <code-block language="javascript">
-        <pre>
+  <feature-section id="setup-api">
+    <span slot="title">Setup API</span>
+    <h3 class="text-3xl text-gray-700 mt-3 font-semi font-serif">How to declare the API of a component</h3>
+
+    <p class="text-xl text-gray-600 mt-8">Declare inputs (props):</p>
+    <code-block language="javascript">
+      <pre>
           import { defineProps } from '@li3/web';
 
           function setup() {
@@ -212,11 +204,11 @@
             });
           }
       </pre>
-      </code-block>
+    </code-block>
 
-      <p class="text-xl text-gray-600 mt-8">Declare outputs (events):</p>
-      <code-block language="javascript">
-        <pre>import { defineEvents } from '@li3/web';
+    <p class="text-xl text-gray-600 mt-8">Declare outputs (events):</p>
+    <code-block language="javascript">
+      <pre>import { defineEvents } from '@li3/web';
 
         function setup() {
           const emit = defineEvents['update', 'remove']);
@@ -224,11 +216,11 @@
           emit('update', { value: 123 });
         }
       </pre>
-      </code-block>
+    </code-block>
 
-      <p class="text-xl text-gray-600 mt-8">Create reactive values (ref/computed) and watchers:</p>
-      <code-block language="javascript">
-        <pre>
+    <p class="text-xl text-gray-600 mt-8">Create reactive values (ref/computed) and watchers:</p>
+    <code-block language="javascript">
+      <pre>
           import { ref, unref, computed, watch } from '@li3/web';
 
           function setup() {
@@ -244,11 +236,11 @@
             return { name, greeting, isEmpty }
           }
         </pre>
-      </code-block>
+    </code-block>
 
-      <p class="text-xl text-gray-600 mt-8">Lifecycle events:</p>
-      <code-block language="javascript">
-        <pre>
+    <p class="text-xl text-gray-600 mt-8">Lifecycle events:</p>
+    <code-block language="javascript">
+      <pre>
           import { onInit, onUpdate, onDestroy } from '@li3/web';
 
           function setup() {
@@ -265,77 +257,74 @@
             });
           }
         </pre>
-      </code-block>
+    </code-block>
 
-      <p class="text-xl text-gray-600 mt-8">Access DOM nodes (.one / .many):</p>
-      <code-block language="javascript">
-        <template>
-          <script type="module">
-            import { defineQuery } from '@li3/web';
+    <p class="text-xl text-gray-600 mt-8">Access DOM nodes (.one / .many):</p>
+    <code-block language="javascript">
+      <template>
+        <script type="module">
+          import { defineQuery } from '@li3/web';
 
-            function setup() {
-              const inputs = defineQuery('input');
+          function setup() {
+            const inputs = defineQuery('input');
 
-              function something() {
-                const value = inputs.one.value;
-                const valid = [...inputs.many].every(input => isValid(input));
-              }
+            function something() {
+              const value = inputs.one.value;
+              const valid = [...inputs.many].every(input => isValid(input));
             }
-          </script>
+          }
+        </script>
+      </template>
+    </code-block>
+
+    <p class="text-xl text-gray-600 mt-8">Load resources:</p>
+    <code-block language="javascript">
+      <template>
+        <script type="module">
+          import { loadCss, loadScript } from '@li3/web';
+
+          function setup() {
+            loadCss('http://example.com/main.css');
+            loadScript('http://example.com/index.js');
+          }
+        </script>
+      </template>
+
+      </template>
+    </code-block>
+  </feature-section>
+
+  <feature-section id="loops">
+    <span slot="title">Conditionals and loops</span>
+    <h3 class="text-3xl text-gray-700 mt-3 font-semi font-serif">Repeat a template or add/remove elements based on
+      a
+      condition</h3>
+
+    <p class="text-xl text-gray-600 mt-8">Conditional elements with <code
+        class="font-mono bg-gray-100 p-1 inline-block">template[if]</code></p>
+    <code-block language="javascript">
+      <template>
+        <template if="condition">
+          <div>Show me</div>
         </template>
-      </code-block>
+      </template>
+    </code-block>
 
-      <p class="text-xl text-gray-600 mt-8">Load resources:</p>
-      <code-block language="javascript">
-        <template>
-          <script type="module">
-            import { loadCss, loadScript } from '@li3/web';
-
-            function setup() {
-              loadCss('http://example.com/main.css');
-              loadScript('http://example.com/index.js');
-            }
-          </script>
+    <p class="text-xl text-gray-600 mt-8">Repeat elements with <code
+        class="font-mono bg-gray-100 p-1 inline-block">template[for]</code></p>
+    <code-block language="javascript">
+      <template>
+        <template for="item of list">
+          <div>Repeat me</div>
         </template>
+      </template>
+    </code-block>
 
-        </template>
-      </code-block>
-    </div>
-  </section>
-
-  <section id="loops"
-    class="py-12 px-8">
-    <div class="max-w-4xl mx-auto">
-      <h2 class="text-5xl text-red-500 font-bold font-serif">Conditionals and loops</h2>
-      <h3 class="text-3xl text-gray-700 mt-3 font-semi font-serif">Repeat a template or add/remove elements based on a
-        condition</h3>
-
-      <p class="text-xl text-gray-600 mt-8">Conditional elements with <code
-          class="font-mono bg-gray-100 p-1 inline-block">template[if]</code></p>
-      <code-block language="javascript">
-        <template>
-          <template if="condition">
-            <div>Show me</div>
-          </template>
-        </template>
-      </code-block>
-
-      <p class="text-xl text-gray-600 mt-8">Repeat elements with <code
-          class="font-mono bg-gray-100 p-1 inline-block">template[for]</code></p>
-      <code-block language="javascript">
-        <template>
-          <template for="item of list">
-            <div>Repeat me</div>
-          </template>
-        </template>
-      </code-block>
-
-      <p class="mt-12 text-xl text-gray-600 mb-8">
-        And that's it!<br />
-        Now <a class="text-blue-600 underline"
-          href="/docs">go to the documentation</a> to see the full API!</p>
-    </div>
-  </section>
+    <p class="mt-12 text-xl text-gray-600 mb-8">
+      And that's it!<br />
+      Now <a class="text-blue-600 underline"
+        href="/docs">go to the documentation</a> to see the full API!</p>
+  </feature-section>
 
   <section class="py-12 px-8 flex items-center">
     <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 contents-children">
@@ -362,7 +351,7 @@
   <!-- Footer -->
   <footer class="bg-gray-100 py-8 px-8 text-center">
     <p class="text-gray-600">Released under the MIT License</p>
-    <p class="text-gray-600 mt-2">Copyright © 2024 Darlan Alves</p>
+    <p class="text-gray-600 mt-2">Copyright © 2024 Lithium Components</p>
   </footer>
 </body>
 

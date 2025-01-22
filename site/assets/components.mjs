@@ -77,3 +77,12 @@ createComponent("feature-card", {
         <p class="text-gray-600"><slot></slot></p>
       </div>`,
 });
+
+createComponent('feature-section', {
+  template: `<section class="py-12 px-8">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-5xl text-red-500 mr-4 font-bold font-serif"><slot name="title"></slot></h2>
+      <slot></slot>
+    </div>
+  </section>`
+})
