@@ -33,16 +33,15 @@
   <nav class="flex justify-between items-center space-x-8 px-8 py-4 my-4 sticky top-0 z-10 rounded-full max-w-4xl mx-auto border border-gray-100 shadow-sm bg-white/20 backdrop-blur">
     <a href="/"
       class="text-2xl font-bold text-gray-800 inline-block h-10 border border-4 border-black px-1 rounded">Li³</a>
-    <auto-toc class="hidden sm:block"></auto-toc>
-    <div class="hidden md:flex gap-8 font-medium">
-      <a href="#get-started"
-        class="text-gray-600 hover:text-black transition-colors">Introduction</a>
+
+    <div class="hidden sm:flex gap-8 font-medium">
       <a href="/docs"
         class="text-gray-600 hover:text-black transition-colors">API</a>
       <a href="https://github.com/apphorde/lithium"
         target="_blank"
         class="text-gray-600 hover:text-black transition-colors">GitHub</a>
     </div>
+    <auto-toc class="hidden sm:block contents"></auto-toc>
   </nav>
 
   <section class="h-screen bg-gray-100 flex items-center justify-center px-8">
@@ -72,7 +71,7 @@
   </section>
 
   <feature-section id="get-started">
-    <span slot="title">Batteries included</span>
+    <span slot="title">Introduction</span>
     <p class="text-xl text-gray-600 mt-6">Add an import map to any page:</p>
 
     <code-block>
@@ -355,14 +354,12 @@
   </footer>
 
   <template component="auto-toc">
-    <div
-      class="flex items-center justify-stretch p-1 border rounded-lg text-sm shadow-sm whitespace-nowrap bg-white">
-      <template for="link of links">
-        <a class="w-full text-center p-2 text-blue-500 font-medium"
-          bind-href="'#' + link.id"
-          on-click.prevent="navigateTo(link.id)">{{link.text}}</a>
-      </template>
-    </div>
+    <template for="link of links">
+      <a class="text-gray-600 hover:text-black transition-colors"
+        bind-href="'#' + link.id"
+        on-click.prevent="navigateTo(link.id)">{{link.text}}</a>
+    </template>
+
     <script setup>
       import { ref, onInit } from '@li3/web';
 
