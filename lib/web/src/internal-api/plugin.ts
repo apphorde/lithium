@@ -1,30 +1,34 @@
-export class PluginDispatcher {
-  private hooks: Record<string, any[]>;
-
-  setHooks(hooks: string[]) {
-    this.hooks = {};
-    for (const next of hooks) {
-      this.hooks[next] = [];
-    }
+export function createDispatcher(hookNames: string[]) {
+  const hooks: Record<string, any[]> = {};
+  for (const next of hookNames) {
+    this.hooks[next] = [];
   }
 
-  use(plugin: object) {
-    const hooks = Object.keys(this.hooks);
-
-    for (const next of hooks) {
-      if (plugin[next]) {
-        this.hooks[next].push(plugin);
+  return {
+    use(plugin: object) {
+      for (const next of hookNames) {
+        if (plugin[next]) {
+          hooks[next].push(plugin);
+        }
       }
-    }
-  }
+    },
 
-  apply(hook: string, args: any[] = []) {
-    const plugins = this.hooks[hook];
-    for (const plugin of plugins) {
-      plugin[hook](...args);
-    }
-  }
+    apply(hook: string, args: any[] = []) {
+      const plugins = hooks[hook];
+      for (const plugin of plugins) {
+        plugin[hook](...args);
+      }
+    },
+  };
 }
 
-export const plugins = new PluginDispatcher();
-plugins.setHooks(["setup", "createDom", "createElement", "applyAttribute", "appendDom", "init", "update", "destroy"]);
+export const plugins = createDispatcher([
+  "setup",
+  "createDom",
+  "createElement",
+  "applyAttribute",
+  "appendDom",
+  "init",
+  "update",
+  "destroy",
+]);
