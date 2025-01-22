@@ -6,7 +6,7 @@ export { PluginDispatcher, plugins } from "./internal-api/plugin.js";
 
 import { createState, fork } from "./internal-api/reactive.js";
 import { getCurrentInstance, pop, push } from "./internal-api/stack.js";
-import * as dom from "./internal-api/dom.js";
+import * as DOM from "./internal-api/dom.js";
 
 export { tpl, domReady } from "./internal-api/dom.js";
 export * from "./component-api/setup.js";
@@ -30,7 +30,7 @@ export { Ref, unref, isRef } from "@li3/reactive";
 export const Lithium = {
   reactive: { createState, fork },
   stack: { getCurrentInstance, pop, push },
-  dom: { ...dom },
+  DOM: { ...DOM },
   plugins: {
     addScriptToPage,
     adoptStyleSheet,
