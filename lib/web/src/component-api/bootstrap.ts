@@ -1,5 +1,6 @@
 import { domReady, tpl } from "../internal-api/dom.js";
 import { mount } from "../component-api/mount.js";
+import { createInlineComponent } from "./custom-elements";
 
 async function loadInitializer(init) {
   if (init.charAt(0) === "{" || init.charAt(0) === "[") {
@@ -37,6 +38,14 @@ export async function bootstrap(node) {
   });
 }
 
-domReady(function () {
+domReady(async function () {
+  const inline: HTMLTemplateElement[] = Array.from(
+    document.querySelectorAll("template[component]")
+  );
+
+  for (const template of inline) {
+    await createInlineComponent(template);
+  }
+
   document.querySelectorAll("[lit-app]").forEach(bootstrap);
 });

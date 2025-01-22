@@ -11,7 +11,7 @@ import * as dom from "./internal-api/dom.js";
 export { tpl, domReady } from "./internal-api/dom.js";
 export * from "./component-api/setup.js";
 export { inject, provide } from "./component-api/inject.js";
-export { createComponent } from "./component-api/custom-elements.js";
+export { createComponent, createInlineComponent } from "./component-api/custom-elements.js";
 export { mount } from "./component-api/mount.js";
 export { bootstrap } from "./component-api/bootstrap.js";
 

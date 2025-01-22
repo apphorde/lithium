@@ -1,9 +1,16 @@
 import { mount } from "./mount.js";
-import type { AnyFunction, ComponentDefinition } from "../internal-api/types.js";
+import type {
+  AnyFunction,
+  ComponentDefinition,
+} from "../internal-api/types.js";
+import { createBlobModule } from "../internal-api/expressions";
 
 export const DefineComponent = Symbol("@@def");
 
-export function createComponent(name: string, def: ComponentDefinition | AnyFunction): void {
+export function createComponent(
+  name: string,
+  def: ComponentDefinition | AnyFunction
+): void {
   if (typeof def === "function") {
     def = { setup: def } as ComponentDefinition;
   }
@@ -30,4 +37,22 @@ export function createComponent(name: string, def: ComponentDefinition | AnyFunc
 
   Component[DefineComponent] = def;
   customElements.define(name, Component);
+}
+
+export async function createInlineComponent(template: HTMLTemplateElement) {
+  const name = template.getAttribute("component");
+  const setup = template.content.querySelector("script[setup]");
+  const component: ComponentDefinition = { template };
+
+  if (!name) return;
+
+  const code = setup?.textContent.trim();
+
+  if (setup && code) {
+    const md = await createBlobModule(code, "text/javascript");
+    setup.remove();
+    component.setup = md.default;
+  }
+
+  createComponent(name, component);
 }
