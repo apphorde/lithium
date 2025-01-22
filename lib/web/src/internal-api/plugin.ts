@@ -1,7 +1,7 @@
 export function createDispatcher(hookNames: string[]) {
   const hooks: Record<string, any[]> = {};
   for (const next of hookNames) {
-    this.hooks[next] = [];
+    hooks[next] = [];
   }
 
   return {
