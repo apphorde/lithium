@@ -29,7 +29,7 @@
 </head>
 
 <body class="font-sans text-gray-900 antialiased">
-  <nav class="flex justify-between items-center space-x-8 px-8 py-4 sticky top-0 z-10 rounded-full max-w-4xl mx-auto border border-gray-100 shadow mt-4"
+  <nav class="flex justify-between items-center space-x-8 px-8 py-4 my-4 sticky top-0 z-10 rounded-full max-w-4xl mx-auto border border-gray-100 shadow"
     style="background-color: rgba(255, 255, 255, 0.16);backdrop-filter: blur(10px);">
     <a href="/"
       class="text-2xl font-bold text-gray-800">Li³</a>
@@ -356,7 +356,7 @@
 
   <template component="auto-toc">
     <div
-      class="flex items-center justify-stretch p-1 border rounded-lg text-sm shadow-sm mt-2 whitespace-nowrap bg-white">
+      class="flex items-center justify-stretch p-1 border rounded-lg text-sm shadow-sm whitespace-nowrap bg-white">
       <template for="link of links">
         <a class="w-full text-center p-2 text-blue-500 font-medium"
           bind-href="'#' + link.id"
@@ -442,7 +442,7 @@
   </template>
 
   <template component="feature-section">
-    <section class="py-12 px-8">
+    <section class="py-24 px-8">
       <div class="max-w-4xl mx-auto">
         <h2 class="text-5xl text-red-500 mr-4 font-bold font-serif">
           <slot name="title"></slot>
