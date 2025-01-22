@@ -40,8 +40,8 @@
       <a href="https://github.com/apphorde/lithium"
         target="_blank"
         class="text-gray-600 hover:text-black transition-colors">GitHub</a>
+        <auto-toc class="hidden sm:block contents"></auto-toc>
     </div>
-    <auto-toc class="hidden sm:block contents"></auto-toc>
   </nav>
 
   <section class="h-screen bg-gray-100 flex items-center justify-center px-8">
@@ -355,7 +355,7 @@
 
   <template component="auto-toc">
     <template for="link of links">
-      <a class="text-gray-600 hover:text-black transition-colors"
+      <a class="text-gray-600 hover:text-black transition-colors mx-4"
         bind-href="'#' + link.id"
         on-click.prevent="navigateTo(link.id)">{{link.text}}</a>
     </template>
