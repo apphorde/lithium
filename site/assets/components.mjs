@@ -55,7 +55,7 @@ function autoTableOfContent() {
 }
 
 createComponent("code-block", {
-  template: `<div class="bg-white rounded-lg px-4 py-2 mt-6 shadow-lg w-full border">
+  template: `<div class="bg-white rounded-lg px-4 py-6 my-6 shadow-lg w-full border">
   <div class="text-gray-800 font-mono whitespace-pre overflow-x-auto"><slot></slot></div>
   </div>`,
   setup: codeBlock,
