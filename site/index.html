@@ -452,10 +452,11 @@
     </section>
     <script setup>
       import { onInit, DOM } from '@li3/web';
-
-      onInit(({ element }) => {
-        DOM.emitEvent(document.body, 'addsection', element);
-      });
+      export default function featureSection() {
+        onInit(({ element }) => {
+          DOM.emitEvent(document.body, 'addsection', element);
+        });
+      }
     </script>
   </template>
 </body>
