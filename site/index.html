@@ -353,6 +353,37 @@
     <p class="text-gray-600">Released under the MIT License</p>
     <p class="text-gray-600 mt-2">Copyright © 2024 Lithium Components</p>
   </footer>
+
+  <template component="auto-toc">
+    <div
+      class="flex items-center justify-stretch p-1 border rounded-lg text-sm shadow-sm mt-2 whitespace-nowrap bg-white">
+      <template for="link of links">
+        <a class="w-full text-center p-2 text-blue-500 font-medium"
+          bind-href="'#' + link.id"
+          on-click.prevent="navigateTo(link.id)">{{link.text}}</a>
+      </template>
+    </div>
+    <script setup>
+      export default function autoTableOfContent() {
+        const links = ref([]);
+
+        function navigateTo(id) {
+          document.getElementById(id).scrollIntoView({ behavior: "smooth" });
+        }
+
+        onInit(function () {
+          links.value = [...document.querySelectorAll("section[id]")].map(
+            (section) => {
+              const text = section.querySelector("h2").textContent.trim();
+              return { id: section.id, text };
+            }
+          );
+        });
+
+        return { navigateTo, links };
+      }
+    </script>
+  </template>
 </body>
 
 </html>

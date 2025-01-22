@@ -35,7 +35,7 @@ function codeBlock({ element }) {
   });
 }
 
-function autoTableOfContent() {
+export default function autoTableOfContent() {
   const links = ref([]);
 
   function navigateTo(id) {
