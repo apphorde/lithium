@@ -1,4 +1,4 @@
-import { reactive } from "@li3/reactive";
+import { reactive } from "./index.js";
 import { describe, it, mock } from "node:test";
 import assert from "node:assert";
 

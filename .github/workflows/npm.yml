@@ -25,7 +25,7 @@ jobs:
         run: |
           set -e
           which pnpm && echo 'pnpm OK' || npm i -g pnpm
-          pnpm i && pnpx nx run-many -t build,test
+          pnpm i && pnpm i tsx && pnpx nx run-many -t build,test
 
       - name: Publish to NPM
         env:
