@@ -26,21 +26,24 @@
     .contents-children>* {
       display: contents;
     }
+    .noisy {
+      background: linear-gradient(95.9deg, var(--color-primary) 0%, #2C0848C8 100%), rgba(123, 123, 123, 0.37) url(/noisy.svg)
+    }
   </style>
 </head>
 
 <body class="font-sans text-gray-900 antialiased">
-  <nav class="flex justify-between items-center space-x-8 px-8 py-4 my-4 sticky top-0 z-10 rounded-full max-w-4xl mx-auto border border-gray-100 shadow-sm bg-white/20 backdrop-blur">
+  <nav class="flex items-center space-x-8 px-8 py-4 my-4 sticky top-0 z-10 rounded-full max-w-4xl mx-auto border border-gray-100 shadow-sm bg-white/20 backdrop-blur">
     <a href="/"
       class="text-2xl font-bold text-gray-800 inline-block h-10 border border-4 border-black px-1 rounded">Li³</a>
 
     <div class="hidden sm:flex gap-8 font-medium">
+      <auto-toc class="hidden sm:block contents"></auto-toc>
       <a href="/docs"
         class="text-gray-600 hover:text-black transition-colors">API</a>
       <a href="https://github.com/apphorde/lithium"
         target="_blank"
         class="text-gray-600 hover:text-black transition-colors">GitHub</a>
-        <auto-toc class="hidden sm:block contents"></auto-toc>
     </div>
   </nav>
 
@@ -184,7 +187,7 @@
   </feature-section>
 
   <feature-section id="setup-api">
-    <span slot="title">Setup API</span>
+    <span slot="title">Declarative API</span>
     <h3 class="text-3xl text-gray-700 mt-3 font-semi font-serif">How to declare the API of a component</h3>
 
     <p class="text-xl text-gray-600 mt-8">Declare inputs (props):</p>
@@ -207,14 +210,14 @@
 
     <p class="text-xl text-gray-600 mt-8">Declare outputs (events):</p>
     <code-block language="javascript">
-      <pre>import { defineEvents } from '@li3/web';
+      <template>import { defineEvents } from '@li3/web';
 
         function setup() {
           const emit = defineEvents['update', 'remove']);
 
           emit('update', { value: 123 });
         }
-      </pre>
+      </template>
     </code-block>
 
     <p class="text-xl text-gray-600 mt-8">Create reactive values (ref/computed) and watchers:</p>
@@ -439,7 +442,7 @@
   </template>
 
   <template component="feature-section">
-    <section class="py-24 px-8">
+    <section class="py-16 my-16 px-8 noisy rounded-lg">
       <div class="max-w-4xl mx-auto">
         <h2 class="text-5xl text-red-500 mr-4 font-bold font-serif">
           <slot name="title"></slot>

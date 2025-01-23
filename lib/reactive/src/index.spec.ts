@@ -1,6 +1,6 @@
 import { reactive } from "@li3/reactive";
 import { describe, it, mock } from "node:test";
-import assert from "assert";
+import assert from "node:assert";
 
 describe("reactive values", () => {
   it("should observe a change in an object", () => {
