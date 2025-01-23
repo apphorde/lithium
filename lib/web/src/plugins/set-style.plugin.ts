@@ -3,11 +3,12 @@ import { compileExpression, wrapTryCatch } from "../internal-api/expressions.js"
 import { plugins } from "../internal-api/plugin.js";
 import { watch } from "../component-api/setup.js";
 import { RuntimeInternals } from "../internal-api/types";
+import { dashToCamelCase } from "./property-binding.plugin.js"
 
 plugins.use({
   applyAttribute($el, node, attribute, expression) {
     if (attribute.startsWith("style-")) {
-      const style = attribute.replace("style-", "");
+      const style = dashToCamelCase(attribute.replace("style-", ""));
       createStyleBinding($el, node, style, expression);
     }
   },
