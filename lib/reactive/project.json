@@ -2,6 +2,11 @@
   "name": "@li3/reactive",
   "targets": {
     "build": {},
-    "tsc": {}
+    "tsc": {},
+    "test": {
+      "options": {
+        "command": "npx tsx {projectRoot}/src/index.spec.ts"
+      }
+    }
   }
 }
