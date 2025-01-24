@@ -27,7 +27,7 @@ import { createTextNodeBinding } from "./plugins/text-template.plugin.js";
 import { plugins } from './internal-api/plugin.js';
 
 import { unref, isRef } from "@li3/reactive";
-export { Ref, unref, isRef } from "@li3/reactive";
+export { type Ref, unref, isRef } from "@li3/reactive";
 
 export const Reactive = { createState, fork, isRef, unref };
 export const DOM = { ...dom };
