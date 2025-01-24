@@ -20,8 +20,7 @@
     html {
       --color-primary: #ae60be;
       --color-red: rgb(239 68 68);
-      --color-primary-dark: #342317
-      font-family: Fricolage Grotesque, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+      --color-primary-dark: #342317 font-family: Fricolage Grotesque, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
     }
 
     .contents-children>* {
@@ -43,12 +42,10 @@
     <div class="hidden sm:flex gap-8 font-medium">
       <auto-toc class="hidden sm:block contents"></auto-toc>
       <a href="/docs"
-        class=hover:text-black
-        transition-colors">API</a>
+        class="hover:text-black transition-colors">API</a>
       <a href="https://github.com/apphorde/lithium"
         target="_blank"
-        class=hover:text-black
-        transition-colors">GitHub</a>
+        class="hover:text-black transition-colors">GitHub</a>
     </div>
   </nav>
 
@@ -93,8 +90,8 @@
           </script>
       </template>
     </code-block>
-    <p class="text-xl mt-6">Now import the API from <span
-        class="font-mono bg-gray-200 p-1 rounded">@li3/web</span> and mount a component into an element
+    <p class="text-xl mt-6">Now import the API from <span class="font-mono bg-gray-200 p-1 rounded">@li3/web</span> and
+      mount a component into an element
     </p>
 
     <code-block>
@@ -356,15 +353,13 @@
 
   <!-- Footer -->
   <footer class="bg-gray-100 py-8 px-8 text-center">
-    <p class=">Released under the MIT License</p>
-    <p class= mt-2">Copyright © 2024 Lithium Components</p>
+    <p>Released under the MIT License</p>
+    <p class="mt-2">Copyright © 2024 Lithium Components</p>
   </footer>
 
   <template component="auto-toc">
     <template for="link of links">
-      <a class=hover:text-black
-        transition-colors
-        mx-4"
+      <a class="hover:text-black transition-colors mx-4"
         bind-href="'#' + link.id"
         on-click.prevent="navigateTo(link.id)">{{link.text}}</a>
     </template>
@@ -443,28 +438,27 @@
       <h3 class="text-xl font-bold mb-4">
         <slot name="title"></slot>
       </h3>
-      <slot class=""></slot>
+      <slot></slot>
     </div>
   </template>
 
-  <template component="
-        feature-section">
-        <section class="py-8 my-16">
-          <div class="max-w-4xl mx-auto p-8 noisy rounded-2xl text-white">
-            <h2 class="text-5xl mr-4 font-bold font-serif">
-              <slot name="title"></slot>
-            </h2>
-            <slot></slot>
-          </div>
-        </section>
-        <script setup>
-          import { onInit, DOM } from '@li3/web';
-          export default function featureSection() {
-            onInit(({ element }) => {
-              DOM.emitEvent(document.body, 'addsection', element);
-            });
-          }
-        </script>
+  <template component="feature-section">
+    <section class="py-8 my-16">
+      <div class="max-w-4xl mx-auto p-8 noisy rounded-2xl text-white">
+        <h2 class="text-5xl mr-4 font-bold font-serif">
+          <slot name="title"></slot>
+        </h2>
+        <slot></slot>
+      </div>
+    </section>
+    <script setup>
+      import { onInit, DOM } from '@li3/web';
+      export default function featureSection() {
+        onInit(({ element }) => {
+          DOM.emitEvent(document.body, 'addsection', element);
+        });
+      }
+    </script>
   </template>
 </body>
 
