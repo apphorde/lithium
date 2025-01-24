@@ -16,11 +16,9 @@
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root,
-    html {
-      --color-primary: #ae60be;
-      --color-red: rgb(239 68 68);
-      --color-primary-dark: #342317 font-family: Fricolage Grotesque, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+    body {
+      font-family: Fricolage Grotesque, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+      background: #110719c8;
     }
 
     .contents-children>* {
@@ -28,16 +26,16 @@
     }
 
     .noisy {
-      background: linear-gradient(45deg, var(--color-primary) 0%, var(--color-primary-dark) 100%), rgba(123, 123, 123, 0.37) url(/assets/noisy.svg);
+      background: linear-gradient(95.9deg, #5627A3C8 0%, #2C0848C8 100%), rgba(123, 123, 123, 0.37) url(/assets/noisy.svg)
     }
   </style>
 </head>
 
-<body class="text-gray-800 antialiased">
+<body class="text-gray-100 antialiased">
   <nav
     class="flex items-center space-x-8 px-8 py-4 my-4 sticky top-0 z-10 rounded-full max-w-4xl mx-auto border border-gray-100 shadow-sm bg-white/20 backdrop-blur">
     <a href="/"
-      class="text-2xl font-bold inline-block h-10 border border-4 border-black px-1 rounded">Li³</a>
+      class="text-2xl font-bold inline-block h-10 border border-4 border-gray-100 px-1 rounded">Li³</a>
 
     <div class="hidden sm:flex gap-8 font-medium">
       <auto-toc class="hidden sm:block contents"></auto-toc>
@@ -388,7 +386,7 @@
     </script>
   </template>
   <template component="code-block">
-    <div class="bg-white rounded-lg p-5 my-6 shadow-md w-full border border-gray-300">
+    <div class="bg-white rounded-lg p-5 my-6 shadow-md w-full border border-gray-300 text-gray-800">
       <slot class="font-mono whitespace-pre overflow-x-auto block"></slot>
     </div>
     <script setup>
@@ -431,7 +429,7 @@
   </template>
 
   <template component="feature-card">
-    <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border">
+    <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border text-gray-800">
       <div class="text-4xl mb-4">
         <slot name="icon"></slot>
       </div>
