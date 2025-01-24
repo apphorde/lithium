@@ -49,7 +49,7 @@ export async function createInlineComponent(template: HTMLTemplateElement) {
   if (setup) {
     const href = setup.getAttribute("src");
     const md = href
-      ? await import(href)
+      ? await import(new URL(href, window.location.href).toString())
       : await createBlobModule(setup.textContent.trim(), "text/javascript");
 
     setup.remove();
