@@ -3,10 +3,6 @@
   "targets": {
     "build": {},
     "tsc": {},
-    "test": {
-      "options": {
-        "command": "npx tsx {projectRoot}/src/index.spec.ts"
-      }
-    }
+    "test": {}
   }
 }

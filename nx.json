@@ -7,7 +7,7 @@
     "tsc": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx tsc -p {projectRoot}/tsconfig.json --noEmit"
+        "command": "npx tsc -p {projectRoot}/tsconfig.json --noEmit --rootDir {projectRoot}"
       }
     },
     "build": {
@@ -18,9 +18,10 @@
       }
     },
     "test": {
+      "dependsOn": ["build", "tsc"],
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo true"
+        "command": "test -f {projectRoot}/src/index.spec.ts && npx tsx {projectRoot}/src/index.spec.ts"
       }
     }
   }
