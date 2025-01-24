@@ -75,6 +75,11 @@
 
   <feature-section id="get-started">
     <span slot="title">Introduction</span>
+    <!-- <div class="flex px-4 pt-2">
+      <button class="p-2"></button>
+    </div>-->
+
+    <!-- https://cdn.li3.dev/@li3/web@latest -->
     <p class="text-xl mt-6">Add an import map to any page:</p>
 
     <code-block>
@@ -88,6 +93,7 @@
           </script>
       </template>
     </code-block>
+
     <p class="text-xl mt-6">Now import the API from <span class="font-mono bg-gray-200 p-1 rounded">@li3/web</span> and
       mount a component into an element
     </p>
@@ -119,7 +125,7 @@
       </template>
     </code-block>
 
-    <p class="text-xl mt-6">And here's the mounted element:</p>
+    <p class="text-xl mt-6">Try it out:</p>
     <div class="bg-white rounded-lg px-4 py-6 mt-6 shadow-lg w-full flex flex-col items-center">
       <div id="app"
         class="w-full md:w-1/2"></div>
@@ -355,77 +361,23 @@
     <p class="mt-2">Copyright © 2024 Lithium Components</p>
   </footer>
 
-  <template component="auto-toc">
+  <template component="li-toc">
     <template for="link of links">
       <a class="hover:text-black transition-colors mx-4"
         bind-href="'#' + link.id"
         on-click.prevent="navigateTo(link.id)">{{link.text}}</a>
     </template>
 
-    <script setup>
-      import { ref, onInit } from '@li3/web';
-
-      export default function autoTableOfContent() {
-        const links = ref([]);
-
-        function navigateTo(id) {
-          document.getElementById(id).scrollIntoView({ behavior: "smooth" });
-        }
-
-        function addSection(section) {
-          const text = section.querySelector("h2").textContent.trim();
-          links.value = [...links.value, { id: section.id, text }];
-        }
-
-        onInit(function () {
-          document.body.addEventListener('addsection', e => addSection(e.detail));
-        });
-
-        return { navigateTo, links };
-      }
-    </script>
+    <script setup
+      src="/components/li-toc.mjs"></script>
   </template>
+
   <template component="code-block">
     <div class="bg-white rounded-lg p-5 my-6 shadow-md w-full border border-gray-300 text-gray-800">
       <slot class="font-mono whitespace-pre overflow-x-auto block"></slot>
     </div>
-    <script setup>
-      import { load, highlight } from "https://highlight.jsfn.run/index.mjs";
-      import {
-        ref,
-        defineProps,
-        defineQuery,
-        onInit
-      } from "@li3/web";
-
-      load();
-
-      export default function codeBlock({ element }) {
-        const props = defineProps(["language"]);
-        const pre = defineQuery("pre");
-        const template = defineQuery("template");
-        const source = (pre.one || template.one || element).innerHTML.trim() || "";
-        const slot = defineQuery("slot");
-        const lines = source.split("\n");
-        const padding = lines
-          .filter((line) => line && line.startsWith(" "))
-          .reduce(
-            (prev, line) => Math.min(prev, line.indexOf(line.trim())),
-            lines[0].length
-          );
-        const toReplace = " ".repeat(padding);
-        const trimmedSource = lines
-          .map((line) => line.replace(toReplace, ""))
-          .join("\n");
-
-        onInit(async () => {
-          slot.one.innerHTML = await highlight(trimmedSource, {
-            language: props.language || "html",
-          });
-        });
-      }
-
-    </script>
+    <script setup
+      src="/components/code-block.mjs"></script>
   </template>
 
   <template component="feature-card">
@@ -440,9 +392,15 @@
     </div>
   </template>
 
+  <template component="li-card">
+    <div class="p-8 noisy rounded-2xl text-white">
+      <slot></slot>
+    </div>
+  </template>
+
   <template component="feature-section">
-    <section class="py-8 my-16">
-      <div class="max-w-4xl mx-auto p-8 noisy rounded-2xl text-white">
+    <section class="my-16">
+      <div class="max-w-4xl mx-auto">
         <h2 class="text-5xl mr-4 font-bold font-serif">
           <slot name="title"></slot>
         </h2>

@@ -46,10 +46,12 @@ export async function createInlineComponent(template: HTMLTemplateElement) {
 
   if (!name) return;
 
-  const code = setup?.textContent.trim();
+  if (setup) {
+    const href = setup.getAttribute("src");
+    const md = href
+      ? await import(href)
+      : await createBlobModule(setup.textContent.trim(), "text/javascript");
 
-  if (setup && code) {
-    const md = await createBlobModule(code, "text/javascript");
     setup.remove();
     component.setup = md.default;
   }
