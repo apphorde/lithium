@@ -14,48 +14,53 @@
       }
     }
   </script>
-  <!-- <script type="module"
-    src="/assets/components.mjs"></script> -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root, html {
+    :root,
+    html {
       --color-primary: #ae60be;
-      font-family: Fricolage Grotesque, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      --color-red: rgb(239 68 68);
+      --color-primary-dark: #342317
+      font-family: Fricolage Grotesque, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
     }
 
     .contents-children>* {
       display: contents;
     }
+
     .noisy {
-      background: linear-gradient(95.9deg, var(--color-primary) 0%, #2C0848C8 100%), rgba(123, 123, 123, 0.37) url(/noisy.svg)
+      background: linear-gradient(45deg, var(--color-primary) 0%, var(--color-primary-dark) 100%), rgba(123, 123, 123, 0.37) url(/assets/noisy.svg);
     }
   </style>
 </head>
 
-<body class="font-sans text-gray-900 antialiased">
-  <nav class="flex items-center space-x-8 px-8 py-4 my-4 sticky top-0 z-10 rounded-full max-w-4xl mx-auto border border-gray-100 shadow-sm bg-white/20 backdrop-blur">
+<body class="text-gray-800 antialiased">
+  <nav
+    class="flex items-center space-x-8 px-8 py-4 my-4 sticky top-0 z-10 rounded-full max-w-4xl mx-auto border border-gray-100 shadow-sm bg-white/20 backdrop-blur">
     <a href="/"
-      class="text-2xl font-bold text-gray-800 inline-block h-10 border border-4 border-black px-1 rounded">Li³</a>
+      class="text-2xl font-bold inline-block h-10 border border-4 border-black px-1 rounded">Li³</a>
 
     <div class="hidden sm:flex gap-8 font-medium">
       <auto-toc class="hidden sm:block contents"></auto-toc>
       <a href="/docs"
-        class="text-gray-600 hover:text-black transition-colors">API</a>
+        class=hover:text-black
+        transition-colors">API</a>
       <a href="https://github.com/apphorde/lithium"
         target="_blank"
-        class="text-gray-600 hover:text-black transition-colors">GitHub</a>
+        class=hover:text-black
+        transition-colors">GitHub</a>
     </div>
   </nav>
 
-  <section class="h-screen bg-gray-100 flex items-center justify-center px-8">
+  <section class="h-screen flex items-center justify-center px-8">
     <div class="max-w-2xl">
       <h1 class="font-bold mb-6 font-serif">
-        <span class="text-5xl text-red-500 mr-4 mb-2 inline-block">lithium</span><br />
+        <span class="text-5xl mr-4 mb-2 inline-block">lithium</span><br />
         <span class="text-md italic mr-2">(lith·i·um)</span>
-        <span class="text-md text-gray-500 rounded">noun</span>
+        <span class="text-md rounded">noun</span>
       </h1>
 
-      <p class="text-xl text-gray-600 mb-8 font-serif">
+      <p class="text-xl mb-8 font-serif">
         A lightweight, reactive element library that fills the last gaps of the web platform and
         empowers developers to build reactive interfaces using only Web API's.
       </p>
@@ -75,7 +80,7 @@
 
   <feature-section id="get-started">
     <span slot="title">Introduction</span>
-    <p class="text-xl text-gray-600 mt-6">Add an import map to any page:</p>
+    <p class="text-xl mt-6">Add an import map to any page:</p>
 
     <code-block>
       <template>
@@ -88,8 +93,9 @@
           </script>
       </template>
     </code-block>
-    <p class="text-xl text-gray-600 mt-6">Now import the API from <span
-        class="font-mono bg-gray-200 p-1 rounded">@li3/web</span> and mount a component into an element</p>
+    <p class="text-xl mt-6">Now import the API from <span
+        class="font-mono bg-gray-200 p-1 rounded">@li3/web</span> and mount a component into an element
+    </p>
 
     <code-block>
       <template>
@@ -118,7 +124,7 @@
       </template>
     </code-block>
 
-    <p class="text-xl text-gray-600 mt-6">And here's the mounted element:</p>
+    <p class="text-xl mt-6">And here's the mounted element:</p>
     <div class="bg-white rounded-lg px-4 py-6 mt-6 shadow-lg w-full flex flex-col items-center">
       <div id="app"
         class="w-full md:w-1/2"></div>
@@ -150,9 +156,9 @@
 
   <feature-section id="bindings">
     <span slot="title">Bindings</span>
-    <h3 class="text-3xl text-gray-700 mt-3 font-semi font-serif">How to bring static HTML to life</h3>
+    <h3 class="text-3xl mt-3 font-semi font-serif">How to bring static HTML to life</h3>
 
-    <p class="text-xl text-gray-600 mt-8">Bind a property or attribute: </p>
+    <p class="text-xl mt-8">Bind a property or attribute: </p>
     <code-block>
       <template>
         <button attr-lang="language"
@@ -160,7 +166,7 @@
       </template>
     </code-block>
 
-    <p class="text-xl text-gray-600 mt-6">Listen to events:</p>
+    <p class="text-xl mt-6">Listen to events:</p>
     <code-block>
       <template>
         <form on-submit.prevent.stop="onSubmit($event)"></form>
@@ -169,7 +175,7 @@
     </code-block>
     <small class="mt-3 block">Available modifiers: "capture", "once", "passive", "stop" and "prevent".</small>
 
-    <p class="text-xl text-gray-600 mt-6">Add/remove classes:</p>
+    <p class="text-xl mt-6">Add/remove classes:</p>
     <code-block>
       <template>
         <input class-border-red.bg-yellow="isInvalid()" />
@@ -177,7 +183,7 @@
     </code-block>
     <small class="mt-3 block">Multiple classes can be separated by a dot (.)</small>
 
-    <p class="text-xl text-gray-600 mt-6">Set style:</p>
+    <p class="text-xl mt-6">Set style:</p>
     <code-block>
       <template>
         <div style-display="shouldBeVisible ? 'block' : 'none'"></div>
@@ -188,9 +194,9 @@
 
   <feature-section id="setup-api">
     <span slot="title">Declarative API</span>
-    <h3 class="text-3xl text-gray-700 mt-3 font-semi font-serif">How to declare the API of a component</h3>
+    <h3 class="text-3xl mt-3 font-semi font-serif">How to declare the API of a component</h3>
 
-    <p class="text-xl text-gray-600 mt-8">Declare inputs (props):</p>
+    <p class="text-xl mt-8">Declare inputs (props):</p>
     <code-block language="javascript">
       <pre>
           import { defineProps } from '@li3/web';
@@ -208,19 +214,19 @@
       </pre>
     </code-block>
 
-    <p class="text-xl text-gray-600 mt-8">Declare outputs (events):</p>
+    <p class="text-xl mt-8">Declare outputs (events):</p>
     <code-block language="javascript">
       <template>import { defineEvents } from '@li3/web';
 
         function setup() {
-          const emit = defineEvents['update', 'remove']);
+        const emit = defineEvents['update', 'remove']);
 
-          emit('update', { value: 123 });
+        emit('update', { value: 123 });
         }
       </template>
     </code-block>
 
-    <p class="text-xl text-gray-600 mt-8">Create reactive values (ref/computed) and watchers:</p>
+    <p class="text-xl mt-8">Create reactive values (ref/computed) and watchers:</p>
     <code-block language="javascript">
       <pre>
           import { ref, unref, computed, watch } from '@li3/web';
@@ -240,7 +246,7 @@
         </pre>
     </code-block>
 
-    <p class="text-xl text-gray-600 mt-8">Lifecycle events:</p>
+    <p class="text-xl mt-8">Lifecycle events:</p>
     <code-block language="javascript">
       <pre>
           import { onInit, onUpdate, onDestroy } from '@li3/web';
@@ -261,7 +267,7 @@
         </pre>
     </code-block>
 
-    <p class="text-xl text-gray-600 mt-8">Access DOM nodes (.one / .many):</p>
+    <p class="text-xl mt-8">Access DOM nodes (.one / .many):</p>
     <code-block language="javascript">
       <template>
         <script type="module">
@@ -279,7 +285,7 @@
       </template>
     </code-block>
 
-    <p class="text-xl text-gray-600 mt-8">Load resources:</p>
+    <p class="text-xl mt-8">Load resources:</p>
     <code-block language="javascript">
       <template>
         <script type="module">
@@ -298,11 +304,9 @@
 
   <feature-section id="loops">
     <span slot="title">Conditionals and loops</span>
-    <h3 class="text-3xl text-gray-700 mt-3 font-semi font-serif">Repeat a template or add/remove elements based on
-      a
-      condition</h3>
+    <h3 class="text-3xl mt-3 font-semi font-serif">Repeat a template or add/remove elements based on a condition</h3>
 
-    <p class="text-xl text-gray-600 mt-8">Conditional elements with <code
+    <p class="text-xl mt-8">Conditional elements with <code
         class="font-mono bg-gray-100 p-1 inline-block">template[if]</code></p>
     <code-block language="javascript">
       <template>
@@ -312,7 +316,7 @@
       </template>
     </code-block>
 
-    <p class="text-xl text-gray-600 mt-8">Repeat elements with <code
+    <p class="text-xl mt-8">Repeat elements with <code
         class="font-mono bg-gray-100 p-1 inline-block">template[for]</code></p>
     <code-block language="javascript">
       <template>
@@ -322,7 +326,7 @@
       </template>
     </code-block>
 
-    <p class="mt-12 text-xl text-gray-600 mb-8">
+    <p class="mt-12 text-xl mb-8">
       And that's it!<br />
       Now <a class="text-blue-600 underline"
         href="/docs">go to the documentation</a> to see the full API!</p>
@@ -352,13 +356,15 @@
 
   <!-- Footer -->
   <footer class="bg-gray-100 py-8 px-8 text-center">
-    <p class="text-gray-600">Released under the MIT License</p>
-    <p class="text-gray-600 mt-2">Copyright © 2024 Lithium Components</p>
+    <p class=">Released under the MIT License</p>
+    <p class= mt-2">Copyright © 2024 Lithium Components</p>
   </footer>
 
   <template component="auto-toc">
     <template for="link of links">
-      <a class="text-gray-600 hover:text-black transition-colors mx-4"
+      <a class=hover:text-black
+        transition-colors
+        mx-4"
         bind-href="'#' + link.id"
         on-click.prevent="navigateTo(link.id)">{{link.text}}</a>
     </template>
@@ -388,7 +394,7 @@
   </template>
   <template component="code-block">
     <div class="bg-white rounded-lg p-5 my-6 shadow-md w-full border border-gray-300">
-      <slot class="text-gray-800 font-mono whitespace-pre overflow-x-auto block"></slot>
+      <slot class="font-mono whitespace-pre overflow-x-auto block"></slot>
     </div>
     <script setup>
       import { load, highlight } from "https://highlight.jsfn.run/index.mjs";
@@ -434,30 +440,31 @@
       <div class="text-4xl mb-4">
         <slot name="icon"></slot>
       </div>
-      <h3 class="text-xl font-bold text-gray-800 mb-4">
+      <h3 class="text-xl font-bold mb-4">
         <slot name="title"></slot>
       </h3>
-      <slot class="text-gray-600"></slot>
+      <slot class=""></slot>
     </div>
   </template>
 
-  <template component="feature-section">
-    <section class="py-16 my-16 px-8 noisy rounded-lg">
-      <div class="max-w-4xl mx-auto">
-        <h2 class="text-5xl text-red-500 mr-4 font-bold font-serif">
-          <slot name="title"></slot>
-        </h2>
-        <slot></slot>
-      </div>
-    </section>
-    <script setup>
-      import { onInit, DOM } from '@li3/web';
-      export default function featureSection() {
-        onInit(({ element }) => {
-          DOM.emitEvent(document.body, 'addsection', element);
-        });
-      }
-    </script>
+  <template component="
+        feature-section">
+        <section class="py-8 my-16">
+          <div class="max-w-4xl mx-auto p-8 noisy rounded-2xl text-white">
+            <h2 class="text-5xl mr-4 font-bold font-serif">
+              <slot name="title"></slot>
+            </h2>
+            <slot></slot>
+          </div>
+        </section>
+        <script setup>
+          import { onInit, DOM } from '@li3/web';
+          export default function featureSection() {
+            onInit(({ element }) => {
+              DOM.emitEvent(document.body, 'addsection', element);
+            });
+          }
+        </script>
   </template>
 </body>
 
