@@ -17,8 +17,8 @@ export function mount(element: DocumentFragment | Element | string, def: Compone
     throw new Error("Target element not found");
   }
 
+  // custom element was moved betwen parents and does not need to mount again
   if (element[mounted]) {
-    console.warn("Tried to mount an element twice", element);
     return;
   }
 

@@ -39,8 +39,8 @@ export function createComponent(
   customElements.define(name, Component);
 }
 
-export async function createInlineComponent(template: HTMLTemplateElement) {
-  const name = template.getAttribute("component");
+export async function createInlineComponent(template: HTMLTemplateElement, name = '') {
+  name ||= template.getAttribute("component");
   const setup = template.content.querySelector("script[setup]");
   const component: ComponentDefinition = { template };
 

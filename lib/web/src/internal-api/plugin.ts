@@ -1,10 +1,13 @@
 export function createDispatcher(hookNames: string[]) {
   const hooks: Record<string, any[]> = {};
-  for (const next of hookNames) {
-    hooks[next] = [];
-  }
 
   return {
+    reset() {
+      for (const next of hookNames) {
+        hooks[next] = [];
+      }
+    },
+
     use(plugin: object) {
       for (const next of hookNames) {
         if (plugin[next]) {
@@ -32,3 +35,5 @@ export const plugins = createDispatcher([
   "update",
   "destroy",
 ]);
+
+plugins.reset();

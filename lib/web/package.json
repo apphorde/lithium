@@ -1,6 +1,6 @@
 {
   "name": "@li3/web",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "exports": {
     ".": {
       "default": "./index.js",
