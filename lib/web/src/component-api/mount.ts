@@ -30,7 +30,7 @@ export function mount(element: DocumentFragment | Element | string, def: Compone
     setup,
     template,
     shadowDom,
-    props: options?.props,
+    initialValues: options?.props,
     parent: options?.parent,
   });
 }

@@ -19,8 +19,8 @@ export interface CreateInstanceProperties {
   setup?: Function;
   template?: HTMLTemplateElement | string;
   shadowDom?: ShadowRootInit | string;
-  props: any;
-  parent: any;
+  initialValues?: any;
+  parent?: any;
 }
 
 export interface RuntimeInternals extends CreateInstanceProperties {

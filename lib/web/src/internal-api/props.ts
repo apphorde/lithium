@@ -2,8 +2,8 @@ import { isElement } from "./dom.js";
 import { RuntimeInternals } from "./types.js";
 
 export function getPropValue($el: RuntimeInternals, property: string, definition: any) {
-  if ($el.props && property in $el.props) {
-    return $el.props[property];
+  if ($el.initialValues?.[property] !== undefined) {
+    return $el.initialValues[property];
   }
 
   if ($el.element.hasOwnProperty(property)) {
@@ -11,7 +11,7 @@ export function getPropValue($el: RuntimeInternals, property: string, definition
   }
 
   if (isElement($el.element) && $el.element.hasAttribute(property.toLowerCase())) {
-    return $el.element.getAttribute(property);
+    return $el.element.getAttribute(property.toLowerCase());
   }
 
   if (definition && definition.hasOwnProperty("default")) {

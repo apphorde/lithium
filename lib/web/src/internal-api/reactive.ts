@@ -23,8 +23,9 @@ export function fork(parent: any, child: any, callback: AnyFunction) {
 }
 
 export function createState($el: RuntimeInternals): void {
+  // TODO check if state keys and prop names have a conflict
   const componentData = $el.setup($el, $el.element) || {};
-  $el.state = $el.reactive.watchDeep({ ...componentData, ...$el.state });
+  $el.state = $el.reactive.watchDeep(componentData);
   $el.stateKeys = Object.keys($el.state);
 
   if ($el.parent) {

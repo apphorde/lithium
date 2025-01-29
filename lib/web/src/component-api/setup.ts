@@ -60,34 +60,37 @@ export function defineEvents(eventNames: any): EventEmitFunction {
   return emitEvent.bind(null, el);
 }
 
+export function inputRef<T = any>(name: string, initialValue?: T): Ref<T> {
+  const $el = getCurrentInstance();
+  const $ref = $el.reactive.ref<T>(initialValue);
+
+  if (!isElement($el.element)) {
+    return $ref;
+  }
+
+  Object.defineProperty($el.element, name, {
+    get() {
+      return $ref.value;
+    },
+    set(value) {
+      const oldValue = $ref.value;
+      $ref.value = value;
+      plugins.apply("update", [$el, name, oldValue, value]);
+      $el.update.forEach((f) => f($el, name, oldValue, value));
+    },
+  });
+
+  return $ref;
+}
+
 export function defineProps(definitions: string[] | Record<string, any>): any {
   const $el = getCurrentInstance();
-  const keys = !Array.isArray(definitions) ? Object.keys(definitions) : definitions;
-  const { element, state } = $el;
+  const propertyNames = !Array.isArray(definitions) ? Object.keys(definitions) : definitions;
   const props = {};
 
-  for (const property of keys) {
-    let initialValue = getPropValue($el, property, definitions[property]);
-
-    const $ref = $el.reactive.ref(initialValue);
-    state[property] = $ref;
-    props[property] = $ref;
-
-    if (!isElement(element)) {
-      continue;
-    }
-
-    Object.defineProperty(element, property, {
-      get() {
-        return $ref.value;
-      },
-      set(value) {
-        const oldValue = $ref.value;
-        $ref.value = value;
-        plugins.apply("update", [$el, property, oldValue, value]);
-        $el.update.forEach((f) => f($el, property, oldValue, value));
-      },
-    });
+  for (const property of propertyNames) {
+    const initialValue = getPropValue($el, property, definitions[property]);
+    $el.state[property] = props[property] = inputRef(property, initialValue);
   }
 
   return new Proxy(
