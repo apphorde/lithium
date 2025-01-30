@@ -1,51 +1,29 @@
-import { domReady, tpl } from "../internal-api/dom.js";
+import { domReady } from "../internal-api/dom.js";
 import { mount } from "../component-api/mount.js";
-import { createInlineComponent } from "./custom-elements";
+import { createInlineComponent, getComponentFromTemplate } from "./custom-elements";
 
-async function loadInitializer(init) {
-  if (init.charAt(0) === "{" || init.charAt(0) === "[") {
-    return () => JSON.parse(init);
-  }
+export async function bootstrap(template: HTMLTemplateElement, spec) {
+  const div = document.createElement('div');
+  template.parentNode.insertBefore(div, template);
 
-  if (window[init] && typeof window[init] === "function") {
-    return window[init];
-  }
-
-  try {
-    const mod = await import(new URL(init, location.href).toString());
-    const setup = mod.setup || mod.default;
-
-    if (typeof setup !== "function") {
-      return () => {
-        throw new Error("Invalid setup module at " + init);
-      };
-    }
-
-    return setup;
-  } catch {}
-
-  return () => ({});
+  return mount(div, spec);
 }
 
-export async function bootstrap(node) {
-  const init = node.getAttribute("lit-app");
-  const setup = await loadInitializer(init);
-  const template = node.querySelector("template") || tpl(node.innerHTML);
-
-  return mount(node, {
-    template,
-    setup: () => setup(),
-  });
-}
-
-domReady(async function () {
+domReady(function () {
   const inline: HTMLTemplateElement[] = Array.from(
     document.querySelectorAll("template[component]")
   );
 
+  const apps: HTMLTemplateElement[] = Array.from(
+    document.querySelectorAll("template[app]")
+  );
+
   for (const template of inline) {
-    await createInlineComponent(template);
+    createInlineComponent(template);
   }
 
-  document.querySelectorAll("[lit-app]").forEach(bootstrap);
+
+  for (const template of apps) {
+    getComponentFromTemplate(template).then((spec) => bootstrap(template, spec));
+  }
 });

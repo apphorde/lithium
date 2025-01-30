@@ -39,12 +39,9 @@ export function createComponent(
   customElements.define(name, Component);
 }
 
-export async function createInlineComponent(template: HTMLTemplateElement, name = '') {
-  name ||= template.getAttribute("component");
+export async function getComponentFromTemplate(template: HTMLTemplateElement): Promise<ComponentDefinition> {
   const setup = template.content.querySelector("script[setup]");
   const component: ComponentDefinition = { template };
-
-  if (!name) return;
 
   if (setup) {
     const href = setup.getAttribute("src");
@@ -56,5 +53,14 @@ export async function createInlineComponent(template: HTMLTemplateElement, name 
     component.setup = md.default;
   }
 
+  return component;
+}
+
+export async function createInlineComponent(template: HTMLTemplateElement, name = '') {
+  name ||= template.getAttribute("component");
+
+  if (!name) return;
+
+  const component = await getComponentFromTemplate(template);
   createComponent(name, component);
 }
