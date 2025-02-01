@@ -55,6 +55,10 @@ export function reactive<T extends object>(object: T, callback: VoidFunction, op
 
   return new Proxy(object, {
     set(target, p, value) {
+      if ((target as any)[p] === value) {
+        return;
+      }
+
       if (typeof value === "object" && value !== null && !options?.shallow) {
         value = reactive(value, callback, options);
       }

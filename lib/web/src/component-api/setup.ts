@@ -93,6 +93,7 @@ export function defineProps(definitions: string[] | Record<string, any>): any {
     $el.state[property] = props[property] = inputRef(property, initialValue);
   }
 
+  /*
   return new Proxy(
     { __w: true },
     {
@@ -114,6 +115,9 @@ export function defineProps(definitions: string[] | Record<string, any>): any {
       },
     }
   );
+  */
+
+  return props;
 }
 
 export function watch(expression: AnyFunction, effect?: AnyFunction): void {
