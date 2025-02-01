@@ -1,4 +1,4 @@
-import { ReactiveContext } from "@li3/reactive";
+import { ReactiveContext, type Ref } from "@li3/reactive";
 
 export type LifeCycleFunction = (runtime: LifeCycleObject) => void;
 export type UpdateLifeCycleFunction = (
@@ -31,6 +31,7 @@ export interface RuntimeInternals extends CreateInstanceProperties {
   scripts: Array<string>;
   stateKeys: string[];
   state: any;
+  props: Record<string, Ref<any>>;
 
   init: Array<LifeCycleFunction>;
   update: Array<UpdateLifeCycleFunction>;

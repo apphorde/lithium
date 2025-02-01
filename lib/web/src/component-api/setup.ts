@@ -1,7 +1,7 @@
 import { getCurrentInstance } from "../internal-api/stack.js";
 import { EventEmitFunction } from "../internal-api/types.js";
 import { defineEventOnElement, isElement, emitEvent } from "../internal-api/dom.js";
-import type { AnyFunction } from "../internal-api/types.js";
+import type { AnyFunction, RuntimeInternals } from "../internal-api/types.js";
 import type { Ref } from "@li3/reactive";
 import { getPropValue } from "../internal-api/props.js";
 import { plugins } from "../internal-api/plugin.js";
@@ -83,39 +83,23 @@ export function inputRef<T = any>(name: string, initialValue?: T): Ref<T> {
   return $ref;
 }
 
+export function syncProp($el: RuntimeInternals, p: string, value: any) {
+  if ($el.props[p] && $el.props[p].value !== value) {
+    $el.reactive.suspend();
+    $el.props[p].value = value;
+    $el.reactive.unsuspend();
+  }
+}
+
 export function defineProps(definitions: string[] | Record<string, any>): any {
   const $el = getCurrentInstance();
   const propertyNames = !Array.isArray(definitions) ? Object.keys(definitions) : definitions;
-  const props = {};
+  const props = $el.props;
 
   for (const property of propertyNames) {
     const initialValue = getPropValue($el, property, definitions[property]);
-    $el.state[property] = props[property] = inputRef(property, initialValue);
+    props[property] = inputRef(property, initialValue);
   }
-
-  /*
-  return new Proxy(
-    { __w: true },
-    {
-      get(_t, p) {
-        if (p === "__w") return true;
-
-        if (props[p]) {
-          return props[p].value;
-        }
-      },
-      set(_t, p, value) {
-        if (props[p] && props[p].value !== value) {
-          $el.reactive.suspend();
-          props[p].value = value;
-          $el.reactive.unsuspend();
-        }
-
-        return true;
-      },
-    }
-  );
-  */
 
   return props;
 }
@@ -126,11 +110,9 @@ export function watch(expression: AnyFunction, effect?: AnyFunction): void {
 
 export function computed<T>(fn: () => T): Ref<T> {
   const $ref = ref<T>(null, { shallow: true });
+
   watch(() => {
-    const v = fn();
-    if ($ref.value !== v) {
-      $ref.value = v;
-    }
+    $ref.value = fn();
   });
 
   return $ref;

@@ -18,7 +18,8 @@ export function createInstance(properties: CreateInstanceProperties): RuntimeInt
     template: !template ? null : typeof template === 'string' ? tpl(template) : template,
     stylesheets: [],
     scripts: [],
-    state: {},
+    state: null,
+    props: {},
     stateKeys: [],
     init: [],
     update: [],
@@ -32,7 +33,6 @@ export function createInstance(properties: CreateInstanceProperties): RuntimeInt
     const { reactive } = $el;
     reactive.suspend();
     createState($el);
-    plugins.apply("setup", [$el]);
     createDom($el);
     reactive.unsuspend();
     reactive.check();

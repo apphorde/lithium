@@ -1,4 +1,5 @@
 import type { AnyFunction, RuntimeInternals } from "./types";
+import { plugins } from "./plugin.js";
 
 export function fork(parent: any, child: any, callback: AnyFunction) {
   return new Proxy(child, {
@@ -25,7 +26,8 @@ export function fork(parent: any, child: any, callback: AnyFunction) {
 export function createState($el: RuntimeInternals): void {
   // TODO check if state keys and prop names have a conflict
   const componentData = $el.setup($el, $el.element) || {};
-  $el.state = $el.reactive.watchDeep(componentData);
+  const combinedState = { ...$el.props, ...componentData };
+  $el.state = $el.reactive.watchDeep(combinedState);
   $el.stateKeys = Object.keys($el.state);
 
   if ($el.parent) {
@@ -36,4 +38,6 @@ export function createState($el: RuntimeInternals): void {
 
   Object.freeze($el.state);
   Object.freeze($el.stateKeys);
+
+  plugins.apply("setup", [$el]);
 }
