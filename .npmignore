@@ -1,6 +1,8 @@
 src/
 project.json
 rollup.config.js
+tsconfig.json
+typedoc.json
 .git/
 .github/
 .npmrc
