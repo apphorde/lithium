@@ -64,3 +64,21 @@ export async function createInlineComponent(template: HTMLTemplateElement, name 
   const component = await getComponentFromTemplate(template);
   createComponent(name, component);
 }
+
+export async function loadTemplate(url: string | URL) {
+  const req = await fetch(url);
+
+  if (req.ok) {
+    const html = await req.text();
+    const dom = new DOMParser().parseFromString(html, 'text/html').body;
+    const template = dom.querySelector('template');
+    return template;
+  }
+
+  throw new Error('Unable to load ' + url + ': ' + req.statusText);
+}
+
+export async function loadAndParse(url: string | URL) {
+  const t = await loadTemplate(url);
+  return createInlineComponent(t);
+}
