@@ -39,9 +39,18 @@ export function createComponent(
   customElements.define(name, Component);
 }
 
+export function getShadowDomValue(source: string): ShadowRootInit {
+  if (!source) return;
+
+  source = String(source);
+
+  return source.startsWith("{") ? JSON.parse(source) : { mode: source };
+}
+
 export async function getComponentFromTemplate(template: HTMLTemplateElement): Promise<ComponentDefinition> {
   const setup = template.content.querySelector("script[setup]");
-  const component: ComponentDefinition = { template };
+  const shadowDom = template.getAttribute('shadow-dom');
+  const component: ComponentDefinition = { template, shadowDom: getShadowDomValue(shadowDom) };
 
   if (setup) {
     const href = setup.getAttribute("src");

@@ -17,12 +17,11 @@ A single-file component has usually two parts: a `template` and a `script`. Opti
 
 ## `<template>`
 
-A `template` can define options for [ShadowDOM](https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow).
+A `template` can define options for [ShadowDOM](https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow) in an attribute.
 `shadow-dom` can either be a string or a JSON. For simplicity, `open` or `closed` are accepted as strings.
 Otherwise, a JSON object with the same options passed to `element.attachShadow()` can also be provided.
 
-If no shadow-dom attribute is provided, the component behaves like a regular DOM structure, with the content of `<template>` processed
-and appended to the custom element's root node.
+If no shadow-dom attribute is provided, the component behaves like a regular DOM structure, with the content of `<template>` processed and appended to the custom element's root node.
 
 ## `<script>`
 
@@ -55,20 +54,23 @@ A component with only setup code:
 A component with a template using shadowDom, a script and styles:
 
 ```html
-<template shadow-dom="open">
+<template component="greeting-card" shadow-dom="open">
   <div class="hello">Hello, {{ name }}!</div>
+
+  <script setup>
+    import { defineProps } from "@li3/web";
+
+    export default function() {
+      defineProps(["name"]);
+    }
+  </script>
+
+  <style>
+    .hello {
+      font-size: 3rem;
+    }
+  </style>
 </template>
-
-<script>
-  import { defineProps } from "@li3/web";
-  defineProps(["name"]);
-</script>
-
-<style>
-  .hello {
-    font-size: 3rem;
-  }
-</style>
 ```
 
 A component that has only a template:
