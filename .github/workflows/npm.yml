@@ -33,6 +33,5 @@ jobs:
         run: |
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
           echo "//registry.npmjs.org/:always-auth=true" >> .npmrc
-          # pnpx nx run-many -t publish
           pnpm publish -r --no-git-checks --access public
 
