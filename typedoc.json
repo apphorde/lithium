@@ -4,6 +4,7 @@
   "name": "Li3",
   "entryPointStrategy": "packages",
   "includeVersion": false,
+  "projectDocuments": ["docs/*.md"],
   "packageOptions": {
     "includeVersion": true,
     "entryPoints": ["src/index.ts"]

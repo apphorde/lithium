@@ -34,7 +34,7 @@ import { plugins } from './internal-api/plugin.js';
 
 // re-export reactive API
 import { unref, isRef, ref as createRef } from "@li3/reactive";
-export { type Ref, unref, isRef } from "@li3/reactive";
+export { type Ref, unref, isRef, debounce } from "@li3/reactive";
 
 export const Reactive = { createState, fork, isRef, unref, ref: createRef };
 export const DOM = { ...dom };
@@ -68,7 +68,7 @@ export const Lithium = {
   Options,
   Component,
   Plugins,
-  API,
+  API: { ...API },
 };
 
 window["Lithium"] = Lithium;
