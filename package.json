@@ -15,6 +15,7 @@
     "typescript": "^5.7.3"
   },
   "scripts": {
-    "docs": "npx -y typedoc"
+    "docs": "npx -y typedoc",
+    "ci:publish": "pnpm publish -r"
   }
 }

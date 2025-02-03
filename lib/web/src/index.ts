@@ -1,21 +1,26 @@
 import { getOption, setOption } from "./internal-api/options.js";
 
-export type * from "./internal-api/types.js";
-export { getOption, setOption } from "./internal-api/options.js";
-export { createDispatcher, plugins } from "./internal-api/plugin.js";
-
+// internal tools
 import { createState, fork } from "./internal-api/reactive.js";
-export { getCurrentInstance, pop, push } from "./internal-api/stack.js";
+import { pop, push, getCurrentInstance } from "./internal-api/stack.js";
 import * as dom from "./internal-api/dom.js";
 
+export type * from "./internal-api/types.js";
+export { createDispatcher } from "./internal-api/plugin.js";
+export { getCurrentInstance } from "./internal-api/stack.js";
 export { tpl, domReady } from "./internal-api/dom.js";
+
+// public API
+import * as API from "./component-api/setup.js";
+import { getComponentFromTemplate, loadAndParse } from "./component-api/custom-elements.js";
+
 export * from "./component-api/setup.js";
 export { inject, provide } from "./component-api/inject.js";
 export { createComponent, createInlineComponent } from "./component-api/custom-elements.js";
-import { getComponentFromTemplate, loadAndParse } from "./component-api/custom-elements.js";
 export { mount } from "./component-api/mount.js";
 export { bootstrap } from "./component-api/bootstrap.js";
 
+// plugins
 import { createAttributeBinding, createPropertyBinding } from "./plugins/property-binding.plugin.js";
 import { createEventBinding } from "./plugins/event-handler.plugin.js";
 import { addScriptToPage, adoptStyleSheet, injectStylesheetOnElement } from "./plugins/inject-resources.plugin.js";
@@ -27,12 +32,15 @@ import { templateIf } from "./plugins/template-if.plugin.js";
 import { createTextNodeBinding } from "./plugins/text-template.plugin.js";
 import { plugins } from './internal-api/plugin.js';
 
-import { unref, isRef } from "@li3/reactive";
+// re-export reactive API
+import { unref, isRef, ref as createRef } from "@li3/reactive";
 export { type Ref, unref, isRef } from "@li3/reactive";
 
-export const Reactive = { createState, fork, isRef, unref };
+export const Reactive = { createState, fork, isRef, unref, ref: createRef };
 export const DOM = { ...dom };
 export const Component = { fromTemplate: getComponentFromTemplate, load: loadAndParse };
+export const Options = { getOption, setOption };
+export const Stack = { pop, push, getCurrentInstance };
 export const Plugins = {
     use: plugins.use,
     addScriptToPage,
@@ -49,13 +57,16 @@ export const Plugins = {
     templateIf,
   };
 
-window["Lithium"] = {
-  setOption,
-  getOption,
-  Reactive,
+export const Lithium = {
+  Options,
+  Component,
   DOM,
-  Plugins
+  Plugins,
+  Reactive,
+  API,
 };
+
+window["Lithium"] = Lithium;
 
 if (window.name === "debug") {
   setOption("debugEnabled", true);
