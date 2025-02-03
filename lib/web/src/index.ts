@@ -15,7 +15,7 @@ import * as API from "./component-api/setup.js";
 import { getComponentFromTemplate, loadAndParse } from "./component-api/custom-elements.js";
 
 export * from "./component-api/setup.js";
-export { inject, provide } from "./component-api/inject.js";
+import { createComponent, createInlineComponent } from "./component-api/custom-elements.js";
 export { createComponent, createInlineComponent } from "./component-api/custom-elements.js";
 export { mount } from "./component-api/mount.js";
 export { bootstrap } from "./component-api/bootstrap.js";
@@ -38,9 +38,14 @@ export { type Ref, unref, isRef } from "@li3/reactive";
 
 export const Reactive = { createState, fork, isRef, unref, ref: createRef };
 export const DOM = { ...dom };
-export const Component = { fromTemplate: getComponentFromTemplate, load: loadAndParse };
 export const Options = { getOption, setOption };
 export const Stack = { pop, push, getCurrentInstance };
+export const Component = {
+  fromTemplate: getComponentFromTemplate,
+  load: loadAndParse,
+  create: createComponent,
+  createInline: createInlineComponent
+};
 export const Plugins = {
     use: plugins.use,
     addScriptToPage,

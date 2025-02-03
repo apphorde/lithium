@@ -39,18 +39,17 @@ export function createComponent(
   customElements.define(name, Component);
 }
 
-export function getShadowDomValue(source: string): ShadowRootInit {
-  if (!source) return;
+export function getShadowDomOptions(template: HTMLTemplateElement): ShadowRootInit {
+  const source = template.getAttribute('shadow-dom') || '';
 
-  source = String(source);
-
-  return source.startsWith("{") ? JSON.parse(source) : { mode: source };
+  if (source) {
+    return source.startsWith("{") ? JSON.parse(source) : { mode: source };
+  }
 }
 
 export async function getComponentFromTemplate(template: HTMLTemplateElement): Promise<ComponentDefinition> {
   const setup = template.content.querySelector("script[setup]");
-  const shadowDom = template.getAttribute('shadow-dom');
-  const component: ComponentDefinition = { template, shadowDom: getShadowDomValue(shadowDom) };
+  const component: ComponentDefinition = { template, shadowDom: getShadowDomOptions(template) };
 
   if (setup) {
     const href = setup.getAttribute("src");
@@ -65,15 +64,31 @@ export async function getComponentFromTemplate(template: HTMLTemplateElement): P
   return component;
 }
 
+/**
+ * Creates a custom element from a template element
+ *
+ * @param template The template element to create a component from
+ * @param name Optional. Name of the custom element, if not provided it will be taken from the 'component' attribute
+ */
 export async function createInlineComponent(template: HTMLTemplateElement, name = '') {
   name ||= template.getAttribute("component");
 
-  if (!name) return;
+  if (!name) {
+    throw new Error('Component name is required');
+  }
 
   const component = await getComponentFromTemplate(template);
   createComponent(name, component);
 }
 
+/**
+ * Loads a component template from a URL. The source must be a valid HTML template element,
+ * with a <script setup> block if the component requires a setup function.
+ * <style> tags are also supported as usual.
+ *
+ * @param url
+ * @returns
+ */
 export async function loadTemplate(url: string | URL) {
   const req = await fetch(url);
 
@@ -87,6 +102,11 @@ export async function loadTemplate(url: string | URL) {
   throw new Error('Unable to load ' + url + ': ' + req.statusText);
 }
 
+/**
+ * Loads a component from a URL and registers it as a custom element
+ * @param url
+ * @returns {Promise<void>}
+ */
 export async function loadAndParse(url: string | URL) {
   const t = await loadTemplate(url);
   return createInlineComponent(t);

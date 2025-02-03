@@ -17,6 +17,6 @@
   },
   "scripts": {
     "docs": "npx -y typedoc",
-    "ci:publish": "pnpm publish -r"
+    "ci:publish": "pnpm publish -r --no-git-checks --access public"
   }
 }
