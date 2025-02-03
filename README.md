@@ -8,7 +8,7 @@ Lithium (Li³) is a lightweight element (get it?) library to author web componen
 
 ## Importing the library
 
-We can use 2 ESM features to load li3 and it's sub-modules: [**import map**](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap) and [**module script type**](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#applying_the_module_to_your_html)
+We can use two ESM features to load li3 and it's sub-modules: [**import map**](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap) and [**module script type**](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#applying_the_module_to_your_html)
 
 ```html
 <!-- the import map will let any @li3 package to load with a short name -->
@@ -95,7 +95,7 @@ The same way you bind a property:
 
 `attr-name="expression"`
 
-### Toggle a CSS class
+### How can I add/remove a CSS class based on a condition?
 
 Add the class name after the `class-` prefix to add/remove it based on the value of an expression
 
@@ -103,13 +103,20 @@ Add the class name after the `class-` prefix to add/remove it based on the value
 
 Invalid attribute name characters cannot be used for class bindings.
 
-### Listen to an event
+### How to listen to an event
 
 Any event listener can be attached to an element with the `on-` prefix.
 Event flags can be added after the event name, separated with a dot.
-Two arguments are provided to an event handler: `$event` and `$flags`
 
-`on-click.prevent="expression($event, $flags)"`
+Two arguments are provided to an event handler: `$event` and `$flags`.
+Use the `stop` flag to call `.stopPropagation()`, and `prevent` to call `.preventDefault()` in the event.
+Native API flags like `capture` and `once` can be set via flags too, or any custom flag you wish to use.
+
+Here we call `onButtonClick(mouseEvent, { prevent: true, primary: true })`:
+
+```html
+<button on-click.prevent.primary="onButtonClick($event, $flags)">OK</button>
+```
 
 ### Create reference to a node
 

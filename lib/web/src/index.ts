@@ -63,11 +63,11 @@ export const Plugins = {
   };
 
 export const Lithium = {
+  Reactive,
+  DOM,
   Options,
   Component,
-  DOM,
   Plugins,
-  Reactive,
   API,
 };
 
