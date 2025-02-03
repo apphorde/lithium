@@ -72,20 +72,21 @@ export function defineEvent(name: string) {
 export function defineProps(definitions: string[] | Record<string, PropDefinition<any>>): any {
   const $el = getCurrentInstance();
   const propertyNames = !Array.isArray(definitions) ? Object.keys(definitions) : definitions;
-  const props = $el.props;
 
   for (const property of propertyNames) {
-    const initialValue = getPropValue($el, property, definitions[property]);
-    props[property] = createInputRef($el, property, initialValue);
+    defineProp(property, definitions[property]);
   }
 
-  return props;
+  return $el.props;
 }
 
 export function defineProp<T>(property: string, definition?: PropDefinition<T>) {
   const $el = getCurrentInstance();
   const initialValue = getPropValue($el, property, definition);
-  $el.props[property] = createInputRef($el, property, initialValue);
+  const $ref = createInputRef($el, property, initialValue);
+  $el.props[property] = $ref;
+
+  return $ref;
 }
 
 export function syncProp($el: RuntimeInternals, p: string, value: any) {
@@ -102,10 +103,7 @@ export function watch(expression: AnyFunction, effect?: AnyFunction): void {
 
 export function computed<T>(fn: () => T): Ref<T> {
   const $ref = ref<T>(null, { shallow: true });
-
-  watch(() => {
-    $ref.value = fn();
-  });
+  watch(() =>  $ref.value = fn());
 
   return $ref;
 }
