@@ -94,7 +94,7 @@ export async function loadTemplate(url: string | URL) {
 
   if (req.ok) {
     const html = await req.text();
-    const dom = new DOMParser().parseFromString(html, 'text/html').body;
+    const dom = new DOMParser().parseFromString(html, 'text/html');
     const template = dom.querySelector('template');
     return template;
   }
