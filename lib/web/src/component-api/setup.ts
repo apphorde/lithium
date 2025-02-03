@@ -3,8 +3,7 @@ import { EventEmitFunction } from "../internal-api/types.js";
 import { defineEventOnElement, isElement, emitEvent } from "../internal-api/dom.js";
 import type { AnyFunction, RuntimeInternals } from "../internal-api/types.js";
 import type { Ref } from "@li3/reactive";
-import { getPropValue } from "../internal-api/props.js";
-import { plugins } from "../internal-api/plugin.js";
+import { createInputRef, getPropValue, type PropDefinition } from "../internal-api/props.js";
 
 export function loadCss(url: string): void {
   getCurrentInstance().stylesheets.push(url);
@@ -48,7 +47,7 @@ export function defineQuery(selector: string) {
   );
 }
 
-export function defineEvents(eventNames: any): EventEmitFunction {
+export function defineEvents(eventNames: string[]): EventEmitFunction {
   const el = getCurrentInstance().element;
 
   if (isElement(el)) {
@@ -60,27 +59,33 @@ export function defineEvents(eventNames: any): EventEmitFunction {
   return emitEvent.bind(null, el);
 }
 
-export function inputRef<T = any>(name: string, initialValue?: T): Ref<T> {
-  const $el = getCurrentInstance();
-  const $ref = $el.reactive.ref<T>(initialValue);
+export function defineEvent(name: string) {
+  const el = getCurrentInstance().element;
 
-  if (!isElement($el.element)) {
-    return $ref;
+  if (isElement(el)) {
+    defineEventOnElement(el, name);
   }
 
-  Object.defineProperty($el.element, name, {
-    get() {
-      return $ref.value;
-    },
-    set(value) {
-      const oldValue = $ref.value;
-      $ref.value = value;
-      plugins.apply("update", [$el, name, oldValue, value]);
-      $el.update.forEach((f) => f($el, name, oldValue, value));
-    },
-  });
+  return emitEvent.bind(null, el, name);
+}
 
-  return $ref;
+export function defineProps(definitions: string[] | Record<string, PropDefinition<any>>): any {
+  const $el = getCurrentInstance();
+  const propertyNames = !Array.isArray(definitions) ? Object.keys(definitions) : definitions;
+  const props = $el.props;
+
+  for (const property of propertyNames) {
+    const initialValue = getPropValue($el, property, definitions[property]);
+    props[property] = createInputRef($el, property, initialValue);
+  }
+
+  return props;
+}
+
+export function defineProp<T>(property: string, definition?: PropDefinition<T>) {
+  const $el = getCurrentInstance();
+  const initialValue = getPropValue($el, property, definition);
+  $el.props[property] = createInputRef($el, property, initialValue);
 }
 
 export function syncProp($el: RuntimeInternals, p: string, value: any) {
@@ -89,19 +94,6 @@ export function syncProp($el: RuntimeInternals, p: string, value: any) {
     $el.props[p].value = value;
     $el.reactive.unsuspend();
   }
-}
-
-export function defineProps(definitions: string[] | Record<string, any>): any {
-  const $el = getCurrentInstance();
-  const propertyNames = !Array.isArray(definitions) ? Object.keys(definitions) : definitions;
-  const props = $el.props;
-
-  for (const property of propertyNames) {
-    const initialValue = getPropValue($el, property, definitions[property]);
-    props[property] = inputRef(property, initialValue);
-  }
-
-  return props;
 }
 
 export function watch(expression: AnyFunction, effect?: AnyFunction): void {
