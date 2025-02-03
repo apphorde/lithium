@@ -6,51 +6,110 @@ A batteries-included library to build reactive interfaces.
 
 Lithium (Li³) is a lightweight element (get it?) library to author web components with the least amount of deviation from Web API's.
 
-## Template Syntax
+## Importing the library
 
-A component can be authored in plain HTML, and even inserted into a webpage directly into the source.
-That's because of the `<template>` tag: we can write _inert_ HTML inside a template, and replicate it as a custom element.
-
-Here's what we introduce _on top of the Web API_:
-
-- add a `component` attribute to tell `li3` what is the custom element name
-- optionally, add `shadow-dom` attribute to specify [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM) API options.
+We can use 2 ESM features to load li3 and it's sub-modules: [**import map**](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap) and [**module script type**](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#applying_the_module_to_your_html)
 
 ```html
-<template component="ui-card">
-  <div class="rounded-lg bg-white border my-4 p-4">
+<!-- the import map will let any @li3 package to load with a short name -->
+<script type="importmap">
+  { "imports": { "@li3/": "https://cdn.li3.dev/@li3/" } }
+</script>
+
+<!-- The script tag loads the main library and initializes all components -->
+<script type="module" src="https://cdn.li3.dev/@li3/web"></script>
+```
+
+## Template Syntax
+
+The [content template element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template) provides an API to include markup in a webpage without rendering it. The `template` elements also have a `.contents` property, which allows us to clone the entire template without modifying the original nodes.
+
+Another imporant aspect of templates is that scripts and styles are not activated either. We can include a `<script>` element inside a template and later use that source [as a module](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules).
+
+### `<script setup>` and `component` attribute
+
+Now that we know templates, let's expand on that API. A component can be authored in plain HTML, and even inserted into a webpage directly into the source.
+
+Here's what we introduce _on top of the standard API_:
+
+- add a `component` attribute to give `li3` the custom element name
+- optionally, add `shadow-dom` attribute to specify [Shadow DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM) API options.
+- inside the template, add a `<script setup>` tag to write the component logic. In that script, use [import](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#importing_features_into_your_script) statements to load `li3` and export a default value with a `setup` function:
+
+```html
+<template component="ui-card" shadow-dom="open">
+  <div class="card">
+    <span class="card-title">{{ title }}</span>
     <slot></slot>
   </div>
+  <script setup>
+    import { defineProp } from '@li3/web';
+    export default function uiCard() {
+      defineProp('title');
+    }
+  </script>
+  <style>
+    .card {
+      padding: 1rem;
+      margin: 1rem auto;
+      border-radius: 0.5rem;
+      border: 1px solid #333;
+      backgroud-color: white;
+    }
+    .card-title {
+      color: #999;
+      text-transform: upppercase;
+      font-size: 0.75rem;
+      display: inline-block;
+      padding: 0.5rem 0;
+    }
+  </style>
 </template>
 ```
 
 ## Component Syntax
 
-### Interpolate text
+Now that we know how to declare components, let's look at the template syntax for property bindings and events.
+
+### Text interpolation
+
+Use two curly brackets to mark text areas to interpolate:
 
 ```html
 <div>Hello, {{ name }}!</div>
 ```
 
-### Bind a property to a value
+### How to bind a property to a value?
 
-`bind-property="expression"`
+Add `bind-` prefix to a property name and an expression in the attribute to evaluate.
+For properties that need `camelCase` syntax, like `innerText`, use a dash format instead: `inner-text`.
+Acronyms like `inner-html` and `base-url` also work.
 
-> Note: Use dash-case for camelCase properties: `bind-inner-html="expression"`
+```html
+<tag bind-property="expression">
+```
 
-### Bind an attribute to a value
+### How to bind an attribute to a value?
+
+The same way you bind a property:
 
 `attr-name="expression"`
 
 ### Toggle a CSS class
 
-`class-font-bold="boolean"`
+Add the class name after the `class-` prefix to add/remove it based on the value of an expression
+
+`class-font-bold="booleanValue"`
 
 Invalid attribute name characters cannot be used for class bindings.
 
 ### Listen to an event
 
-`on-click="expression($event)"`
+Any event listener can be attached to an element with the `on-` prefix.
+Event flags can be added after the event name, separated with a dot.
+Two arguments are provided to an event handler: `$event` and `$flags`
+
+`on-click.prevent="expression($event, $flags)"`
 
 ### Create reference to a node
 
@@ -73,20 +132,15 @@ function setup() {
 }
 ```
 
-## Usage
+## Other tools and helpers
+
+### tpl(html: string)
 
 At runtime, the `tpl` function can help with parsing an HTML text.
 
 ```ts
 import { tpl, createComponent, defineProps } from "@li3/web";
-
 const template = tpl`<div>Hello, {{name}}!</div>`;
-
-function setup() {
-  defineProps(["name"]);
-}
-
-export default createComponent("user-greeting", { setup, template });
 ```
 
 ## Dependency Injection and Providers
