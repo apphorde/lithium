@@ -1,32 +1,32 @@
-import { getCurrentInstance } from "../internal-api/stack.js";
+import { getCurrentContext } from "../internal-api/stack.js";
 import { EventEmitFunction } from "../internal-api/types.js";
 import { defineEventOnElement, isElement, emitEvent } from "../internal-api/dom.js";
-import type { AnyFunction, RuntimeInternals } from "../internal-api/types.js";
+import type { AnyFunction } from "../internal-api/types.js";
 import type { Ref } from "@li3/reactive";
 import { createInputRef, getPropValue, type PropDefinition } from "../internal-api/props.js";
 
 export function loadCss(url: string): void {
-  getCurrentInstance().stylesheets.push(url);
+  getCurrentContext().stylesheets.push(url);
 }
 
 export function loadScript(url: string): void {
-  getCurrentInstance().scripts.push(url);
+  getCurrentContext().scripts.push(url);
 }
 
 export function onInit(fn: VoidFunction): void {
-  getCurrentInstance().init.push(fn);
+  getCurrentContext().init.push(fn);
 }
 
 export function onUpdate(fn: VoidFunction): void {
-  getCurrentInstance().update.push(fn);
+  getCurrentContext().update.push(fn);
 }
 
 export function onDestroy(fn: VoidFunction): void {
-  getCurrentInstance().destroy.push(fn);
+  getCurrentContext().destroy.push(fn);
 }
 
 export function defineQuery(selector: string) {
-  const $el = getCurrentInstance();
+  const $el = getCurrentContext();
   const root = ($el.element as Element).shadowRoot || $el.element;
 
   return new Proxy(
@@ -48,7 +48,7 @@ export function defineQuery(selector: string) {
 }
 
 export function defineEvents(eventNames: string[]): EventEmitFunction {
-  const el = getCurrentInstance().element;
+  const el = getCurrentContext().element;
 
   if (isElement(el)) {
     for (const event of eventNames) {
@@ -60,7 +60,7 @@ export function defineEvents(eventNames: string[]): EventEmitFunction {
 }
 
 export function defineEvent(name: string) {
-  const el = getCurrentInstance().element;
+  const el = getCurrentContext().element;
 
   if (isElement(el)) {
     defineEventOnElement(el, name);
@@ -70,7 +70,7 @@ export function defineEvent(name: string) {
 }
 
 export function defineProps(definitions: string[] | Record<string, PropDefinition<any>>): any {
-  const $el = getCurrentInstance();
+  const $el = getCurrentContext();
   const propertyNames = !Array.isArray(definitions) ? Object.keys(definitions) : definitions;
 
   for (const property of propertyNames) {
@@ -81,7 +81,7 @@ export function defineProps(definitions: string[] | Record<string, PropDefinitio
 }
 
 export function defineProp<T>(property: string, definition?: PropDefinition<T>) {
-  const $el = getCurrentInstance();
+  const $el = getCurrentContext();
   const initialValue = getPropValue($el, property, definition);
   const $ref = createInputRef($el, property, initialValue);
   $el.props[property] = $ref;
@@ -89,39 +89,30 @@ export function defineProp<T>(property: string, definition?: PropDefinition<T>) 
   return $ref;
 }
 
-export function syncProp($el: RuntimeInternals, p: string, value: any) {
-  if ($el.props[p] && $el.props[p].value !== value) {
-    $el.reactive.suspend();
-    $el.props[p].value = value;
-    $el.reactive.unsuspend();
-  }
-}
-
 export function watch(expression: AnyFunction, effect?: AnyFunction): void {
-  return getCurrentInstance().reactive.watch(expression, effect);
+  return getCurrentContext().reactive.watch(expression, effect);
 }
 
 export function computed<T>(fn: () => T): Ref<T> {
   const $ref = ref<T>(null, { shallow: true });
-  watch(() =>  $ref.value = fn());
+  watch(() => ($ref.value = fn()));
 
   return $ref;
 }
 
 export function ref<T>(value?: T, options?): Ref<T> {
-  return getCurrentInstance().reactive.ref(value, options);
+  return getCurrentContext().reactive.ref(value, options);
 }
 
 export function shallowRef<T>(value?: T, options = {}): Ref<T> {
   return ref(value, { ...options, shallow: true });
 }
 
-
 type InjectionEvent<T> = CustomEvent & { result?: T };
 
 export function provide<T>(token: Symbol, provider): void {
   const fn = typeof provider === "function" ? provider : () => provider;
-  const { element } = getCurrentInstance();
+  const { element } = getCurrentContext();
 
   element.addEventListener("$inject", (e: InjectionEvent<T>) => {
     if (e.detail === token) {
@@ -132,7 +123,7 @@ export function provide<T>(token: Symbol, provider): void {
 }
 
 export function inject<T>(token: any) {
-  const { element } = getCurrentInstance();
+  const { element } = getCurrentContext();
   const event = new CustomEvent("$inject", {
     detail: token,
     bubbles: true,

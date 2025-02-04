@@ -2,27 +2,27 @@ import { plugins } from "../internal-api/plugin.js";
 import { mount } from "../component-api/mount.js";
 import { defineProps } from "../component-api/setup.js";
 import { unref } from "@li3/reactive";
-import type { RuntimeInternals } from "../internal-api/types.js";
+import type { RuntimeContext } from "../internal-api/types.js";
 import { getOption } from "../internal-api/options.js";
 import { compileExpression, wrapTryCatch } from "../internal-api/expressions.js";
 
 const VM = Symbol("@@FOR");
 
 interface NodeCacheEntry {
-  $el: RuntimeInternals;
+  $el: RuntimeContext;
   nodes: ChildNode[];
 }
 
-interface Context {
+interface TemplateForRuntimeContext {
   nodeCache: NodeCacheEntry[];
   itemName: string;
   indexName: string;
-  $el: RuntimeInternals;
+  $el: RuntimeContext;
   template: HTMLTemplateElement;
 }
 
 plugins.use({
-  appendDom($el: RuntimeInternals) {
+  createDom($el: RuntimeContext) {
     const { element } = $el;
     const templates: HTMLTemplateElement[] = Array.from(
       (element["shadowRoot"] || element).querySelectorAll("template[for]")
@@ -34,7 +34,7 @@ plugins.use({
   },
 });
 
-export function templateForOf(template: HTMLTemplateElement, $el: RuntimeInternals) {
+export function templateForOf(template: HTMLTemplateElement, $el: RuntimeContext) {
   const nodeCache: NodeCacheEntry[] = [];
   const expression = template.getAttribute("for");
   const [iteration, source] = expression.split("of").map((s) => s.trim());
@@ -45,7 +45,7 @@ export function templateForOf(template: HTMLTemplateElement, $el: RuntimeInterna
         .map((s) => s.trim())
     : [iteration, "index"];
 
-  const context: Context = { itemName, indexName, nodeCache, $el, template };
+  const context: TemplateForRuntimeContext = { itemName, indexName, nodeCache, $el, template };
 
   function onListChange(list: any[]) {
     list = unref(list);
@@ -104,7 +104,7 @@ function findLastNode(nodeCache: NodeCacheEntry[]) {
   }
 }
 
-function resize(context: Context, newLength: number, list?: any[]) {
+function resize(context: TemplateForRuntimeContext, newLength: number, list?: any[]) {
   const { nodeCache } = context;
 
   if (newLength === nodeCache.length) {
@@ -153,7 +153,7 @@ function resize(context: Context, newLength: number, list?: any[]) {
   return newElements;
 }
 
-function createCacheEntry(context: Context, props: any): NodeCacheEntry {
+function createCacheEntry(context: TemplateForRuntimeContext, props: any): NodeCacheEntry {
   const { $el, template, itemName, indexName } = context;
   const contextProperties = [itemName, indexName, "$first", "$last", "$odd", "$even"];
 
@@ -167,7 +167,7 @@ function createCacheEntry(context: Context, props: any): NodeCacheEntry {
   return { nodes: Array.from(itemFragment.childNodes), $el: childState };
 }
 
-function updateStateOfCacheEntries(context: Context, list: any[]) {
+function updateStateOfCacheEntries(context: TemplateForRuntimeContext, list: any[]) {
   const { nodeCache, itemName } = context;
   let index = 0;
 

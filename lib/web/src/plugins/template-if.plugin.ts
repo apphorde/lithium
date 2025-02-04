@@ -1,10 +1,10 @@
 import { plugins } from "../internal-api/plugin.js";
 import { compileExpression } from "../internal-api/expressions.js";
 import { mount } from "../component-api/mount.js";
-import type { RuntimeInternals } from "../internal-api/types.js";
+import type { RuntimeContext } from "../internal-api/types.js";
 
 plugins.use({
-  appendDom($el: RuntimeInternals) {
+  createDom($el: RuntimeContext) {
     const { element } = $el;
     const templates: HTMLTemplateElement[] = Array.from(
       (element["shadowRoot"] || element).querySelectorAll("template[if]")
@@ -16,7 +16,7 @@ plugins.use({
   },
 });
 
-export async function templateIf(template: HTMLTemplateElement, $el: RuntimeInternals) {
+export async function templateIf(template: HTMLTemplateElement, $el: RuntimeContext) {
   const expression = template.getAttribute("if");
   const getter = compileExpression($el, expression);
   const previousNodes = [];

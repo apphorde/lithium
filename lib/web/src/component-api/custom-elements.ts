@@ -1,16 +1,17 @@
-import { mount } from "./mount.js";
-import type {
-  AnyFunction,
-  ComponentDefinition,
-} from "../internal-api/types.js";
+import { activateContext, createRuntimeContext } from "../internal-api/lifecycle.js";
+import { domReady } from "../internal-api/dom.js";
+
+import type { AnyFunction, ComponentDefinition, RuntimeContext } from "../internal-api/types.js";
 import { createBlobModule } from "../internal-api/expressions";
 
 export const DefineComponent = Symbol("@@def");
 
-export function createComponent(
-  name: string,
-  def: ComponentDefinition | AnyFunction
-): void {
+/**
+ * Create a custom element from a component definition
+ * @param name The name of the custom element. Must follow the custom element naming rules
+ * @param def The component definition. Can be a setup function or an object with a setup function and other options
+ */
+export function createComponent(name: string, def: ComponentDefinition | AnyFunction): void {
   if (typeof def === "function") {
     def = { setup: def } as ComponentDefinition;
   }
@@ -111,3 +112,68 @@ export async function loadAndParse(url: string | URL) {
   const t = await loadTemplate(url);
   return createInlineComponent(t);
 }
+
+const mounted = Symbol();
+
+export interface MountOptions {
+  props?: any;
+  parent?: RuntimeContext;
+}
+
+/**
+ * Mount a component to a target element
+ * @param element The target element to mount the component to
+ * @param def The component definition
+ * @param options Optional. Props to pass to the component or a parent context to inherit from
+ */
+export function mount(element: DocumentFragment | Element | string, def: ComponentDefinition, options?: MountOptions) {
+  if (typeof element === "string") {
+    element = document.querySelector(element);
+  }
+
+  if (!element) {
+    throw new Error("Target element not found");
+  }
+
+  // custom element was moved betwen parents and does not need to mount again
+  if (element[mounted]) {
+    return;
+  }
+
+  element[mounted] = true;
+  const { setup, template, shadowDom } = def;
+
+  const $el = createRuntimeContext({
+    element,
+    setup,
+    template,
+    shadowDom,
+    initialValues: options?.props,
+    parent: options?.parent,
+  });
+
+  activateContext($el);
+
+  return $el;
+}
+
+export async function createApp(template: HTMLTemplateElement, spec) {
+  const div = document.createElement("div");
+  div.style.display = "contents";
+  template.parentNode.insertBefore(div, template);
+
+  return mount(div, spec);
+}
+
+domReady(function () {
+  const inline: HTMLTemplateElement[] = Array.from(document.querySelectorAll("template[component]"));
+  const apps: HTMLTemplateElement[] = Array.from(document.querySelectorAll("template[app]"));
+
+  for (const template of inline) {
+    createInlineComponent(template);
+  }
+
+  for (const template of apps) {
+    getComponentFromTemplate(template).then((spec) => createApp(template, spec));
+  }
+});

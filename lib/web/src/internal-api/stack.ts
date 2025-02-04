@@ -1,8 +1,8 @@
-import type { RuntimeInternals } from "./types.js";
+import type { RuntimeContext } from "./types.js";
 
-const stack: RuntimeInternals[] = [];
+const stack: RuntimeContext[] = [];
 
-export function push(item: RuntimeInternals) {
+export function push(item: RuntimeContext) {
   return stack.push(item);
 }
 
@@ -10,6 +10,6 @@ export function pop() {
   return stack.pop();
 }
 
-export function getCurrentInstance(): RuntimeInternals {
+export function getCurrentContext(): RuntimeContext {
   return stack[stack.length - 1];
 }

@@ -1,7 +1,7 @@
 import { setEventHandler } from "../internal-api/dom.js";
 import { compileExpression } from "../internal-api/expressions.js";
 import { plugins } from "../internal-api/plugin.js";
-import { RuntimeInternals } from "../internal-api/types";
+import { RuntimeContext } from "../internal-api/types";
 
 plugins.use({
   applyAttribute($el, node: Element, attribute: string, value: string) {
@@ -11,12 +11,7 @@ plugins.use({
   },
 });
 
-export function createEventBinding(
-  $el: RuntimeInternals,
-  element: Element,
-  attribute: string,
-  expression: string
-): void {
+export function createEventBinding($el: RuntimeContext, element: Element, attribute: string, expression: string): void {
   const [eventName, ...flags] = attribute.split(".");
   const exec = compileExpression($el, expression, ["$event", "$flags"]);
   const options = {};

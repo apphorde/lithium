@@ -1,4 +1,4 @@
-import type { AnyFunction, Attribute, RuntimeInternals } from "./types.js";
+import type { AnyFunction, Attribute, RuntimeContext } from "./types.js";
 import { plugins } from "./plugin.js";
 import { unref } from "@li3/reactive";
 
@@ -11,7 +11,7 @@ export function setProperty(el: Element, property: string, value: any): void {
 export function setEventHandler(el: EventTarget, eventName: string, handler: AnyFunction, options?: any): void {
   el.addEventListener(
     eventName,
-    function(event: Event) {
+    function (event: Event) {
       options.stop && event.stopPropagation();
       options.prevent && event.preventDefault();
       handler(event);
@@ -114,7 +114,7 @@ export function clearElement(element: Element | DocumentFragment) {
   element.innerHTML = "";
 }
 
-export function createDom($el: RuntimeInternals): void {
+export function createDom($el: RuntimeContext): void {
   if (!$el.template) {
     return;
   }
@@ -169,13 +169,13 @@ export function emitEvent(element: Element, eventName: string, detail: any): voi
 
 export function mapContentToSlots(content: Array<ChildNode>, element: Element | DocumentFragment) {
   const slots: Record<string, HTMLSlotElement> = {};
-  element.querySelectorAll('slot').forEach(slot => slots[slot.name || 'default'] = slot);
+  element.querySelectorAll("slot").forEach((slot) => (slots[slot.name || "default"] = slot));
 
   const frag = document.createDocumentFragment();
   frag.append(...content);
 
-  frag.querySelectorAll('[slot]').forEach(element => {
-    const slotName = element.getAttribute('slot');
+  frag.querySelectorAll("[slot]").forEach((element) => {
+    const slotName = element.getAttribute("slot");
     if (slots[slotName]) {
       slots[slotName].append(element);
     }

@@ -1,4 +1,4 @@
-import type { AnyFunction, RuntimeInternals } from "./types";
+import type { AnyFunction, RuntimeContext } from "./types";
 import { plugins } from "./plugin.js";
 
 export function fork(parent: any, child: any, callback: AnyFunction) {
@@ -23,7 +23,7 @@ export function fork(parent: any, child: any, callback: AnyFunction) {
   });
 }
 
-export function createState($el: RuntimeInternals): void {
+export function createState($el: RuntimeContext): void {
   // TODO check if state keys and prop names have a conflict
   const componentData = $el.setup($el, $el.element) || {};
   const combinedState = { ...$el.props, ...componentData };

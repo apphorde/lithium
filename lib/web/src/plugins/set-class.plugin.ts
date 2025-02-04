@@ -2,7 +2,7 @@ import { setClassName } from "../internal-api/dom.js";
 import { compileExpression, wrapTryCatch } from "../internal-api/expressions.js";
 import { plugins } from "../internal-api/plugin.js";
 import { watch } from "../component-api/setup.js";
-import { RuntimeInternals } from "../internal-api/types";
+import { RuntimeContext } from "../internal-api/types";
 
 plugins.use({
   applyAttribute($el, node, attribute, value) {
@@ -13,7 +13,7 @@ plugins.use({
 });
 
 export function createClassBinding(
-  $el: RuntimeInternals,
+  $el: RuntimeContext,
   element: Element,
   classNames: string,
   expression: string

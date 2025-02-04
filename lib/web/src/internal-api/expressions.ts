@@ -1,4 +1,4 @@
-import { AnyFunction, RuntimeInternals } from "./types.js";
+import { AnyFunction, RuntimeContext } from "./types.js";
 import { unref } from "@li3/reactive";
 import { getOption } from "./options.js";
 
@@ -16,7 +16,7 @@ function unwrap(stateKeys, state) {
   return unwrapped;
 }
 
-export function compileExpression($el: RuntimeInternals, expression: string, args: string[] = []): AnyFunction {
+export function compileExpression($el: RuntimeContext, expression: string, args: string[] = []): AnyFunction {
   if (getOption("useModuleExpressions")) {
     return compileExpressionBlob($el, expression, args);
   }
@@ -34,7 +34,7 @@ export function createBlobModule(code: string, type = "text/javascript") {
 
 const modCache = new Map();
 
-export function compileExpressionBlob($el: RuntimeInternals, expression: string, args: string[] = []) {
+export function compileExpressionBlob($el: RuntimeContext, expression: string, args: string[] = []) {
   const { state, stateKeys } = $el;
   const fargs = ["__s", ...args].join(", ");
   const fasync = expression.includes("await ") ? "async " : "";
@@ -55,7 +55,7 @@ export function compileExpressionBlob($el: RuntimeInternals, expression: string,
   };
 }
 
-export function compileExpressionEval($el: RuntimeInternals, expression: string, args: string[] = []): AnyFunction {
+export function compileExpressionEval($el: RuntimeContext, expression: string, args: string[] = []): AnyFunction {
   const { state, stateKeys } = $el;
   const code = `
   const {${stateKeys.join(", ")}} = __u(__s);

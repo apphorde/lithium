@@ -1,5 +1,5 @@
 import { ReactiveContext } from "@li3/reactive";
-import { CreateInstanceProperties, RuntimeInternals } from "./types.js";
+import { CreateRuntimeOptions, RuntimeContext } from "./types.js";
 import { plugins } from "./plugin.js";
 import { createState } from "./reactive.js";
 import { push, pop } from "./stack.js";
@@ -9,13 +9,14 @@ import { getOption } from "./options.js";
 const noop = () => {};
 const VM = Symbol("@@Runtime");
 
-export function createInstance(properties: CreateInstanceProperties): RuntimeInternals {
+export function createRuntimeContext(properties: CreateRuntimeOptions): RuntimeContext {
   const { setup = noop, template, shadowDom } = properties;
-  const $el: RuntimeInternals = {
+
+  const $el: RuntimeContext = {
     ...properties,
     shadowDom: typeof shadowDom === "string" ? ({ mode: shadowDom } as ShadowRootInit) : shadowDom,
     setup,
-    template: !template ? null : typeof template === 'string' ? tpl(template) : template,
+    template: !template ? null : typeof template === "string" ? tpl(template) : template,
     stylesheets: [],
     scripts: [],
     state: null,
@@ -27,6 +28,10 @@ export function createInstance(properties: CreateInstanceProperties): RuntimeInt
     reactive: new ReactiveContext(),
   };
 
+  return $el;
+}
+
+export function activateContext($el: RuntimeContext) {
   push($el);
 
   try {
@@ -34,9 +39,8 @@ export function createInstance(properties: CreateInstanceProperties): RuntimeInt
     reactive.suspend();
     createState($el);
     createDom($el);
-    reactive.unsuspend();
     reactive.check();
-
+    reactive.unsuspend();
     ($el.element as any).__destroy = () => {
       plugins.apply("destroy", [$el]);
       $el.destroy.forEach((f) => f($el));
@@ -49,10 +53,12 @@ export function createInstance(properties: CreateInstanceProperties): RuntimeInt
       $el.element[VM] = $el;
     }
   } catch (error) {
+    if (getOption("debugEnabled")) {
+      throw error;
+    }
+
     console.log("Failed to initialize component!", $el, error);
   }
 
   pop();
-
-  return $el;
 }

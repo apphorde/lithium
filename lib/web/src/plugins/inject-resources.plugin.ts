@@ -1,9 +1,9 @@
 import { createBlobModule } from "../internal-api/expressions";
 import { plugins } from "../internal-api/plugin.js";
-import type { RuntimeInternals } from "../internal-api/types.js";
+import type { RuntimeContext } from "../internal-api/types.js";
 
 plugins.use({
-  async appendDom($el: RuntimeInternals) {
+  async appendDom($el: RuntimeContext) {
     const { element, stylesheets, scripts } = $el;
 
     // TODO wait for scripts and stylesheets before component is mounted

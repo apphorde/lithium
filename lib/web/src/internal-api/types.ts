@@ -10,20 +10,20 @@ export type UpdateLifeCycleFunction = (
 
 export interface LifeCycleObject {
   element: Element | DocumentFragment;
-  template: HTMLTemplateElement;
+  template: HTMLTemplateElement | null;
   state: any;
 }
 
-export interface CreateInstanceProperties {
+export interface CreateRuntimeOptions {
   element: Element | DocumentFragment;
   setup?: Function;
   template?: HTMLTemplateElement | string;
   shadowDom?: ShadowRootInit | string;
   initialValues?: any;
-  parent?: any;
+  parent?: RuntimeContext;
 }
 
-export interface RuntimeInternals extends CreateInstanceProperties {
+export interface RuntimeContext extends CreateRuntimeOptions {
   setup: Function;
   template: HTMLTemplateElement | null;
   reactive: ReactiveContext;

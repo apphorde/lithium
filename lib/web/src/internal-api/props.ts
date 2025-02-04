@@ -1,11 +1,11 @@
-import type { Ref } from '@li3/reactive';
+import type { Ref } from "@li3/reactive";
 import { isElement } from "./dom.js";
-import { RuntimeInternals } from "./types.js";
-import { plugins } from './plugin.js';
+import { RuntimeContext } from "./types.js";
+import { plugins } from "./plugin.js";
 
-export type PropDefinition<T> = { type: Function, default: T | (() => T) };
+export type PropDefinition<T> = { type: Function; default: T | (() => T) };
 
-export function getPropValue<T>($el: RuntimeInternals, property: string, definition: PropDefinition<T>): T {
+export function getPropValue<T>($el: RuntimeContext, property: string, definition: PropDefinition<T>): T {
   if ($el.initialValues?.[property] !== undefined) {
     return $el.initialValues[property];
   }
@@ -28,7 +28,7 @@ export function getPropValue<T>($el: RuntimeInternals, property: string, definit
   }
 }
 
-export function createInputRef<T = any>($el: RuntimeInternals, name: string, initialValue?: T): Ref<T> {
+export function createInputRef<T = any>($el: RuntimeContext, name: string, initialValue?: T): Ref<T> {
   const $ref = $el.reactive.ref<T>(initialValue);
 
   if (!isElement($el.element)) {
@@ -48,4 +48,12 @@ export function createInputRef<T = any>($el: RuntimeInternals, name: string, ini
   });
 
   return $ref;
+}
+
+export function syncProp($el: RuntimeContext, p: string, value: any) {
+  if ($el.props[p] && $el.props[p].value !== value) {
+    $el.reactive.suspend();
+    $el.props[p].value = value;
+    $el.reactive.unsuspend();
+  }
 }
