@@ -1,5 +1,5 @@
 import { plugins } from "../internal-api/plugin.js";
-import { mount } from "../component-api/mount.js";
+import { mount } from "../component-api/custom-elements.js";
 import { defineProps } from "../component-api/setup.js";
 import { unref } from "@li3/reactive";
 import type { RuntimeContext } from "../internal-api/types.js";

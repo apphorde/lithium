@@ -1,6 +1,6 @@
 import { plugins } from "../internal-api/plugin.js";
 import { compileExpression } from "../internal-api/expressions.js";
-import { mount } from "../component-api/mount.js";
+import { mount } from "../component-api/custom-elements.js";
 import type { RuntimeContext } from "../internal-api/types.js";
 
 plugins.use({
