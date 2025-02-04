@@ -89,7 +89,7 @@ export function defineProp<T>(property: string, definition?: PropDefinition<T>) 
   return $ref;
 }
 
-export function watch(expression: AnyFunction, effect?: AnyFunction): void {
+export function watch(expression: AnyFunction | Ref<any>, effect?: AnyFunction): void {
   return getCurrentContext().reactive.watch(expression, effect);
 }
 

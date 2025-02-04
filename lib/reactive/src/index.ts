@@ -144,7 +144,8 @@ export class ReactiveContext implements ObservableContext {
       throw new Error("Watcher effect must be a function");
     }
 
-    this.observers.push(effect ? observer(getter, effect) : (getter as any));
+    const fn = effect ? observer(getter, effect) : (isRef(getter) ? () => getter.value : getter);
+    this.observers.push(fn);
   }
 
   ref<T>(initialValue: T | null, options?: RefOptions): Ref<T> {
