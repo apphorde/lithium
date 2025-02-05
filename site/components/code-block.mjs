@@ -4,7 +4,7 @@ import { defineProp, defineQuery, onInit } from "@li3/web";
 load();
 
 export default function codeBlock({ element }) {
-  const { language } = defineProp("language", "html");
+  const language = defineProp("language", "html");
   const pre = defineQuery("pre");
   const template = defineQuery("template");
   const source = (pre.one || template.one || element).innerHTML.trim() || "";
