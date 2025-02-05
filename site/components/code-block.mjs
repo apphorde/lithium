@@ -1,10 +1,10 @@
 import { load, highlight } from "https://highlight.jsfn.run/index.mjs";
-import { defineProps, defineQuery, onInit } from "@li3/web";
+import { defineProp, defineQuery, onInit } from "@li3/web";
 
 load();
 
 export default function codeBlock({ element }) {
-  const props = defineProps(["language"]);
+  const { language } = defineProp("language", "html");
   const pre = defineQuery("pre");
   const template = defineQuery("template");
   const source = (pre.one || template.one || element).innerHTML.trim() || "";
@@ -23,7 +23,7 @@ export default function codeBlock({ element }) {
 
   onInit(async () => {
     slot.one.innerHTML = await highlight(trimmedSource, {
-      language: props.language || "html",
+      language: language.value || "html",
     });
   });
 }
