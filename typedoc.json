@@ -8,5 +8,6 @@
   "packageOptions": {
     "includeVersion": true,
     "entryPoints": ["src/index.ts"]
-  }
+  },
+  "plugin": ["typedoc-unhoax-theme", "typedoc-plugin-mdn-links"]
 }
