@@ -9,5 +9,5 @@
     "includeVersion": true,
     "entryPoints": ["src/index.ts"]
   },
-  "plugin": ["typedoc-unhoax-theme", "typedoc-plugin-mdn-links", "typedoc-plugin-extras"]
+  "plugin": ["typedoc-unhoax-theme", "typedoc-plugin-mdn-links", "typedoc-plugin-extras", "./site/inject-li3.mjs"]
 }
