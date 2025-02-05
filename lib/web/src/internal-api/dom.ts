@@ -125,7 +125,7 @@ export function createDom($el: RuntimeContext): void {
   plugins.apply("createDom", [$el, dom]);
 
   traverseDom(dom, (node, attributes) => {
-    plugins.apply("createElement", [$el, node]);
+    plugins.apply("initElement", [$el, node]);
 
     if (!isElement(node) || !(Array.isArray(attributes) && attributes.length)) {
       return;
