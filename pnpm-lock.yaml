@@ -47,9 +47,6 @@ importers:
       typedoc-plugin-mdn-links:
         specifier: ^4.0.11
         version: 4.0.11(typedoc@0.27.6(typescript@5.7.3))
-      typedoc-unhoax-theme:
-        specifier: ^0.4.6
-        version: 0.4.6(typedoc@0.27.6(typescript@5.7.3))
       typescript:
         specifier: ^5.7.3
         version: 5.7.3
@@ -1005,11 +1002,6 @@ packages:
     peerDependencies:
       typedoc: 0.26.x || 0.27.x
 
-  typedoc-unhoax-theme@0.4.6:
-    resolution: {integrity: sha512-AJtauURau1k1H6kn4sOqtPt/nOuAt9Es7/zlaSzaIF4IBAGoGJBiHjY97Kq2fNLQWqxpMxtNWq19izBA9tUOCA==}
-    peerDependencies:
-      typedoc: ^0.27.4
-
   typedoc@0.27.6:
     resolution: {integrity: sha512-oBFRoh2Px6jFx366db0lLlihcalq/JzyCVp7Vaq1yphL/tbgx2e+bkpkCgJPunaPvPwoTOXSwasfklWHm7GfAw==}
     engines: {node: '>= 18'}
@@ -1860,10 +1852,6 @@ snapshots:
       typedoc: 0.27.6(typescript@5.7.3)
 
   typedoc-plugin-mdn-links@4.0.11(typedoc@0.27.6(typescript@5.7.3)):
-    dependencies:
-      typedoc: 0.27.6(typescript@5.7.3)
-
-  typedoc-unhoax-theme@0.4.6(typedoc@0.27.6(typescript@5.7.3)):
     dependencies:
       typedoc: 0.27.6(typescript@5.7.3)
 
