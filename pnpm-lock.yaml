@@ -38,6 +38,12 @@ importers:
       tsx:
         specifier: ^4.19.2
         version: 4.19.2
+      typedoc:
+        specifier: ^0.27.6
+        version: 0.27.6(typescript@5.7.3)
+      typedoc-plugin-extras:
+        specifier: ^4.0.0
+        version: 4.0.0(typedoc@0.27.6(typescript@5.7.3))
       typedoc-plugin-mdn-links:
         specifier: ^4.0.11
         version: 4.0.11(typedoc@0.27.6(typescript@5.7.3))
@@ -51,8 +57,8 @@ importers:
   lib/cli:
     dependencies:
       '@li3/sfc':
-        specifier: workspace:*
-        version: link:../sfc
+        specifier: 0.0.2
+        version: 0.0.2
 
   lib/html-parser: {}
 
@@ -266,6 +272,12 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
+
+  '@li3/html-parser@0.0.3':
+    resolution: {integrity: sha512-xEYRMz+z7wOls9LOxxorH7/ZNWW73RBayLDKZjDxv6ZGgYxgvNYiSNvAA8uVKsJVpzIYji2YNBR7tjT4FTWcGQ==}
+
+  '@li3/sfc@0.0.2':
+    resolution: {integrity: sha512-3QvdGMUi1wyAPlVSZ4oRLoUxwM7d7P/9jW498HXI7adKFtj7H+ctxWS3iXA4fRsLmPt9+BYa5QE/5ZByNSPnmw==}
 
   '@napi-rs/wasm-runtime@0.2.4':
     resolution: {integrity: sha512-9zESzOO5aDByvhIAsOy9TbpZ0Ur2AJbUI7UT73kcUTS2mxAMHOBaa1st/jAymNoCtvrit99kkzT1FZuXVcgfIQ==}
@@ -983,6 +995,11 @@ packages:
     engines: {node: '>=18.0.0'}
     hasBin: true
 
+  typedoc-plugin-extras@4.0.0:
+    resolution: {integrity: sha512-wqImx4K39u9+M4mkRvBxds8BMzlxKXrhHwtOAGvgtQza+E9+h9YmYJIJsnFyF06XRmv/02tQIBan76A3GdpZFg==}
+    peerDependencies:
+      typedoc: 0.27.x
+
   typedoc-plugin-mdn-links@4.0.11:
     resolution: {integrity: sha512-xx9at8P8ABWYG9CLi04Y/uMcy3URIIzA+vy/JGN15Hn/VqDeapRIglwStS1MaQKwCixwZzoUpIoDaGcHdcoFWg==}
     peerDependencies:
@@ -1159,6 +1176,13 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
+
+  '@li3/html-parser@0.0.3': {}
+
+  '@li3/sfc@0.0.2':
+    dependencies:
+      '@li3/html-parser': 0.0.3
+      acorn: 8.14.0
 
   '@napi-rs/wasm-runtime@0.2.4':
     dependencies:
@@ -1830,6 +1854,10 @@ snapshots:
       get-tsconfig: 4.10.0
     optionalDependencies:
       fsevents: 2.3.3
+
+  typedoc-plugin-extras@4.0.0(typedoc@0.27.6(typescript@5.7.3)):
+    dependencies:
+      typedoc: 0.27.6(typescript@5.7.3)
 
   typedoc-plugin-mdn-links@4.0.11(typedoc@0.27.6(typescript@5.7.3)):
     dependencies:

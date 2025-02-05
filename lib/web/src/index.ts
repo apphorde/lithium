@@ -15,6 +15,7 @@ import * as API from "./component-api/setup.js";
 import { getComponentFromTemplate, loadAndParse } from "./component-api/custom-elements.js";
 
 export * from "./component-api/setup.js";
+export type * from "./component-api/custom-elements.js";
 import { createComponent, createInlineComponent, createApp, mount } from "./component-api/custom-elements.js";
 export { createComponent, createInlineComponent, createApp, mount } from "./component-api/custom-elements.js";
 

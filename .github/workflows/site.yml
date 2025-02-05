@@ -25,4 +25,4 @@ jobs:
       withTag: true
       type: static
       path: "site"
-      buildCommand: cd .. && npm i -g pnpm && pnpm i && npx nx run-many -t build && npm run docs
+      buildCommand: cd .. && pnpm i && npx nx run-many -t build && pnpm run docs
