@@ -171,21 +171,19 @@
 
   <feature-section id="setup-api">
     <span slot="title">Declarative API</span>
-    <h3 class="text-3xl mt-3 font-semi font-serif">
-      How to declare the API of a component
-    </h3>
 
-    <p class="text-xl mt-8">Declare inputs (props):</p>
+    <p class="text-xl mt-8">Declare element inputs (props):</p>
     <code-block language="javascript">
       <pre>
-          import { defineProps } from '@li3/web';
+          import { defineProp, defineProps } from '@li3/web';
 
-          function setup() {
+          export default function setup() {
             // short form
-            defineProps(['foo', 'bar']);
+            const foo = defineProp('foo');
+            const bar = defineProp('foo', 123);
 
             // long form with defaults
-            defineProps({
+            const { foo, bar } = defineProps({
               foo: String,
               bar: { default: 123 }
             });
@@ -195,10 +193,19 @@
 
     <p class="text-xl mt-8">Declare outputs (events):</p>
     <code-block language="javascript">
-      <template>import { defineEvents } from '@li3/web'; function setup() { const
-        emit = defineEvents['update', 'remove']); emit('update', { value: 123
-        }); }
-      </template>
+      <pre>
+        import { defineEvent, defineEvents } from '@li3/web';
+
+        export default function setup() {
+          // short form
+          const emit = defineEvents(['update', 'remove']);
+          emit('update', { value: 123 });
+
+          // long form, with individual emitters
+          const onUpdate = defineEvent('update');
+          onUpdate(123)
+        }
+      </pre>
     </code-block>
 
     <p class="text-xl mt-8">
@@ -208,7 +215,7 @@
       <pre>
           import { ref, unref, computed, watch } from '@li3/web';
 
-          function setup() {
+          export default function setup() {
             const name = ref('Joe');
             const greeting = computed(() => 'Hello, ' + unref(name));
 
@@ -228,7 +235,7 @@
       <pre>
           import { onInit, onUpdate, onDestroy } from '@li3/web';
 
-          function setup() {
+          export default function setup() {
             onInit(function() {
               // called once on mount
             });
