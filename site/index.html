@@ -1,200 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-    content="width=device-width, initial-scale=1.0">
-  <title>Lithium - The Modern Frontend Framework</title>
-  <script type="importmap">
-    {
-      "imports": {
-        "@li3/": "https://cdn.li3.dev/@li3/",
-        "@sodium/": "https://--sodium.static.apphor.de/"
-      }
-    }
-  </script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body {
-      font-family: Fricolage Grotesque, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
-      background: #110719c8;
-    }
-
-    .contents-children>* {
-      display: contents;
-    }
-
-    .noisy {
-      background: linear-gradient(95.9deg, #5627A3C8 0%, #2C0848C8 100%), rgba(123, 123, 123, 0.37) url(/assets/noisy.svg)
-    }
-  </style>
-</head>
-
-<body class="text-gray-100 antialiased">
-  <nav
-    class="flex items-center space-x-8 px-8 py-4 my-4 sticky top-0 z-10 rounded-full max-w-4xl mx-auto border border-gray-100 shadow-sm bg-white/20 backdrop-blur">
-    <a href="/"
-      class="text-2xl font-bold inline-block h-10 border border-4 border-gray-100 px-1 rounded">Li³</a>
-
-    <div class="hidden sm:flex gap-8 font-medium">
-      <auto-toc class="hidden sm:block contents"></auto-toc>
-      <a href="/docs"
-        class="hover:text-black transition-colors">API</a>
-      <a href="https://github.com/apphorde/lithium"
-        target="_blank"
-        class="hover:text-black transition-colors">GitHub</a>
-    </div>
-  </nav>
-
-  <section class="h-screen flex items-center justify-center px-8">
-    <div class="max-w-2xl">
-      <h1 class="font-bold mb-6 font-serif">
-        <span class="text-5xl mr-4 mb-2 inline-block">lithium</span><br />
-        <span class="text-md italic mr-2">(lith·i·um)</span>
-        <span class="text-md rounded">noun</span>
-      </h1>
-
-      <p class="text-xl mb-8 font-serif">
-        A lightweight, reactive element library that fills the last gaps of the web platform and
-        empowers developers to build reactive interfaces using only Web API's.
-      </p>
-      <div class="flex flex-wrap gap-4">
-        <a href="#get-started"
-          class="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transform hover:-translate-y-0.5 transition-all">
-          Get Started
-        </a>
-        <a href="https://github.com/apphorde/lithium"
-          target="_blank"
-          class="px-6 py-3 bg-white text-blue-600 border border-blue-600 rounded-lg font-semibold hover:bg-gray-50 transform hover:-translate-y-0.5 transition-all">
-          View on GitHub
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <feature-section id="get-started">
-    <span slot="title">Introduction</span>
-    <p class="text-xl mt-6">Add an import map to any page:</p>
-
-    <code-block>
-      <template>
-        <script type="importmap">
-          {
-            "imports": {
-              "@li3/": "https://cdn.li3.dev/@li3/"
-            }
-          }
-          </script>
-      </template>
-    </code-block>
-
-    <p class="text-xl mt-6">Now import the API from <span class="font-mono bg-gray-200 p-1 rounded">@li3/web</span> and
-      mount a component into an element
-    </p>
-
-    <code-block>
-      <template>
-        <script type="module">
-          import { ref, tpl, mount } from "@li3/web";
-
-          const template = tpl`<div>
-            <label>Your name:</label>
-            <input type="text" on-input="setName($event.target.value)" bind-value="name" />
-            <hr />
-            <h1>Hello, {{ name }}!</h1>
-            </div>`;
-
-          function setup() {
-            const name = ref('');
-
-            function setName(v) {
-              name.value = v;
-            }
-
-            return { name, setName };
-          }
-
-          mount('#app', { setup, template })
-        </script>
-      </template>
-    </code-block>
-
-    <p class="text-xl mt-6">Try it out:</p>
-    <div class="bg-white rounded-lg px-4 py-6 mt-6 shadow-lg w-full flex flex-col items-center">
-      <div id="app"
-        class="w-full md:w-1/2"></div>
-    </div>
-
-    <script type="module">
-      import { ref, tpl, mount } from "@li3/web";
-
-      const template = tpl`<div>
-          <h1 class="text-xl font-bold">Hello, {{ name }}!</h1>
-          <hr class="border-t my-3" />
-          <label class="py-2">Your name:</label>
-          <input type="text" class="mt-2 p-2 border rounded bg-white w-full" on-input="setName($event.target.value)" bind-value="name" />
-        </div>`;
-
-      function setup() {
-        const name = ref('');
-
-        function setName(v) {
-          name.value = v;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lithium - The Modern Frontend Framework</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@li3/": "https://cdn.li3.dev/@li3/",
+          "@sodium/": "https://--sodium.static.apphor.de/"
         }
-
-        return { name, setName };
+      }
+    </script>
+    <script src="https://cdn.li3.dev/@li3/web" type="module"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: Fricolage Grotesque, ui-sans-serif, system-ui, sans-serif,
+          "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+          "Noto Color Emoji" !important;
+          background: #160523c8;
       }
 
-      mount('#app', { setup: setup, template })
-    </script>
-  </feature-section>
+      .contents-children > * {
+        display: contents;
+      }
 
-  <feature-section id="bindings">
-    <span slot="title">Bindings</span>
-    <h3 class="text-3xl mt-3 font-semi font-serif">How to bring static HTML to life</h3>
+      .noisy {
+        background: linear-gradient(95.9deg, #5627a3c8 0%, #2c0848c8 100%),
+          rgba(123, 123, 123, 0.37) url(/assets/noisy.svg);
+      }
+    </style>
+  </head>
 
-    <p class="text-xl mt-8">Bind a property or attribute: </p>
-    <code-block>
-      <template>
-        <button attr-lang="language"
-          bind-disabled="isDisabled"></button>
-      </template>
-    </code-block>
+  <body class="text-gray-100 antialiased">
+    <nav
+      class="flex items-center space-x-8 px-8 py-4 my-4 sticky top-0 z-10 rounded-full max-w-4xl mx-auto border border-gray-100 shadow-sm bg-white/20 backdrop-blur"
+    >
+      <a
+        href="/"
+        class="text-2xl font-bold inline-block h-10 border border-4 border-gray-100 px-1 rounded"
+        >Li³</a
+      >
 
-    <p class="text-xl mt-6">Listen to events:</p>
-    <code-block>
-      <template>
-        <form on-submit.prevent.stop="onSubmit($event)"></form>
+      <div class="hidden sm:flex gap-8 font-medium">
+        <auto-toc class="hidden sm:block contents"></auto-toc>
+        <a href="/docs" class="hover:text-black transition-colors">API</a>
+        <a
+          href="https://github.com/apphorde/lithium"
+          target="_blank"
+          class="hover:text-black transition-colors"
+          >GitHub</a
+        >
+      </div>
+    </nav>
 
-      </template>
-    </code-block>
-    <small class="mt-3 block">Available modifiers: "capture", "once", "passive", "stop" and "prevent".</small>
+    <section class="h-screen flex items-center justify-center px-8">
+      <div class="max-w-2xl">
+        <h1 class="font-bold mb-6 font-serif">
+          <span class="text-5xl mr-4 mb-2 inline-block">lithium</span><br />
+          <span class="text-md italic mr-2">(lith·i·um)</span>
+          <span class="text-md rounded">noun</span>
+        </h1>
 
-    <p class="text-xl mt-6">Add/remove classes:</p>
-    <code-block>
-      <template>
-        <input class-border-red.bg-yellow="isInvalid()" />
-      </template>
-    </code-block>
-    <small class="mt-3 block">Multiple classes can be separated by a dot (.)</small>
+        <p class="text-xl mb-8 font-serif">
+          A lightweight, reactive element library that fills the last gaps of
+          the web platform and empowers developers to build reactive interfaces
+          using only Web API's.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a
+            href="#get-started"
+            class="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transform hover:-translate-y-0.5 transition-all"
+          >
+            Get Started
+          </a>
+          <a
+            href="https://github.com/apphorde/lithium"
+            target="_blank"
+            class="px-6 py-3 bg-white text-blue-600 border border-blue-600 rounded-lg font-semibold hover:bg-gray-50 transform hover:-translate-y-0.5 transition-all"
+          >
+            View on GitHub
+          </a>
+        </div>
+      </div>
+    </section>
 
-    <p class="text-xl mt-6">Set style:</p>
-    <code-block>
-      <template>
-        <div style-display="shouldBeVisible ? 'block' : 'none'"></div>
-      </template>
-    </code-block>
-    <small class="mt-3 block">Multiple classes can be separated by a dot (.)</small>
-  </feature-section>
+    <feature-section id="get-started">
+      <span slot="title">Start coding in 1 minute</span>
+      <div class="flex mb-8 space-x-8">
+        <div class="w-1/3">
+          <p class="mt-6">Load the library</p>
+        </div>
+        <code-block class="block w-2/3">
+          <template>
+            <script type="importmap">
+              {
+                "imports": {
+                  "@li3/": "https://cdn.li3.dev/@li3/"
+                }
+              }
+            </script>
+            <script type="module" src="https://cdn.li3.dev/@li3/web"></script>
+          </template>
+        </code-block>
+      </div>
 
-  <feature-section id="setup-api">
-    <span slot="title">Declarative API</span>
-    <h3 class="text-3xl mt-3 font-semi font-serif">How to declare the API of a component</h3>
+      <div class="flex mb-8 space-x-8">
+        <p class="w-1/3">Declare an application</p>
+        <code-block class="block w-2/3" srcelement="#hello-app"></code-block>
+      </div>
 
-    <p class="text-xl mt-8">Declare inputs (props):</p>
-    <code-block language="javascript">
-      <pre>
+      <div class="flex mb-8">
+        <p class="w-1/3">See it in action</p>
+        <template id="hello-app" app>
+          <div class="w-2/3">
+            <label class="py-2">Your name:</label>
+            <input
+              type="text"
+              class="mt-2 p-2 border rounded bg-white w-full text-black"
+              on-input="setName($event.target.value)"
+              bind-value="name"
+            />
+            <hr class="border-t my-3" />
+            <p class="text-xl font-bold">Hello, {{ name }}!</p>
+          </div>
+          <script setup>
+            import { ref } from "@li3/web";
+
+            export default function setup() {
+              const name = ref("");
+
+              function setName(v) {
+                name.value = v;
+              }
+
+              return { name, setName };
+            }
+          </script>
+        </template>
+      </div>
+    </feature-section>
+
+    <feature-section id="bindings">
+      <span slot="title">Bindings</span>
+      <h3 class="text-3xl mt-3 font-semi font-serif">
+        How to bring static HTML to life
+      </h3>
+
+      <p class="text-xl mt-8">Bind a property or attribute:</p>
+      <code-block>
+        <template>
+          <button attr-lang="language" bind-disabled="isDisabled"></button>
+        </template>
+      </code-block>
+
+      <p class="text-xl mt-6">Listen to events:</p>
+      <code-block>
+        <template>
+          <form on-submit.prevent.stop="onSubmit($event)"></form>
+        </template>
+      </code-block>
+      <small class="mt-3 block"
+        >Available modifiers: "capture", "once", "passive", "stop" and
+        "prevent".</small
+      >
+
+      <p class="text-xl mt-6">Add/remove classes:</p>
+      <code-block>
+        <template>
+          <input class-border-red.bg-yellow="isInvalid()" />
+        </template>
+      </code-block>
+      <small class="mt-3 block"
+        >Multiple classes can be separated by a dot (.)</small
+      >
+
+      <p class="text-xl mt-6">Set style:</p>
+      <code-block>
+        <template>
+          <div style-display="shouldBeVisible ? 'block' : 'none'"></div>
+        </template>
+      </code-block>
+      <small class="mt-3 block"
+        >Multiple classes can be separated by a dot (.)</small
+      >
+    </feature-section>
+
+    <feature-section id="setup-api">
+      <span slot="title">Declarative API</span>
+      <h3 class="text-3xl mt-3 font-semi font-serif">
+        How to declare the API of a component
+      </h3>
+
+      <p class="text-xl mt-8">Declare inputs (props):</p>
+      <code-block language="javascript">
+        <pre>
           import { defineProps } from '@li3/web';
 
           function setup() {
@@ -207,24 +208,24 @@
               bar: { default: 123 }
             });
           }
-      </pre>
-    </code-block>
+      </pre
+        >
+      </code-block>
 
-    <p class="text-xl mt-8">Declare outputs (events):</p>
-    <code-block language="javascript">
-      <template>import { defineEvents } from '@li3/web';
+      <p class="text-xl mt-8">Declare outputs (events):</p>
+      <code-block language="javascript">
+        <template
+          >import { defineEvents } from '@li3/web'; function setup() { const
+          emit = defineEvents['update', 'remove']); emit('update', { value: 123
+          }); }
+        </template>
+      </code-block>
 
-        function setup() {
-        const emit = defineEvents['update', 'remove']);
-
-        emit('update', { value: 123 });
-        }
-      </template>
-    </code-block>
-
-    <p class="text-xl mt-8">Create reactive values (ref/computed) and watchers:</p>
-    <code-block language="javascript">
-      <pre>
+      <p class="text-xl mt-8">
+        Create reactive values (ref/computed) and watchers:
+      </p>
+      <code-block language="javascript">
+        <pre>
           import { ref, unref, computed, watch } from '@li3/web';
 
           function setup() {
@@ -240,11 +241,11 @@
             return { name, greeting, isEmpty }
           }
         </pre>
-    </code-block>
+      </code-block>
 
-    <p class="text-xl mt-8">Lifecycle events:</p>
-    <code-block language="javascript">
-      <pre>
+      <p class="text-xl mt-8">Lifecycle events:</p>
+      <code-block language="javascript">
+        <pre>
           import { onInit, onUpdate, onDestroy } from '@li3/web';
 
           function setup() {
@@ -261,156 +262,254 @@
             });
           }
         </pre>
-    </code-block>
+      </code-block>
 
-    <p class="text-xl mt-8">Access DOM nodes (.one / .many):</p>
-    <code-block language="javascript">
-      <template>
-        <script type="module">
-          import { defineQuery } from '@li3/web';
+      <p class="text-xl mt-8">Access DOM nodes (.one / .many):</p>
+      <code-block language="javascript">
+        <template>
+          <script type="module">
+            import { defineQuery } from "@li3/web";
 
-          function setup() {
-            const inputs = defineQuery('input');
+            function setup() {
+              const inputs = defineQuery("input");
 
-            function something() {
-              const value = inputs.one.value;
-              const valid = [...inputs.many].every(input => isValid(input));
+              function something() {
+                const value = inputs.one.value;
+                const valid = [...inputs.many].every((input) => isValid(input));
+              }
             }
-          }
-        </script>
-      </template>
-    </code-block>
-
-    <p class="text-xl mt-8">Load resources:</p>
-    <code-block language="javascript">
-      <template>
-        <script type="module">
-          import { loadCss, loadScript } from '@li3/web';
-
-          function setup() {
-            loadCss('http://example.com/main.css');
-            loadScript('http://example.com/index.js');
-          }
-        </script>
-      </template>
-
-      </template>
-    </code-block>
-  </feature-section>
-
-  <feature-section id="loops">
-    <span slot="title">Conditionals and loops</span>
-    <h3 class="text-3xl mt-3 font-semi font-serif">Repeat a template or add/remove elements based on a condition</h3>
-
-    <p class="text-xl mt-8">Conditional elements with <code
-        class="font-mono bg-gray-100 p-1 inline-block">template[if]</code></p>
-    <code-block language="javascript">
-      <template>
-        <template if="condition">
-          <div>Show me</div>
+          </script>
         </template>
-      </template>
-    </code-block>
+      </code-block>
 
-    <p class="text-xl mt-8">Repeat elements with <code
-        class="font-mono bg-gray-100 p-1 inline-block">template[for]</code></p>
-    <code-block language="javascript">
-      <template>
-        <template for="item of list">
-          <div>Repeat me</div>
+      <p class="text-xl mt-8">Load resources:</p>
+      <code-block language="javascript">
+        <template>
+          <script type="module">
+            import { loadCss, loadScript } from "@li3/web";
+
+            function setup() {
+              loadCss("http://example.com/main.css");
+              loadScript("http://example.com/index.js");
+            }
+          </script>
         </template>
+      </code-block>
+    </feature-section>
+
+    <feature-section id="loops">
+      <span slot="title">Conditionals and loops</span>
+      <h3 class="text-3xl mt-3 font-semi font-serif">
+        Repeat a template or add/remove elements based on a condition
+      </h3>
+
+      <p class="text-xl mt-8">
+        Conditional elements with
+        <inline-code>template[if]</inline-code>
+      </p>
+      <code-block language="javascript">
+        <template>
+          <template if="condition">
+            <div>Show me</div>
+          </template>
+        </template>
+      </code-block>
+
+      <p class="text-xl mt-8">
+        Repeat elements with
+        <code class="font-mono bg-gray-100 p-1 inline-block"
+          >template[for]</code
+        >
+      </p>
+      <code-block language="javascript">
+        <template>
+          <template for="item of list">
+            <div>Repeat me</div>
+          </template>
+        </template>
+      </code-block>
+
+      <p class="mt-12 text-xl mb-8">
+        And that's it!<br />
+        Now
+        <a class="text-blue-600 underline" href="/docs"
+          >go to the documentation</a
+        >
+        to see the full API!
+      </p>
+    </feature-section>
+
+    <!-- section class="py-12 px-8 flex items-center">
+      <div
+        class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 contents-children"
+      >
+        <feature-card>
+          <span slot="icon">🧱</span>
+          <span slot="title">It's All About Building Blocks</span>
+          Built with composability in mind, Lithium delivers the building blocks
+          to build an app out-of-the-box.
+        </feature-card>
+
+        <feature-card>
+          <span slot="icon">🎯</span>
+          <span slot="title">Future Proof</span>
+          Uses the web platform as much as possible, with an intuitive API to
+          declare components
+        </feature-card>
+
+        <feature-card>
+          <span slot="icon">🔧</span>
+          <span slot="title">It's just web components</span>
+          You can Integrate with any other development tools or framework.
+        </feature-card>
+      </div>
+    </section -->
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 py-8 px-8 text-center">
+      <p>Released under the MIT License</p>
+      <p class="mt-2">Copyright © 2024 Lithium Components</p>
+    </footer>
+
+    <template component="li-toc">
+      <template for="link of links">
+        <a
+          class="hover:text-black transition-colors mx-4"
+          bind-href="'#' + link.id"
+          on-click.prevent="navigateTo(link.id)"
+          >{{link.text}}</a
+        >
       </template>
-    </code-block>
 
-    <p class="mt-12 text-xl mb-8">
-      And that's it!<br />
-      Now <a class="text-blue-600 underline"
-        href="/docs">go to the documentation</a> to see the full API!</p>
-  </feature-section>
+      <script setup>
+        import { ref, onInit } from "@li3/web";
 
-  <section class="py-12 px-8 flex items-center">
-    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 contents-children">
-      <feature-card>
-        <span slot="icon">🧱</span>
-        <span slot="title">It's All About Building Blocks</span>
-        Built with composability in mind, Lithium delivers the building blocks to build an app out-of-the-box.
-      </feature-card>
+        export default function autoTableOfContent() {
+          const links = ref([]);
 
-      <feature-card>
-        <span slot="icon">🎯</span>
-        <span slot="title">Future Proof</span>
-        Uses the web platform as much as possible, with an intuitive API to declare components
-      </feature-card>
+          function navigateTo(id) {
+            document.getElementById(id).scrollIntoView({ behavior: "smooth" });
+          }
 
-      <feature-card>
-        <span slot="icon">🔧</span>
-        <span slot="title">It's just web components</span>
-        You can Integrate with any other development tools or framework.
-      </feature-card>
-    </div>
-  </section>
+          function addSection(section) {
+            const text = section.querySelector("h2").textContent.trim();
+            links.value = [...links.value, { id: section.id, text }];
+          }
 
-  <!-- Footer -->
-  <footer class="bg-gray-100 py-8 px-8 text-center">
-    <p>Released under the MIT License</p>
-    <p class="mt-2">Copyright © 2024 Lithium Components</p>
-  </footer>
+          onInit(function () {
+            document.body.addEventListener("addsection", (e) =>
+              addSection(e.detail)
+            );
+          });
 
-  <template component="li-toc">
-    <template for="link of links">
-      <a class="hover:text-black transition-colors mx-4"
-        bind-href="'#' + link.id"
-        on-click.prevent="navigateTo(link.id)">{{link.text}}</a>
+          return { navigateTo, links };
+        }
+      </script>
     </template>
 
-    <script setup
-      src="/components/li-toc.mjs"></script>
-  </template>
-
-  <template component="code-block">
-    <div class="bg-white rounded-lg p-5 my-6 shadow border border-gray-300 text-gray-800 text-sm">
-      <slot class="font-mono whitespace-pre overflow-x-auto block"></slot>
-    </div>
-    <script setup
-      src="/components/code-block.mjs"></script>
-  </template>
-
-  <template component="feature-card">
-    <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border text-gray-800">
-      <div class="text-4xl mb-4">
-        <slot name="icon"></slot>
+    <template component="code-block">
+      <div
+        class="bg-white rounded-lg p-5 my-6 shadow border border-gray-300 text-gray-800 text-xs relative"
+      >
+        <button
+          class="absolute right-0 top-0 m-1 text-xs px-2 py-1 bg-gray-100 text-gray-800 border rounded"
+          on-click="onCopy()"
+        >
+          copy
+        </button>
+        <slot
+          class="font-mono whitespace-pre overflow-x-auto block w-full"
+        ></slot>
       </div>
-      <h3 class="text-xl font-bold mb-4">
-        <slot name="title"></slot>
-      </h3>
-      <slot></slot>
-    </div>
-  </template>
+      <script setup>
+        import { load, highlight } from "https://highlight.jsfn.run/index.mjs";
+        import { defineProp, defineQuery, onInit } from "@li3/web";
 
-  <template component="li-card">
-    <div class="p-8 noisy rounded-2xl text-white">
-      <slot class="contents"></slot>
-    </div>
-  </template>
+        load();
 
-  <template component="feature-section">
-    <section class="my-16">
-      <div class="max-w-4xl mx-auto">
-        <h2 class="text-5xl mr-4 font-bold font-serif">
+        export default function codeBlock({ element }) {
+          const language = defineProp("language", "html");
+          const srcElement = defineProp("srcElement", "");
+          const pre = defineQuery("pre");
+          const template = defineQuery("template");
+          const source =
+            (srcElement.value &&
+              document.querySelector(srcElement.value)?.outerHTML) ||
+            (pre.one || template.one || element).innerHTML.trim() ||
+            "";
+          const slot = defineQuery("slot");
+          const lines = source.split("\n");
+          const padding = lines
+            .filter((line) => line.trim() && line.startsWith(" "))
+            .reduce(
+              (prev, line) => Math.min(prev, line.indexOf(line.trim())),
+              lines[0].length
+            );
+
+          const toReplace = " ".repeat(padding);
+          const trimmedSource = lines
+            .map((line) => line.replace(toReplace, ""))
+            .join("\n");
+
+          onInit(async () => {
+            slot.one.innerHTML = await highlight(trimmedSource, {
+              language: language.value || "html",
+            });
+          });
+
+          return {
+            onCopy() {
+              navigator.clipboard.writeText(trimmedSource);
+            },
+          };
+        }
+      </script>
+    </template>
+
+    <template component="feature-card">
+      <div
+        class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border text-gray-800"
+      >
+        <div class="text-4xl mb-4">
+          <slot name="icon"></slot>
+        </div>
+        <h3 class="text-xl font-bold mb-4">
           <slot name="title"></slot>
-        </h2>
+        </h3>
         <slot></slot>
       </div>
-    </section>
-    <script setup>
-      import { onInit, DOM } from '@li3/web';
-      export default function featureSection() {
-        onInit(({ element }) => {
-          DOM.emitEvent(document.body, 'addsection', element);
-        });
-      }
-    </script>
-  </template>
-</body>
+    </template>
 
+    <template component="li-card">
+      <div class="p-8 noisy rounded-2xl text-white border border-gray-600">
+        <slot class="contents"></slot>
+      </div>
+    </template>
+
+    <template component="feature-section">
+      <section class="my-16">
+        <div class="max-w-4xl mx-auto">
+          <li-card>
+            <h2 class="text-sm uppercase py-2 font-bold">
+              <slot name="title"></slot>
+            </h2>
+            <slot></slot>
+          </li-card>
+        </div>
+      </section>
+      <script setup>
+        import { onInit, DOM } from "@li3/web";
+        export default function featureSection() {
+          onInit(({ element }) => {
+            DOM.emitEvent(document.body, "addsection", element);
+          });
+        }
+      </script>
+    </template>
+    <template component="inline-code">
+      <slot
+        class="font-mono rounded bg-gray-100 p-1 inline-block text-gray-800 text-sm"
+      ></slot>
+    </template>
+  </body>
 </html>
