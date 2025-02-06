@@ -49,7 +49,6 @@ export function createState($el: RuntimeContext): void {
   Object.freeze($el.state);
   Object.freeze($el.stateKeys);
 
-  $el.view = {};
   for (const key of $el.stateKeys) {
     Object.defineProperty($el.view, key, {
       configurable: false,

@@ -23,6 +23,7 @@ export function createRuntimeContext(properties: CreateRuntimeOptions): RuntimeC
     props: {},
     stateKeys: [],
     init: [],
+    view: {},
     update: [],
     destroy: [],
     reactive: new ReactiveContext(),

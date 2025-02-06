@@ -1,22 +1,12 @@
 import { AnyFunction, RuntimeContext } from "./types.js";
-import { unref } from "@li3/reactive";
 import { getOption } from "./options.js";
 
 const fnCache = new Map();
 const domParser = new DOMParser();
 const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
 
-function unwrap(stateKeys, state) {
-  const unwrapped = Object.create(null);
-
-  for (const key of stateKeys) {
-    unwrapped[key] = unref(state[key]);
-  }
-
-  return unwrapped;
-}
-
 export function compileExpression($el: RuntimeContext, expression: string, args: string[] = []): AnyFunction {
+  // TODO detect CSP issues and fallback
   if (getOption("useModuleExpressions")) {
     return compileExpressionBlob($el, expression, args);
   }
@@ -35,11 +25,10 @@ export function createBlobModule(code: string, type = "text/javascript") {
 const modCache = new Map();
 
 export function compileExpressionBlob($el: RuntimeContext, expression: string, args: string[] = []) {
-  const { state, stateKeys } = $el;
   const fargs = ["__s", ...args].join(", ");
   const fasync = expression.includes("await ") ? "async " : "";
   const code = `export default ${fasync}function(${fargs}) {
-    const {${stateKeys.join(", ")}} = __s;
+    const {${$el.stateKeys.join(", ")}} = __s;
     return ${expression};
   }`;
 
@@ -51,14 +40,13 @@ export function compileExpressionBlob($el: RuntimeContext, expression: string, a
 
   return async function (...args: any[]) {
     const fn = await mod;
-    return fn.default(unwrap(stateKeys, state), ...args);
+    return fn.default($el.view, ...args);
   };
 }
 
 export function compileExpressionEval($el: RuntimeContext, expression: string, args: string[] = []): AnyFunction {
-  const { state, stateKeys } = $el;
   const code = `
-  const {${stateKeys.join(", ")}} = __u(__s);
+  const {${$el.stateKeys.join(", ")}} = __u(__s);
   return ${expression}
   `;
   const cacheKey = code + args;
@@ -74,11 +62,11 @@ export function compileExpressionEval($el: RuntimeContext, expression: string, a
 
     const functionType = expression.includes("await ") ? AsyncFunction : Function;
 
-    fn = functionType(...["__s", "__u", ...args], finalCode);
+    fn = functionType(...["__s", ...args, finalCode]);
     fnCache.set(cacheKey, fn);
   }
 
-  return fn.bind(state, state, unwrap.bind(null, stateKeys));
+  return fn.bind(null, $el.view);
 }
 
 export function wrapTryCatch(exp: string, fn: AnyFunction) {
