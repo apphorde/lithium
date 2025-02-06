@@ -5,7 +5,7 @@ import { watch } from "../component-api/setup.js";
 import { RuntimeContext } from "../internal-api/types";
 
 plugins.use({
-  applyAttribute($el, node, attribute, value) {
+  attribute($el, node, attribute, value) {
     if (attribute.startsWith("bind-")) {
       createPropertyBinding($el, node, dashToCamelCase(attribute.replace("bind-", "")), value);
     }

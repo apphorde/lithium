@@ -22,11 +22,8 @@ interface TemplateForRuntimeContext {
 }
 
 plugins.use({
-  createDom($el: RuntimeContext) {
-    const { element } = $el;
-    const templates: HTMLTemplateElement[] = Array.from(
-      (element["shadowRoot"] || element).querySelectorAll("template[for]")
-    );
+  dom($el: RuntimeContext) {
+    const templates: HTMLTemplateElement[] = Array.from($el.element.querySelectorAll("template[for]"));
 
     for (const t of templates) {
       templateForOf(t, $el);

@@ -3,7 +3,7 @@ import { plugins } from "../internal-api/plugin.js";
 import type { RuntimeContext } from "../internal-api/types.js";
 
 plugins.use({
-  async appendDom($el: RuntimeContext) {
+  async init($el: RuntimeContext) {
     const { element, stylesheets, scripts } = $el;
 
     // TODO wait for scripts and stylesheets before component is mounted

@@ -122,10 +122,10 @@ export function createDom($el: RuntimeContext): void {
   const { element, template, shadowDom } = $el;
   const dom = template.content.cloneNode(true);
 
-  plugins.apply("createDom", [$el, dom]);
+  plugins.apply("dom", [$el, dom]);
 
   traverseDom(dom, (node, attributes) => {
-    plugins.apply("initElement", [$el, node]);
+    plugins.apply("element", [$el, node]);
 
     if (!isElement(node) || !(Array.isArray(attributes) && attributes.length)) {
       return;
@@ -134,7 +134,7 @@ export function createDom($el: RuntimeContext): void {
     for (const attr of attributes) {
       const attribute = attr[0].trim();
       const value = attr[1].trim();
-      plugins.apply("applyAttribute", [$el, node, attribute, value]);
+      plugins.apply("attribute", [$el, node, attribute, value]);
     }
   });
 
@@ -151,8 +151,6 @@ export function createDom($el: RuntimeContext): void {
     element.attachShadow(shadowDom as ShadowRootInit);
     element.shadowRoot.append(dom);
   }
-
-  plugins.apply("appendDom", [$el]);
 }
 
 export function defineEventOnElement(el: Element, name: string): void {

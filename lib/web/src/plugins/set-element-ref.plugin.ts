@@ -4,7 +4,7 @@ import { markAsReactive, isRef } from "@li3/reactive";
 import { RuntimeContext } from "../internal-api/types";
 
 plugins.use({
-  applyAttribute($el: RuntimeContext, node: Element, attribute: string, refName: string) {
+  attribute($el: RuntimeContext, node: Element, attribute: string, refName: string) {
     if (attribute === "ref") {
       setElementRefValue($el, node, refName.trim());
     }

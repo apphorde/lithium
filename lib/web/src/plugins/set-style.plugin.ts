@@ -6,7 +6,7 @@ import { RuntimeContext } from "../internal-api/types";
 import { dashToCamelCase } from "./property-binding.plugin.js";
 
 plugins.use({
-  applyAttribute($el, node, attribute, expression) {
+  attribute($el, node, attribute, expression) {
     if (attribute.startsWith("style-")) {
       const style = dashToCamelCase(attribute.replace("style-", ""));
       createStyleBinding($el, node, style, expression);

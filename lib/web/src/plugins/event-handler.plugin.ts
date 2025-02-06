@@ -4,7 +4,7 @@ import { plugins } from "../internal-api/plugin.js";
 import { RuntimeContext } from "../internal-api/types";
 
 plugins.use({
-  applyAttribute($el, node: Element, attribute: string, value: string) {
+  attribute($el, node: Element, attribute: string, value: string) {
     if (attribute.startsWith("on-")) {
       createEventBinding($el, node, attribute.replace("on-", ""), value);
     }

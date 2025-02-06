@@ -4,11 +4,8 @@ import { mount } from "../component-api/custom-elements.js";
 import type { RuntimeContext } from "../internal-api/types.js";
 
 plugins.use({
-  createDom($el: RuntimeContext) {
-    const { element } = $el;
-    const templates: HTMLTemplateElement[] = Array.from(
-      (element["shadowRoot"] || element).querySelectorAll("template[if]")
-    );
+  dom($el: RuntimeContext) {
+    const templates: HTMLTemplateElement[] = Array.from($el.element.querySelectorAll("template[if]"));
 
     for (const t of templates) {
       templateIf(t, $el);

@@ -5,7 +5,7 @@ import { watch } from "../component-api/setup.js";
 import { RuntimeContext } from "../internal-api/types";
 
 plugins.use({
-  initElement($el: RuntimeContext, node: Text) {
+  element($el: RuntimeContext, node: Text) {
     if (node.nodeType !== node.TEXT_NODE) {
       return;
     }

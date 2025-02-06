@@ -1,5 +1,6 @@
 import type { AnyFunction, RuntimeContext } from "./types";
 import { plugins } from "./plugin.js";
+import { unref } from "@li3/reactive";
 
 export function fork(parent: any, child: any, callback: AnyFunction) {
   return new Proxy(child, {
@@ -23,10 +24,19 @@ export function fork(parent: any, child: any, callback: AnyFunction) {
   });
 }
 
+export class ComponentInstance {
+  static extend(properties) {
+    Object.assign(ComponentInstance.prototype, properties);
+  }
+}
+
 export function createState($el: RuntimeContext): void {
   // TODO check if state keys and prop names have a conflict
-  const componentData = $el.setup($el, $el.element) || {};
-  const combinedState = { ...$el.props, ...componentData };
+  const baseState = new ComponentInstance();
+  const componentState = Object.assign(baseState, $el.setup($el) || {});
+  plugins.apply("setup", [$el, componentState]);
+
+  const combinedState = { ...$el.props, ...componentState };
   $el.state = $el.reactive.watchDeep(combinedState);
   $el.stateKeys = Object.keys($el.state);
 
@@ -39,5 +49,16 @@ export function createState($el: RuntimeContext): void {
   Object.freeze($el.state);
   Object.freeze($el.stateKeys);
 
-  plugins.apply("setup", [$el]);
+  $el.view = {};
+  for (const key of $el.stateKeys) {
+    Object.defineProperty($el.view, key, {
+      configurable: false,
+      get() {
+        return unref(combinedState[key]);
+      },
+      set() {
+        throw new Error('Property is read-only');
+      },
+    });
+  }
 }

@@ -31,6 +31,7 @@ export interface RuntimeContext extends CreateRuntimeOptions {
   scripts: Array<string>;
   stateKeys: string[];
   state: any;
+  view: any;
   props: Record<string, Ref<any>>;
 
   init: Array<LifeCycleFunction>;
