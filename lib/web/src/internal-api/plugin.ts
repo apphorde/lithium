@@ -27,10 +27,9 @@ export function createDispatcher(hookNames: string[]) {
 
 export const plugins = createDispatcher([
   "setup",
-  "createDom",
-  "initElement",
-  "applyAttribute",
-  "appendDom",
+  "dom",
+  "element",
+  "attribute",
   "init",
   "update",
   "destroy",
