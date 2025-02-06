@@ -18,6 +18,7 @@ plugins.use({
 
 export function createTextNodeBinding($el: RuntimeContext, node: Text) {
   const text = String(node.textContent);
+
   if (!(text.includes("${") || text.includes("{{"))) {
     return;
   }
