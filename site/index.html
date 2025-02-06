@@ -75,11 +75,6 @@
 
   <feature-section id="get-started">
     <span slot="title">Introduction</span>
-    <!-- <div class="flex px-4 pt-2">
-      <button class="p-2"></button>
-    </div>-->
-
-    <!-- https://cdn.li3.dev/@li3/web@latest -->
     <p class="text-xl mt-6">Add an import map to any page:</p>
 
     <code-block>
@@ -373,7 +368,7 @@
   </template>
 
   <template component="code-block">
-    <div class="bg-white rounded-lg p-5 my-6 shadow-md w-full border border-gray-300 text-gray-800">
+    <div class="bg-white rounded-lg p-5 my-6 shadow border border-gray-300 text-gray-800 text-sm">
       <slot class="font-mono whitespace-pre overflow-x-auto block"></slot>
     </div>
     <script setup
@@ -394,7 +389,7 @@
 
   <template component="li-card">
     <div class="p-8 noisy rounded-2xl text-white">
-      <slot></slot>
+      <slot class="contents"></slot>
     </div>
   </template>
 
