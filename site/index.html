@@ -9,13 +9,13 @@
   <script type="importmap">
       {
         "imports": {
+          "@li3/web": "https://cdn.li3.dev/@li3/web@latest/index.js",
           "@li3/": "https://cdn.li3.dev/@li3/",
           "@sodium/": "https://--sodium.static.apphor.de/"
         }
       }
     </script>
-  <script src="https://cdn.li3.dev/@li3/web"
-    type="module"></script>
+  <script type="module">import '@li3/web';</script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
@@ -143,38 +143,35 @@
   </feature-section>
 
   <feature-section id="bindings">
-    <span slot="title">Bindings</span>
+    <span slot="title">Template syntax</span>
     <h3 class="text-3xl mt-3 font-semi font-serif">
       How to bring static HTML to life
     </h3>
 
-    <p class="text-xl mt-8">Bind a property or attribute:</p>
-    <code-block>
+    <code-block title="Bind a property or attribute">
       <template>
         <button attr-lang="language"
           bind-disabled="isDisabled"></button>
       </template>
     </code-block>
 
-    <p class="text-xl mt-6">Listen to events:</p>
-    <code-block>
+    <code-block title="Listen to events">
       <template>
         <form on-submit.prevent.stop="onSubmit($event)"></form>
       </template>
     </code-block>
+
     <small class="mt-3 block">Available modifiers: "capture", "once", "passive", "stop" and
       "prevent".</small>
 
-    <p class="text-xl mt-6">Add/remove classes:</p>
-    <code-block>
+    <code-block title="Add/remove CSS classes">
       <template>
         <input class-border-red.bg-yellow="isInvalid()" />
       </template>
     </code-block>
     <small class="mt-3 block">Multiple classes can be separated by a dot (.)</small>
 
-    <p class="text-xl mt-6">Set style:</p>
-    <code-block>
+    <code-block title="Set styles">
       <template>
         <div style-display="shouldBeVisible ? 'block' : 'none'"></div>
       </template>
@@ -183,7 +180,7 @@
   </feature-section>
 
   <feature-section id="setup-api">
-    <span slot="title">Declarative API</span>
+    <span slot="title">Declarative Component API</span>
     <code-block language="javascript"
       title="Declare element inputs (props):">
       <pre>
@@ -319,19 +316,18 @@
     </code-block>
 
     <p class="mt-12 text-xl mb-8">
-      Need more?
-      Head to <a class="underline"
-        href="/docs">the full documentation</a>to see the full API!
+      Need more? Head to <a class="underline"
+        href="/docs">the full documentation</a> to see the API and more examples!
     </p>
   </feature-section>
 
   <footer class="py-8 px-8 text-center">
-    <p>Released under the MIT License.<br/>
+    <p>Released under the MIT License.<br />
     <p class="mt-2">Copyright © 2024 Li3: Lithium web components</p>
   </footer>
 
   <template component="code-block">
-    <div class="bg-white rounded-lg p-5 mb-6 shadow border border-gray-300 text-gray-800 text-xs relative">
+    <div class="bg-white rounded-lg mb-6 shadow border border-gray-300 text-gray-800 text-xs relative">
       <button class="absolute right-0 top-0 m-1 text-xs px-2 py-1 bg-white text-gray-800 border rounded"
         on-click="onCopy()">
         copy

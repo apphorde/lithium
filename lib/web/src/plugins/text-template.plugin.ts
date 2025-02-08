@@ -29,5 +29,7 @@ export function createTextNodeBinding($el: RuntimeContext, node: Text) {
     "`" + text.replace(/\{\{([\s\S]+?)}}/g, (_: any, inner: string) => "${ " + inner.trim() + " }") + "`";
 
   const fn = compileExpression($el, expression);
-  watch(wrapTryCatch(expression, fn), (v?: any) => setText(node, v));
+  const getter = wrapTryCatch(expression, fn);
+
+  watch(getter, (v: string) => setText(node, v));
 }

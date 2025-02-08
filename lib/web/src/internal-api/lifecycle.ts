@@ -40,8 +40,8 @@ export function activateContext($el: RuntimeContext) {
     reactive.suspend();
     createState($el);
     createDom($el);
-    reactive.check();
     reactive.unsuspend();
+    reactive.check();
 
     ($el.element as any).__destroy = () => {
       plugins.apply("destroy", [$el]);
