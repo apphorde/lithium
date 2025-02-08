@@ -145,41 +145,41 @@
   <feature-section id="bindings">
     <span slot="title">Template syntax</span>
     <span slot="subtitle">Add life to your static HTML text</span>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 justify-items-stretch items-stretch">
-      <code-block title="Bind a property or attribute">
-        <template>
-          <button attr-lang="language"
-            bind-disabled="isDisabled"></button>
-        </template>
-      </code-block>
 
-      <code-block title="Listen to events"
-        footnote="'stop' and 'prevent' modifiers have special meaning.">
-        <template>
-          <form on-submit.prevent.stop="onSubmit($event)"></form>
-        </template>
-      </code-block>
+    <code-block title="Bind a property or attribute">
+      <template>
+        <button attr-lang="language"
+          bind-disabled="isDisabled"></button>
+      </template>
+    </code-block>
 
-      <code-block title="Add/remove CSS classes"
-        footnote="Multiple classes can be separated by a dot.">
-        <template>
-          <input class-border-red.bg-yellow="isInvalid()" />
-        </template>
-      </code-block>
+    <code-block title="Listen to events"
+      footnote="'stop' and 'prevent' modifiers have special meaning.">
+      <template>
+        <form on-submit.prevent.stop="onSubmit($event)"></form>
+      </template>
+    </code-block>
 
-      <code-block title="Set styles">
-        <template>
-          <div style-display="shouldBeVisible ? 'block' : 'none'"></div>
-        </template>
-      </code-block>
-    </div>
+    <code-block title="Add/remove CSS classes"
+      footnote="Multiple classes can be separated by a dot.">
+      <template>
+        <input class-border-red.bg-yellow="isInvalid()" />
+      </template>
+    </code-block>
+
+    <code-block title="Set styles">
+      <template>
+        <div style-display="shouldBeVisible ? 'block' : 'none'"></div>
+      </template>
+    </code-block>
   </feature-section>
 
   <feature-section id="setup-api">
     <span slot="title">Declarative Component API</span>
-    <code-block language="javascript"
-      title="Declare element inputs (props):">
-      <pre>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 justify-items-stretch items-stretch">
+      <code-block language="javascript"
+        title="Declare element inputs (props):">
+        <pre>
           import { defineProp, defineProps } from '@li3/web';
 
           export default function setup() {
@@ -194,11 +194,11 @@
             });
           }
       </pre>
-    </code-block>
+      </code-block>
 
-    <code-block language="javascript"
-      title="Declare outputs (events):">
-      <pre>
+      <code-block language="javascript"
+        title="Declare outputs (events):">
+        <pre>
         import { defineEvent, defineEvents } from '@li3/web';
 
         export default function setup() {
@@ -211,11 +211,11 @@
           onUpdate(123)
         }
       </pre>
-    </code-block>
+      </code-block>
 
-    <code-block language="javascript"
-      title="Create reactive values (ref/computed) and watchers:">
-      <pre>
+      <code-block language="javascript"
+        title="Create reactive values (ref/computed) and watchers:">
+        <pre>
           import { ref, unref, computed, watch } from '@li3/web';
 
           export default function setup() {
@@ -231,11 +231,11 @@
             return { name, greeting, isEmpty }
           }
         </pre>
-    </code-block>
+      </code-block>
 
-    <code-block language="javascript"
-      title="Use lifecycle events">
-      <pre>
+      <code-block language="javascript"
+        title="Use lifecycle events">
+        <pre>
           import { onInit, onUpdate, onDestroy } from '@li3/web';
 
           export default function setup() {
@@ -252,39 +252,40 @@
             });
           }
         </pre>
-    </code-block>
+      </code-block>
 
-    <code-block language="javascript"
-      title="Access DOM nodes (.one or .many)">
-      <template>
-        <script type="module">
-          import { defineQuery } from "@li3/web";
+      <code-block language="javascript"
+        title="Access DOM nodes (.one or .many)">
+        <template>
+          <script type="module">
+            import { defineQuery } from "@li3/web";
 
-          function setup() {
-            const inputs = defineQuery("input");
+            function setup() {
+              const inputs = defineQuery("input");
 
-            function something() {
-              const value = inputs.one.value;
-              const valid = [...inputs.many].every((input) => isValid(input));
+              function something() {
+                const value = inputs.one.value;
+                const valid = [...inputs.many].every((input) => isValid(input));
+              }
             }
-          }
-        </script>
-      </template>
-    </code-block>
+          </script>
+        </template>
+      </code-block>
 
-    <code-block language="javascript"
-      title="Load scripts and styles">
-      <template>
-        <script type="module">
-          import { loadCss, loadScript } from "@li3/web";
+      <code-block language="javascript"
+        title="Load scripts and styles">
+        <template>
+          <script type="module">
+            import { loadCss, loadScript } from "@li3/web";
 
-          function setup() {
-            loadCss("http://example.com/main.css");
-            loadScript("http://example.com/index.js");
-          }
-        </script>
-      </template>
-    </code-block>
+            function setup() {
+              loadCss("http://example.com/main.css");
+              loadScript("http://example.com/index.js");
+            }
+          </script>
+        </template>
+      </code-block>
+    </div>
   </feature-section>
 
   <feature-section id="loops">
