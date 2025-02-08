@@ -144,44 +144,43 @@
 
   <feature-section id="bindings">
     <span slot="title">Template syntax</span>
-    <h3 class="text-3xl mt-3 font-semi font-serif">
-      How to bring static HTML to life
-    </h3>
+    <span slot="subtitle">How to bring static HTML to life</span>
 
-    <code-block title="Bind a property or attribute">
+    <code-block title="Bind a property or attribute"
+      class="mb-6">
       <template>
         <button attr-lang="language"
           bind-disabled="isDisabled"></button>
       </template>
     </code-block>
 
-    <code-block title="Listen to events">
+    <code-block title="Listen to events"
+      footnote="'stop' and 'prevent' modifiers have special meaning."
+      class="mb-6">
       <template>
         <form on-submit.prevent.stop="onSubmit($event)"></form>
       </template>
     </code-block>
 
-    <small class="mt-3 block">Available modifiers: "capture", "once", "passive", "stop" and
-      "prevent".</small>
-
-    <code-block title="Add/remove CSS classes">
+    <code-block title="Add/remove CSS classes"
+      footnote="Multiple classes can be separated by a dot."
+      class="mb-6">
       <template>
         <input class-border-red.bg-yellow="isInvalid()" />
       </template>
     </code-block>
-    <small class="mt-3 block">Multiple classes can be separated by a dot (.)</small>
 
     <code-block title="Set styles">
       <template>
         <div style-display="shouldBeVisible ? 'block' : 'none'"></div>
       </template>
     </code-block>
-    <small class="mt-3 block">Multiple classes can be separated by a dot (.)</small>
   </feature-section>
 
   <feature-section id="setup-api">
     <span slot="title">Declarative Component API</span>
     <code-block language="javascript"
+      class="mb-6"
       title="Declare element inputs (props):">
       <pre>
           import { defineProp, defineProps } from '@li3/web';
@@ -201,6 +200,7 @@
     </code-block>
 
     <code-block language="javascript"
+      class="mb-6"
       title="Declare outputs (events):">
       <pre>
         import { defineEvent, defineEvents } from '@li3/web';
@@ -218,6 +218,7 @@
     </code-block>
 
     <code-block language="javascript"
+      class="mb-6"
       title="Create reactive values (ref/computed) and watchers:">
       <pre>
           import { ref, unref, computed, watch } from '@li3/web';
@@ -238,6 +239,7 @@
     </code-block>
 
     <code-block language="javascript"
+      class="mb-6"
       title="Use lifecycle events">
       <pre>
           import { onInit, onUpdate, onDestroy } from '@li3/web';
@@ -259,6 +261,7 @@
     </code-block>
 
     <code-block language="javascript"
+      class="mb-6"
       title="Access DOM nodes (.one or .many)">
       <template>
         <script type="module">
@@ -277,6 +280,7 @@
     </code-block>
 
     <code-block language="javascript"
+      class="mb-6"
       title="Load scripts and styles">
       <template>
         <script type="module">
@@ -293,9 +297,7 @@
 
   <feature-section id="loops">
     <span slot="title">Conditionals and loops</span>
-    <h3 class="text-3xl mt-3 font-semi font-serif">
-      Repeat a template or add/remove elements based on a condition
-    </h3>
+    <span slot="subtitle">Repeat a template or add/remove elements based on a condition</span>
 
     <code-block language="javascript"
       title="Conditional templates: template[if]">
@@ -327,13 +329,15 @@
   </footer>
 
   <template component="code-block">
-    <div class="bg-white rounded-lg mb-6 shadow border border-gray-300 text-gray-800 text-xs relative">
+    <div class="bg-white rounded-lg shadow border border-gray-300 text-gray-800 text-xs relative">
       <button class="absolute right-0 top-0 m-1 text-xs px-2 py-1 bg-white text-gray-800 border rounded"
         on-click="onCopy()">
         copy
       </button>
-      <div class="text-xs mb-2 px-4 py-3 uppercase bg-gray-100 rounded-t-lg font-bold text-green-700">{{ title }}</div>
+      <div class="empty:hidden text-xs mb-2 px-4 py-3 uppercase bg-gray-100 rounded-t-lg font-bold text-green-700">{{
+        title }}</div>
       <slot class="font-mono whitespace-pre overflow-x-auto block w-full p-4 pt-0"></slot>
+      <small class="empty:hidden mt-2 block">{{footnote}}</small>
     </div>
     <script setup>
       import { load, highlight } from "https://highlight.jsfn.run/index.mjs";
@@ -343,6 +347,7 @@
 
       export default function codeBlock({ element }) {
         const title = defineProp("title", "");
+        const footnote = defineProp("footnote", "");
         const language = defineProp("language", "html");
         const srcElement = defineProp("srcElement", "");
         const pre = defineQuery("pre");
@@ -406,6 +411,9 @@
           <h2 class="text-sm uppercase py-2 font-bold">
             <slot name="title"></slot>
           </h2>
+          <h3 class="text-3xl mt-3 mb-6 font-semi font-serif">
+            <slot name="subtitle"></slot>
+          </h3>
           <slot></slot>
         </li-card>
       </div>
