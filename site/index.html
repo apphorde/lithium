@@ -78,7 +78,7 @@
       <div class="w-1/3">
         <p class="mt-6">Load the library</p>
       </div>
-      <code-block class="block w-2/3">
+      <code-block class="w-2/3">
         <template>
           <script type="importmap">
               {
@@ -94,7 +94,7 @@
     </div>
 
     <div class="flex mb-8 space-x-8">
-      <code-block class="block w-2/3"
+      <code-block class="w-2/3"
         srcelement="#hello-app"></code-block>
       <p class="w-1/3">Declare an application</p>
     </div>
@@ -363,13 +363,13 @@
           .map((line) => line.replace(toReplace, ""))
           .join("\n");
 
-        hostClasses("mb-6 block");
-
         onInit(async () => {
           slot.one.innerHTML = await highlight(trimmedSource, {
             language: language.value || "html",
           });
         });
+
+        hostClasses("mb-6 block");
 
         return {
           onCopy() {
