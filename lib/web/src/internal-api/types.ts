@@ -37,6 +37,8 @@ export interface RuntimeContext extends CreateRuntimeOptions {
   init: Array<LifeCycleFunction>;
   update: Array<UpdateLifeCycleFunction>;
   destroy: Array<LifeCycleFunction>;
+
+  hostClasses: string[];
 }
 
 export interface ComponentDefinition {

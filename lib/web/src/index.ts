@@ -26,6 +26,7 @@ import { addScriptToPage, adoptStyleSheet, injectStylesheetOnElement } from "./p
 import { createClassBinding } from "./plugins/set-class.plugin.js";
 import { setElementRefValue } from "./plugins/set-element-ref.plugin.js";
 import { createStyleBinding } from "./plugins/set-style.plugin.js";
+import { applyHostAttributes } from "./plugins/host-properties.plugin.js";
 import { templateForOf } from "./plugins/template-for.plugin.js";
 import { templateIf } from "./plugins/template-if.plugin.js";
 import { createTextNodeBinding } from "./plugins/text-template.plugin.js";
@@ -52,6 +53,7 @@ export const Plugins = {
   reset: plugins.reset,
   addScriptToPage,
   adoptStyleSheet,
+  applyHostAttributes,
   createAttributeBinding,
   createClassBinding,
   createEventBinding,

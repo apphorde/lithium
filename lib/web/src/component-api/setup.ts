@@ -25,6 +25,10 @@ export function onDestroy(fn: VoidFunction): void {
   getCurrentContext().destroy.push(fn);
 }
 
+export function hostClasses(classes: string) {
+  getCurrentContext().hostClasses.push(classes);
+}
+
 export function defineQuery(selector: string) {
   const $el = getCurrentContext();
   const root = ($el.element as Element).shadowRoot || $el.element;

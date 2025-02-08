@@ -26,6 +26,7 @@ export function createRuntimeContext(properties: CreateRuntimeOptions): RuntimeC
     view: {},
     update: [],
     destroy: [],
+    hostClasses: [],
     reactive: new ReactiveContext(),
   };
 

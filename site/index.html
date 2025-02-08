@@ -146,8 +146,7 @@
     <span slot="title">Template syntax</span>
     <span slot="subtitle">How to bring static HTML to life</span>
 
-    <code-block title="Bind a property or attribute"
-      class="mb-6">
+    <code-block title="Bind a property or attribute">
       <template>
         <button attr-lang="language"
           bind-disabled="isDisabled"></button>
@@ -155,16 +154,14 @@
     </code-block>
 
     <code-block title="Listen to events"
-      footnote="'stop' and 'prevent' modifiers have special meaning."
-      class="mb-6">
+      footnote="'stop' and 'prevent' modifiers have special meaning.">
       <template>
         <form on-submit.prevent.stop="onSubmit($event)"></form>
       </template>
     </code-block>
 
     <code-block title="Add/remove CSS classes"
-      footnote="Multiple classes can be separated by a dot."
-      class="mb-6">
+      footnote="Multiple classes can be separated by a dot.">
       <template>
         <input class-border-red.bg-yellow="isInvalid()" />
       </template>
@@ -180,7 +177,6 @@
   <feature-section id="setup-api">
     <span slot="title">Declarative Component API</span>
     <code-block language="javascript"
-      class="mb-6"
       title="Declare element inputs (props):">
       <pre>
           import { defineProp, defineProps } from '@li3/web';
@@ -200,7 +196,6 @@
     </code-block>
 
     <code-block language="javascript"
-      class="mb-6"
       title="Declare outputs (events):">
       <pre>
         import { defineEvent, defineEvents } from '@li3/web';
@@ -218,7 +213,6 @@
     </code-block>
 
     <code-block language="javascript"
-      class="mb-6"
       title="Create reactive values (ref/computed) and watchers:">
       <pre>
           import { ref, unref, computed, watch } from '@li3/web';
@@ -239,7 +233,6 @@
     </code-block>
 
     <code-block language="javascript"
-      class="mb-6"
       title="Use lifecycle events">
       <pre>
           import { onInit, onUpdate, onDestroy } from '@li3/web';
@@ -261,7 +254,6 @@
     </code-block>
 
     <code-block language="javascript"
-      class="mb-6"
       title="Access DOM nodes (.one or .many)">
       <template>
         <script type="module">
@@ -280,7 +272,6 @@
     </code-block>
 
     <code-block language="javascript"
-      class="mb-6"
       title="Load scripts and styles">
       <template>
         <script type="module">
@@ -335,13 +326,14 @@
         copy
       </button>
       <div class="empty:hidden text-xs mb-2 px-4 py-3 uppercase bg-gray-100 rounded-t-lg font-bold text-green-700">{{
-        title }}</div>
+        title || '' }}</div>
       <slot class="font-mono whitespace-pre overflow-x-auto block w-full p-4 pt-0"></slot>
-      <small class="empty:hidden mt-2 block">{{footnote}}</small>
+      <small class="empty:hidden px-4 py-2 block text-xs border-t">{{ footnote || '' }}</small>
     </div>
+
     <script setup>
       import { load, highlight } from "https://highlight.jsfn.run/index.mjs";
-      import { defineProp, defineQuery, onInit } from "@li3/web";
+      import { defineProp, defineQuery, onInit, hostClasses } from "@li3/web";
 
       load();
 
@@ -370,6 +362,8 @@
         const trimmedSource = lines
           .map((line) => line.replace(toReplace, ""))
           .join("\n");
+
+        hostClasses("mb-6 block");
 
         onInit(async () => {
           slot.one.innerHTML = await highlight(trimmedSource, {
