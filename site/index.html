@@ -144,34 +144,35 @@
 
   <feature-section id="bindings">
     <span slot="title">Template syntax</span>
-    <span slot="subtitle">How to bring static HTML to life</span>
+    <span slot="subtitle">Add life to your static HTML text</span>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 justify-items-stretch items-stretch">
+      <code-block title="Bind a property or attribute">
+        <template>
+          <button attr-lang="language"
+            bind-disabled="isDisabled"></button>
+        </template>
+      </code-block>
 
-    <code-block title="Bind a property or attribute">
-      <template>
-        <button attr-lang="language"
-          bind-disabled="isDisabled"></button>
-      </template>
-    </code-block>
+      <code-block title="Listen to events"
+        footnote="'stop' and 'prevent' modifiers have special meaning.">
+        <template>
+          <form on-submit.prevent.stop="onSubmit($event)"></form>
+        </template>
+      </code-block>
 
-    <code-block title="Listen to events"
-      footnote="'stop' and 'prevent' modifiers have special meaning.">
-      <template>
-        <form on-submit.prevent.stop="onSubmit($event)"></form>
-      </template>
-    </code-block>
+      <code-block title="Add/remove CSS classes"
+        footnote="Multiple classes can be separated by a dot.">
+        <template>
+          <input class-border-red.bg-yellow="isInvalid()" />
+        </template>
+      </code-block>
 
-    <code-block title="Add/remove CSS classes"
-      footnote="Multiple classes can be separated by a dot.">
-      <template>
-        <input class-border-red.bg-yellow="isInvalid()" />
-      </template>
-    </code-block>
-
-    <code-block title="Set styles">
-      <template>
-        <div style-display="shouldBeVisible ? 'block' : 'none'"></div>
-      </template>
-    </code-block>
+      <code-block title="Set styles">
+        <template>
+          <div style-display="shouldBeVisible ? 'block' : 'none'"></div>
+        </template>
+      </code-block>
+    </div>
   </feature-section>
 
   <feature-section id="setup-api">
@@ -320,14 +321,14 @@
   </footer>
 
   <template component="code-block">
-    <div class="bg-white rounded-lg shadow border border-gray-300 text-gray-800 text-xs relative">
+    <div class="bg-white rounded-lg shadow border border-gray-300 text-gray-800 text-xs relative flex flex-col h-full">
       <button class="absolute right-0 top-0 m-1 text-xs px-2 py-1 bg-white text-gray-800 border rounded"
         on-click="onCopy()">
         copy
       </button>
       <div class="empty:hidden text-xs mb-2 px-4 py-3 uppercase bg-gray-100 rounded-t-lg font-bold text-green-700">{{
         title || '' }}</div>
-      <slot class="font-mono whitespace-pre overflow-x-auto block w-full p-4 pt-0"></slot>
+      <slot class="font-mono whitespace-pre overflow-x-auto block w-full px-4 my-4"></slot>
       <small class="empty:hidden px-4 py-2 block text-xs border-t">{{ footnote || '' }}</small>
     </div>
 
