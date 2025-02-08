@@ -184,9 +184,8 @@
 
   <feature-section id="setup-api">
     <span slot="title">Declarative API</span>
-
-    <p class="text-xl mt-8">Declare element inputs (props):</p>
-    <code-block language="javascript">
+    <code-block language="javascript"
+      title="Declare element inputs (props):">
       <pre>
           import { defineProp, defineProps } from '@li3/web';
 
@@ -204,8 +203,8 @@
       </pre>
     </code-block>
 
-    <p class="text-xl mt-8">Declare outputs (events):</p>
-    <code-block language="javascript">
+    <code-block language="javascript"
+      title="Declare outputs (events):">
       <pre>
         import { defineEvent, defineEvents } from '@li3/web';
 
@@ -221,10 +220,8 @@
       </pre>
     </code-block>
 
-    <p class="text-xl mt-8">
-      Create reactive values (ref/computed) and watchers:
-    </p>
-    <code-block language="javascript">
+    <code-block language="javascript"
+      title="Create reactive values (ref/computed) and watchers:">
       <pre>
           import { ref, unref, computed, watch } from '@li3/web';
 
@@ -243,8 +240,8 @@
         </pre>
     </code-block>
 
-    <p class="text-xl mt-8">Lifecycle events:</p>
-    <code-block language="javascript">
+    <code-block language="javascript"
+      title="Use lifecycle events">
       <pre>
           import { onInit, onUpdate, onDestroy } from '@li3/web';
 
@@ -264,8 +261,8 @@
         </pre>
     </code-block>
 
-    <p class="text-xl mt-8">Access DOM nodes (.one / .many):</p>
-    <code-block language="javascript">
+    <code-block language="javascript"
+      title="Access DOM nodes (.one or .many)">
       <template>
         <script type="module">
           import { defineQuery } from "@li3/web";
@@ -282,8 +279,8 @@
       </template>
     </code-block>
 
-    <p class="text-xl mt-8">Load resources:</p>
-    <code-block language="javascript">
+    <code-block language="javascript"
+      title="Load scripts and styles">
       <template>
         <script type="module">
           import { loadCss, loadScript } from "@li3/web";
@@ -303,11 +300,8 @@
       Repeat a template or add/remove elements based on a condition
     </h3>
 
-    <p class="text-xl mt-8">
-      Conditional elements with
-      <inline-code>template[if]</inline-code>
-    </p>
-    <code-block language="javascript">
+    <code-block language="javascript"
+      title="Conditional templates: template[if]">
       <template>
         <template if="condition">
           <div>Show me</div>
@@ -315,36 +309,35 @@
       </template>
     </code-block>
 
-    <p class="text-xl mt-8">
-      Repeat elements with
-      <inline-code>template[for]</inline-code>
-    </p>
-    <code-block language="javascript">
+    <code-block language="javascript"
+      title="Repeating templates: template[for..of]">
       <template>
-        <template for="item of list">
-          <div>Repeat me</div>
+        <template for="item of links">
+          <li><a bind-href="item.href">{{ item.label }}</a></li>
         </template>
       </template>
     </code-block>
 
     <p class="mt-12 text-xl mb-8">
-      That's it! Now <a class="underline"
-        href="/docs">head to the documentation</a>to see the full API!
+      Need more?
+      Head to <a class="underline"
+        href="/docs">the full documentation</a>to see the full API!
     </p>
   </feature-section>
 
   <footer class="py-8 px-8 text-center">
-    <p>Released under the MIT License</p>
-    <p class="mt-2">Copyright © 2024 Lithium Components</p>
+    <p>Released under the MIT License.<br/>
+    <p class="mt-2">Copyright © 2024 Li3: Lithium web components</p>
   </footer>
 
   <template component="code-block">
     <div class="bg-white rounded-lg p-5 mb-6 shadow border border-gray-300 text-gray-800 text-xs relative">
-      <button class="absolute right-0 top-0 m-1 text-xs px-2 py-1 bg-gray-100 text-gray-800 border rounded"
+      <button class="absolute right-0 top-0 m-1 text-xs px-2 py-1 bg-white text-gray-800 border rounded"
         on-click="onCopy()">
         copy
       </button>
-      <slot class="font-mono whitespace-pre overflow-x-auto block w-full"></slot>
+      <div class="text-xs mb-2 px-4 py-3 uppercase bg-gray-100 rounded-t-lg font-bold text-green-700">{{ title }}</div>
+      <slot class="font-mono whitespace-pre overflow-x-auto block w-full p-4 pt-0"></slot>
     </div>
     <script setup>
       import { load, highlight } from "https://highlight.jsfn.run/index.mjs";
@@ -353,6 +346,7 @@
       load();
 
       export default function codeBlock({ element }) {
+        const title = defineProp("title", "");
         const language = defineProp("language", "html");
         const srcElement = defineProp("srcElement", "");
         const pre = defineQuery("pre");
