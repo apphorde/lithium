@@ -21,6 +21,22 @@
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    :root {
+      --primary: #411e5c;
+    }
+
+    .bg-primary {
+      background-color: var(--primary);
+    }
+
+    .border-primary {
+      border-color: var(--primary);
+    }
+
+    .text-primary {
+      color: var(--primary);
+    }
+
     body {
       font-family: Fricolage Grotesque, ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
@@ -33,10 +49,12 @@
     }
 
     .noisy {
-      background: linear-gradient(180deg, #5627a3c8 0%, #2c0848c8 50%), url(/assets/noisy.svg);
+      background: #ffffff20 url(/assets/noisy.svg);
     }
 
-    markdown-block > * { margin-bottom: 1rem; }
+    markdown-block>* {
+      margin-bottom: 1rem !important;
+    }
   </style>
 </head>
 
@@ -64,12 +82,12 @@
       </p>
       <div class="flex flex-wrap gap-4">
         <a href="/docs"
-          class="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transform hover:-translate-y-0.5 transition-all">
+          class="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transform hover:-translate-y-0.5 transition-all">
           Read the Docs
         </a>
         <a href="https://github.com/apphorde/lithium"
           target="_blank"
-          class="px-6 py-3 bg-white text-blue-600 border border-blue-600 rounded-lg font-semibold hover:bg-gray-50 transform hover:-translate-y-0.5 transition-all">
+          class="px-6 py-3 bg-white text-primary border border-primary rounded-lg font-semibold hover:bg-gray-50 transform hover:-translate-y-0.5 transition-all">
           View on GitHub
         </a>
       </div>
@@ -78,7 +96,8 @@
 
   <feature-section id="get-started">
     <span slot="title">1 minute intro:</span>
-    <h2 class="text-xl mb-8 font-serif">So, what is Lithium exactly?</h2>
+    <span slot="subtitle">So, what is Lithium exactly?</span>
+
     <markdown-block class="block text-sm my-8">
       <pre>
 It's a library to write reactive web interfaces using a simple and predictable mental model.
