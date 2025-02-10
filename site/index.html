@@ -35,6 +35,8 @@
     .noisy {
       background: linear-gradient(180deg, #5627a3c8 0%, #2c0848c8 50%), url(/assets/noisy.svg);
     }
+
+    markdown-block > * { margin-bottom: 1rem; }
   </style>
 </head>
 
@@ -349,7 +351,7 @@ Here's a quick example:
         on-click="onCopy()">
         copy
       </button>
-      <div class="empty:hidden text-xs mb-2 px-4 py-3 uppercase bg-gray-100 rounded-t-lg font-bold text-green-700">{{
+      <div class="empty:hidden text-xs px-4 py-3 uppercase bg-gray-100 rounded-t-lg font-bold text-green-700">{{
         title || '' }}</div>
       <slot class="font-mono whitespace-pre overflow-x-auto block w-full px-4 my-4"></slot>
       <small class="empty:hidden px-4 py-2 block text-xs border-t">{{ footnote || '' }}</small>
