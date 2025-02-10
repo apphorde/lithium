@@ -78,7 +78,7 @@
   <feature-section id="get-started">
     <span slot="title">1 minute intro:</span>
     <h2 class="text-xl mb-8 font-serif">So, what is Lithium exactly?</h2>
-    <markdown-block class="text-sm my-8 font-serif">
+    <markdown-block class="block text-sm my-8">
       <pre>
 It's a library to write reactive web interfaces using a simple and predictable mental model.
 This model works for all skill levels: beginner, advanced and AI developers.
@@ -106,8 +106,7 @@ Here's a quick example:
               }
             }
           </script>
-        <script type="module"
-          src="https://cdn.li3.dev/@li3/web"></script>
+        <script type="module">import '@li3/web';</script>
       </template>
     </code-block>
 
@@ -118,7 +117,7 @@ Here's a quick example:
     <div class="mb-8">
       <template id="hello-app"
         app>
-        <form class="w-2/3 bg-white rounded-lg p-5 mb-6 shadow border border-gray-300 text-gray-800 text-xs"
+        <form class="md:w-2/3 mx-auto bg-white rounded-lg p-5 mb-6 shadow border border-gray-300 text-gray-800 text-xs"
           on-submit.prevent="sayMyName()">
           <label class="py-2">What is your name?</label>
           <input type="text"
