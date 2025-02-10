@@ -73,45 +73,57 @@
   </section>
 
   <feature-section id="get-started">
-    <span slot="title">Start coding in 1 minute</span>
-    <div class="flex mb-8 space-x-8">
-      <div class="w-1/3">
-        <p class="mt-6">Load the library</p>
-      </div>
-      <code-block class="w-2/3">
-        <template>
-          <script type="importmap">
-              {
-                "imports": {
-                  "@li3/": "https://cdn.li3.dev/@li3/"
-                }
+    <span slot="title">1 minute intro:</span>
+    <markdown-block class="text-xl mb-8 font-serif">
+      <pre>
+      ## What is Lithium?
+
+      It's a library to write reactive web interfaces using a simple and predictable mental model.
+      This model works for all skill levels: beginner, advanced and AI developers.
+
+      I know what you are thinking! Oh, yet another framework! _sigh_ no thanks.
+
+      So what makes **Lithium** different?
+
+      We **_embrace_** the web platform, instead of putting it away as abstractions.
+
+      Using [inline components and a declarative API](/docs), we can define the _shape_ of a component, and let the implementation details aside.
+      Then we can pick and choose which implementation you want to use, again with standard API's and put them together to bring life to your user interface (UI).
+      </pre>
+    </markdown-block>
+
+    <code-block class="mb-8"
+      title="Load the library">
+      <template>
+        <script type="importmap">
+            {
+              "imports": {
+                "@li3/": "https://cdn.li3.dev/@li3/"
               }
-            </script>
-          <script type="module"
-            src="https://cdn.li3.dev/@li3/web"></script>
-        </template>
-      </code-block>
-    </div>
+            }
+          </script>
+        <script type="module"
+          src="https://cdn.li3.dev/@li3/web"></script>
+      </template>
+    </code-block>
 
-    <div class="flex mb-8 space-x-8">
-      <code-block class="w-2/3"
-        srcelement="#hello-app"></code-block>
-      <p class="w-1/3">Declare an application</p>
-    </div>
+    <code-block class="mb-8"
+      title="Declare an application"
+      srcelement="#hello-app"></code-block>
 
-    <div class="flex mb-8">
-      <p class="w-1/3">See it in action</p>
+    <div class="mb-8">
       <template id="hello-app"
         app>
-        <div class="w-2/3 bg-white rounded-lg p-5 mb-6 shadow border border-gray-300 text-gray-800 text-xs">
-          <label class="py-2">Your name:</label>
+        <form class="w-2/3 bg-white rounded-lg p-5 mb-6 shadow border border-gray-300 text-gray-800 text-xs"
+          on-submit.prevent="sayMyName()">
+          <label class="py-2">What is your name?</label>
           <input type="text"
             class="mt-2 p-2 border rounded bg-white w-full text-black"
             on-input="setName($event.target.value)"
             bind-value="name" />
           <hr class="border-t my-3" />
-          <p class="text-xl font-bold">Hello, {{ name }}!</p>
-        </div>
+          <p class="text-xl font-bold">Hello, {{ name || 'stranger' }}.</p>
+        </form>
         <script setup>
           import { ref } from "@li3/web";
 
@@ -122,7 +134,11 @@
               name.value = v;
             }
 
-            return { name, setName };
+            function sayMyName() {
+              alert(name.value);
+            }
+
+            return { name, sayMyName, setName };
           }
         </script>
         <script setup>
@@ -135,7 +151,11 @@
               name.value = v;
             }
 
-            return { name, setName };
+            function sayMyName() {
+              alert(name.value);
+            }
+
+            return { name, sayMyName, setName };
           }
         </script>
       </template>
