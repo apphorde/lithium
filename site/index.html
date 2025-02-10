@@ -48,10 +48,6 @@
       display: contents;
     }
 
-    .noisy {
-      background: #ffffff20 url(/assets/noisy.svg);
-    }
-
     markdown-block>* {
       margin-bottom: 1rem !important;
     }
@@ -438,7 +434,7 @@ Here's a quick example:
   </template>
 
   <template component="li-card">
-    <div class="p-8 noisy rounded-2xl text-white shadow-xl">
+    <div class="p-8 bg-white/15 rounded-2xl text-white shadow-xl">
       <slot class="contents"></slot>
     </div>
   </template>
