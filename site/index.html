@@ -16,8 +16,8 @@
       }
     </script>
   <script type="module">
-  import '@li3/web';
-  import '@sodium/markdown-block';
+    import '@li3/web';
+    import '@sodium/markdown-block';
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -77,22 +77,23 @@
 
   <feature-section id="get-started">
     <span slot="title">1 minute intro:</span>
-    <markdown-block class="text-xl mb-8 font-serif">
+    <h2 class="text-xl mb-8 font-serif">So, what is Lithium exactly?</h2>
+    <markdown-block class="text-sm my-8 font-serif">
       <pre>
-      ## What is Lithium?
+It's a library to write reactive web interfaces using a simple and predictable mental model.
+This model works for all skill levels: beginner, advanced and AI developers.
 
-      It's a library to write reactive web interfaces using a simple and predictable mental model.
-      This model works for all skill levels: beginner, advanced and AI developers.
+I know what you are thinking! Oh, yet another framework! _sigh_ no thanks.
 
-      I know what you are thinking! Oh, yet another framework! _sigh_ no thanks.
+So what makes **Lithium** different?
 
-      So what makes **Lithium** different?
+We **_embrace_** the web platform, instead of putting it away as abstractions.
 
-      We **_embrace_** the web platform, instead of putting it away as abstractions.
+Using [inline components and a declarative API](/docs), we can define the _shape_ of a component, and let the implementation details aside.
+Then we can pick and choose which implementation you want to use, again with standard API's and put them together to bring life to your user interface (UI).
 
-      Using [inline components and a declarative API](/docs), we can define the _shape_ of a component, and let the implementation details aside.
-      Then we can pick and choose which implementation you want to use, again with standard API's and put them together to bring life to your user interface (UI).
-      </pre>
+Here's a quick example:
+</pre>
     </markdown-block>
 
     <code-block class="mb-8"
