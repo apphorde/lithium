@@ -51,17 +51,53 @@ importers:
         specifier: ^5.7.3
         version: 5.7.3
 
+  lib/browser:
+    dependencies:
+      '@li3/dom':
+        specifier: workspace:*
+        version: link:../dom
+      '@li3/reactive':
+        specifier: workspace:*
+        version: link:../reactive
+      '@li3/runtime':
+        specifier: workspace:*
+        version: link:../runtime
+
   lib/cli:
     dependencies:
       '@li3/sfc':
         specifier: 0.0.2
         version: 0.0.2
 
+  lib/dom: {}
+
   lib/html-parser: {}
+
+  lib/plugins:
+    dependencies:
+      '@li3/html-parser':
+        specifier: workspace:*
+        version: link:../html-parser
+      '@li3/reactive':
+        specifier: workspace:*
+        version: link:../reactive
 
   lib/reactive: {}
 
-  lib/scope: {}
+  lib/runtime:
+    dependencies:
+      '@li3/dom':
+        specifier: workspace:*
+        version: link:../dom
+      '@li3/reactive':
+        specifier: workspace:*
+        version: link:../reactive
+
+  lib/scope:
+    dependencies:
+      '@li3/runtime':
+        specifier: workspace:*
+        version: link:../runtime
 
   lib/sfc:
     dependencies:
