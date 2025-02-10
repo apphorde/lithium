@@ -1,5 +1,5 @@
 {
-  "name": "@li3/web",
+  "name": "@li3/browser",
   "targets": {
     "build": {},
     "tsc": {}
