@@ -1,0 +1,7 @@
+{
+  "name": "@li3/web",
+  "targets": {
+    "build": {},
+    "tsc": {}
+  }
+}

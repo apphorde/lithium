@@ -1,13 +1,10 @@
 {
-  "name": "@li3/scope",
-  "version": "0.0.2",
+  "name": "@li3/dom",
+  "version": "0.0.1",
   "exports": {
     ".": {
       "default": "./index.js",
       "types": "./dist/index.d.ts"
     }
-  },
-  "dependencies": {
-    "@li3/runtime": "workspace:*"
   }
 }

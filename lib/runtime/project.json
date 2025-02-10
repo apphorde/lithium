@@ -1,0 +1,7 @@
+{
+  "name": "@li3/runtime",
+  "targets": {
+    "build": {},
+    "tsc": {}
+  }
+}

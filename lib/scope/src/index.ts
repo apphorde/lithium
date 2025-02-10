@@ -1,94 +1,82 @@
-interface Scope {
-  run<T>(name: string, args?: any[]): T;
+import { RuntimeContext, AnyFunction, getOption } from '@li3/runtime';
+
+const fnCache = new Map();
+const domParser = new DOMParser();
+const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
+
+export function compileExpression($el: RuntimeContext, expression: string, args: string[] = []): AnyFunction {
+  try {
+    return compileExpressionBlob($el, expression, args);
+  } catch {
+    return compileExpressionEval($el, expression, args);
+  }
 }
 
-let uid = 1;
-const $properties = Symbol();
-const $expressions = Symbol();
-const $source = Symbol();
-const identity = (f) => f;
-
-export function createScope(parent?: Scope): Scope {
-  const properties = parent ? parent[$properties].slice() : [];
-  const expressions = parent ? { ...parent[$expressions] } : {};
-  const source = {};
-
-  return new Proxy(
-    {},
-    {
-      get(_t, p) {
-        if (p === $properties) {
-          return properties;
-        }
-
-        if (p === $expressions) {
-          return expressions;
-        }
-
-        if (p === $source) {
-          return source;
-        }
-      },
-    }
-  ) as Scope;
+export function createBlobModule(code: string, type = "text/javascript") {
+  const blob = new Blob([code], { type });
+  const url = URL.createObjectURL(blob);
+  const modPromise = import(url);
+  modPromise.then(() => URL.revokeObjectURL(url));
+  return modPromise;
 }
 
-export function addExpression(
-  scope: Scope,
-  expression: string,
-  args?: string[]
-) {
-  const name = "__" + uid++;
-  const e = scope[$expressions];
-  e[name] = [expression, args];
+const modCache = new Map();
 
-  return name;
-}
+export function compileExpressionBlob($el: RuntimeContext, expression: string, args: string[] = []) {
+  const fargs = ["__s", ...args].join(", ");
+  const fasync = expression.includes("await ") ? "async " : "";
+  const code = `export default ${fasync}function(${fargs}) {
+    const {${$el.stateKeys.join(", ")}} = __s;
+    return ${expression};
+  }`;
 
-export function addProperty(scope: Scope, property: string) {
-  scope[$properties].push(property);
-}
-
-export function addProperties(scope: Scope, properties: string[]) {
-  scope[$properties].push(...properties);
-}
-
-export function compile(scope: Scope): void {
-  const name = "scope" + uid++;
-  const code = [`function ${name}(__s, __u) {`];
-  const functionMap = scope[$expressions];
-  const refs: string[] = scope[$properties];
-  const keys = Object.keys(functionMap);
-
-  for (const fn of keys) {
-    const exp = functionMap[fn][0];
-    const args = functionMap[fn][1] || "";
-    const accessors = refs
-      .filter((r) => exp.includes(r))
-      .map((ref) => `const ${ref} = __u(__s.${ref});`)
-      .join(",");
-
-    code.push(
-      `${
-        fn.includes("await") ? "async " : ""
-      } function ${fn} (${args}) { ${accessors} return ${exp} } `
-    );
+  if (!modCache.has(code)) {
+    modCache.set(code, createBlobModule(code));
   }
 
-  code.push(`return { ${keys.join(",")} }; }`);
-  scope[$source].fn = Function("return " + code.join("\n"))();
-  scope[$source].source = code.join("\n");
+  const mod = modCache.get(code);
+
+  return async function (...args: any[]) {
+    const fn = await mod;
+    return fn.default($el.view, ...args);
+  };
 }
 
-export function configure(scope: Scope, options: { unwrap: any }) {
-  scope[$source].unwrap = options.unwrap;
+export function compileExpressionEval($el: RuntimeContext, expression: string, args: string[] = []): AnyFunction {
+  const code = `
+  const {${$el.stateKeys.join(", ")}} = __u(__s);
+  return ${expression}
+  `;
+  const cacheKey = code + args;
+  let fn = fnCache.get(cacheKey);
+
+  if (!fn) {
+    let finalCode = code;
+
+    if (getOption("useDomParser")) {
+      const parsed = domParser.parseFromString(code, "text/html");
+      finalCode = parsed.body.innerText.trim();
+    }
+
+    const functionType = expression.includes("await ") ? AsyncFunction : Function;
+
+    fn = functionType(...["__s", ...args, finalCode]);
+    fnCache.set(cacheKey, fn);
+  }
+
+  return fn.bind(null, $el.view);
 }
 
-export function bind(scope: Scope, context: any) {
-  const scopeSource = scope[$source];
-  return scopeSource.fn(context, scopeSource.unwrap || identity);
-}
+export function wrapTryCatch(exp: string, fn: AnyFunction) {
+  if (getOption("debugEnabled")) {
+    return () => fn();
+  }
 
-export function getSource(scope: Scope) {
-  return scope[$source].source;
+  return () => {
+    try {
+      return fn();
+    } catch (e) {
+      console.log("Error: " + exp, e);
+    }
+  };
 }

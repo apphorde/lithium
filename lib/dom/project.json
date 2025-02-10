@@ -1,0 +1,8 @@
+{
+  "name": "@li3/dom",
+  "targets": {
+    "build": {},
+    "tsc": {},
+    "test": {}
+  }
+}
