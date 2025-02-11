@@ -1,4 +1,3 @@
-import { ReactiveContext } from "@li3/reactive";
 import { tpl, traverseDom, isElement, isFragment, clearElement, mapContentToSlots } from "@li3/dom";
 import { CreateRuntimeOptions, RuntimeContext } from "./types.js";
 import { Plugins } from "./plugin.js";
@@ -17,19 +16,6 @@ export function createRuntimeContext(properties: CreateRuntimeOptions): RuntimeC
     shadowDom: typeof shadowDom === "string" ? ({ mode: shadowDom } as ShadowRootInit) : shadowDom,
     setup,
     template: !template ? null : typeof template === "string" ? tpl(template) : template,
-    state: null,
-    stateKeys: [],
-    props: {},
-
-    init: [],
-    update: [],
-    destroy: [],
-    view: {},
-
-    stylesheets: [],
-    scripts: [],
-    hostClasses: [],
-    reactive: new ReactiveContext(),
   });
 
   return $el;
@@ -102,7 +88,6 @@ export function createDom($el: RuntimeContext): void {
     element.append(dom);
     mapContentToSlots(previousContent, element);
   } else {
-    element.attachShadow(shadowDom as ShadowRootInit);
-    element.shadowRoot.append(dom);
+    (element as Element).attachShadow(shadowDom as ShadowRootInit).append(dom);
   }
 }

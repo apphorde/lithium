@@ -23,18 +23,37 @@ export interface CreateRuntimeOptions {
   parent?: RuntimeContext;
 }
 
-export class RuntimeContext implements CreateRuntimeOptions {
+export class RuntimeContext {
   static readonly extensions: AnyFunction[] = [];
   static use(fn: AnyFunction) {
     RuntimeContext.extensions.push(fn);
   }
 
-  constructor(props: any) {
+  constructor(props: CreateRuntimeOptions) {
     for (const f of RuntimeContext.extensions) {
       Object.assign(this, f());
     }
 
-    Object.assign(this, props);
+    Object.assign(
+      this,
+      RuntimeContext.extensions.map(f => f()),
+      {
+        state: {},
+        stateKeys: [],
+        parent: null,
+        props: {},
+        initialValues: {},
+
+        init: [],
+        update: [],
+        destroy: [],
+        view: {},
+
+        hostClasses: [],
+        reactive: new ReactiveContext(),
+      },
+      props
+    );
   }
 
   shadowDom?: ShadowRootInit;
@@ -46,8 +65,10 @@ export class RuntimeContext implements CreateRuntimeOptions {
   scripts: Array<string>;
   stateKeys: string[];
   state: any;
+  initialValues: any;
   view: any;
   props: Record<string, Ref<any>>;
+  parent?: RuntimeContext;
 
   init: Array<LifeCycleFunction>;
   update: Array<UpdateLifeCycleFunction>;

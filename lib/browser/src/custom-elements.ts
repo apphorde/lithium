@@ -1,8 +1,6 @@
-import { activateContext, createRuntimeContext } from "../internal-api/lifecycle.js";
 import { domReady } from "@li3/dom";
-
-import type { AnyFunction, ComponentDefinition, RuntimeContext } from "@li3/runtime";
-import { createBlobModule } from "../internal-api/expressions";
+import { activateContext, AnyFunction, ComponentDefinition, createRuntimeContext, RuntimeContext } from "@li3/runtime";
+import { createBlobModule } from "@li3/scope";
 
 export const DefineComponent = Symbol("@@def");
 
@@ -41,7 +39,7 @@ export function createComponent(name: string, def: ComponentDefinition | AnyFunc
 }
 
 export function getShadowDomOptions(template: HTMLTemplateElement): ShadowRootInit {
-  const source = template.getAttribute('shadow-dom') || '';
+  const source = template.getAttribute("shadow-dom") || "";
 
   if (source) {
     return source.startsWith("{") ? JSON.parse(source) : { mode: source };
@@ -71,11 +69,11 @@ export async function getComponentFromTemplate(template: HTMLTemplateElement): P
  * @param template The template element to create a component from
  * @param name Optional. Name of the custom element, if not provided it will be taken from the 'component' attribute
  */
-export async function createInlineComponent(template: HTMLTemplateElement, name = '') {
+export async function createInlineComponent(template: HTMLTemplateElement, name = "") {
   name ||= template.getAttribute("component");
 
   if (!name) {
-    throw new Error('Component name is required');
+    throw new Error("Component name is required");
   }
 
   const component = await getComponentFromTemplate(template);
@@ -95,12 +93,12 @@ export async function loadTemplate(url: string | URL) {
 
   if (req.ok) {
     const html = await req.text();
-    const dom = new DOMParser().parseFromString(html, 'text/html');
-    const template = dom.querySelector('template');
+    const dom = new DOMParser().parseFromString(html, "text/html");
+    const template = dom.querySelector("template");
     return template;
   }
 
-  throw new Error('Unable to load ' + url + ': ' + req.statusText);
+  throw new Error("Unable to load " + url + ": " + req.statusText);
 }
 
 /**

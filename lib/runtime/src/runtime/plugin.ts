@@ -35,4 +35,4 @@ export const Plugins = createDispatcher([
   "destroy",
 ]);
 
-plugins.reset();
+Plugins.reset();

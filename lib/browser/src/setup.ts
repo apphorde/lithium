@@ -1,10 +1,13 @@
-import { getCurrentContext } from "../internal-api/stack.js";
-import { EventEmitFunction } from "../internal-api/types.js";
-import { defineEventOnElement, isElement, emitEvent } from "@li3/dom";
-import type { AnyFunction } from "../internal-api/types.js";
+import { defineEventOnElement, emitEvent, isElement } from "@li3/dom";
 import type { Ref } from "@li3/reactive";
-import { createInputRef, getPropValue, type PropDefinition } from "../internal-api/props.js";
-
+import {
+  AnyFunction,
+  createInputRef,
+  EventEmitFunction,
+  getCurrentContext,
+  getPropValue,
+  type PropDefinition,
+} from "@li3/runtime";
 
 export function onInit(fn: VoidFunction): void {
   getCurrentContext().init.push(fn);
@@ -90,19 +93,19 @@ export function watch(expression: AnyFunction | Ref<any>, effect?: AnyFunction):
   return getCurrentContext().reactive.watch(expression, effect);
 }
 
-export function computed<T>(fn: () => T): Ref<T> {
+export function computed<T>(fn: () => T) {
   const $ref = ref<T>(null, { shallow: true });
   watch(() => ($ref.value = fn()));
 
   return $ref;
 }
 
-export function ref<T>(value?: T, options?): Ref<T> {
-  return getCurrentContext().reactive.ref(value, options);
+export function ref<T>(value?: T, options?) {
+  return getCurrentContext().reactive.ref<T>(value, options);
 }
 
-export function shallowRef<T>(value?: T, options = {}): Ref<T> {
-  return ref(value, { ...options, shallow: true });
+export function shallowRef<T>(value?: T, options = {}) {
+  return ref<T>(value, { ...options, shallow: true });
 }
 
 type InjectionEvent<T> = CustomEvent & { result?: T };

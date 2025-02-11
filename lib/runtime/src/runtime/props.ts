@@ -6,7 +6,7 @@ import { Plugins } from "./plugin.js";
 export type PropDefinition<T> = { type: Function; default: T | (() => T) };
 
 export function getPropValue<T>($el: RuntimeContext, property: string, definition: PropDefinition<T>): T {
-  if ($el.initialValues?.[property] !== undefined) {
+  if ($el.initialValues[property] !== undefined) {
     return $el.initialValues[property];
   }
 
