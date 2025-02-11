@@ -1,4 +1,4 @@
-import { RuntimeContext, AnyFunction, getOption } from '@li3/runtime';
+import { RuntimeContext, type AnyFunction, getOption } from '@li3/runtime';
 
 const fnCache = new Map();
 const domParser = new DOMParser();
