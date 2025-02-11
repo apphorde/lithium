@@ -9,7 +9,10 @@ export function loadScript(url: string): void {
   getCurrentContext().scripts.push(url);
 }
 
-RuntimeContext.use(() => ({ stylesheets: [], scripts: [] }))
+RuntimeContext.use(() => ({
+  stylesheets: [],
+  scripts: [],
+}));
 
 Plugins.use({
   async init($el: RuntimeContext) {
