@@ -49,19 +49,6 @@ export function setAttribute(el: Element, attribute: string, value: boolean): vo
   el.setAttribute(attribute, String(value));
 }
 
-export const Attributes = Symbol("@@attr");
-export function applyAttributes(element: Element, attributes?: Attribute[]) {
-  attributes ||= element[Attributes];
-
-  if (!attributes) {
-    return;
-  }
-
-  for (const attr of attributes) {
-    setAttribute(element, attr[0], attr[1]);
-  }
-}
-
 export function traverseDom(dom: any, visitor: AnyFunction) {
   const stack = [dom];
 
@@ -72,7 +59,7 @@ export function traverseDom(dom: any, visitor: AnyFunction) {
       stack.push(...Array.from(next.childNodes));
     }
 
-    visitor(next, next[Attributes] || getAttributes(next));
+    visitor(next, getAttributes(next));
   }
 }
 

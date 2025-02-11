@@ -62,6 +62,9 @@ importers:
       '@li3/runtime':
         specifier: workspace:*
         version: link:../runtime
+      '@li3/scope':
+        specifier: workspace:*
+        version: link:../scope
 
   lib/cli:
     dependencies:
@@ -75,12 +78,15 @@ importers:
 
   lib/plugins:
     dependencies:
-      '@li3/html-parser':
+      '@li3/dom':
         specifier: workspace:*
-        version: link:../html-parser
-      '@li3/reactive':
+        version: link:../dom
+      '@li3/runtime':
         specifier: workspace:*
-        version: link:../reactive
+        version: link:../runtime
+      '@li3/scope':
+        specifier: workspace:*
+        version: link:../scope
 
   lib/reactive: {}
 
