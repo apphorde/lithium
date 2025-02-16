@@ -1,3 +1,4 @@
+// import { onDestroy } from "@li3/runtime";
 import { observer, ref, Ref } from "@li3/reactive";
 
 const noop = () => {};
@@ -15,10 +16,7 @@ export interface StoreOptions {
   effects?: Record<string, Reducer<any, any>>;
 }
 
-export function useStore<T, A extends Action>(
-  initialState: T,
-  options?: StoreOptions
-) {
+export function useStore<T, A extends Action>(initialState: T, options?: StoreOptions) {
   const events = new EventTarget();
   const reducers = [];
   const effects = [];
@@ -82,25 +80,27 @@ export function useStore<T, A extends Action>(
 
     events.addEventListener("dispatch", check);
 
-    return {
-      detach() {
-        observers.length = 0;
-        events.removeEventListener("dispatch", check);
-      },
+    function detach() {
+      observers.length = 0;
+      events.removeEventListener("dispatch", check);
+    }
 
-      select<V>(selector: (state: T) => V = identity): Ref<V> {
-        const value = selector(state.value);
-        const valueRef = ref(value, noop);
-        const o = observer(
-          () => selector(state.value),
-          (value) => (valueRef.value = value)
-        );
+    function select<V>(selector: (state: T) => V = identity): Ref<V> {
+      const value = selector(state.value);
+      const valueRef = ref(value, noop);
+      const o = observer(
+        () => selector(state.value),
+        (value) => (valueRef.value = value)
+      );
 
-        observers.push(o);
+      observers.push(o);
 
-        return valueRef;
-      },
-    };
+      return valueRef;
+    }
+
+    // onDestroy(detach);
+
+    return { detach, select };
   }
 
   return { events, useSelectors, dispatch, addReducer, addEffect };

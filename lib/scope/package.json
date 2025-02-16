@@ -8,6 +8,6 @@
     }
   },
   "dependencies": {
-    "@li3/runtime": "link:../runtime"
+    "@li3/runtime": "workspace:*"
   }
 }

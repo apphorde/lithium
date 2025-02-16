@@ -1,10 +1,14 @@
 # @li3/store
 
-Create a reactive store with an initial state, and dispatch actions
+Create and manage state with reactive properties.
 
 ## Usage
 
+Declare a store in a module
+
 ```js
+// count-store.js
+
 import { useStore } from "@li3/store";
 
 const reducers = {
@@ -16,21 +20,36 @@ const reducers = {
   },
 };
 
-// here it's safe to reuse this store's value
-const store = useStore({ count: 0 }, { reducers });
-const { useSelectors, dispatch } = store;
+const effects = {
+  add(state) {
+    console.log("New count:", state.count);
+  },
+  remove(state) {
+    console.log("New count:", state.count);
+  },
+};
 
-// now we get into state selection via live Ref instances.
+export default useStore({ count: 0 }, { reducers, effects });
+```
+
+Then import the store and dispatch actions:
+
+```js
+import countStore from "./count-store.js";
+
+// it's safe to import the same store many times
+const { useSelectors, dispatch } = countStore;
+
+dispatch("add"); // logs 1
+dispatch("add"); // logs 2
+dispatch("remove"); // logs 1 again
+
+// for components, we select state values via live Ref instances.
 // every Ref has to be detached after use to prevent memory leaks
+import { onInit }
 const { select, unref } = useSelectors();
+
 const counter = select((s) => s.count);
-
-dispatch("add"); // +1
-dispatch("add"); // +1
-dispatch("remove"); // -1
-
-console.log(counter.value); // 1
-
 // detach all live bindings created with select()
 unref();
 ```

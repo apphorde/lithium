@@ -4,7 +4,7 @@
   "exports": {
     ".": {
       "default": "./index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/src/index.d.ts"
     }
   }
 }
