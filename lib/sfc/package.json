@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "acorn": "latest",
-    "@li3/html-parser": "workspace:../html-parser"
+    "@li3/html-parser": "link:../html-parser"
   }
 }

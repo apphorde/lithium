@@ -8,9 +8,9 @@
     }
   },
   "dependencies": {
-    "@li3/reactive": "workspace:../reactive",
-    "@li3/runtime": "workspace:../runtime",
-    "@li3/dom": "workspace:../dom",
-    "@li3/scope": "workspace:../scope"
+    "@li3/reactive": "link:../reactive",
+    "@li3/runtime": "link:../runtime",
+    "@li3/dom": "link:../dom",
+    "@li3/scope": "link:../scope"
   }
 }

@@ -8,8 +8,8 @@
     }
   },
   "dependencies": {
-    "@li3/dom": "workspace:../dom",
-    "@li3/runtime": "workspace:../runtime",
-    "@li3/scope": "workspace:../scope"
+    "@li3/dom": "link:../dom",
+    "@li3/runtime": "link:../runtime",
+    "@li3/scope": "link:../scope"
   }
 }
