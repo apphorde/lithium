@@ -1,10 +1,10 @@
-import { mount } from "@li3/runtime";
-import { defineProps } from "@li3/runtime";
-import { unref } from "@li3/reactive";
-import { getOption, Plugins, RuntimeContext } from "@li3/runtime";
-import { compileExpression, wrapTryCatch } from "@li3/scope";
+import { mount } from '@li3/runtime';
+import { defineProps } from '@li3/runtime';
+import { unref } from '@li3/reactive';
+import { getOption, Plugins, RuntimeContext } from '@li3/runtime';
+import { compileExpression, wrapTryCatch } from '@li3/scope';
 
-const VM = Symbol("@@FOR");
+const VM = Symbol('@@FOR');
 
 interface NodeCacheEntry {
   $el: RuntimeContext;
@@ -21,7 +21,7 @@ interface TemplateForRuntimeContext {
 
 Plugins.use({
   dom($el: RuntimeContext) {
-    const templates: HTMLTemplateElement[] = Array.from($el.element.querySelectorAll("template[for]"));
+    const templates: HTMLTemplateElement[] = Array.from($el.element.querySelectorAll('template[for]'));
 
     for (const t of templates) {
       templateForOf(t, $el);
@@ -31,14 +31,14 @@ Plugins.use({
 
 export function templateForOf(template: HTMLTemplateElement, $el: RuntimeContext) {
   const nodeCache: NodeCacheEntry[] = [];
-  const expression = template.getAttribute("for");
-  const [iteration, source] = expression.split("of").map((s) => s.trim());
-  const [itemName, indexName] = iteration.includes("[")
+  const expression = template.getAttribute('for');
+  const [iteration, source] = expression.split('of').map((s) => s.trim());
+  const [itemName, indexName] = iteration.includes('[')
     ? iteration
         .slice(1, -1)
-        .split(",")
+        .split(',')
         .map((s) => s.trim())
-    : [iteration, "index"];
+    : [iteration, 'index'];
 
   const context: TemplateForRuntimeContext = { itemName, indexName, nodeCache, $el, template };
 
@@ -50,7 +50,7 @@ export function templateForOf(template: HTMLTemplateElement, $el: RuntimeContext
       return;
     }
 
-    if (!getOption("cachedTemplateFor")) {
+    if (!getOption('cachedTemplateFor')) {
       resize(context, 0);
     }
 
@@ -70,7 +70,7 @@ export function templateForOf(template: HTMLTemplateElement, $el: RuntimeContext
     template.parentNode.insertBefore(newNodes, lastNode);
     $el.reactive.check();
 
-    if (getOption("debugEnabled")) {
+    if (getOption('debugEnabled')) {
       template[VM] = nodeCache;
     }
   }
@@ -150,7 +150,7 @@ function resize(context: TemplateForRuntimeContext, newLength: number, list?: an
 
 function createCacheEntry(context: TemplateForRuntimeContext, props: any): NodeCacheEntry {
   const { $el, template, itemName, indexName } = context;
-  const contextProperties = [itemName, indexName, "$first", "$last", "$odd", "$even"];
+  const contextProperties = [itemName, indexName, '$first', '$last', '$odd', '$even'];
 
   function setup() {
     defineProps(contextProperties);

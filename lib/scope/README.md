@@ -9,7 +9,7 @@ import { addProperties, addExpression, createScope, compile, bind } from '@lithi
 const scope = createScope();
 
 // declare properties that are expected to be available in the context
-addProperties(scope, ["counter", "increase"]);
+addProperties(scope, ['counter', 'increase']);
 
 // add JS expressions
 const counter = addExpression(scope, `'Counter is at ' + counter + '.'`);
@@ -23,7 +23,7 @@ const state = {
   counter: 1,
   increase() {
     state.counter++;
-  }
+  },
 };
 
 const bindings = bind(scope, state);
@@ -60,4 +60,4 @@ Link a pre-compiled scope to a context object. A scope can be linked multiple ti
 Options:
 
 - `unwrap`: a function used to unwrap values before execution. Useful if any value needs to be transformed before
-it is passed onto expressions.
+  it is passed onto expressions.

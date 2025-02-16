@@ -1,9 +1,9 @@
-import { getCurrentContext } from "../internal-api/stack.js";
-import { EventEmitFunction } from "../internal-api/types.js";
-import { defineEventOnElement, isElement, emitEvent } from "../internal-api/dom.js";
-import type { AnyFunction } from "../internal-api/types.js";
-import type { Ref } from "@li3/reactive";
-import { createInputRef, getPropValue, type PropDefinition } from "../internal-api/props.js";
+import { getCurrentContext } from '../internal-api/stack.js';
+import { EventEmitFunction } from '../internal-api/types.js';
+import { defineEventOnElement, isElement, emitEvent } from '../internal-api/dom.js';
+import type { AnyFunction } from '../internal-api/types.js';
+import type { Ref } from '@li3/reactive';
+import { createInputRef, getPropValue, type PropDefinition } from '../internal-api/props.js';
 
 export function loadCss(url: string): void {
   getCurrentContext().stylesheets.push(url);
@@ -37,17 +37,17 @@ export function defineQuery(selector: string) {
     {},
     {
       get(_t, key) {
-        if (key === "one") {
+        if (key === 'one') {
           return root.querySelector(selector);
         }
 
-        if (key === "many") {
+        if (key === 'many') {
           return root.querySelectorAll(selector);
         }
 
         return null;
       },
-    }
+    },
   );
 }
 
@@ -115,10 +115,10 @@ export function shallowRef<T>(value?: T, options = {}): Ref<T> {
 type InjectionEvent<T> = CustomEvent & { result?: T };
 
 export function provide<T>(token: Symbol, provider): void {
-  const fn = typeof provider === "function" ? provider : () => provider;
+  const fn = typeof provider === 'function' ? provider : () => provider;
   const { element } = getCurrentContext();
 
-  element.addEventListener("$inject", (e: InjectionEvent<T>) => {
+  element.addEventListener('$inject', (e: InjectionEvent<T>) => {
     if (e.detail === token) {
       e.result = fn();
       e.stopPropagation();
@@ -128,7 +128,7 @@ export function provide<T>(token: Symbol, provider): void {
 
 export function inject<T>(token: any) {
   const { element } = getCurrentContext();
-  const event = new CustomEvent("$inject", {
+  const event = new CustomEvent('$inject', {
     detail: token,
     bubbles: true,
   }) as CustomEvent & { result: T };
@@ -138,7 +138,7 @@ export function inject<T>(token: any) {
   const result = event.result;
 
   if (!result) {
-    throw new Error("Injectable not found: " + token);
+    throw new Error('Injectable not found: ' + token);
   }
 
   return result;

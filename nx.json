@@ -26,13 +26,6 @@
       "options": {
         "command": "test -f {projectRoot}/src/index.spec.ts && npx tsx {projectRoot}/src/index.spec.ts"
       }
-    },
-    "publish": {
-      "dependsOn": ["^build", "^tsc"],
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "pnpm publish --no-git-checks --access public -r {projectRoot}"
-      }
     }
   }
 }

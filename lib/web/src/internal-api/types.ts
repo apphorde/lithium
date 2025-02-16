@@ -1,11 +1,11 @@
-import { ReactiveContext, type Ref } from "@li3/reactive";
+import { ReactiveContext, type Ref } from '@li3/reactive';
 
 export type LifeCycleFunction = (runtime: LifeCycleObject) => void;
 export type UpdateLifeCycleFunction = (
   runtime: LifeCycleObject,
   property: string,
   oldValue: any,
-  newValue: any
+  newValue: any,
 ) => void;
 
 export interface LifeCycleObject {

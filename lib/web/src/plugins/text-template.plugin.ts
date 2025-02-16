@@ -1,8 +1,8 @@
-import { setText } from "../internal-api/dom.js";
-import { compileExpression, wrapTryCatch } from "../internal-api/expressions.js";
-import { plugins } from "../internal-api/plugin.js";
-import { watch } from "../component-api/setup.js";
-import { RuntimeContext } from "../internal-api/types";
+import { setText } from '../internal-api/dom.js';
+import { compileExpression, wrapTryCatch } from '../internal-api/expressions.js';
+import { plugins } from '../internal-api/plugin.js';
+import { watch } from '../component-api/setup.js';
+import { RuntimeContext } from '../internal-api/types';
 
 plugins.use({
   element($el: RuntimeContext, node: Text) {
@@ -10,7 +10,7 @@ plugins.use({
       return;
     }
 
-    if (!node.parentElement?.hasAttribute("literal")) {
+    if (!node.parentElement?.hasAttribute('literal')) {
       createTextNodeBinding($el, node);
     }
   },
@@ -19,14 +19,14 @@ plugins.use({
 export function createTextNodeBinding($el: RuntimeContext, node: Text) {
   const text = String(node.textContent);
 
-  if (!(text.includes("${") || text.includes("{{"))) {
+  if (!(text.includes('${') || text.includes('{{'))) {
     return;
   }
 
-  node.textContent = "";
+  node.textContent = '';
 
   const expression =
-    "`" + text.replace(/\{\{([\s\S]+?)}}/g, (_: any, inner: string) => "${ " + inner.trim() + " }") + "`";
+    '`' + text.replace(/\{\{([\s\S]+?)}}/g, (_: any, inner: string) => '${ ' + inner.trim() + ' }') + '`';
 
   const fn = compileExpression($el, expression);
   const getter = wrapTryCatch(expression, fn);

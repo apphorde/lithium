@@ -1,17 +1,17 @@
-import { setAttribute, setProperty } from "../internal-api/dom.js";
-import { compileExpression, wrapTryCatch } from "../internal-api/expressions.js";
-import { plugins } from "../internal-api/plugin.js";
-import { watch } from "../component-api/setup.js";
-import { RuntimeContext } from "../internal-api/types";
+import { setAttribute, setProperty } from '../internal-api/dom.js';
+import { compileExpression, wrapTryCatch } from '../internal-api/expressions.js';
+import { plugins } from '../internal-api/plugin.js';
+import { watch } from '../component-api/setup.js';
+import { RuntimeContext } from '../internal-api/types';
 
 plugins.use({
   attribute($el, node, attribute, value) {
-    if (attribute.startsWith("bind-")) {
-      createPropertyBinding($el, node, dashToCamelCase(attribute.replace("bind-", "")), value);
+    if (attribute.startsWith('bind-')) {
+      createPropertyBinding($el, node, dashToCamelCase(attribute.replace('bind-', '')), value);
     }
 
-    if (attribute.startsWith("attr-")) {
-      createAttributeBinding($el, node, dashToCamelCase(attribute.replace("attr-", "")), value);
+    if (attribute.startsWith('attr-')) {
+      createAttributeBinding($el, node, dashToCamelCase(attribute.replace('attr-', '')), value);
     }
   },
 });
@@ -27,8 +27,8 @@ export function createAttributeBinding($el: RuntimeContext, element: Element, na
 }
 
 const wellKnownProperties = {
-  "base-url": "baseURL",
-  "inner-html": "innerHTML",
+  'base-url': 'baseURL',
+  'inner-html': 'innerHTML',
 };
 
 function dashToUpperCase(s: string) {

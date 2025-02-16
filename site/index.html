@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport"
-    content="width=device-width, initial-scale=1.0" />
-  <title>Lithium - The Modern Frontend Framework</title>
-  <script type="importmap">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lithium - The Modern Frontend Framework</title>
+    <script type="importmap">
       {
         "imports": {
           "@li3/web": "https://cdn.li3.dev/@li3/web@latest/index.js",
@@ -15,87 +13,97 @@
         }
       }
     </script>
-  <script type="module">
-    import '@li3/web';
-    import '@sodium/markdown-block';
-  </script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    :root {
-      --primary: #411e5c;
-    }
+    <script type="module">
+      import '@li3/web';
+      import '@sodium/markdown-block';
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        --primary: #411e5c;
+      }
 
-    .bg-primary {
-      background-color: var(--primary);
-    }
+      .bg-primary {
+        background-color: var(--primary);
+      }
 
-    .border-primary {
-      border-color: var(--primary);
-    }
+      .border-primary {
+        border-color: var(--primary);
+      }
 
-    .text-primary {
-      color: var(--primary);
-    }
+      .text-primary {
+        color: var(--primary);
+      }
 
-    body {
-      font-family: Fricolage Grotesque, ui-sans-serif, system-ui, sans-serif,
-        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-        "Noto Color Emoji" !important;
-      background: #30074fc8;
-    }
+      body {
+        font-family:
+          Fricolage Grotesque,
+          ui-sans-serif,
+          system-ui,
+          sans-serif,
+          'Apple Color Emoji',
+          'Segoe UI Emoji',
+          'Segoe UI Symbol',
+          'Noto Color Emoji' !important;
+        background: #30074fc8;
+      }
 
-    .contents-children>* {
-      display: contents;
-    }
+      .contents-children > * {
+        display: contents;
+      }
 
-    markdown-block>* {
-      margin-bottom: 1rem !important;
-    }
-  </style>
-</head>
+      markdown-block > * {
+        margin-bottom: 1rem !important;
+      }
+    </style>
+  </head>
 
-<body class="text-gray-100 antialiased">
-  <nav
-    class="flex justify-between items-center space-x-8 px-8 py-2 my-4 sticky top-0 z-10 rounded-full max-w-4xl mx-auto border border-gray-100 shadow-sm bg-white/20 backdrop-blur">
-    <a href="/"
-      class="text-2xl font-bold inline-block h-10 border border-4 border-gray-100 px-1 rounded">Li³</a>
-    <a href="https://github.com/apphorde/lithium"
-      target="_blank"
-      class="hover:text-black transition-colors">View on GitHub</a>
-  </nav>
+  <body class="text-gray-100 antialiased">
+    <nav
+      class="flex justify-between items-center space-x-8 px-8 py-2 my-4 sticky top-0 z-10 rounded-full max-w-4xl mx-auto border border-gray-100 shadow-sm bg-white/20 backdrop-blur"
+    >
+      <a href="/" class="text-2xl font-bold inline-block h-10 border border-4 border-gray-100 px-1 rounded">Li³</a>
+      <a href="https://github.com/apphorde/lithium" target="_blank" class="hover:text-black transition-colors"
+        >View on GitHub</a
+      >
+    </nav>
 
-  <section class="my-16 flex items-center justify-center px-8">
-    <div class="max-w-2xl">
-      <h1 class="font-bold mb-6 font-serif">
-        <span class="text-5xl mr-4 mb-2 inline-block">lithium</span><br />
-        <span class="text-md italic mr-2">(lith·i·um)</span>
-        <span class="text-md rounded">noun</span>
-      </h1>
+    <section class="my-16 flex items-center justify-center px-8">
+      <div class="max-w-2xl">
+        <h1 class="font-bold mb-6 font-serif">
+          <span class="text-5xl mr-4 mb-2 inline-block">lithium</span><br />
+          <span class="text-md italic mr-2">(lith·i·um)</span>
+          <span class="text-md rounded">noun</span>
+        </h1>
 
-      <p class="text-xl mb-8 font-serif">
-        A lightweight library to build reactive interfaces.<br />
-        Embraces the Web API's of today and provides an out-of-box experience.
-      </p>
-      <div class="flex flex-wrap gap-4">
-        <a href="/docs"
-          class="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transform hover:-translate-y-0.5 transition-all">
-          Read the Docs
-        </a>
-        <a href="https://github.com/apphorde/lithium"
-          target="_blank"
-          class="px-6 py-3 bg-white text-primary border border-primary rounded-lg font-semibold hover:bg-gray-50 transform hover:-translate-y-0.5 transition-all">
-          View on GitHub
-        </a>
+        <p class="text-xl mb-8 font-serif">
+          A lightweight library to build reactive interfaces.<br />
+          Embraces the Web API's of today and provides an out-of-box experience.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a
+            href="/docs"
+            class="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transform hover:-translate-y-0.5 transition-all"
+          >
+            Read the Docs
+          </a>
+          <a
+            href="https://github.com/apphorde/lithium"
+            target="_blank"
+            class="px-6 py-3 bg-white text-primary border border-primary rounded-lg font-semibold hover:bg-gray-50 transform hover:-translate-y-0.5 transition-all"
+          >
+            View on GitHub
+          </a>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <feature-section id="get-started">
-    <span slot="title">1 minute intro:</span>
-    <span slot="subtitle">So, what is Lithium exactly?</span>
+    <feature-section id="get-started">
+      <span slot="title">1 minute intro:</span>
+      <span slot="subtitle">So, what is Lithium exactly?</span>
 
-    <markdown-block class="block text-sm my-8">
-      <pre>
+      <markdown-block class="block text-sm my-8">
+        <pre>
 It's a library to write reactive web interfaces using a simple and predictable mental model.
 This model works for all skill levels: beginner, advanced and AI developers.
 
@@ -109,116 +117,115 @@ Using [inline components and a declarative API](/docs), we can define the _shape
 Then we can pick and choose which implementation you want to use, again with standard API's and put them together to bring life to your user interface (UI).
 
 Here's a quick example:
-</pre>
-    </markdown-block>
+</pre
+        >
+      </markdown-block>
 
-    <code-block class="mb-8"
-      title="Load the library">
-      <template>
-        <script type="importmap">
+      <code-block class="mb-8" title="Load the library">
+        <template>
+          <script type="importmap">
             {
               "imports": {
                 "@li3/": "https://cdn.li3.dev/@li3/"
               }
             }
           </script>
-        <script type="module">import '@li3/web';</script>
-      </template>
-    </code-block>
+          <script type="module">
+            import '@li3/web';
+          </script>
+        </template>
+      </code-block>
 
-    <code-block class="mb-8"
-      title="Declare an application"
-      srcelement="#hello-app"></code-block>
+      <code-block class="mb-8" title="Declare an application" srcelement="#hello-app"></code-block>
 
-    <div class="mb-8">
-      <template id="hello-app"
-        app>
-        <form class="md:w-2/3 mx-auto bg-white rounded-lg p-5 mb-6 shadow border border-gray-300 text-gray-800 text-xs"
-          on-submit.prevent="sayMyName()">
-          <label class="py-2">What is your name?</label>
-          <input type="text"
-            class="mt-2 p-2 border rounded bg-white w-full text-black"
-            on-input="setName($event.target.value)"
-            bind-value="name" />
-          <hr class="border-t my-3" />
-          <p class="text-xl font-bold">Hello, {{ name || 'stranger' }}.</p>
-        </form>
-        <script setup>
-          import { ref } from "@li3/web";
+      <div class="mb-8">
+        <template id="hello-app" app>
+          <form
+            class="md:w-2/3 mx-auto bg-white rounded-lg p-5 mb-6 shadow border border-gray-300 text-gray-800 text-xs"
+            on-submit.prevent="sayMyName()"
+          >
+            <label class="py-2">What is your name?</label>
+            <input
+              type="text"
+              class="mt-2 p-2 border rounded bg-white w-full text-black"
+              on-input="setName($event.target.value)"
+              bind-value="name"
+            />
+            <hr class="border-t my-3" />
+            <p class="text-xl font-bold">Hello, {{ name || 'stranger' }}.</p>
+          </form>
+          <script setup>
+            import { ref } from '@li3/web';
 
-          export default function setup() {
-            const name = ref("");
+            export default function setup() {
+              const name = ref('');
 
-            function setName(v) {
-              name.value = v;
+              function setName(v) {
+                name.value = v;
+              }
+
+              function sayMyName() {
+                alert(name.value);
+              }
+
+              return { name, sayMyName, setName };
             }
+          </script>
+          <script setup>
+            import { ref } from '@li3/web';
 
-            function sayMyName() {
-              alert(name.value);
+            export default function setup() {
+              const name = ref('');
+
+              function setName(v) {
+                name.value = v;
+              }
+
+              function sayMyName() {
+                alert(name.value);
+              }
+
+              return { name, sayMyName, setName };
             }
+          </script>
+        </template>
+      </div>
+    </feature-section>
 
-            return { name, sayMyName, setName };
-          }
-        </script>
-        <script setup>
-          import { ref } from "@li3/web";
+    <feature-section id="bindings">
+      <span slot="title">Template syntax</span>
+      <span slot="subtitle">Add life to your static HTML text</span>
 
-          export default function setup() {
-            const name = ref("");
+      <code-block title="Bind a property or attribute">
+        <template>
+          <button attr-lang="language" bind-disabled="isDisabled"></button>
+        </template>
+      </code-block>
 
-            function setName(v) {
-              name.value = v;
-            }
+      <code-block title="Listen to events" footnote="'stop' and 'prevent' modifiers have special meaning.">
+        <template>
+          <form on-submit.prevent.stop="onSubmit($event)"></form>
+        </template>
+      </code-block>
 
-            function sayMyName() {
-              alert(name.value);
-            }
+      <code-block title="Add/remove CSS classes" footnote="Multiple classes can be separated by a dot.">
+        <template>
+          <input class-border-red.bg-yellow="isInvalid()" />
+        </template>
+      </code-block>
 
-            return { name, sayMyName, setName };
-          }
-        </script>
-      </template>
-    </div>
-  </feature-section>
+      <code-block title="Set styles">
+        <template>
+          <div style-display="shouldBeVisible ? 'block' : 'none'"></div>
+        </template>
+      </code-block>
+    </feature-section>
 
-  <feature-section id="bindings">
-    <span slot="title">Template syntax</span>
-    <span slot="subtitle">Add life to your static HTML text</span>
-
-    <code-block title="Bind a property or attribute">
-      <template>
-        <button attr-lang="language"
-          bind-disabled="isDisabled"></button>
-      </template>
-    </code-block>
-
-    <code-block title="Listen to events"
-      footnote="'stop' and 'prevent' modifiers have special meaning.">
-      <template>
-        <form on-submit.prevent.stop="onSubmit($event)"></form>
-      </template>
-    </code-block>
-
-    <code-block title="Add/remove CSS classes"
-      footnote="Multiple classes can be separated by a dot.">
-      <template>
-        <input class-border-red.bg-yellow="isInvalid()" />
-      </template>
-    </code-block>
-
-    <code-block title="Set styles">
-      <template>
-        <div style-display="shouldBeVisible ? 'block' : 'none'"></div>
-      </template>
-    </code-block>
-  </feature-section>
-
-  <feature-section id="setup-api">
-    <span slot="title">Declarative Component API</span>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 justify-items-stretch items-stretch">
-      <code-block language="javascript"
-        title="Declare element inputs (props):">
-        <pre>
+    <feature-section id="setup-api">
+      <span slot="title">Declarative Component API</span>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 justify-items-stretch items-stretch">
+        <code-block language="javascript" title="Declare element inputs (props):">
+          <pre>
           import { defineProp, defineProps } from '@li3/web';
 
           export default function setup() {
@@ -232,12 +239,12 @@ Here's a quick example:
               bar: { default: 123 }
             });
           }
-      </pre>
-      </code-block>
+      </pre
+          >
+        </code-block>
 
-      <code-block language="javascript"
-        title="Declare outputs (events):">
-        <pre>
+        <code-block language="javascript" title="Declare outputs (events):">
+          <pre>
         import { defineEvent, defineEvents } from '@li3/web';
 
         export default function setup() {
@@ -249,12 +256,12 @@ Here's a quick example:
           const onUpdate = defineEvent('update');
           onUpdate(123)
         }
-      </pre>
-      </code-block>
+      </pre
+          >
+        </code-block>
 
-      <code-block language="javascript"
-        title="Create reactive values (ref/computed) and watchers:">
-        <pre>
+        <code-block language="javascript" title="Create reactive values (ref/computed) and watchers:">
+          <pre>
           import { ref, unref, computed, watch } from '@li3/web';
 
           export default function setup() {
@@ -269,12 +276,12 @@ Here's a quick example:
 
             return { name, greeting, isEmpty }
           }
-        </pre>
-      </code-block>
+        </pre
+          >
+        </code-block>
 
-      <code-block language="javascript"
-        title="Use lifecycle events">
-        <pre>
+        <code-block language="javascript" title="Use lifecycle events">
+          <pre>
           import { onInit, onUpdate, onDestroy } from '@li3/web';
 
           export default function setup() {
@@ -290,174 +297,169 @@ Here's a quick example:
               // called once on unmount
             });
           }
-        </pre>
-      </code-block>
+        </pre
+          >
+        </code-block>
 
-      <code-block language="javascript"
-        title="Access DOM nodes (.one or .many)">
-        <template>
-          <script type="module">
-            import { defineQuery } from "@li3/web";
+        <code-block language="javascript" title="Access DOM nodes (.one or .many)">
+          <template>
+            <script type="module">
+              import { defineQuery } from '@li3/web';
 
-            function setup() {
-              const inputs = defineQuery("input");
+              function setup() {
+                const inputs = defineQuery('input');
 
-              function something() {
-                const value = inputs.one.value;
-                const valid = [...inputs.many].every((input) => isValid(input));
+                function something() {
+                  const value = inputs.one.value;
+                  const valid = [...inputs.many].every((input) => isValid(input));
+                }
               }
-            }
-          </script>
-        </template>
-      </code-block>
+            </script>
+          </template>
+        </code-block>
 
-      <code-block language="javascript"
-        title="Load scripts and styles">
+        <code-block language="javascript" title="Load scripts and styles">
+          <template>
+            <script type="module">
+              import { loadCss, loadScript } from '@li3/web';
+
+              function setup() {
+                loadCss('http://example.com/main.css');
+                loadScript('http://example.com/index.js');
+              }
+            </script>
+          </template>
+        </code-block>
+      </div>
+    </feature-section>
+
+    <feature-section id="loops">
+      <span slot="title">Conditionals and loops</span>
+      <span slot="subtitle">Repeat a template or add/remove elements based on a condition</span>
+
+      <code-block language="javascript" title="Conditional templates: template[if]">
         <template>
-          <script type="module">
-            import { loadCss, loadScript } from "@li3/web";
-
-            function setup() {
-              loadCss("http://example.com/main.css");
-              loadScript("http://example.com/index.js");
-            }
-          </script>
+          <template if="condition">
+            <div>Show me</div>
+          </template>
         </template>
       </code-block>
-    </div>
-  </feature-section>
 
-  <feature-section id="loops">
-    <span slot="title">Conditionals and loops</span>
-    <span slot="subtitle">Repeat a template or add/remove elements based on a condition</span>
-
-    <code-block language="javascript"
-      title="Conditional templates: template[if]">
-      <template>
-        <template if="condition">
-          <div>Show me</div>
+      <code-block language="javascript" title="Repeating templates: template[for..of]">
+        <template>
+          <template for="item of links">
+            <li><a bind-href="item.href">{{ item.label }}</a></li>
+          </template>
         </template>
-      </template>
-    </code-block>
+      </code-block>
 
-    <code-block language="javascript"
-      title="Repeating templates: template[for..of]">
-      <template>
-        <template for="item of links">
-          <li><a bind-href="item.href">{{ item.label }}</a></li>
-        </template>
-      </template>
-    </code-block>
+      <p class="mt-12 text-xl mb-8">
+        Need more? Head to <a class="underline" href="/docs">the full documentation</a> to see the API and more
+        examples!
+      </p>
+    </feature-section>
 
-    <p class="mt-12 text-xl mb-8">
-      Need more? Head to <a class="underline"
-        href="/docs">the full documentation</a> to see the API and more examples!
-    </p>
-  </feature-section>
+    <footer class="py-8 px-8 text-center">
+      <p>Released under the MIT License.<br /></p>
+      <p class="mt-2">Copyright © 2024 Li3: Lithium web components</p>
+    </footer>
 
-  <footer class="py-8 px-8 text-center">
-    <p>Released under the MIT License.<br />
-    <p class="mt-2">Copyright © 2024 Li3: Lithium web components</p>
-  </footer>
+    <template component="code-block">
+      <div
+        class="bg-white rounded-lg shadow border border-gray-300 text-gray-800 text-xs relative flex flex-col h-full"
+      >
+        <button
+          class="absolute right-0 top-0 m-1 text-xs px-2 py-1 bg-white text-gray-800 border rounded"
+          on-click="onCopy()"
+        >
+          copy
+        </button>
+        <div class="empty:hidden text-xs px-4 py-3 uppercase bg-gray-100 rounded-t-lg font-bold text-green-700">
+          {{ title || '' }}
+        </div>
+        <slot class="font-mono whitespace-pre overflow-x-auto block w-full px-4 my-4"></slot>
+        <small class="empty:hidden px-4 py-2 block text-xs border-t">{{ footnote || '' }}</small>
+      </div>
 
-  <template component="code-block">
-    <div class="bg-white rounded-lg shadow border border-gray-300 text-gray-800 text-xs relative flex flex-col h-full">
-      <button class="absolute right-0 top-0 m-1 text-xs px-2 py-1 bg-white text-gray-800 border rounded"
-        on-click="onCopy()">
-        copy
-      </button>
-      <div class="empty:hidden text-xs px-4 py-3 uppercase bg-gray-100 rounded-t-lg font-bold text-green-700">{{
-        title || '' }}</div>
-      <slot class="font-mono whitespace-pre overflow-x-auto block w-full px-4 my-4"></slot>
-      <small class="empty:hidden px-4 py-2 block text-xs border-t">{{ footnote || '' }}</small>
-    </div>
+      <script setup>
+        import { load, highlight } from 'https://highlight.jsfn.run/index.mjs';
+        import { defineProp, defineQuery, onInit, hostClasses } from '@li3/web';
 
-    <script setup>
-      import { load, highlight } from "https://highlight.jsfn.run/index.mjs";
-      import { defineProp, defineQuery, onInit, hostClasses } from "@li3/web";
+        load();
 
-      load();
+        export default function codeBlock({ element }) {
+          const title = defineProp('title', '');
+          const footnote = defineProp('footnote', '');
+          const language = defineProp('language', 'html');
+          const srcElement = defineProp('srcElement', '');
+          const pre = defineQuery('pre');
+          const template = defineQuery('template');
+          const source =
+            (srcElement.value && document.querySelector(srcElement.value)?.outerHTML) ||
+            (pre.one || template.one || element).innerHTML.trim() ||
+            '';
+          const slot = defineQuery('slot');
+          const lines = source.split('\n');
+          const padding = lines
+            .filter((line) => line.trim() && line.startsWith(' '))
+            .reduce((prev, line) => Math.min(prev, line.indexOf(line.trim())), lines[0].length);
 
-      export default function codeBlock({ element }) {
-        const title = defineProp("title", "");
-        const footnote = defineProp("footnote", "");
-        const language = defineProp("language", "html");
-        const srcElement = defineProp("srcElement", "");
-        const pre = defineQuery("pre");
-        const template = defineQuery("template");
-        const source =
-          (srcElement.value &&
-            document.querySelector(srcElement.value)?.outerHTML) ||
-          (pre.one || template.one || element).innerHTML.trim() ||
-          "";
-        const slot = defineQuery("slot");
-        const lines = source.split("\n");
-        const padding = lines
-          .filter((line) => line.trim() && line.startsWith(" "))
-          .reduce(
-            (prev, line) => Math.min(prev, line.indexOf(line.trim())),
-            lines[0].length
-          );
+          const toReplace = ' '.repeat(padding);
+          const trimmedSource = lines.map((line) => line.replace(toReplace, '')).join('\n');
 
-        const toReplace = " ".repeat(padding);
-        const trimmedSource = lines
-          .map((line) => line.replace(toReplace, ""))
-          .join("\n");
-
-        onInit(async () => {
-          slot.one.innerHTML = await highlight(trimmedSource, {
-            language: language.value || "html",
+          onInit(async () => {
+            slot.one.innerHTML = await highlight(trimmedSource, {
+              language: language.value || 'html',
+            });
           });
-        });
 
-        hostClasses("mb-6 block");
+          hostClasses('mb-6 block');
 
-        return {
-          onCopy() {
-            navigator.clipboard.writeText(trimmedSource);
-          },
-        };
-      }
-    </script>
-  </template>
+          return {
+            onCopy() {
+              navigator.clipboard.writeText(trimmedSource);
+            },
+          };
+        }
+      </script>
+    </template>
 
-  <template component="feature-card">
-    <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border text-gray-800">
-      <div class="text-4xl mb-4">
-        <slot name="icon"></slot>
+    <template component="feature-card">
+      <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border text-gray-800">
+        <div class="text-4xl mb-4">
+          <slot name="icon"></slot>
+        </div>
+        <h3 class="text-xl font-bold mb-4">
+          <slot name="title"></slot>
+        </h3>
+        <slot></slot>
       </div>
-      <h3 class="text-xl font-bold mb-4">
-        <slot name="title"></slot>
-      </h3>
-      <slot></slot>
-    </div>
-  </template>
+    </template>
 
-  <template component="li-card">
-    <div class="p-8 bg-white/15 rounded-2xl text-white shadow-xl">
-      <slot class="contents"></slot>
-    </div>
-  </template>
-
-  <template component="feature-section">
-    <section class="mb-16 mx-8 md:mx-4 lg:mx-0">
-      <div class="max-w-4xl mx-auto">
-        <li-card>
-          <h2 class="text-sm uppercase py-2 font-bold">
-            <slot name="title"></slot>
-          </h2>
-          <h3 class="text-3xl mt-3 mb-6 font-semi font-serif">
-            <slot name="subtitle"></slot>
-          </h3>
-          <slot></slot>
-        </li-card>
+    <template component="li-card">
+      <div class="p-8 bg-white/15 rounded-2xl text-white shadow-xl">
+        <slot class="contents"></slot>
       </div>
-    </section>
-  </template>
+    </template>
 
-  <template component="inline-code">
-    <slot class="font-mono rounded bg-gray-100 p-1 inline-block text-gray-800 text-sm"></slot>
-  </template>
-</body>
+    <template component="feature-section">
+      <section class="mb-16 mx-8 md:mx-4 lg:mx-0">
+        <div class="max-w-4xl mx-auto">
+          <li-card>
+            <h2 class="text-sm uppercase py-2 font-bold">
+              <slot name="title"></slot>
+            </h2>
+            <h3 class="text-3xl mt-3 mb-6 font-semi font-serif">
+              <slot name="subtitle"></slot>
+            </h3>
+            <slot></slot>
+          </li-card>
+        </div>
+      </section>
+    </template>
 
+    <template component="inline-code">
+      <slot class="font-mono rounded bg-gray-100 p-1 inline-block text-gray-800 text-sm"></slot>
+    </template>
+  </body>
 </html>

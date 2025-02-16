@@ -4,12 +4,12 @@ on:
     branches:
       - main
     paths:
-      - "*.json"
-      - "*.yaml"
-      - "*.js"
-      - "*.ts"
-      - "lib/**"
-      - ".github/**"
+      - '*.json'
+      - '*.yaml'
+      - '*.js'
+      - '*.ts'
+      - 'lib/**'
+      - '.github/**'
 
 jobs:
   publish-apphorde:
@@ -25,7 +25,8 @@ jobs:
         run: |
           set -e
           which pnpm && echo 'pnpm OK' || npm i -g pnpm
-          pnpm i && pnpx nx run-many -t build,test
+          pnpm i
+          pnpm nx run-many -t build,tsc,test
 
       - name: Publish to AppHorde Registry
         env:

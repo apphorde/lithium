@@ -8,6 +8,6 @@
     "sourceMap": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "types": ["node"],
+    "types": ["node"]
   }
 }

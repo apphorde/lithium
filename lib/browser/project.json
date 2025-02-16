@@ -2,7 +2,6 @@
   "name": "@li3/browser",
   "targets": {
     "build": {},
-    "tsc": {},
-    "publish": {}
+    "tsc": {}
   }
 }

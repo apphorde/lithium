@@ -1,6 +1,6 @@
-import type { AnyFunction, Attribute, RuntimeContext } from "./types.js";
-import { plugins } from "./plugin.js";
-import { unref } from "@li3/reactive";
+import type { AnyFunction, Attribute, RuntimeContext } from './types.js';
+import { plugins } from './plugin.js';
+import { unref } from '@li3/reactive';
 
 const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
 
@@ -16,12 +16,12 @@ export function setEventHandler(el: EventTarget, eventName: string, handler: Any
       options.prevent && event.preventDefault();
       handler(event);
     },
-    options
+    options,
   );
 }
 
 export function setClassName(el: Element, classNames: string, value: any): void {
-  for (const cls of classNames.split(".").filter(Boolean)) {
+  for (const cls of classNames.split('.').filter(Boolean)) {
     el.classList.toggle(cls, value);
   }
 }
@@ -39,7 +39,7 @@ export function setAttribute(el: Element, attribute: string, value: boolean): vo
     return;
   }
 
-  if (typeof value === "boolean" && value === false) {
+  if (typeof value === 'boolean' && value === false) {
     el.removeAttribute(attribute);
     return;
   }
@@ -74,18 +74,18 @@ export function isFragment(node: any): node is DocumentFragment {
 }
 
 export function tpl(text: string) {
-  const template = document.createElement("template");
+  const template = document.createElement('template');
   template.innerHTML = text;
   return template;
 }
 
 export function domReady(fn?) {
-  if (document.readyState === "complete") {
+  if (document.readyState === 'complete') {
     return fn ? fn() : Promise.resolve(null);
   }
 
   return new Promise((next) => {
-    window.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener('DOMContentLoaded', () => {
       fn && fn();
       next(null);
     });
@@ -98,7 +98,7 @@ export function clearElement(element: Element | DocumentFragment) {
     return;
   }
 
-  element.innerHTML = "";
+  element.innerHTML = '';
 }
 
 export function createDom($el: RuntimeContext): void {
@@ -109,10 +109,10 @@ export function createDom($el: RuntimeContext): void {
   const { element, template, shadowDom } = $el;
   const dom = template.content.cloneNode(true);
 
-  plugins.apply("dom", [$el, dom]);
+  plugins.apply('dom', [$el, dom]);
 
   traverseDom(dom, (node, attributes) => {
-    plugins.apply("element", [$el, node]);
+    plugins.apply('element', [$el, node]);
 
     if (!isElement(node) || !(Array.isArray(attributes) && attributes.length)) {
       return;
@@ -121,7 +121,7 @@ export function createDom($el: RuntimeContext): void {
     for (const attr of attributes) {
       const attribute = attr[0].trim();
       const value = attr[1].trim();
-      plugins.apply("attribute", [$el, node, attribute, value]);
+      plugins.apply('attribute', [$el, node, attribute, value]);
     }
   });
 
@@ -141,7 +141,7 @@ export function createDom($el: RuntimeContext): void {
 }
 
 export function defineEventOnElement(el: Element, name: string): void {
-  const property = "on" + name.toLowerCase();
+  const property = 'on' + name.toLowerCase();
   if (!el.hasOwnProperty(property)) {
     Object.defineProperty(el, property, { value: null });
   }
@@ -154,13 +154,13 @@ export function emitEvent(element: Element, eventName: string, detail: any): voi
 
 export function mapContentToSlots(content: Array<ChildNode>, element: Element | DocumentFragment) {
   const slots: Record<string, HTMLSlotElement> = {};
-  element.querySelectorAll("slot").forEach((slot) => (slots[slot.name || "default"] = slot));
+  element.querySelectorAll('slot').forEach((slot) => (slots[slot.name || 'default'] = slot));
 
   const frag = document.createDocumentFragment();
   frag.append(...content);
 
-  frag.querySelectorAll("[slot]").forEach((element) => {
-    const slotName = element.getAttribute("slot");
+  frag.querySelectorAll('[slot]').forEach((element) => {
+    const slotName = element.getAttribute('slot');
     if (slots[slotName]) {
       slots[slotName].append(element);
     }

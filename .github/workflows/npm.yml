@@ -4,12 +4,12 @@ on:
     branches:
       - main
     paths:
-      - "*.json"
-      - "*.yaml"
-      - "*.js"
-      - "*.ts"
-      - "lib/**"
-      - ".github/**"
+      - '*.json'
+      - '*.yaml'
+      - '*.js'
+      - '*.ts'
+      - 'lib/**'
+      - '.github/**'
 
 jobs:
   publish-npm:
@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build packages and publish
+      - name: Build and publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
@@ -29,4 +29,6 @@ jobs:
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
           echo "//registry.npmjs.org/:always-auth=true" >> .npmrc
           which pnpm && echo 'pnpm OK' || npm i -g pnpm
-          pnpm i && pnpx nx run-many -t publish
+          pnpm i
+          pnpm nx run-many -t build,tsc
+          pnpm publish --no-git-checks --access public -r

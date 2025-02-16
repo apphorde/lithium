@@ -1,6 +1,6 @@
-import { parseArgs } from "./parse-args.js";
-import compile from "./compile.js";
-import publish from "./publish.js";
+import { parseArgs } from './parse-args.js';
+import compile from './compile.js';
+import publish from './publish.js';
 
 const commands = {
   compile,
@@ -22,7 +22,7 @@ async function main() {
     return;
   }
 
-  throw new Error("Invalid command: " + command);
+  throw new Error('Invalid command: ' + command);
 }
 
 main();

@@ -1,4 +1,4 @@
-import type { RuntimeContext } from "./types.js";
+import type { RuntimeContext } from './types.js';
 
 const stack: RuntimeContext[] = [];
 

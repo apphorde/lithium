@@ -1,22 +1,22 @@
-import { ReactiveContext } from "@li3/reactive";
-import { CreateRuntimeOptions, RuntimeContext } from "./types.js";
-import { plugins } from "./plugin.js";
-import { createState } from "./reactive.js";
-import { push, pop } from "./stack.js";
-import { createDom, tpl } from "./dom.js";
-import { getOption } from "./options.js";
+import { ReactiveContext } from '@li3/reactive';
+import { CreateRuntimeOptions, RuntimeContext } from './types.js';
+import { plugins } from './plugin.js';
+import { createState } from './reactive.js';
+import { push, pop } from './stack.js';
+import { createDom, tpl } from './dom.js';
+import { getOption } from './options.js';
 
 const noop = () => {};
-const VM = Symbol("@@Runtime");
+const VM = Symbol('@@Runtime');
 
 export function createRuntimeContext(properties: CreateRuntimeOptions): RuntimeContext {
   const { setup = noop, template, shadowDom } = properties;
 
   const $el: RuntimeContext = {
     ...properties,
-    shadowDom: typeof shadowDom === "string" ? ({ mode: shadowDom } as ShadowRootInit) : shadowDom,
+    shadowDom: typeof shadowDom === 'string' ? ({ mode: shadowDom } as ShadowRootInit) : shadowDom,
     setup,
-    template: !template ? null : typeof template === "string" ? tpl(template) : template,
+    template: !template ? null : typeof template === 'string' ? tpl(template) : template,
     stylesheets: [],
     scripts: [],
     state: null,
@@ -45,22 +45,22 @@ export function activateContext($el: RuntimeContext) {
     reactive.check();
 
     ($el.element as any).__destroy = () => {
-      plugins.apply("destroy", [$el]);
+      plugins.apply('destroy', [$el]);
       $el.destroy.forEach((f) => f($el));
     };
 
-    plugins.apply("init", [$el]);
+    plugins.apply('init', [$el]);
     $el.init.forEach((f) => f($el));
 
-    if (getOption("debugEnabled")) {
+    if (getOption('debugEnabled')) {
       $el.element[VM] = $el;
     }
   } catch (error) {
-    if (getOption("debugEnabled")) {
+    if (getOption('debugEnabled')) {
       throw error;
     }
 
-    console.log("Failed to initialize component!", $el, error);
+    console.log('Failed to initialize component!', $el, error);
   }
 
   pop();

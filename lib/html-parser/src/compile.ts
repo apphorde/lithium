@@ -1,18 +1,13 @@
 let _uid = 1;
 
 function uid() {
-  return "u" + _uid++;
+  return 'u' + _uid++;
 }
 
-export function compile(
-  node,
-  options,
-  children?,
-  context = { ns: "", vars: [] }
-) {
+export function compile(node, options, children?, context = { ns: '', vars: [] }) {
   const code = [];
 
-  if (node.type === "document") {
+  if (node.type === 'document') {
     const id = uid();
     context.vars.push(`${id}=document.createDocumentFragment()`);
 
@@ -23,7 +18,7 @@ export function compile(
       next && code.push(next);
     }
 
-    docChildren.length && code.push(`p(${id},[${docChildren.join(",")}]);`);
+    docChildren.length && code.push(`p(${id},[${docChildren.join(',')}]);`);
 
     _uid = 1;
     return {
@@ -34,16 +29,16 @@ ne=(x,n)=>_d.createElementNS(n=='s'?'http://www.w3.org/2000/svg':'',x),
 t=x=>_d.createTextNode(x),
 a=(e,a,b='')=>e.setAttribute(a,b),
 p=(t,a)=>t.append(...a);
-let ${context.vars.join(",")};
-${code.join("")}`,
+let ${context.vars.join(',')};
+${code.join('')}`,
     };
   }
 
-  if (node.type === "element") {
+  if (node.type === 'element') {
     const id = uid();
 
-    if (node.tag === "svg") {
-      context.ns = "s";
+    if (node.tag === 'svg') {
+      context.ns = 's';
     }
 
     if (context.ns) {
@@ -76,17 +71,17 @@ ${code.join("")}`,
         next && code.push(next);
       }
 
-      elChildren.length && code.push(`p(${id},[${elChildren.join(",")}]);`);
+      elChildren.length && code.push(`p(${id},[${elChildren.join(',')}]);`);
     }
 
-    if (node.tag === "svg") {
-      context.ns = "";
+    if (node.tag === 'svg') {
+      context.ns = '';
     }
 
-    return code.join("");
+    return code.join('');
   }
 
-  if (node.type === "text" && node.text.trim()) {
+  if (node.type === 'text' && node.text.trim()) {
     const id = uid();
     context.vars.push(`${id}=t(${JSON.stringify(node.text)})`);
     children.push(id);

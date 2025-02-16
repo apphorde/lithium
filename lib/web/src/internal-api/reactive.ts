@@ -1,6 +1,6 @@
-import type { AnyFunction, RuntimeContext } from "./types";
-import { plugins } from "./plugin.js";
-import { unref } from "@li3/reactive";
+import type { AnyFunction, RuntimeContext } from './types';
+import { plugins } from './plugin.js';
+import { unref } from '@li3/reactive';
 
 export function fork(parent: any, child: any, callback: AnyFunction) {
   return new Proxy(child, {
@@ -34,7 +34,7 @@ export function createState($el: RuntimeContext): void {
   // TODO check if state keys and prop names have a conflict
   const baseState = new ComponentInstance();
   const componentState = Object.assign(baseState, $el.setup($el) || {});
-  plugins.apply("setup", [$el, componentState]);
+  plugins.apply('setup', [$el, componentState]);
 
   const combinedState = { ...$el.props, ...componentState };
   $el.state = $el.reactive.watchDeep(combinedState);

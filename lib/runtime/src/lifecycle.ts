@@ -1,21 +1,21 @@
-import { tpl, traverseDom, isElement, isFragment, clearElement, mapContentToSlots } from "@li3/dom";
-import { CreateRuntimeOptions, RuntimeContext } from "./types.js";
-import { Plugins } from "./plugin.js";
-import { createState } from "./reactive.js";
-import { push, pop } from "./stack.js";
-import { getOption } from "./options.js";
+import { tpl, traverseDom, isElement, isFragment, clearElement, mapContentToSlots } from '@li3/dom';
+import { CreateRuntimeOptions, RuntimeContext } from './types.js';
+import { Plugins } from './plugin.js';
+import { createState } from './reactive.js';
+import { push, pop } from './stack.js';
+import { getOption } from './options.js';
 
 const noop = () => {};
-const VM = Symbol("@@Runtime");
+const VM = Symbol('@@Runtime');
 
 export function createRuntimeContext(properties: CreateRuntimeOptions): RuntimeContext {
   const { setup = noop, template, shadowDom } = properties;
 
   const $el = new RuntimeContext({
     ...properties,
-    shadowDom: typeof shadowDom === "string" ? ({ mode: shadowDom } as ShadowRootInit) : shadowDom,
+    shadowDom: typeof shadowDom === 'string' ? ({ mode: shadowDom } as ShadowRootInit) : shadowDom,
     setup,
-    template: !template ? null : typeof template === "string" ? tpl(template) : template,
+    template: !template ? null : typeof template === 'string' ? tpl(template) : template,
   });
 
   return $el;
@@ -33,22 +33,22 @@ export function activateContext($el: RuntimeContext) {
     reactive.check();
 
     ($el.element as any).__destroy = () => {
-      Plugins.apply("destroy", [$el]);
+      Plugins.apply('destroy', [$el]);
       $el.destroy.forEach((f) => f($el));
     };
 
-    Plugins.apply("init", [$el]);
+    Plugins.apply('init', [$el]);
     $el.init.forEach((f) => f($el));
 
-    if (getOption("debugEnabled")) {
+    if (getOption('debugEnabled')) {
       $el.element[VM] = $el;
     }
   } catch (error) {
-    if (getOption("debugEnabled")) {
+    if (getOption('debugEnabled')) {
       throw error;
     }
 
-    console.log("Failed to initialize component!", $el, error);
+    console.log('Failed to initialize component!', $el, error);
   }
 
   pop();
@@ -62,10 +62,10 @@ export function createDom($el: RuntimeContext): void {
   const { element, template, shadowDom } = $el;
   const dom = template.content.cloneNode(true);
 
-  Plugins.apply("dom", [$el, dom]);
+  Plugins.apply('dom', [$el, dom]);
 
   traverseDom(dom, (node, attributes) => {
-    Plugins.apply("element", [$el, node]);
+    Plugins.apply('element', [$el, node]);
 
     if (!isElement(node) || !(Array.isArray(attributes) && attributes.length)) {
       return;
@@ -74,7 +74,7 @@ export function createDom($el: RuntimeContext): void {
     for (const attr of attributes) {
       const attribute = attr[0].trim();
       const value = attr[1].trim();
-      Plugins.apply("attribute", [$el, node, attribute, value]);
+      Plugins.apply('attribute', [$el, node, attribute, value]);
     }
   });
 

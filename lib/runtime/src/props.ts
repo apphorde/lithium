@@ -1,7 +1,7 @@
-import type { Ref } from "@li3/reactive";
-import { isElement, getAttribute } from "@li3/dom";
-import { RuntimeContext } from "./types.js";
-import { Plugins } from "./plugin.js";
+import type { Ref } from '@li3/reactive';
+import { isElement, getAttribute } from '@li3/dom';
+import { RuntimeContext } from './types.js';
+import { Plugins } from './plugin.js';
 
 export type PropDefinition<T> = { type: Function; default: T | (() => T) };
 
@@ -20,8 +20,8 @@ export function getPropValue<T>($el: RuntimeContext, property: string, definitio
     return fromDom as T;
   }
 
-  if (definition && definition.hasOwnProperty("default")) {
-    if (typeof definition.default === "function") {
+  if (definition && definition.hasOwnProperty('default')) {
+    if (typeof definition.default === 'function') {
       return (definition.default as any)();
     }
 
@@ -43,7 +43,7 @@ export function createInputRef<T = any>($el: RuntimeContext, name: string, initi
     set(value) {
       const oldValue = $ref.value;
       $ref.value = value;
-      Plugins.apply("update", [$el, name, oldValue, value]);
+      Plugins.apply('update', [$el, name, oldValue, value]);
       $el.update.forEach((f) => f($el, name, oldValue, value));
     },
   });

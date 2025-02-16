@@ -2,6 +2,7 @@
   "name": "@li3/monorepo",
   "license": "MIT",
   "devDependencies": {
+    "@cloud-cli/prettier-config": "^1.0.0",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.4",
@@ -9,6 +10,7 @@
     "@types/node": "^22.13.1",
     "core-js": "^3.40.0",
     "nx": "20.4.2",
+    "prettier": "^3.5.1",
     "rollup": "^4.34.6",
     "tslib": "^2.8.1",
     "tsx": "^4.19.2",
@@ -17,6 +19,7 @@
     "typedoc-plugin-mdn-links": "^4.0.12",
     "typescript": "^5.7.3"
   },
+  "prettier": "@cloud-cli/prettier-config",
   "scripts": {
     "docs": "pnpm typedoc --footerLastModified"
   },

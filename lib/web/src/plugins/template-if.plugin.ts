@@ -1,11 +1,11 @@
-import { plugins } from "../internal-api/plugin.js";
-import { compileExpression } from "../internal-api/expressions.js";
-import { mount } from "../component-api/custom-elements.js";
-import type { RuntimeContext } from "../internal-api/types.js";
+import { plugins } from '../internal-api/plugin.js';
+import { compileExpression } from '../internal-api/expressions.js';
+import { mount } from '../component-api/custom-elements.js';
+import type { RuntimeContext } from '../internal-api/types.js';
 
 plugins.use({
   dom($el: RuntimeContext) {
-    const templates: HTMLTemplateElement[] = Array.from($el.element.querySelectorAll("template[if]"));
+    const templates: HTMLTemplateElement[] = Array.from($el.element.querySelectorAll('template[if]'));
 
     for (const t of templates) {
       templateIf(t, $el);
@@ -14,7 +14,7 @@ plugins.use({
 });
 
 export async function templateIf(template: HTMLTemplateElement, $el: RuntimeContext) {
-  const expression = template.getAttribute("if");
+  const expression = template.getAttribute('if');
   const getter = compileExpression($el, expression);
   const previousNodes = [];
   let childContext;

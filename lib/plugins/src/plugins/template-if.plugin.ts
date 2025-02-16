@@ -1,9 +1,9 @@
-import { compileExpression } from "@li3/scope";
-import { mount, Plugins, RuntimeContext } from "@li3/runtime";
+import { compileExpression } from '@li3/scope';
+import { mount, Plugins, RuntimeContext } from '@li3/runtime';
 
 Plugins.use({
   dom($el: RuntimeContext) {
-    const templates: HTMLTemplateElement[] = Array.from($el.element.querySelectorAll("template[if]"));
+    const templates: HTMLTemplateElement[] = Array.from($el.element.querySelectorAll('template[if]'));
 
     for (const t of templates) {
       templateIf(t, $el);
@@ -12,7 +12,7 @@ Plugins.use({
 });
 
 export async function templateIf(template: HTMLTemplateElement, $el: RuntimeContext) {
-  const expression = template.getAttribute("if");
+  const expression = template.getAttribute('if');
   const getter = compileExpression($el, expression);
   const previousNodes = [];
   let childContext;

@@ -2,10 +2,10 @@ export function parseArgs(): Args {
   const argv = process.argv.slice(2);
   const options: Record<string, string | boolean> = {};
   const args: string[] = [];
-  let flag = "";
+  let flag = '';
 
   for (const next of argv) {
-    if (next.startsWith("--")) {
+    if (next.startsWith('--')) {
       if (flag) {
         options[flag] = true;
       }
@@ -16,7 +16,7 @@ export function parseArgs(): Args {
 
     if (flag) {
       options[flag] = next;
-      flag = "";
+      flag = '';
     } else {
       args.push(next);
     }

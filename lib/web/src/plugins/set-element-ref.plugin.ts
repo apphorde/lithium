@@ -1,11 +1,11 @@
-import { getOption } from "../internal-api/options";
-import { plugins } from "../internal-api/plugin.js";
-import { markAsReactive, isRef } from "@li3/reactive";
-import { RuntimeContext } from "../internal-api/types";
+import { getOption } from '../internal-api/options';
+import { plugins } from '../internal-api/plugin.js';
+import { markAsReactive, isRef } from '@li3/reactive';
+import { RuntimeContext } from '../internal-api/types';
 
 plugins.use({
   attribute($el: RuntimeContext, node: Element, attribute: string, refName: string) {
-    if (attribute === "ref") {
+    if (attribute === 'ref') {
       setElementRefValue($el, node, refName.trim());
     }
   },
@@ -18,7 +18,7 @@ export function setElementRefValue($el: RuntimeContext, node: Element, refName: 
     return;
   }
 
-  if (getOption("debugEnabled")) {
-    console.warn("Ref not found in state: " + refName, $el.state);
+  if (getOption('debugEnabled')) {
+    console.warn('Ref not found in state: ' + refName, $el.state);
   }
 }

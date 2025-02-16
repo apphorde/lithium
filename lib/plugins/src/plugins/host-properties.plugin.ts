@@ -1,5 +1,5 @@
-import { isElement } from "@li3/dom";
-import { Plugins, RuntimeContext } from "@li3/runtime";
+import { isElement } from '@li3/dom';
+import { Plugins, RuntimeContext } from '@li3/runtime';
 
 RuntimeContext.use(() => ({
   hostClasses: [],
@@ -14,8 +14,8 @@ Plugins.use({
 export function applyHostAttributes($el: RuntimeContext) {
   if (!isElement($el.element)) return;
 
-  const hostClasses = $el.hostClasses.join(" ").trim();
+  const hostClasses = $el.hostClasses.join(' ').trim();
   if (hostClasses) {
-    $el.element.className += " " + hostClasses;
+    $el.element.className += ' ' + hostClasses;
   }
 }

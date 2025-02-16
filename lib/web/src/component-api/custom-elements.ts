@@ -1,10 +1,10 @@
-import { activateContext, createRuntimeContext } from "../internal-api/lifecycle.js";
-import { domReady } from "../internal-api/dom.js";
+import { activateContext, createRuntimeContext } from '../internal-api/lifecycle.js';
+import { domReady } from '../internal-api/dom.js';
 
-import type { AnyFunction, ComponentDefinition, RuntimeContext } from "../internal-api/types.js";
-import { createBlobModule } from "../internal-api/expressions";
+import type { AnyFunction, ComponentDefinition, RuntimeContext } from '../internal-api/types.js';
+import { createBlobModule } from '../internal-api/expressions';
 
-export const DefineComponent = Symbol("@@def");
+export const DefineComponent = Symbol('@@def');
 
 /**
  * Create a custom element from a component definition
@@ -12,7 +12,7 @@ export const DefineComponent = Symbol("@@def");
  * @param def The component definition. Can be a setup function or an object with a setup function and other options
  */
 export function createComponent(name: string, def: ComponentDefinition | AnyFunction): void {
-  if (typeof def === "function") {
+  if (typeof def === 'function') {
     def = { setup: def } as ComponentDefinition;
   }
 
@@ -44,19 +44,19 @@ export function getShadowDomOptions(template: HTMLTemplateElement): ShadowRootIn
   const source = template.getAttribute('shadow-dom') || '';
 
   if (source) {
-    return source.startsWith("{") ? JSON.parse(source) : { mode: source };
+    return source.startsWith('{') ? JSON.parse(source) : { mode: source };
   }
 }
 
 export async function getComponentFromTemplate(template: HTMLTemplateElement): Promise<ComponentDefinition> {
-  const setup = template.content.querySelector("script[setup]");
+  const setup = template.content.querySelector('script[setup]');
   const component: ComponentDefinition = { template, shadowDom: getShadowDomOptions(template) };
 
   if (setup) {
-    const href = setup.getAttribute("src");
+    const href = setup.getAttribute('src');
     const md = href
       ? await import(new URL(href, window.location.href).toString())
-      : await createBlobModule(setup.textContent.trim(), "text/javascript");
+      : await createBlobModule(setup.textContent.trim(), 'text/javascript');
 
     setup.remove();
     component.setup = md.default;
@@ -72,7 +72,7 @@ export async function getComponentFromTemplate(template: HTMLTemplateElement): P
  * @param name Optional. Name of the custom element, if not provided it will be taken from the 'component' attribute
  */
 export async function createInlineComponent(template: HTMLTemplateElement, name = '') {
-  name ||= template.getAttribute("component");
+  name ||= template.getAttribute('component');
 
   if (!name) {
     throw new Error('Component name is required');
@@ -127,12 +127,12 @@ export interface MountOptions {
  * @param options Optional. Props to pass to the component or a parent context to inherit from
  */
 export function mount(element: DocumentFragment | Element | string, def: ComponentDefinition, options?: MountOptions) {
-  if (typeof element === "string") {
+  if (typeof element === 'string') {
     element = document.querySelector(element);
   }
 
   if (!element) {
-    throw new Error("Target element not found");
+    throw new Error('Target element not found');
   }
 
   // custom element was moved betwen parents and does not need to mount again
@@ -158,16 +158,16 @@ export function mount(element: DocumentFragment | Element | string, def: Compone
 }
 
 export async function createApp(template: HTMLTemplateElement, spec) {
-  const div = document.createElement("div");
-  div.style.display = "contents";
+  const div = document.createElement('div');
+  div.style.display = 'contents';
   template.parentNode.insertBefore(div, template);
 
   return mount(div, spec);
 }
 
 domReady(function () {
-  const inline: HTMLTemplateElement[] = Array.from(document.querySelectorAll("template[component]"));
-  const apps: HTMLTemplateElement[] = Array.from(document.querySelectorAll("template[app]"));
+  const inline: HTMLTemplateElement[] = Array.from(document.querySelectorAll('template[component]'));
+  const apps: HTMLTemplateElement[] = Array.from(document.querySelectorAll('template[app]'));
 
   for (const template of inline) {
     createInlineComponent(template);

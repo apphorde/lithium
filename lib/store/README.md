@@ -9,7 +9,7 @@ Declare a store in a module
 ```js
 // count-store.js
 
-import { useStore } from "@li3/store";
+import { useStore } from '@li3/store';
 
 const reducers = {
   add(state, action) {
@@ -22,10 +22,10 @@ const reducers = {
 
 const effects = {
   add(state) {
-    console.log("New count:", state.count);
+    console.log('New count:', state.count);
   },
   remove(state) {
-    console.log("New count:", state.count);
+    console.log('New count:', state.count);
   },
 };
 
@@ -35,14 +35,14 @@ export default useStore({ count: 0 }, { reducers, effects });
 Then import the store and dispatch actions:
 
 ```js
-import countStore from "./count-store.js";
+import countStore from './count-store.js';
 
 // it's safe to import the same store many times
 const { useSelectors, dispatch } = countStore;
 
-dispatch("add"); // logs 1
-dispatch("add"); // logs 2
-dispatch("remove"); // logs 1 again
+dispatch('add'); // logs 1
+dispatch('add'); // logs 2
+dispatch('remove'); // logs 1 again
 
 // for components, we select state values via live Ref instances.
 // every Ref has to be detached after use to prevent memory leaks

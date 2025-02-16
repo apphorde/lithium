@@ -1,6 +1,6 @@
-import { setText } from "@li3/dom";
-import { compileExpression, wrapTryCatch } from "@li3/scope";
-import { watch, Plugins, RuntimeContext } from "@li3/runtime";
+import { setText } from '@li3/dom';
+import { compileExpression, wrapTryCatch } from '@li3/scope';
+import { watch, Plugins, RuntimeContext } from '@li3/runtime';
 
 Plugins.use({
   element($el: RuntimeContext, node: Text) {
@@ -8,7 +8,7 @@ Plugins.use({
       return;
     }
 
-    if (!node.parentElement?.hasAttribute("literal")) {
+    if (!node.parentElement?.hasAttribute('literal')) {
       createTextNodeBinding($el, node);
     }
   },
@@ -17,19 +17,14 @@ Plugins.use({
 export function createTextNodeBinding($el: RuntimeContext, node: Text) {
   const text = String(node.textContent);
 
-  if (!(text.includes("${") || text.includes("{{"))) {
+  if (!(text.includes('${') || text.includes('{{'))) {
     return;
   }
 
-  node.textContent = "";
+  node.textContent = '';
 
   const expression =
-    "`" +
-    text.replace(
-      /\{\{([\s\S]+?)}}/g,
-      (_: any, inner: string) => "${ " + inner.trim() + " }"
-    ) +
-    "`";
+    '`' + text.replace(/\{\{([\s\S]+?)}}/g, (_: any, inner: string) => '${ ' + inner.trim() + ' }') + '`';
 
   const fn = compileExpression($el, expression);
   const getter = wrapTryCatch(expression, fn);

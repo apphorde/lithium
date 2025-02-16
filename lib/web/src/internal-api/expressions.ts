@@ -1,5 +1,5 @@
-import { AnyFunction, RuntimeContext } from "./types.js";
-import { getOption } from "./options.js";
+import { AnyFunction, RuntimeContext } from './types.js';
+import { getOption } from './options.js';
 
 const fnCache = new Map();
 const domParser = new DOMParser();
@@ -7,14 +7,14 @@ const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
 
 export function compileExpression($el: RuntimeContext, expression: string, args: string[] = []): AnyFunction {
   // TODO detect CSP issues and fallback
-  if (getOption("useModuleExpressions")) {
+  if (getOption('useModuleExpressions')) {
     return compileExpressionBlob($el, expression, args);
   }
 
   return compileExpressionEval($el, expression, args);
 }
 
-export function createBlobModule(code: string, type = "text/javascript") {
+export function createBlobModule(code: string, type = 'text/javascript') {
   const blob = new Blob([code], { type });
   const url = URL.createObjectURL(blob);
   const modPromise = import(url);
@@ -25,10 +25,10 @@ export function createBlobModule(code: string, type = "text/javascript") {
 const modCache = new Map();
 
 export function compileExpressionBlob($el: RuntimeContext, expression: string, args: string[] = []) {
-  const fargs = ["__s", ...args].join(", ");
-  const fasync = expression.includes("await ") ? "async " : "";
+  const fargs = ['__s', ...args].join(', ');
+  const fasync = expression.includes('await ') ? 'async ' : '';
   const code = `export default ${fasync}function(${fargs}) {
-    const {${$el.stateKeys.join(", ")}} = __s;
+    const {${$el.stateKeys.join(', ')}} = __s;
     return ${expression};
   }`;
 
@@ -46,7 +46,7 @@ export function compileExpressionBlob($el: RuntimeContext, expression: string, a
 
 export function compileExpressionEval($el: RuntimeContext, expression: string, args: string[] = []): AnyFunction {
   const code = `
-  const {${$el.stateKeys.join(", ")}} = __u(__s);
+  const {${$el.stateKeys.join(', ')}} = __u(__s);
   return ${expression}
   `;
   const cacheKey = code + args;
@@ -55,14 +55,14 @@ export function compileExpressionEval($el: RuntimeContext, expression: string, a
   if (!fn) {
     let finalCode = code;
 
-    if (getOption("useDomParser")) {
-      const parsed = domParser.parseFromString(code, "text/html");
+    if (getOption('useDomParser')) {
+      const parsed = domParser.parseFromString(code, 'text/html');
       finalCode = parsed.body.innerText.trim();
     }
 
-    const functionType = expression.includes("await ") ? AsyncFunction : Function;
+    const functionType = expression.includes('await ') ? AsyncFunction : Function;
 
-    fn = functionType(...["__s", ...args, finalCode]);
+    fn = functionType(...['__s', ...args, finalCode]);
     fnCache.set(cacheKey, fn);
   }
 
@@ -70,7 +70,7 @@ export function compileExpressionEval($el: RuntimeContext, expression: string, a
 }
 
 export function wrapTryCatch(exp: string, fn: AnyFunction) {
-  if (getOption("debugEnabled")) {
+  if (getOption('debugEnabled')) {
     return () => fn();
   }
 
@@ -78,7 +78,7 @@ export function wrapTryCatch(exp: string, fn: AnyFunction) {
     try {
       return fn();
     } catch (e) {
-      console.log("Error: " + exp, e);
+      console.log('Error: ' + exp, e);
     }
   };
 }

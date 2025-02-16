@@ -4,7 +4,7 @@ export interface Ref<T> {
 }
 
 type AnyFunction = (...args: any) => any;
-const reactiveTag = "__w";
+const reactiveTag = '__w';
 
 export interface ObservableContext {
   check: VoidFunction;
@@ -34,7 +34,7 @@ export function observer<T>(valueGetter: Ref<T> | (() => T), effect: (value: T) 
 }
 
 export interface ReactiveOptions {
-  shallow?: boolean
+  shallow?: boolean;
 }
 
 export function reactive<T extends object>(object: T, callback: VoidFunction, options?: ReactiveOptions): T {
@@ -47,7 +47,7 @@ export function reactive<T extends object>(object: T, callback: VoidFunction, op
   if (!options?.shallow) {
     const values = Object.entries(object);
     for (const [key, next] of values) {
-      if (typeof next === "object" && next !== null) {
+      if (typeof next === 'object' && next !== null) {
         (object as any)[key] = reactive(next, callback);
       }
     }
@@ -59,7 +59,7 @@ export function reactive<T extends object>(object: T, callback: VoidFunction, op
         return false;
       }
 
-      if (typeof value === "object" && value !== null && !options?.shallow) {
+      if (typeof value === 'object' && value !== null && !options?.shallow) {
         value = reactive(value, callback, options);
       }
 
@@ -71,7 +71,7 @@ export function reactive<T extends object>(object: T, callback: VoidFunction, op
       delete target[p];
       callback();
       return true;
-    }
+    },
   });
 }
 
@@ -119,7 +119,7 @@ export function ref<T>(initialValue: T | null, effect: AnyFunction, options?: Re
 }
 
 export function isRef<X>(t: any): t is Ref<X> {
-  return typeof t !== "object" ? false : t && t.__isRef;
+  return typeof t !== 'object' ? false : t && t.__isRef;
 }
 
 export function unref<T>(v: T | Ref<T>): T {
@@ -136,15 +136,15 @@ export class ReactiveContext implements ObservableContext {
   }
 
   watch<T>(getter: Ref<T> | (() => T), effect?: AnyFunction): void {
-    if (typeof getter !== "function" && !isRef(getter)) {
-      throw new Error("Watched expression must be a function");
+    if (typeof getter !== 'function' && !isRef(getter)) {
+      throw new Error('Watched expression must be a function');
     }
 
-    if (effect && typeof effect !== "function") {
-      throw new Error("Watcher effect must be a function");
+    if (effect && typeof effect !== 'function') {
+      throw new Error('Watcher effect must be a function');
     }
 
-    const fn = effect ? observer(getter, effect) : (isRef(getter) ? () => getter.value : getter);
+    const fn = effect ? observer(getter, effect) : isRef(getter) ? () => getter.value : getter;
     this.observers.push(fn);
   }
 
