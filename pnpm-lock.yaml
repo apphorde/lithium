@@ -69,8 +69,8 @@ importers:
   lib/cli:
     dependencies:
       '@li3/sfc':
-        specifier: 0.0.2
-        version: 0.0.2
+        specifier: link:../sfc
+        version: link:../sfc
 
   lib/dom: {}
 
@@ -102,7 +102,7 @@ importers:
   lib/scope:
     dependencies:
       '@li3/runtime':
-        specifier: workspace:*
+        specifier: link:../runtime
         version: link:../runtime
 
   lib/sfc:
@@ -311,12 +311,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
-
-  '@li3/html-parser@0.0.3':
-    resolution: {integrity: sha512-xEYRMz+z7wOls9LOxxorH7/ZNWW73RBayLDKZjDxv6ZGgYxgvNYiSNvAA8uVKsJVpzIYji2YNBR7tjT4FTWcGQ==}
-
-  '@li3/sfc@0.0.2':
-    resolution: {integrity: sha512-3QvdGMUi1wyAPlVSZ4oRLoUxwM7d7P/9jW498HXI7adKFtj7H+ctxWS3iXA4fRsLmPt9+BYa5QE/5ZByNSPnmw==}
 
   '@napi-rs/wasm-runtime@0.2.4':
     resolution: {integrity: sha512-9zESzOO5aDByvhIAsOy9TbpZ0Ur2AJbUI7UT73kcUTS2mxAMHOBaa1st/jAymNoCtvrit99kkzT1FZuXVcgfIQ==}
@@ -1210,13 +1204,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
-
-  '@li3/html-parser@0.0.3': {}
-
-  '@li3/sfc@0.0.2':
-    dependencies:
-      '@li3/html-parser': 0.0.3
-      acorn: 8.14.0
 
   '@napi-rs/wasm-runtime@0.2.4':
     dependencies:

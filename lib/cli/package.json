@@ -11,6 +11,6 @@
     "li3": "./index.js"
   },
   "dependencies": {
-    "@li3/sfc": "0.0.2"
+    "@li3/sfc": "link:../sfc"
   }
 }
