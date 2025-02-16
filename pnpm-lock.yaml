@@ -93,10 +93,10 @@ importers:
   lib/runtime:
     dependencies:
       '@li3/dom':
-        specifier: link:../dom
+        specifier: workspace:*
         version: link:../dom
       '@li3/reactive':
-        specifier: link:../reactive
+        specifier: workspace:*
         version: link:../reactive
 
   lib/scope:

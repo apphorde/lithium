@@ -46,10 +46,9 @@ dispatch("remove"); // logs 1 again
 
 // for components, we select state values via live Ref instances.
 // every Ref has to be detached after use to prevent memory leaks
-import { onInit }
-const { select, unref } = useSelectors();
-
+const { select, detach } = useSelectors();
 const counter = select((s) => s.count);
+
 // detach all live bindings created with select()
-unref();
+detach();
 ```

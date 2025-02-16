@@ -5,6 +5,7 @@
   },
   "targetDefaults": {
     "tsc": {
+      "dependsOn": ["^tsc"],
       "executor": "nx:run-commands",
       "options": {
         "command": "npx tsc -p {projectRoot}/tsconfig.json --noEmit --rootDir {projectRoot}"
