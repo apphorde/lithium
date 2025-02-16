@@ -6,6 +6,7 @@
   "targetDefaults": {
     "tsc": {
       "dependsOn": ["^tsc"],
+      "cache": true,
       "executor": "nx:run-commands",
       "options": {
         "command": "npx tsc -p {projectRoot}/tsconfig.json --noEmit --rootDir {projectRoot}"
@@ -13,6 +14,7 @@
     },
     "build": {
       "dependsOn": ["^build", "^tsc"],
+      "cache": true,
       "executor": "nx:run-commands",
       "options": {
         "command": "rollup -c {projectRoot}/rollup.config.js"

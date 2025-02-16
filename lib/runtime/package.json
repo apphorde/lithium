@@ -8,7 +8,7 @@
     }
   },
   "dependencies": {
-    "@li3/reactive": "workspace:*",
-    "@li3/dom": "workspace:*"
+    "@li3/reactive": "workspace:../reactive",
+    "@li3/dom": "workspace:../dom"
   }
 }

@@ -54,16 +54,16 @@ importers:
   lib/browser:
     dependencies:
       '@li3/dom':
-        specifier: workspace:*
+        specifier: workspace:../dom
         version: link:../dom
       '@li3/reactive':
-        specifier: workspace:*
+        specifier: workspace:../reactive
         version: link:../reactive
       '@li3/runtime':
-        specifier: workspace:*
+        specifier: workspace:../runtime
         version: link:../runtime
       '@li3/scope':
-        specifier: workspace:*
+        specifier: workspace:../scope
         version: link:../scope
 
   lib/cli:
@@ -79,13 +79,13 @@ importers:
   lib/plugins:
     dependencies:
       '@li3/dom':
-        specifier: workspace:*
+        specifier: workspace:../dom
         version: link:../dom
       '@li3/runtime':
-        specifier: workspace:*
+        specifier: workspace:../runtime
         version: link:../runtime
       '@li3/scope':
-        specifier: workspace:*
+        specifier: workspace:../scope
         version: link:../scope
 
   lib/reactive: {}
@@ -93,22 +93,22 @@ importers:
   lib/runtime:
     dependencies:
       '@li3/dom':
-        specifier: workspace:*
+        specifier: workspace:../dom
         version: link:../dom
       '@li3/reactive':
-        specifier: workspace:*
+        specifier: workspace:../reactive
         version: link:../reactive
 
   lib/scope:
     dependencies:
       '@li3/runtime':
-        specifier: workspace:*
+        specifier: workspace:../runtime
         version: link:../runtime
 
   lib/sfc:
     dependencies:
       '@li3/html-parser':
-        specifier: workspace:*
+        specifier: workspace:../html-parser
         version: link:../html-parser
       acorn:
         specifier: latest
@@ -123,10 +123,10 @@ importers:
   lib/web:
     dependencies:
       '@li3/html-parser':
-        specifier: workspace:*
+        specifier: workspace:../html-parser
         version: link:../html-parser
       '@li3/reactive':
-        specifier: workspace:*
+        specifier: workspace:../reactive
         version: link:../reactive
 
 packages:

@@ -14,7 +14,7 @@ export function getPropValue<T>($el: RuntimeContext, property: string, definitio
     return $el.element[property];
   }
 
-  const fromDom = getAttribute($el.element, property.toLowerCase());
+  const fromDom = getAttribute($el.element as Element, property.toLowerCase());
   if (fromDom) {
     // TODO typecast number/bool?
     return fromDom as T;
