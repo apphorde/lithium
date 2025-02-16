@@ -2,6 +2,7 @@
   "name": "@li3/runtime",
   "targets": {
     "build": {},
-    "tsc": {}
+    "tsc": {},
+    "publish": {}
   }
 }

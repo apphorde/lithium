@@ -2,6 +2,7 @@
   "name": "@li3/sfc",
   "targets": {
     "build": {},
-    "tsc": {}
+    "tsc": {},
+    "publish": {}
   }
 }

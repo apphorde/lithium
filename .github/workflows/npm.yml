@@ -21,17 +21,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build packages
-        run: |
-          set -e
-          which pnpm && echo 'pnpm OK' || npm i -g pnpm
-          pnpm i && pnpx nx run-many -t build,test
-
-      - name: Publish to NPM
+      - name: Build packages and publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
+          set -e
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
           echo "//registry.npmjs.org/:always-auth=true" >> .npmrc
-          pnpm publish -r --no-git-checks --access public
-
+          which pnpm && echo 'pnpm OK' || npm i -g pnpm
+          pnpm i && pnpx nx run-many -t publish

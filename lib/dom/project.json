@@ -3,6 +3,6 @@
   "targets": {
     "build": {},
     "tsc": {},
-    "test": {}
+    "publish": {}
   }
 }

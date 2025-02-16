@@ -1,14 +1,14 @@
-import * as Options from "./runtime/options.js";
-import * as State from "./runtime/reactive.js";
-import * as Stack from "./runtime/stack.js";
+import * as Options from "./options.js";
+import * as State from "./reactive.js";
+import * as Stack from "./stack.js";
 
-export * from "./runtime/lifecycle.js";
-export * from "./runtime/options.js";
-export * from "./runtime/plugin.js";
-export * from "./runtime/props.js";
-export * from "./runtime/reactive.js";
-export * from "./runtime/stack.js";
-export * from "./runtime/types.js";
+export * from "./lifecycle.js";
+export * from "./options.js";
+export * from "./plugin.js";
+export * from "./props.js";
+export * from "./reactive.js";
+export * from "./stack.js";
+export * from "./types.js";
 
 globalThis["Lithium"] = {
   Options: { ...Options },
