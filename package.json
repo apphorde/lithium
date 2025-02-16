@@ -19,5 +19,12 @@
   },
   "scripts": {
     "docs": "pnpm typedoc --footerLastModified"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "core-js",
+      "esbuild",
+      "nx"
+    ]
   }
 }
