@@ -1,5 +1,4 @@
-import { mount } from '@li3/runtime';
-import { defineProps } from '@li3/runtime';
+import { mount, defineProps } from '@li3/browser';
 import { unref } from '@li3/reactive';
 import { getOption, Plugins, RuntimeContext } from '@li3/runtime';
 import { compileExpression, wrapTryCatch } from '@li3/scope';

@@ -1,4 +1,4 @@
-import type { AnyFunction, Attribute, RuntimeContext } from './types.js';
+import type { AnyFunction, RuntimeContext } from './types.js';
 import { plugins } from './plugin.js';
 import { unref } from '@li3/reactive';
 

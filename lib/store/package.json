@@ -1,6 +1,6 @@
 {
   "name": "@li3/store",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "exports": {
     ".": {
       "default": "./index.js",

@@ -16,7 +16,7 @@ export interface StoreOptions {
   effects?: Record<string, Reducer<any, any>>;
 }
 
-export function useStore<T, A extends Action>(initialState: T, options?: StoreOptions) {
+export function createStore<T, A extends Action>(initialState: T, options?: StoreOptions) {
   const events = new EventTarget();
   const reducers = [];
   const effects = [];

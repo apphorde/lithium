@@ -25,26 +25,28 @@ export function hostClasses(classes: string) {
   getCurrentContext().hostClasses.push(classes);
 }
 
-export function defineQuery(selector: string) {
+export interface QueryObject {
+  one: Element | null;
+  many: NodeListOf<Element>;
+}
+
+export function defineQuery(selector: string): QueryObject {
   const $el = getCurrentContext();
   const root = ($el.element as Element).shadowRoot || $el.element;
 
-  return new Proxy(
-    {},
-    {
-      get(_t, key) {
-        if (key === 'one') {
-          return root.querySelector(selector);
-        }
+  return new Proxy({} as QueryObject, {
+    get(_t, key) {
+      if (key === 'one') {
+        return root.querySelector(selector);
+      }
 
-        if (key === 'many') {
-          return root.querySelectorAll(selector);
-        }
+      if (key === 'many') {
+        return Array.from(root.querySelectorAll(selector));
+      }
 
-        return null;
-      },
+      return null;
     },
-  );
+  });
 }
 
 export function defineEvents(eventNames: string[]): EventEmitFunction {
@@ -69,7 +71,7 @@ export function defineEvent(name: string) {
   return emitEvent.bind(null, el, name);
 }
 
-export function defineProps(definitions: string[] | Record<string, PropDefinition<any>>): any {
+export function defineProps(definitions: string[] | Record<string, PropDefinition<any>>): Record<string, Ref<any>> {
   const $el = getCurrentContext();
   const propertyNames = !Array.isArray(definitions) ? Object.keys(definitions) : definitions;
 
@@ -80,10 +82,10 @@ export function defineProps(definitions: string[] | Record<string, PropDefinitio
   return $el.props;
 }
 
-export function defineProp<T>(property: string, definition?: PropDefinition<T>) {
+export function defineProp<T>(property: string, definition?: PropDefinition<T>): Ref<T> {
   const $el = getCurrentContext();
   const initialValue = getPropValue($el, property, definition);
-  const $ref = createInputRef($el, property, initialValue);
+  const $ref = createInputRef<T>($el, property, initialValue);
   $el.props[property] = $ref;
 
   return $ref;

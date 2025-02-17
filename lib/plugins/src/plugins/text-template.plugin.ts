@@ -1,6 +1,7 @@
 import { setText } from '@li3/dom';
 import { compileExpression, wrapTryCatch } from '@li3/scope';
-import { watch, Plugins, RuntimeContext } from '@li3/runtime';
+import { Plugins, RuntimeContext } from '@li3/runtime';
+import { watch } from '@li3/browser';
 
 Plugins.use({
   element($el: RuntimeContext, node: Text) {

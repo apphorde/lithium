@@ -9,7 +9,7 @@ Declare a store in a module
 ```js
 // count-store.js
 
-import { useStore } from '@li3/store';
+import { createStore } from '@li3/store';
 
 const reducers = {
   add(state, action) {
@@ -29,7 +29,7 @@ const effects = {
   },
 };
 
-export default useStore({ count: 0 }, { reducers, effects });
+export default createStore({ count: 0 }, { reducers, effects });
 ```
 
 Then import the store and dispatch actions:

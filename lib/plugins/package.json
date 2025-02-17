@@ -1,6 +1,6 @@
 {
   "name": "@li3/plugins",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "exports": {
     ".": {
       "default": "./index.js",
@@ -10,6 +10,8 @@
   "dependencies": {
     "@li3/dom": "link:../dom",
     "@li3/runtime": "link:../runtime",
+    "@li3/reactive": "link:../reactive",
+    "@li3/browser": "link:../browser",
     "@li3/scope": "link:../scope"
   }
 }

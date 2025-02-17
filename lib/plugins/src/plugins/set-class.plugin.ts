@@ -1,6 +1,7 @@
 import { setClassName } from '@li3/dom';
 import { compileExpression, wrapTryCatch } from '@li3/scope';
-import { Plugins, watch, RuntimeContext } from '@li3/runtime';
+import { Plugins, RuntimeContext } from '@li3/runtime';
+import { watch } from '@li3/browser';
 
 Plugins.use({
   attribute($el, node, attribute, value) {

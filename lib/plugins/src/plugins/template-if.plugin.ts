@@ -1,5 +1,6 @@
 import { compileExpression } from '@li3/scope';
-import { mount, Plugins, RuntimeContext } from '@li3/runtime';
+import { Plugins, RuntimeContext } from '@li3/runtime';
+import { mount } from '@li3/browser';
 
 Plugins.use({
   dom($el: RuntimeContext) {

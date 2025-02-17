@@ -15,7 +15,7 @@ export function createRuntimeContext(properties: CreateRuntimeOptions): RuntimeC
     ...properties,
     shadowDom: typeof shadowDom === 'string' ? ({ mode: shadowDom } as ShadowRootInit) : shadowDom,
     setup,
-    template: !template ? null : typeof template === 'string' ? tpl(template) : template,
+    template: !template ? '' : typeof template === 'string' ? tpl(template) : template,
   });
 
   return $el;

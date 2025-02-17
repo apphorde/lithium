@@ -6,8 +6,6 @@ import * as Component from './custom-elements.js';
 export * from './setup.js';
 export * from './custom-elements.js';
 
-export { createComponent, createInlineComponent, createApp, mount } from './custom-elements.js';
-
 Object.assign(globalThis.Lithium, {
   API: { ...API },
   Component: { ...Component },
