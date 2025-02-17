@@ -1,8 +1,8 @@
-import { domReady } from '@li3/dom';
+import { tpl } from '@li3/dom';
 import { activateContext, AnyFunction, ComponentDefinition, createRuntimeContext, RuntimeContext } from '@li3/runtime';
-import { createBlobModule } from '@li3/scope';
+import { getComponentFromTemplate, loadTemplate } from './internal.js';
 
-export const DefineComponent = Symbol('@@def');
+const DefineComponent = Symbol('@@def');
 
 /**
  * Create a custom element from a component definition
@@ -38,38 +38,17 @@ export function createComponent(name: string, def: ComponentDefinition | AnyFunc
   customElements.define(name, Component);
 }
 
-export function getShadowDomOptions(template: HTMLTemplateElement): ShadowRootInit {
-  const source = template.getAttribute('shadow-dom') || '';
-
-  if (source) {
-    return source.startsWith('{') ? JSON.parse(source) : { mode: source };
-  }
-}
-
-export async function getComponentFromTemplate(template: HTMLTemplateElement): Promise<ComponentDefinition> {
-  const setup = template.content.querySelector('script[setup]');
-  const component: ComponentDefinition = { template, shadowDom: getShadowDomOptions(template) };
-
-  if (setup) {
-    const href = setup.getAttribute('src');
-    const md = href
-      ? await import(new URL(href, window.location.href).toString())
-      : await createBlobModule(setup.textContent.trim(), 'text/javascript');
-
-    setup.remove();
-    component.setup = md.default;
-  }
-
-  return component;
-}
-
 /**
  * Creates a custom element from a template element
  *
  * @param template The template element to create a component from
  * @param name Optional. Name of the custom element, if not provided it will be taken from the 'component' attribute
  */
-export async function createInlineComponent(template: HTMLTemplateElement, name = '') {
+export async function createComponentFromTemplate(template: HTMLTemplateElement | string, name = '') {
+  if (typeof template === 'string') {
+    template = tpl(template);
+  }
+
   name ||= template.getAttribute('component');
 
   if (!name) {
@@ -81,34 +60,11 @@ export async function createInlineComponent(template: HTMLTemplateElement, name 
 }
 
 /**
- * Loads a component template from a URL. The source must be a valid HTML template element,
- * with a <script setup> block if the component requires a setup function.
- * <style> tags are also supported as usual.
- *
- * @param url
- * @returns
- */
-export async function loadTemplate(url: string | URL) {
-  const req = await fetch(url);
-
-  if (req.ok) {
-    const html = await req.text();
-    const dom = new DOMParser().parseFromString(html, 'text/html');
-    const template = dom.querySelector('template');
-    return template;
-  }
-
-  throw new Error('Unable to load ' + url + ': ' + req.statusText);
-}
-
-/**
  * Loads a component from a URL and registers it as a custom element
- * @param url
- * @returns {Promise<void>}
  */
-export async function loadAndParse(url: string | URL) {
+export async function loadAndParse(url: string | URL): Promise<void> {
   const t = await loadTemplate(url);
-  return createInlineComponent(t);
+  return createComponentFromTemplate(t);
 }
 
 const mounted = Symbol();
@@ -155,23 +111,10 @@ export function mount(element: DocumentFragment | Element | string, def: Compone
   return $el;
 }
 
-export async function createApp(template: HTMLTemplateElement, spec) {
+export async function createApp(template: HTMLTemplateElement, spec: ComponentDefinition) {
   const div = document.createElement('div');
   div.style.display = 'contents';
   template.parentNode.insertBefore(div, template);
 
   return mount(div, spec);
 }
-
-domReady(function () {
-  const inline: HTMLTemplateElement[] = Array.from(document.querySelectorAll('template[component]'));
-  const apps: HTMLTemplateElement[] = Array.from(document.querySelectorAll('template[app]'));
-
-  for (const template of inline) {
-    createInlineComponent(template);
-  }
-
-  for (const template of apps) {
-    getComponentFromTemplate(template).then((spec) => createApp(template, spec));
-  }
-});
