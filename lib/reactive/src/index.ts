@@ -1,26 +1,115 @@
-export interface Ref<T> {
-  value: T;
-  __isRef: true;
-}
-
 type AnyFunction = (...args: any) => any;
 const reactiveTag = '__w';
 
-export interface ObservableContext {
-  check: VoidFunction;
-  suspended: boolean;
-  observers: AnyFunction[];
+export interface Ref<T> {
+  value: T;
+  readonly __isRef: true;
 }
 
-export function check(target: ObservableContext): void {
-  if (target.suspended) return;
+export interface ReactiveOptions {
+  shallow?: boolean;
+}
 
-  for (const w of target.observers) {
-    w();
+export class ValueRef<T> implements Ref<T> {
+  public readonly __isRef = true as true;
+  private __value: T;
+  private observers: AnyFunction[] = [];
+
+  constructor(
+    value: T,
+    private options?: ReactiveOptions,
+  ) {
+    this.value = value;
+  }
+
+  get value(): T {
+    if (ComputedRef.capturingDependency) {
+      ComputedRef.dependencies.push(this);
+    }
+
+    return this.__value;
+  }
+
+  set value(newValue: T) {
+    if (newValue === this.__value) {
+      return;
+    }
+
+    if (this.options?.shallow || !canBeReactive(newValue)) {
+      this.__value = newValue;
+      this.check();
+      return;
+    }
+
+    this.__value = reactive(newValue as object, () => this.check()) as T;
+    this.check();
+  }
+
+  public check(): void {
+    for (const fn of this.observers) {
+      fn();
+    }
+  }
+
+  public watch(effect: AnyFunction): void {
+    this.observers.push(effect);
   }
 }
 
-export function observer<T>(valueGetter: Ref<T> | (() => T), effect: (value: T) => void): VoidFunction {
+export class ComputedRef<T> implements Ref<T> {
+  public readonly __isRef = true as true;
+  public value: T;
+
+  static dependencies: ValueRef<any>[] = [];
+  static capturingDependency: boolean = false;
+
+  private observers: AnyFunction[] = [];
+
+  constructor(
+    protected getter: () => T,
+    callback?: AnyFunction,
+  ) {
+    ComputedRef.capturingDependency = true;
+    this.value = getter();
+    ComputedRef.capturingDependency = false;
+
+    const effect = () => this.update();
+    for (const dep of ComputedRef.dependencies) {
+      dep.watch(effect);
+    }
+
+    ComputedRef.dependencies = [];
+    if (callback) {
+      this.watch(callback);
+      this.check();
+    }
+  }
+
+  private update() {
+    this.value = this.getter();
+    this.check();
+  }
+
+  public check(): void {
+    for (const fn of this.observers) {
+      fn();
+    }
+  }
+
+  public watch(effect: AnyFunction): void {
+    this.observers.push(effect);
+  }
+}
+
+export function markAsReactive(context: any): void {
+  Object.defineProperty(context, reactiveTag, {
+    value: true,
+    enumerable: false,
+    configurable: false,
+  });
+}
+
+export function watch<T>(valueGetter: Ref<T> | (() => T), effect: (value: T) => void): VoidFunction {
   let lastValue: T | undefined;
 
   return async function () {
@@ -33,23 +122,21 @@ export function observer<T>(valueGetter: Ref<T> | (() => T), effect: (value: T) 
   };
 }
 
-export interface ReactiveOptions {
-  shallow?: boolean;
+export function canBeReactive(object: any): boolean {
+  return object !== null && object !== undefined && typeof object === 'object' && !object[reactiveTag];
 }
 
-export function reactive<T extends object>(object: T, callback: VoidFunction, options?: ReactiveOptions): T {
-  if (object === null || object === undefined || reactiveTag in object) {
+export function reactive<T extends object>(object: T, effect: VoidFunction): T {
+  if (!canBeReactive(object)) {
     return object;
   }
 
   markAsReactive(object);
 
-  if (!options?.shallow) {
-    const values = Object.entries(object);
-    for (const [key, next] of values) {
-      if (typeof next === 'object' && next !== null) {
-        (object as any)[key] = reactive(next, callback);
-      }
+  const values = Object.entries(object);
+  for (const [key, next] of values) {
+    if (typeof next === 'object' && next !== null) {
+      (object as any)[key] = reactive(next, effect);
     }
   }
 
@@ -59,63 +146,34 @@ export function reactive<T extends object>(object: T, callback: VoidFunction, op
         return false;
       }
 
-      if (typeof value === 'object' && value !== null && !options?.shallow) {
-        value = reactive(value, callback, options);
+      if (typeof value === 'object' && value !== null) {
+        value = reactive(value, effect);
       }
 
       (target as any)[p] = value;
-      callback();
+      effect();
       return true;
     },
     deleteProperty(target, p) {
       delete target[p];
-      callback();
+      effect();
       return true;
     },
   });
 }
 
-export function debounce(fn, timeout) {
-  let timer;
-  return function (...args) {
-    clearTimeout(timer);
-    timer = setTimeout(fn, timeout, ...args);
-  };
+export function computedRef<T>(getter: () => T, effect?: AnyFunction): Ref<T> {
+  return new ComputedRef(getter, effect);
 }
 
-export interface RefOptions {
-  debounce: number;
-  shallow: boolean;
-}
+export function valueRef<T>(initialValue: T | null, effect?: AnyFunction, options?: ReactiveOptions): Ref<T> {
+  const $ref = new ValueRef(initialValue, options);
 
-function refDebounce<T>(initialValue: T | null, options: RefOptions) {
-  let v: T | null = unref(initialValue);
-  const set = debounce((newValue) => (v = unref(newValue)), options.debounce);
-
-  return {
-    __isRef: true,
-    get value() {
-      return v;
-    },
-    set value(v) {
-      set(v);
-    },
-  };
-}
-
-export function ref<T>(initialValue: T | null, effect: AnyFunction, options?: RefOptions): Ref<T> {
-  if (options?.debounce) {
-    return reactive(refDebounce(initialValue, options), effect, options) as Ref<T>;
+  if (effect) {
+    $ref.watch(effect);
   }
 
-  return reactive(
-    {
-      __isRef: true,
-      value: initialValue,
-    },
-    effect,
-    options,
-  ) as Ref<T>;
+  return $ref;
 }
 
 export function isRef<X>(t: any): t is Ref<X> {
@@ -124,51 +182,4 @@ export function isRef<X>(t: any): t is Ref<X> {
 
 export function unref<T>(v: T | Ref<T>): T {
   return isRef(v) ? v.value : v;
-}
-
-export class ReactiveContext implements ObservableContext {
-  public check: VoidFunction;
-  public suspended = false;
-  public observers: AnyFunction[] = [];
-
-  constructor() {
-    this.check = check.bind(null, this);
-  }
-
-  watch<T>(getter: Ref<T> | (() => T), effect?: AnyFunction): void {
-    if (typeof getter !== 'function' && !isRef(getter)) {
-      throw new Error('Watched expression must be a function');
-    }
-
-    if (effect && typeof effect !== 'function') {
-      throw new Error('Watcher effect must be a function');
-    }
-
-    const fn = effect ? observer(getter, effect) : isRef(getter) ? () => getter.value : getter;
-    this.observers.push(fn);
-  }
-
-  ref<T>(initialValue: T | null, options?: RefOptions): Ref<T> {
-    return ref(initialValue, this.check, options);
-  }
-
-  watchDeep<T extends object>(context: T, callback?: VoidFunction): T {
-    return reactive(context, callback || this.check);
-  }
-
-  suspend(): void {
-    this.suspended = true;
-  }
-
-  unsuspend(): void {
-    this.suspended = false;
-  }
-}
-
-export function markAsReactive(context: any): void {
-  Object.defineProperty(context, reactiveTag, {
-    value: true,
-    enumerable: false,
-    configurable: false,
-  });
 }

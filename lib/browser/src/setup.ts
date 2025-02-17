@@ -1,5 +1,5 @@
 import { defineEventOnElement, emitEvent, isElement } from '@li3/dom';
-import { type Ref, ref as createRef } from '@li3/reactive';
+import { type Ref, valueRef, computedRef } from '@li3/reactive';
 import {
   AnyFunction,
   createInputRef,
@@ -97,14 +97,11 @@ export function watch(expression: AnyFunction | Ref<any>, effect?: AnyFunction):
 }
 
 export function computed<T>(fn: () => T) {
-  const $ref = ref<T>(null, { shallow: true });
-  watch(() => ($ref.value = fn()));
-
-  return $ref;
+  return computedRef(fn);
 }
 
-export function ref<T>(value?: T, options?) {
-  return getCurrentContext()?.reactive.ref<T>(value, options) ?? createRef(value, options);
+export function ref<T>(value?: T, options?): Ref<T> {
+  return valueRef(value, options);
 }
 
 export function shallowRef<T>(value?: T, options = {}) {

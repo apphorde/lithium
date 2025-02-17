@@ -26,10 +26,8 @@ export function activateContext($el: RuntimeContext) {
 
   try {
     const { reactive } = $el;
-    reactive.suspend();
     createState($el);
     createDom($el);
-    reactive.unsuspend();
     reactive.check();
 
     ($el.element as any).__destroy = () => {
