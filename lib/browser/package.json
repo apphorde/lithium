@@ -8,9 +8,9 @@
     }
   },
   "dependencies": {
-    "@li3/reactive": "latest",
-    "@li3/runtime": "latest",
-    "@li3/dom": "latest",
-    "@li3/scope": "latest"
+    "@li3/reactive": "workspace:*",
+    "@li3/runtime": "workspace:*",
+    "@li3/dom": "workspace:*",
+    "@li3/scope": "workspace:*"
   }
 }

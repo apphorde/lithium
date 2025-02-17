@@ -24,7 +24,7 @@ importers:
         specifier: ^12.1.2
         version: 12.1.2(rollup@4.34.8)(tslib@2.8.1)(typescript@5.7.3)
       '@types/node':
-        specifier: ^22.13.1
+        specifier: ^22.13.4
         version: 22.13.4
       core-js:
         specifier: ^3.40.0
@@ -36,7 +36,7 @@ importers:
         specifier: ^3.5.1
         version: 3.5.1
       rollup:
-        specifier: ^4.34.6
+        specifier: ^4.34.8
         version: 4.34.8
       tslib:
         specifier: ^2.8.1
@@ -51,7 +51,7 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0(typedoc@0.27.7(typescript@5.7.3))
       typedoc-plugin-mdn-links:
-        specifier: ^4.0.12
+        specifier: ^4.0.13
         version: 4.0.13(typedoc@0.27.7(typescript@5.7.3))
       typescript:
         specifier: ^5.7.3
@@ -60,23 +60,23 @@ importers:
   lib/browser:
     dependencies:
       '@li3/dom':
-        specifier: latest
-        version: 0.0.1
+        specifier: workspace:*
+        version: link:../dom
       '@li3/reactive':
-        specifier: latest
-        version: 0.0.5
+        specifier: workspace:*
+        version: link:../reactive
       '@li3/runtime':
-        specifier: latest
-        version: 0.0.2
+        specifier: workspace:*
+        version: link:../runtime
       '@li3/scope':
-        specifier: latest
-        version: 0.0.2
+        specifier: workspace:*
+        version: link:../scope
 
   lib/cli:
     dependencies:
       '@li3/sfc':
-        specifier: latest
-        version: 0.0.2
+        specifier: workspace:*
+        version: link:../sfc
 
   lib/dom: {}
 
@@ -85,43 +85,43 @@ importers:
   lib/plugins:
     dependencies:
       '@li3/browser':
-        specifier: latest
-        version: 0.0.4
+        specifier: workspace:*
+        version: link:../browser
       '@li3/dom':
-        specifier: latest
-        version: 0.0.1
+        specifier: workspace:*
+        version: link:../dom
       '@li3/reactive':
-        specifier: latest
-        version: 0.0.5
+        specifier: workspace:*
+        version: link:../reactive
       '@li3/runtime':
-        specifier: latest
-        version: 0.0.2
+        specifier: workspace:*
+        version: link:../runtime
       '@li3/scope':
-        specifier: latest
-        version: 0.0.2
+        specifier: workspace:*
+        version: link:../scope
 
   lib/reactive: {}
 
   lib/runtime:
     dependencies:
       '@li3/dom':
-        specifier: latest
-        version: 0.0.1
+        specifier: workspace:*
+        version: link:../dom
       '@li3/reactive':
-        specifier: latest
-        version: 0.0.5
+        specifier: workspace:*
+        version: link:../reactive
 
   lib/scope:
     dependencies:
       '@li3/runtime':
-        specifier: latest
-        version: 0.0.2
+        specifier: workspace:*
+        version: link:../runtime
 
   lib/sfc:
     dependencies:
       '@li3/html-parser':
-        specifier: latest
-        version: 0.0.3
+        specifier: workspace:*
+        version: link:../html-parser
       acorn:
         specifier: latest
         version: 8.14.0
@@ -129,17 +129,17 @@ importers:
   lib/store:
     dependencies:
       '@li3/reactive':
-        specifier: latest
-        version: 0.0.5
+        specifier: workspace:*
+        version: link:../reactive
 
   lib/web:
     dependencies:
       '@li3/html-parser':
-        specifier: latest
-        version: 0.0.3
+        specifier: workspace:*
+        version: link:../html-parser
       '@li3/reactive':
-        specifier: latest
-        version: 0.0.5
+        specifier: workspace:*
+        version: link:../reactive
 
 packages:
 
@@ -326,27 +326,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
-
-  '@li3/browser@0.0.4':
-    resolution: {integrity: sha512-B7YXUf8HIjD1snMVS3vXOJmILIPaYYTfgjVZQmSAutT2VM4JIMs9ldqbIquZUAku9s24DkAmEqOHADjHq/MWcQ==}
-
-  '@li3/dom@0.0.1':
-    resolution: {integrity: sha512-8pwbIvM/iBPUSwAqnYFf1gphp+6sNdHHVd+pS96OblIe6JZrJKvERUEB8fS/4vO/nMYUQNrqpywXuB9U0rmV+A==}
-
-  '@li3/html-parser@0.0.3':
-    resolution: {integrity: sha512-xEYRMz+z7wOls9LOxxorH7/ZNWW73RBayLDKZjDxv6ZGgYxgvNYiSNvAA8uVKsJVpzIYji2YNBR7tjT4FTWcGQ==}
-
-  '@li3/reactive@0.0.5':
-    resolution: {integrity: sha512-t4iqAaIxPurWCd36b0BpnJoA0t+8qYIN9nuZbL0HWwey8UfiZQhRIbgaU8YG2AO3B5FJIpVJbfqpFQPVWfHNBg==}
-
-  '@li3/runtime@0.0.2':
-    resolution: {integrity: sha512-3ax1KAqGHMUIQ5FTQII6p13XDNpZu+62605TtdPF3oy4IvuMzwyYr7YCLGNFLn7X+orwVWZ26pvOSa3SuzMsjA==}
-
-  '@li3/scope@0.0.2':
-    resolution: {integrity: sha512-XZNAUC5Lb7auDPGzaIcJ5HqXQEamwnWqHvFrbkllCgOJWHi9MYzLi1pMWlgHF9gxOW0vDfqAtIQ7bW+CVyOx6A==}
-
-  '@li3/sfc@0.0.2':
-    resolution: {integrity: sha512-3QvdGMUi1wyAPlVSZ4oRLoUxwM7d7P/9jW498HXI7adKFtj7H+ctxWS3iXA4fRsLmPt9+BYa5QE/5ZByNSPnmw==}
 
   '@napi-rs/wasm-runtime@0.2.4':
     resolution: {integrity: sha512-9zESzOO5aDByvhIAsOy9TbpZ0Ur2AJbUI7UT73kcUTS2mxAMHOBaa1st/jAymNoCtvrit99kkzT1FZuXVcgfIQ==}
@@ -1295,33 +1274,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
-
-  '@li3/browser@0.0.4':
-    dependencies:
-      '@li3/dom': link:../dom
-      '@li3/reactive': link:../reactive
-      '@li3/runtime': link:../runtime
-      '@li3/scope': link:../scope
-
-  '@li3/dom@0.0.1': {}
-
-  '@li3/html-parser@0.0.3': {}
-
-  '@li3/reactive@0.0.5': {}
-
-  '@li3/runtime@0.0.2':
-    dependencies:
-      '@li3/dom': link:../dom
-      '@li3/reactive': link:../reactive
-
-  '@li3/scope@0.0.2':
-    dependencies:
-      '@li3/runtime': link:../runtime
-
-  '@li3/sfc@0.0.2':
-    dependencies:
-      '@li3/html-parser': 0.0.3
-      acorn: 8.14.0
 
   '@napi-rs/wasm-runtime@0.2.4':
     dependencies:

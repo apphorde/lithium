@@ -11,6 +11,6 @@
     "li3": "./index.js"
   },
   "dependencies": {
-    "@li3/sfc": "latest"
+    "@li3/sfc": "workspace:*"
   }
 }
