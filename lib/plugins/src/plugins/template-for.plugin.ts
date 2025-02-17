@@ -1,4 +1,4 @@
-import { mount, defineProps } from '@li3/browser';
+import { Component, defineProps } from '@li3/browser';
 import { unref } from '@li3/reactive';
 import { getOption, Plugins, RuntimeContext } from '@li3/runtime';
 import { compileExpression, wrapTryCatch } from '@li3/scope';
@@ -156,7 +156,7 @@ function createCacheEntry(context: TemplateForRuntimeContext, props: any): NodeC
   }
 
   const itemFragment = document.createDocumentFragment();
-  const childState = mount(itemFragment, { setup, template }, { parent: $el, props });
+  const childState = Component.mount(itemFragment, { setup, template }, { parent: $el, props });
 
   return { nodes: Array.from(itemFragment.childNodes), $el: childState };
 }
