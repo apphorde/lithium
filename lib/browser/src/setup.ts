@@ -21,6 +21,7 @@ export function onDestroy(fn: VoidFunction): void {
   getCurrentContext().destroy.push(fn);
 }
 
+// TODO move to plugin
 export function hostClasses(classes: string) {
   getCurrentContext().hostClasses.push(classes);
 }

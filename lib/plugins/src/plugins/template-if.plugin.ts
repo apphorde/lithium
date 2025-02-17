@@ -1,6 +1,6 @@
 import { compileExpression } from '@li3/scope';
 import { Plugins, RuntimeContext } from '@li3/runtime';
-import { Component } from '@li3/browser';
+import { mount } from '@li3/browser';
 
 Plugins.use({
   dom($el: RuntimeContext) {
@@ -31,7 +31,7 @@ export async function templateIf(template: HTMLTemplateElement, $el: RuntimeCont
 
   function add() {
     const fragment = document.createDocumentFragment();
-    childContext = Component.mount(fragment, { template }, { parent: $el });
+    childContext = mount(fragment, { template }, { parent: $el });
     previousNodes.push(...Array.from(fragment.childNodes));
     template.parentNode.insertBefore(fragment, template);
   }

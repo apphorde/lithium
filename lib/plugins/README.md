@@ -1,3 +1,3 @@
-# @li3/web
+# @li3/plugins
 
-Browser APIs used to declare Li3 components
+The behavior implementations for component declarations, like events and bindings.

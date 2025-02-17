@@ -5,6 +5,7 @@ import { getComponentFromTemplate } from './internal.js';
 import { domReady } from '@li3/dom';
 
 export * from './setup.js';
+export { mount, createComponent } from './custom-elements.js';
 export { Component };
 
 Object.assign(globalThis.Lithium, {
