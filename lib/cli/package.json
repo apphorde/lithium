@@ -1,6 +1,6 @@
 {
   "name": "@li3/cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "exports": {
     ".": {
       "default": "./index.js",
@@ -11,6 +11,6 @@
     "li3": "./index.js"
   },
   "dependencies": {
-    "@li3/sfc": "link:../sfc"
+    "@li3/sfc": "latest"
   }
 }

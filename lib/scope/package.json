@@ -1,6 +1,6 @@
 {
   "name": "@li3/scope",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "exports": {
     ".": {
       "default": "./index.js",
@@ -8,6 +8,6 @@
     }
   },
   "dependencies": {
-    "@li3/runtime": "link:../runtime"
+    "@li3/runtime": "latest"
   }
 }

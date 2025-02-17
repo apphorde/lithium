@@ -1,6 +1,6 @@
 {
   "name": "@li3/plugins",
-  "version": "0.0.43",
+  "version": "0.0.44",
   "exports": {
     ".": {
       "default": "./index.js",
@@ -8,10 +8,10 @@
     }
   },
   "dependencies": {
-    "@li3/dom": "link:../dom",
-    "@li3/runtime": "link:../runtime",
-    "@li3/reactive": "link:../reactive",
-    "@li3/browser": "link:../browser",
-    "@li3/scope": "link:../scope"
+    "@li3/dom": "latest",
+    "@li3/runtime": "latest",
+    "@li3/reactive": "latest",
+    "@li3/browser": "latest",
+    "@li3/scope": "latest"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@li3/sfc",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "exports": {
     ".": {
       "default": "./index.js",
@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "acorn": "latest",
-    "@li3/html-parser": "link:../html-parser"
+    "@li3/html-parser": "latest"
   }
 }
