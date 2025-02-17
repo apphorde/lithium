@@ -1,5 +1,5 @@
 import { defineEventOnElement, emitEvent, isElement } from '@li3/dom';
-import { type Ref, valueRef, computedRef } from '@li3/reactive';
+import { type Ref, type ComputedRef, type ValueRef, valueRef, computedRef } from '@li3/reactive';
 import {
   AnyFunction,
   createInputRef,
@@ -22,7 +22,7 @@ export function onDestroy(fn: VoidFunction): void {
 }
 
 // TODO move to plugin
-export function hostClasses(classes: string) {
+export function hostClasses(classes: string): void {
   getCurrentContext().hostClasses.push(classes);
 }
 
@@ -62,7 +62,7 @@ export function defineEvents(eventNames: string[]): EventEmitFunction {
   return emitEvent.bind(null, el);
 }
 
-export function defineEvent(name: string) {
+export function defineEvent(name: string): any {
   const el = getCurrentContext().element;
 
   if (isElement(el)) {
@@ -96,7 +96,7 @@ export function watch(expression: AnyFunction | Ref<any>, effect?: AnyFunction):
   return getCurrentContext().reactive.watch(expression, effect);
 }
 
-export function computed<T>(fn: () => T) {
+export function computed<T>(fn: () => T): Ref<T> {
   return computedRef(fn);
 }
 
@@ -104,8 +104,8 @@ export function ref<T>(value?: T, options?): Ref<T> {
   return valueRef(value, options);
 }
 
-export function shallowRef<T>(value?: T, options = {}) {
-  return ref<T>(value, { ...options, shallow: true });
+export function shallowRef<T>(value?: T): Ref<T> {
+  return ref<T>(value, { shallow: true });
 }
 
 type InjectionEvent<T> = CustomEvent & { result?: T };
@@ -122,7 +122,7 @@ export function provide<T>(token: Symbol, provider): void {
   });
 }
 
-export function inject<T>(token: any) {
+export function inject<T>(token: any): T {
   const { element } = getCurrentContext();
   const event = new CustomEvent('$inject', {
     detail: token,
