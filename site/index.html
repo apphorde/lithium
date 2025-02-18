@@ -14,7 +14,7 @@
       }
     </script>
     <script type="module">
-      import '@li3/web';
+      import '@li3/browser';
       import '@sodium/markdown-block';
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -131,7 +131,7 @@ Here's a quick example:
             }
           </script>
           <script type="module">
-            import '@li3/web';
+            import '@li3/browser';
           </script>
         </template>
       </code-block>
@@ -155,7 +155,7 @@ Here's a quick example:
             <p class="text-xl font-bold">Hello, {{ name || 'stranger' }}.</p>
           </form>
           <script setup>
-            import { ref } from '@li3/web';
+            import { ref } from '@li3/browser';
 
             export default function setup() {
               const name = ref('');
@@ -172,7 +172,7 @@ Here's a quick example:
             }
           </script>
           <script setup>
-            import { ref } from '@li3/web';
+            import { ref } from '@li3/browser';
 
             export default function setup() {
               const name = ref('');
@@ -226,7 +226,7 @@ Here's a quick example:
       <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 justify-items-stretch items-stretch">
         <code-block language="javascript" title="Declare element inputs (props):">
           <pre>
-          import { defineProp, defineProps } from '@li3/web';
+          import { defineProp, defineProps } from '@li3/browser';
 
           export default function setup() {
             // short form
@@ -245,7 +245,7 @@ Here's a quick example:
 
         <code-block language="javascript" title="Declare outputs (events):">
           <pre>
-        import { defineEvent, defineEvents } from '@li3/web';
+        import { defineEvent, defineEvents } from '@li3/browser';
 
         export default function setup() {
           // short form
@@ -262,7 +262,7 @@ Here's a quick example:
 
         <code-block language="javascript" title="Create reactive values (ref/computed) and watchers:">
           <pre>
-          import { ref, unref, computed, watch } from '@li3/web';
+          import { ref, unref, computed, watch } from '@li3/browser';
 
           export default function setup() {
             const name = ref('Joe');
@@ -282,7 +282,7 @@ Here's a quick example:
 
         <code-block language="javascript" title="Use lifecycle events">
           <pre>
-          import { onInit, onUpdate, onDestroy } from '@li3/web';
+          import { onInit, onUpdate, onDestroy } from '@li3/browser';
 
           export default function setup() {
             onInit(function() {
@@ -304,7 +304,7 @@ Here's a quick example:
         <code-block language="javascript" title="Access DOM nodes (.one or .many)">
           <template>
             <script type="module">
-              import { defineQuery } from '@li3/web';
+              import { defineQuery } from '@li3/browser';
 
               function setup() {
                 const inputs = defineQuery('input');
@@ -321,7 +321,7 @@ Here's a quick example:
         <code-block language="javascript" title="Load scripts and styles">
           <template>
             <script type="module">
-              import { loadCss, loadScript } from '@li3/web';
+              import { loadCss, loadScript } from '@li3/browser';
 
               function setup() {
                 loadCss('http://example.com/main.css');
@@ -383,7 +383,7 @@ Here's a quick example:
 
       <script setup>
         import { load, highlight } from 'https://highlight.jsfn.run/index.mjs';
-        import { defineProp, defineQuery, onInit, hostClasses } from '@li3/web';
+        import { defineProp, defineQuery, onInit, hostClasses } from '@li3/browser';
 
         load();
 
