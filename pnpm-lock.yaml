@@ -113,6 +113,9 @@ importers:
 
   lib/scope:
     dependencies:
+      '@li3/reactive':
+        specifier: workspace:*
+        version: link:../reactive
       '@li3/runtime':
         specifier: workspace:*
         version: link:../runtime
