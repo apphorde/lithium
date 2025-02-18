@@ -4,6 +4,8 @@ const reactiveTag = '__w';
 export interface Ref<T> {
   value: T;
   readonly __isRef: true;
+  check(): void;
+  watch(effect: AnyFunction): void;
 }
 
 export interface ReactiveOptions {
