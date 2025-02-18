@@ -1,7 +1,7 @@
 import { mount, defineProps } from '@li3/browser';
+import { getOption, Plugins, type RuntimeContext } from '@li3/runtime';
 import { unref } from '@li3/reactive';
-import { getOption, Plugins, RuntimeContext } from '@li3/runtime';
-import { compileExpression, wrapTryCatch } from '@li3/scope';
+import { computedEffect } from '@li3/scope';
 
 const VM = Symbol('@@FOR');
 
@@ -74,13 +74,7 @@ export function templateForOf(template: HTMLTemplateElement, $el: RuntimeContext
     }
   }
 
-  const getter = compileExpression($el, source);
-  $el.reactive.watch(wrapTryCatch(source, getter), onListChange);
-  $el.reactive.watch(() => {
-    for (const next of nodeCache) {
-      next.$el.reactive.check();
-    }
-  });
+  computedEffect($el, source, onListChange);
 }
 
 function findLastNode(nodeCache: NodeCacheEntry[]) {

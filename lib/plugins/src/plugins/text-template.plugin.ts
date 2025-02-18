@@ -1,7 +1,6 @@
 import { setText } from '@li3/dom';
-import { compileExpression, wrapTryCatch } from '@li3/scope';
-import { Plugins, RuntimeContext } from '@li3/runtime';
-import { watch } from '@li3/browser';
+import { computedEffect } from '@li3/scope';
+import { Plugins, type RuntimeContext } from '@li3/runtime';
 
 Plugins.use({
   element($el: RuntimeContext, node: Text) {
@@ -27,8 +26,5 @@ export function createTextNodeBinding($el: RuntimeContext, node: Text) {
   const expression =
     '`' + text.replace(/\{\{([\s\S]+?)}}/g, (_: any, inner: string) => '${ ' + inner.trim() + ' }') + '`';
 
-  const fn = compileExpression($el, expression);
-  const getter = wrapTryCatch(expression, fn);
-
-  watch(getter, (v: string) => setText(node, v));
+  computedEffect($el, expression, (v: string) => setText(node, v));
 }

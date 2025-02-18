@@ -1,7 +1,6 @@
 import { setAttribute, setProperty } from '@li3/dom';
-import { compileExpression, wrapTryCatch } from '@li3/scope';
-import { Plugins, RuntimeContext } from '@li3/runtime';
-import { watch } from '@li3/browser';
+import { Plugins, type RuntimeContext } from '@li3/runtime';
+import { computedEffect } from '@li3/scope';
 
 Plugins.use({
   attribute($el, node, attribute, value) {
@@ -16,13 +15,11 @@ Plugins.use({
 });
 
 export function createPropertyBinding($el: RuntimeContext, element: Element, name: string, expression: string): void {
-  const fn = compileExpression($el, expression);
-  watch(wrapTryCatch(expression, fn), (v: any) => setProperty(element, name, v));
+  computedEffect($el, expression, (v: any) => setProperty(element, name, v));
 }
 
 export function createAttributeBinding($el: RuntimeContext, element: Element, name: string, expression: string): void {
-  const fn = compileExpression($el, expression);
-  watch(wrapTryCatch(expression, fn), (v: any) => setAttribute(element, name, v));
+  computedEffect($el, expression, (v: any) => setAttribute(element, name, v));
 }
 
 const wellKnownProperties = {

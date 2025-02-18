@@ -1,6 +1,6 @@
-import { compileExpression } from '@li3/scope';
-import { Plugins, RuntimeContext } from '@li3/runtime';
+import { Plugins, type RuntimeContext } from '@li3/runtime';
 import { mount } from '@li3/browser';
+import { computedEffect } from '@li3/scope';
 
 Plugins.use({
   dom($el: RuntimeContext) {
@@ -13,12 +13,7 @@ Plugins.use({
 });
 
 export async function templateIf(template: HTMLTemplateElement, $el: RuntimeContext) {
-  const expression = template.getAttribute('if');
-  const getter = compileExpression($el, expression);
   const previousNodes = [];
-  let childContext;
-
-  $el.reactive.watch(() => childContext && childContext.reactive.check());
 
   function remove() {
     for (const next of previousNodes) {
@@ -26,12 +21,11 @@ export async function templateIf(template: HTMLTemplateElement, $el: RuntimeCont
     }
 
     previousNodes.length = 0;
-    childContext = null;
   }
 
   function add() {
     const fragment = document.createDocumentFragment();
-    childContext = mount(fragment, { template }, { parent: $el });
+    mount(fragment, { template }, { parent: $el });
     previousNodes.push(...Array.from(fragment.childNodes));
     template.parentNode.insertBefore(fragment, template);
   }
@@ -47,5 +41,6 @@ export async function templateIf(template: HTMLTemplateElement, $el: RuntimeCont
     }
   }
 
-  $el.reactive.watch(getter, updateDom);
+  const expression = template.getAttribute('if');
+  computedEffect($el, expression, updateDom);
 }
