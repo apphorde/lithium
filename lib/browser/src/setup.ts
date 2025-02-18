@@ -1,5 +1,5 @@
 import { defineEventOnElement, emitEvent, isElement } from '@li3/dom';
-import { type Ref, type ComputedRef, type ValueRef, valueRef, computedRef } from '@li3/reactive';
+import { type Ref, valueRef, computedRef } from '@li3/reactive';
 import {
   AnyFunction,
   createInputRef,
