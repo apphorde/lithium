@@ -1,28 +1,6 @@
 import { unref } from '@li3/reactive';
-import type { AnyFunction, RuntimeContext } from './types';
+import type { RuntimeContext } from './types';
 import { Plugins } from './plugin.js';
-
-export function fork(parent: any, child: any, callback: AnyFunction) {
-  return new Proxy(child, {
-    get(_t, p) {
-      if (child[p] !== undefined) {
-        return child[p];
-      }
-
-      return parent[p];
-    },
-    set(_t, p, v) {
-      if (child.hasOwnProperty(p)) {
-        child[p] = v;
-      } else {
-        parent[p] = v;
-      }
-
-      callback();
-      return true;
-    },
-  });
-}
 
 export class ComponentInstance {
   static extend(properties) {
@@ -36,12 +14,13 @@ export function createState($el: RuntimeContext): void {
   const componentState = Object.assign(baseState, $el.setup($el) || {});
   Plugins.apply('setup', [$el, componentState]);
 
-  $el.state = { ...$el.props, ...componentState };
+  const combinedState = { ...$el.props, ...componentState };
+  $el.state = combinedState;
   $el.stateKeys = Object.keys($el.state);
 
   if ($el.parent) {
     const keys = Object.keys($el.state);
-    $el.state = fork($el.parent.state, $el.state, $el.reactive.check);
+    $el.state = Object.assign(Object.create($el.parent.state), $el.state);
     $el.stateKeys = [...new Set(keys.concat($el.parent.stateKeys))];
   }
 
