@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "@li3/reactive": "workspace:*",
-    "@li3/html-parser": "workspace:*"
+    "@li3/browser": "workspace:*"
   }
 }
