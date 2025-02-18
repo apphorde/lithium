@@ -1,4 +1,5 @@
-import { RuntimeContext, type AnyFunction, getOption } from '@li3/runtime';
+import { type RuntimeContext, type AnyFunction, getOption } from '@li3/runtime';
+import { computedRef } from '@li3/reactive';
 
 const fnCache = new Map();
 const domParser = new DOMParser();
@@ -79,4 +80,10 @@ export function wrapTryCatch(exp: string, fn: AnyFunction) {
       console.log('Error: ' + exp, e);
     }
   };
+}
+
+export function computedEffect<T>($el: RuntimeContext, expression: string, effect: (v: T) => void) {
+  const fn = compileExpression($el, expression);
+  const computed = wrapTryCatch(expression, fn);
+  return computedRef(computed, effect);
 }
