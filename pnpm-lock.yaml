@@ -134,9 +134,12 @@ importers:
 
   lib/web:
     dependencies:
-      '@li3/html-parser':
+      '@li3/browser':
         specifier: workspace:*
-        version: link:../html-parser
+        version: link:../browser
+      '@li3/plugins':
+        specifier: workspace:*
+        version: link:../plugins
       '@li3/reactive':
         specifier: workspace:*
         version: link:../reactive
