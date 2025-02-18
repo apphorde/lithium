@@ -36,8 +36,7 @@ export function createState($el: RuntimeContext): void {
   const componentState = Object.assign(baseState, $el.setup($el) || {});
   Plugins.apply('setup', [$el, componentState]);
 
-  const combinedState = { ...$el.props, ...componentState };
-  $el.state = $el.reactive.watchDeep(combinedState);
+  $el.state = { ...$el.props, ...componentState };
   $el.stateKeys = Object.keys($el.state);
 
   if ($el.parent) {
