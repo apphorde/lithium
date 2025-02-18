@@ -1,6 +1,6 @@
 {
   "name": "@li3/runtime",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "exports": {
     ".": {
       "default": "./index.js",

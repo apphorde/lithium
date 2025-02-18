@@ -29,7 +29,7 @@ export class RuntimeContext {
     RuntimeContext.extensions.push(fn);
   }
 
-  constructor(props: CreateRuntimeOptions) {
+  constructor(options: CreateRuntimeOptions) {
     for (const f of RuntimeContext.extensions) {
       Object.assign(this, f());
     }
@@ -52,8 +52,14 @@ export class RuntimeContext {
         hostClasses: [],
         reactive: valueRef(false),
       },
-      props,
     );
+
+    // prevent empty values from breaking expected behavior of runtime properties,
+    // e.g. a context value returning null instead of object/array
+    const p = Object.entries(options);
+    for (const [k, v] of p) {
+      if (v) this[k] = v;
+    }
   }
 
   shadowDom?: ShadowRootInit;

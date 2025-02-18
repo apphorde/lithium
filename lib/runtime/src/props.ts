@@ -1,4 +1,4 @@
-import type { Ref } from '@li3/reactive';
+import { type Ref, valueRef } from '@li3/reactive';
 import { isElement, getAttribute } from '@li3/dom';
 import { RuntimeContext } from './types.js';
 import { Plugins } from './plugin.js';
@@ -30,7 +30,7 @@ export function getPropValue<T>($el: RuntimeContext, property: string, definitio
 }
 
 export function createInputRef<T = any>($el: RuntimeContext, name: string, initialValue?: T): Ref<T> {
-  const $ref = $el.reactive.ref<T>(initialValue);
+  const $ref = valueRef<T>(initialValue);
 
   if (!isElement($el.element)) {
     return $ref;
