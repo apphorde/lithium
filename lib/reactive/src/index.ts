@@ -49,7 +49,7 @@ export class ValueRef<T> implements Ref<T> {
 
   public check(): void {
     for (const fn of this.observers) {
-      fn();
+      fn(this.value);
     }
   }
 
@@ -94,7 +94,7 @@ export class ComputedRef<T> implements Ref<T> {
 
   public check(): void {
     for (const fn of this.observers) {
-      fn();
+      fn(this.value);
     }
   }
 
