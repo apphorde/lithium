@@ -2,7 +2,7 @@ import { getCurrentContext } from '../internal-api/stack.js';
 import { EventEmitFunction } from '../internal-api/types.js';
 import { defineEventOnElement, isElement, emitEvent } from '../internal-api/dom.js';
 import type { AnyFunction } from '../internal-api/types.js';
-import type { Ref } from '@li3/reactive';
+import { type Ref, computedRef, valueRef } from '@li3/reactive';
 import { createInputRef, getPropValue, type PropDefinition } from '../internal-api/props.js';
 
 export function loadCss(url: string): void {
@@ -98,18 +98,15 @@ export function watch(expression: AnyFunction | Ref<any>, effect?: AnyFunction):
 }
 
 export function computed<T>(fn: () => T): Ref<T> {
-  const $ref = ref<T>(null, { shallow: true });
-  watch(() => ($ref.value = fn()));
-
-  return $ref;
+  return computedRef(fn) as Ref<T>;
 }
 
 export function ref<T>(value?: T, options?): Ref<T> {
-  return getCurrentContext().reactive.ref(value, options);
+  return valueRef(value, options);
 }
 
-export function shallowRef<T>(value?: T, options = {}): Ref<T> {
-  return ref(value, { ...options, shallow: true });
+export function shallowRef<T>(value?: T): Ref<T> {
+  return ref(value, { shallow: true });
 }
 
 type InjectionEvent<T> = CustomEvent & { result?: T };

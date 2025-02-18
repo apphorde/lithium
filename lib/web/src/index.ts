@@ -33,10 +33,10 @@ import { createTextNodeBinding } from './plugins/text-template.plugin.js';
 import { plugins } from './internal-api/plugin.js';
 
 // re-export reactive API
-import { unref, isRef, ref as createRef } from '@li3/reactive';
-export { type Ref, unref, isRef, debounce } from '@li3/reactive';
+import { unref, isRef, valueRef } from '@li3/reactive';
+export { type Ref, unref, isRef, debounce, valueRef, computedRef } from '@li3/reactive';
 
-export const Reactive = { createState, fork, isRef, unref, ref: createRef };
+export const Reactive = { createState, fork, isRef, unref, ref: valueRef };
 export const DOM = { ...dom };
 export const Options = { getOption, setOption };
 export const Stack = { pop, push, getCurrentContext };
