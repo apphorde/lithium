@@ -1,8 +1,5 @@
 // import { onDestroy } from "@li3/runtime";
-import { observer, ref, Ref } from '@li3/reactive';
-
-const noop = () => {};
-const identity = (s) => s;
+import { valueRef, computedRef, Ref } from '@li3/reactive';
 
 export interface Action<T = any> {
   type: string;
@@ -20,7 +17,7 @@ export function createStore<T, A extends Action>(initialState: T, options?: Stor
   const events = new EventTarget();
   const reducers = [];
   const effects = [];
-  const state = { value: initialState };
+  const state = valueRef(initialState);
 
   function dispatch(action: A | string, payload?: any) {
     if (typeof action === 'string') {
@@ -51,57 +48,23 @@ export function createStore<T, A extends Action>(initialState: T, options?: Stor
     events.dispatchEvent(new CustomEvent('dispatch', { detail: action }));
   }
 
-  function addReducer(type: string, fn: Reducer<A, T>) {
-    reducers.push([type, fn]);
-  }
-
-  function addEffect(type: string, fn: Effect<A, T>) {
-    effects.push([type, fn]);
-  }
-
   if (options?.reducers) {
     for (const next of Object.entries(options?.reducers)) {
-      addReducer(next[0], next[1]);
+      reducers.push([next[0], next[1]]);
     }
   }
 
   if (options?.effects) {
     for (const next of Object.entries(options?.effects)) {
-      addEffect(next[0], next[1]);
+      effects.push([next[0], next[1]]);
     }
   }
 
-  function useSelectors() {
-    const observers = [];
+  // events.addEventListener('dispatch', () => state.check());
 
-    function check() {
-      for (const f of observers) f();
-    }
-
-    events.addEventListener('dispatch', check);
-
-    function detach() {
-      observers.length = 0;
-      events.removeEventListener('dispatch', check);
-    }
-
-    function select<V>(selector: (state: T) => V = identity): Ref<V> {
-      const value = selector(state.value);
-      const valueRef = ref(value, noop);
-      const o = observer(
-        () => selector(state.value),
-        (value) => (valueRef.value = value),
-      );
-
-      observers.push(o);
-
-      return valueRef;
-    }
-
-    // onDestroy(detach);
-
-    return { detach, select };
+  function select<V>(selector: (state: T) => V): Ref<V> {
+    return computedRef(() => selector(state.value));
   }
 
-  return { events, useSelectors, dispatch, addReducer, addEffect };
+  return { events, select, dispatch };
 }
