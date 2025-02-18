@@ -1,6 +1,11 @@
 type AnyFunction = (...args: any) => any;
-const reactiveTag = '__w';
+const reactiveTag = Symbol('reactive');
 
+/**
+ * Ref is a type of object that can be watched for changes.
+ * It has a .value property, which holds the current value.
+ * It also has a .watch method, which adds an observer to its value.
+ */
 export interface Ref<T> {
   value: T;
   readonly __isRef: true;
@@ -12,6 +17,17 @@ export interface ReactiveOptions {
   shallow?: boolean;
 }
 
+/**
+ * ValueRef is a reactive reference that updates its value when it is set.
+ * It is used to create reactive values that can be watched for changes.
+ * @param value The initial value of the reference.
+ * @param options An optional object with reactive options.
+ * @returns A ValueRef instance.
+ * @example
+ *    const value = valueRef(1);
+ *    value.watch((value) => console.log(value));
+ *    value.value = 2; // logs 2
+ */
 export class ValueRef<T> implements Ref<T> {
   public readonly __isRef = true as true;
   private __value: T;
@@ -47,57 +63,125 @@ export class ValueRef<T> implements Ref<T> {
     this.check();
   }
 
+  /**
+   * Triggers the observers.
+   */
   public check(): void {
     for (const fn of this.observers) {
       fn(this.value);
     }
   }
 
+  /**
+   * Adds an observer to the reactive value.
+   * @param effect The observer function.
+   */
   public watch(effect: AnyFunction): void {
     this.observers.push(effect);
   }
 }
 
-export class ComputedRef<T> implements Ref<T> {
+/**
+ * ComputedRef is a reactive reference that updates its value when its dependencies change.
+ * It is used to create computed values that depend on other reactive values.
+ *
+ * @param getter A function that returns the computed value.
+ * @param callback An optional callback that is called when the computed value changes.
+ * @returns A ComputedRef instance.
+ *
+ * @example
+ *    const source1 = valueRef(1);
+ *    const source2 = valueRef(2);
+ *    const computed = computedRef(() => source1.value + source2.value);
+ *    computed.watch((value) => console.log(value));
+ *    source1.value = 3; // logs 5
+ *    source2.value = 3; // logs 6
+ */
+export class ComputedRef<T, V = any> implements Ref<T> {
   public readonly __isRef = true as true;
-  public value: T;
+  protected __value: T;
 
-  static dependencies: ValueRef<any>[] = [];
+  /**
+   * The computed value. It is updated when its dependencies change.
+   * It can be accessed using the `value` property, but cannot be set directly.
+   * @returns The computed value.
+   */
+  get value(): T {
+    if (ComputedRef.capturingDependency) {
+      ComputedRef.dependencies.push(this);
+    }
+
+    return this.__value;
+  }
+
+  static dependencies: Ref<any>[] = [];
   static capturingDependency: boolean = false;
+  static queue: { target: ComputedRef<any>; callback: AnyFunction }[] = [];
 
   private observers: AnyFunction[] = [];
 
   constructor(
-    protected getter: () => T,
+    protected getter: () => V,
     callback?: AnyFunction,
   ) {
-    ComputedRef.capturingDependency = true;
-    this.value = getter();
-    ComputedRef.capturingDependency = false;
+    ComputedRef.queue.push({ target: this, callback });
+    ComputedRef.doCaptureDependencies();
+  }
 
-    const effect = () => this.update();
+  static async doCaptureDependencies() {
+    if (ComputedRef.capturingDependency || !ComputedRef.queue.length) return;
+
+    const { target, callback } = ComputedRef.queue.shift();
+    await ComputedRef.captureDependencies(target, callback);
+
+    if (ComputedRef.queue.length) {
+      ComputedRef.doCaptureDependencies();
+    }
+  }
+
+  static async captureDependencies(target: ComputedRef<any>, callback?: AnyFunction) {
+    ComputedRef.dependencies = [];
+
+    try {
+      ComputedRef.capturingDependency = true;
+      await target.update();
+      ComputedRef.capturingDependency = false;
+    } catch {}
+
+    const effect = () => target.update();
+
     for (const dep of ComputedRef.dependencies) {
       dep.watch(effect);
     }
 
-    ComputedRef.dependencies = [];
     if (callback) {
-      this.watch(callback);
-      this.check();
+      target.watch(callback);
+      target.check();
     }
   }
 
-  private update() {
-    this.value = this.getter();
+  /**
+   * Updates the computed value by calling the getter function.
+   * It also triggers the observers with the new value.
+   */
+  async update() {
+    this.__value = (await this.getter()) as T;
     this.check();
   }
 
+  /**
+   * Triggers the observers.
+   */
   public check(): void {
     for (const fn of this.observers) {
       fn(this.value);
     }
   }
 
+  /**
+   * Adds an observer to the computed value.
+   * @param effect The observer function.
+   */
   public watch(effect: AnyFunction): void {
     this.observers.push(effect);
   }
@@ -165,7 +249,7 @@ export function reactive<T extends object>(object: T, effect: VoidFunction): T {
   });
 }
 
-export function computedRef<T>(getter: () => T, effect?: AnyFunction): Ref<T> {
+export function computedRef<T>(getter: () => T, effect?: AnyFunction): Ref<Awaited<T>> {
   return new ComputedRef(getter, effect);
 }
 

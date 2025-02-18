@@ -2,7 +2,6 @@ import { type RuntimeContext, type AnyFunction, getOption } from '@li3/runtime';
 import { computedRef } from '@li3/reactive';
 
 const fnCache = new Map();
-const domParser = new DOMParser();
 const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
 
 export function compileExpression($el: RuntimeContext, expression: string, args: string[] = []): AnyFunction {
@@ -54,8 +53,8 @@ export function compileExpressionEval($el: RuntimeContext, expression: string, a
   if (!fn) {
     let finalCode = code;
 
-    if (getOption('useDomParser')) {
-      const parsed = domParser.parseFromString(code, 'text/html');
+    if (getOption('useDomParser') && typeof DOMParser !== 'undefined') {
+      const parsed = new DOMParser().parseFromString(code, 'text/html');
       finalCode = parsed.body.innerText.trim();
     }
 
@@ -85,5 +84,6 @@ export function wrapTryCatch(exp: string, fn: AnyFunction) {
 export function computedEffect<T>($el: RuntimeContext, expression: string, effect: (v: T) => void) {
   const fn = compileExpression($el, expression);
   const computed = wrapTryCatch(expression, fn);
-  return computedRef(computed, effect);
+  const ref = computedRef(computed, effect);
+  return ref;
 }
