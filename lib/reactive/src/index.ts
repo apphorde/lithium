@@ -111,11 +111,12 @@ export function markAsReactive(context: any): void {
   });
 }
 
-export function watch<T>(valueGetter: Ref<T> | (() => T), effect: (value: T) => void): VoidFunction {
+export function watchValue<T>(valueGetter: Ref<T> | (() => T), effect: (value: T) => void): VoidFunction {
   let lastValue: T | undefined;
+  const getter = isRef<T>(valueGetter) ? async () => await valueGetter.value : async () => unref(await valueGetter());
 
   return async function () {
-    let value = isRef<T>(valueGetter) ? await unref(valueGetter) : unref(await valueGetter());
+    let value = await getter();
 
     if (value !== lastValue && !Number.isNaN(value)) {
       lastValue = value;
