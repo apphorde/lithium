@@ -27,7 +27,6 @@ export function activateContext($el: RuntimeContext) {
   try {
     createState($el);
     createDom($el);
-    $el.reactive.check();
 
     ($el.element as any).__destroy = () => {
       Plugins.apply('destroy', [$el]);

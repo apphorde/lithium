@@ -1,4 +1,4 @@
-import { valueRef, type ValueRef, type Ref } from '@li3/reactive';
+import { type Ref } from '@li3/reactive';
 
 export type LifeCycleFunction = (runtime: LifeCycleObject) => void;
 export type UpdateLifeCycleFunction = (
@@ -48,9 +48,6 @@ export class RuntimeContext {
         update: [],
         destroy: [],
         view: {},
-
-        hostClasses: [],
-        reactive: valueRef(false),
       },
     );
 
@@ -66,9 +63,6 @@ export class RuntimeContext {
   element: Element | DocumentFragment;
   setup: Function;
   template: HTMLTemplateElement | null;
-  reactive: ValueRef<boolean>;
-  stylesheets: Array<string>;
-  scripts: Array<string>;
   stateKeys: string[];
   state: any;
   initialValues: any;
@@ -79,8 +73,6 @@ export class RuntimeContext {
   init: Array<LifeCycleFunction>;
   update: Array<UpdateLifeCycleFunction>;
   destroy: Array<LifeCycleFunction>;
-
-  hostClasses: string[];
 }
 
 export interface ComponentDefinition {

@@ -1,5 +1,5 @@
 import { isElement } from '@li3/dom';
-import { Plugins, RuntimeContext } from '@li3/runtime';
+import { Plugins, RuntimeContext, getCurrentContext } from '@li3/runtime';
 
 RuntimeContext.use(() => ({
   hostClasses: [],
@@ -18,4 +18,8 @@ export function applyHostAttributes($el: RuntimeContext) {
   if (hostClasses) {
     $el.element.className += ' ' + hostClasses;
   }
+}
+
+export function hostClasses(classes: string): void {
+  getCurrentContext().hostClasses.push(classes);
 }

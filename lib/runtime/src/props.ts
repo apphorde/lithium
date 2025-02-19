@@ -50,11 +50,3 @@ export function createInputRef<T = any>($el: RuntimeContext, name: string, initi
 
   return $ref;
 }
-
-export function syncProp($el: RuntimeContext, p: string, value: any) {
-  if ($el.props[p] && $el.props[p].value !== value) {
-    $el.reactive.suspend();
-    $el.props[p].value = value;
-    $el.reactive.unsuspend();
-  }
-}

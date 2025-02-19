@@ -21,11 +21,6 @@ export function onDestroy(fn: VoidFunction): void {
   getCurrentContext().destroy.push(fn);
 }
 
-// TODO move to plugin
-export function hostClasses(classes: string): void {
-  getCurrentContext().hostClasses.push(classes);
-}
-
 export interface QueryObject {
   one: Element | null;
   many: NodeListOf<Element>;
@@ -92,12 +87,8 @@ export function defineProp<T>(property: string, definition?: PropDefinition<T>):
   return $ref;
 }
 
-export function watch(expression: AnyFunction | Ref<any>, effect?: AnyFunction): void {
-  return getCurrentContext().reactive.watch(expression, effect);
-}
-
-export function computed<T>(fn: () => T): Ref<T> {
-  return computedRef(fn);
+export function computed<T>(fn: () => T, effect?: AnyFunction): Ref<T> {
+  return computedRef(fn, effect);
 }
 
 export function ref<T>(value?: T, options?): Ref<T> {

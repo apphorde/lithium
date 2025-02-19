@@ -67,7 +67,6 @@ export function templateForOf(template: HTMLTemplateElement, $el: RuntimeContext
 
     const lastNode = findLastNode(nodeCache) || template;
     template.parentNode.insertBefore(newNodes, lastNode);
-    $el.reactive.check();
 
     if (getOption('debugEnabled')) {
       template[VM] = nodeCache;
