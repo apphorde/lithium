@@ -14,8 +14,7 @@ export function createState($el: RuntimeContext): void {
   const componentState = Object.assign(baseState, $el.setup($el) || {});
   Plugins.apply('setup', [$el, componentState]);
 
-  const combinedState = { ...$el.props, ...componentState };
-  $el.state = combinedState;
+  $el.state = { ...$el.props, ...componentState };
   $el.stateKeys = Object.keys($el.state);
 
   if ($el.parent) {
@@ -31,7 +30,7 @@ export function createState($el: RuntimeContext): void {
     Object.defineProperty($el.view, key, {
       configurable: false,
       get() {
-        return unref(combinedState[key]);
+        return unref($el.state[key]);
       },
       set() {
         throw new Error('Property is read-only');
