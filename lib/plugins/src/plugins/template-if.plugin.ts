@@ -3,8 +3,8 @@ import { mount } from '@li3/browser';
 import { computedEffect } from '@li3/scope';
 
 Plugins.use({
-  dom($el: RuntimeContext) {
-    const templates: HTMLTemplateElement[] = Array.from($el.element.querySelectorAll('template[if]'));
+  dom($el: RuntimeContext, dom: DocumentFragment | HTMLElement) {
+    const templates: HTMLTemplateElement[] = Array.from(dom.querySelectorAll('template[if]'));
 
     for (const t of templates) {
       templateIf(t, $el);

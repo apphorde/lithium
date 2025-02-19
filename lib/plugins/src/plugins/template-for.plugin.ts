@@ -19,8 +19,8 @@ interface TemplateForRuntimeContext {
 }
 
 Plugins.use({
-  dom($el: RuntimeContext) {
-    const templates: HTMLTemplateElement[] = Array.from($el.element.querySelectorAll('template[for]'));
+  dom($el: RuntimeContext, dom: DocumentFragment | HTMLElement) {
+    const templates: HTMLTemplateElement[] = Array.from(dom.querySelectorAll('template[for]'));
 
     for (const t of templates) {
       templateForOf(t, $el);
