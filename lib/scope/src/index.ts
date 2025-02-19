@@ -26,7 +26,7 @@ export function compileExpressionBlob($el: RuntimeContext, expression: string, a
   const fargs = ['__s', ...args].join(', ');
   const fasync = expression.includes('await ') ? 'async ' : '';
   const code = `export default ${fasync}function(${fargs}) {
-    const {${$el.stateKeys.join(', ')}} = __s;
+    const {${$el.stateKeys.filter(key => expression.includes(key)).join(', ')}} = __s;
     return ${expression};
   }`;
 
@@ -44,7 +44,7 @@ export function compileExpressionBlob($el: RuntimeContext, expression: string, a
 
 export function compileExpressionEval($el: RuntimeContext, expression: string, args: string[] = []): AnyFunction {
   const code = `
-  const {${$el.stateKeys.join(', ')}} = __s;
+  const {${$el.stateKeys.filter(key => expression.includes(key)).join(', ')}} = __s;
   return ${expression}
   `;
   const cacheKey = code + args;
