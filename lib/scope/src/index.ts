@@ -5,11 +5,11 @@ const fnCache = new Map();
 const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
 
 export function compileExpression($el: RuntimeContext, expression: string, args: string[] = []): AnyFunction {
-  try {
+  if (getOption('useModuleExpressions')) {
     return compileExpressionBlob($el, expression, args);
-  } catch {
-    return compileExpressionEval($el, expression, args);
   }
+
+  return compileExpressionEval($el, expression, args);
 }
 
 export function createBlobModule(code: string, type = 'text/javascript') {
@@ -44,7 +44,7 @@ export function compileExpressionBlob($el: RuntimeContext, expression: string, a
 
 export function compileExpressionEval($el: RuntimeContext, expression: string, args: string[] = []): AnyFunction {
   const code = `
-  const {${$el.stateKeys.join(', ')}} = __u(__s);
+  const {${$el.stateKeys.join(', ')}} = __s;
   return ${expression}
   `;
   const cacheKey = code + args;
@@ -60,7 +60,7 @@ export function compileExpressionEval($el: RuntimeContext, expression: string, a
 
     const functionType = expression.includes('await ') ? AsyncFunction : Function;
 
-    fn = functionType(...['__s', ...args, finalCode]);
+    fn = functionType('__s', ...args, finalCode);
     fnCache.set(cacheKey, fn);
   }
 
