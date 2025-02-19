@@ -14,14 +14,9 @@ export function createState($el: RuntimeContext): void {
   const componentState = Object.assign(baseState, $el.setup($el) || {});
   Plugins.apply('setup', [$el, componentState]);
 
-  $el.state = { ...$el.props, ...componentState };
-  $el.stateKeys = Object.keys($el.state);
-
-  if ($el.parent) {
-    const keys = Object.keys($el.state);
-    $el.state = Object.assign(Object.create($el.parent.state), $el.state);
-    $el.stateKeys = [...new Set(keys.concat($el.parent.stateKeys))];
-  }
+  const combinedState = { ...$el.props, ...componentState };
+  $el.state = $el.parent ? Object.assign(Object.create($el.parent.state), combinedState) : combinedState;
+  $el.stateKeys = [...new Set(Object.keys(combinedState).concat($el.parent?.stateKeys ?? []))];
 
   Object.freeze($el.state);
   Object.freeze($el.stateKeys);
@@ -33,7 +28,7 @@ export function createState($el: RuntimeContext): void {
         return unref($el.state[key]);
       },
       set() {
-        throw new Error('Property is read-only');
+        throw new Error('State property is read-only');
       },
     });
   }
