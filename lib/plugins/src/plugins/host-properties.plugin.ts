@@ -1,7 +1,7 @@
 import { isElement } from '@li3/dom';
 import { Plugins, RuntimeContext, getCurrentContext } from '@li3/runtime';
 
-interface Extension extends RuntimeContext {
+export interface HostPropertiesExtension extends RuntimeContext {
   hostClasses: string[];
 }
 
@@ -11,11 +11,11 @@ RuntimeContext.use(() => ({
 
 Plugins.use({
   dom($el: RuntimeContext) {
-    applyHostAttributes($el as Extension);
+    applyHostAttributes($el as HostPropertiesExtension);
   },
 });
 
-export function applyHostAttributes($el: Extension): void {
+export function applyHostAttributes($el: HostPropertiesExtension): void {
   if (!isElement($el.element)) return;
 
   const hostClasses = $el.hostClasses.join(' ').trim();
@@ -25,5 +25,5 @@ export function applyHostAttributes($el: Extension): void {
 }
 
 export function hostClasses(classes: string): void {
-  getCurrentContext<Extension>().hostClasses.push(classes);
+  getCurrentContext<HostPropertiesExtension>().hostClasses.push(classes);
 }
