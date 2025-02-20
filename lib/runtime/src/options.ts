@@ -1,4 +1,4 @@
-const options = {
+const options: Record<string, boolean> = {
   debugEnabled: false,
 };
 
@@ -6,6 +6,6 @@ export function setOption<T extends keyof typeof options>(option: T, value: (typ
   options[option] = value;
 }
 
-export function getOption<T extends keyof typeof options>(option: T) {
+export function getOption(option: string) {
   return options[option];
 }
