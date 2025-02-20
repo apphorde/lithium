@@ -29,22 +29,22 @@ describe('computed and value ref', () => {
     const callback = (v) => values.push(v);
     const source1 = valueRef(1);
     const source2 = valueRef(2);
-    const computed1 = computedRef(async () => source1.value + source2.value, callback);
+    const computed1 = computedRef(() => source1.value + source2.value, callback);
     const computed2 = computedRef(() => source1.value + computed1.value, callback);
 
-    await delay(10);
     assert.strictEqual(3, computed1.value, 'computed1 ref value is incorrect');
     assert.strictEqual(4, computed2.value, 'computed2 ref value is incorrect');
     assert.deepStrictEqual(values, [3, 4], 'callback was not triggered correctly');
 
     values.length = 0;
     source1.value = 3;
-    await delay(10);
     assert.strictEqual(5, computed1.value, 'computed1 ref value is incorrect after dependency change');
-    assert.deepStrictEqual(values, [5, 6, 8], 'callback was not triggered correctly');
+
+    // triggers callback for computed1, then computed2
+    // because computed2 also depends on computed1, compute2 triggers twice
+    assert.deepStrictEqual(values, [5, 8, 8], 'callback was not triggered correctly');
 
     source2.value = 3;
-    await delay(10);
     assert.strictEqual(6, computed1.value, 'computed1 ref value is incorrect after dependency change');
     assert.strictEqual(9, computed2.value, 'computed2 ref value is incorrect after dependency change');
   });

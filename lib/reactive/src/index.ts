@@ -11,10 +11,35 @@ export interface Ref<T> {
   readonly __isRef: true;
   check(): void;
   watch(effect: AnyFunction): void;
+  toString(): string;
+  valueOf(): T;
 }
 
 export interface ReactiveOptions {
   shallow?: boolean;
+}
+
+const effects = [Function.prototype];
+let capturingDependency = false;
+
+function captureDependencies(target: ComputedRef<any>, callback?: AnyFunction) {
+  capturingDependency = true;
+  console.log('capture', effects);
+  const effect = () => target.update();
+  effects.push(effect);
+
+  try {
+    target.update();
+  } catch {
+    // ignore
+  } finally {
+    capturingDependency = false;
+  }
+
+  if (callback) {
+    target.watch(callback);
+    target.check();
+  }
 }
 
 /**
@@ -30,36 +55,36 @@ export interface ReactiveOptions {
  */
 export class ValueRef<T> implements Ref<T> {
   public readonly __isRef = true as true;
-  private __value: T;
-  private observers: AnyFunction[] = [];
+  #value: T;
+  #observers: Function[] = [];
 
   constructor(
     value: T,
     private options?: ReactiveOptions,
   ) {
-    this.value = value;
+    this.#value = value;
   }
 
   get value(): T {
-    if (ComputedRef.capturingDependency) {
-      ComputedRef.dependencies.push(this);
+    if (capturingDependency) {
+      this.#observers.push(effects.at(-1));
     }
 
-    return this.__value;
+    return this.#value;
   }
 
   set value(newValue: T) {
-    if (newValue === this.__value) {
+    if (newValue === this.#value) {
       return;
     }
 
     if (this.options?.shallow || !canBeReactive(newValue)) {
-      this.__value = newValue;
+      this.#value = newValue;
       this.check();
       return;
     }
 
-    this.__value = reactive(newValue as object, () => this.check()) as T;
+    this.#value = reactive(newValue as object, () => this.check()) as T;
     this.check();
   }
 
@@ -67,7 +92,7 @@ export class ValueRef<T> implements Ref<T> {
    * Triggers the observers.
    */
   public check(): void {
-    for (const fn of this.observers) {
+    for (const fn of this.#observers) {
       fn(this.value);
     }
   }
@@ -77,7 +102,15 @@ export class ValueRef<T> implements Ref<T> {
    * @param effect The observer function.
    */
   public watch(effect: AnyFunction): void {
-    this.observers.push(effect);
+    this.#observers.push(effect);
+  }
+
+  toString() {
+    return String(this.value);
+  }
+
+  valueOf() {
+    return this.value;
   }
 }
 
@@ -99,7 +132,8 @@ export class ValueRef<T> implements Ref<T> {
  */
 export class ComputedRef<T, V = any> implements Ref<T> {
   public readonly __isRef = true as true;
-  protected __value: T;
+  #observers: Function[] = [];
+  #value: T;
 
   /**
    * The computed value. It is updated when its dependencies change.
@@ -107,68 +141,26 @@ export class ComputedRef<T, V = any> implements Ref<T> {
    * @returns The computed value.
    */
   get value(): T {
-    if (ComputedRef.capturingDependency) {
-      ComputedRef.dependencies.push(this);
+    if (capturingDependency) {
+      this.#observers.push(effects.at(-1));
     }
 
-    return this.__value;
+    return this.#value;
   }
-
-  static dependencies: Ref<any>[] = [];
-  static capturingDependency: boolean = false;
-  static queue: { target: ComputedRef<any>; callback: AnyFunction }[] = [];
-
-  private observers: AnyFunction[] = [];
 
   constructor(
-    protected getter: () => V,
+    protected getter: () => T,
     callback?: AnyFunction,
   ) {
-    ComputedRef.queue.push({ target: this, callback });
-    ComputedRef.doCaptureDependencies();
-  }
-
-  static async doCaptureDependencies() {
-    if (ComputedRef.capturingDependency || !ComputedRef.queue.length) return;
-
-    const { target, callback } = ComputedRef.queue.shift();
-    await ComputedRef.captureDependencies(target, callback);
-
-    if (ComputedRef.queue.length) {
-      ComputedRef.doCaptureDependencies();
-    }
-  }
-
-  static async captureDependencies(target: ComputedRef<any>, callback?: AnyFunction) {
-    ComputedRef.dependencies = [];
-
-    ComputedRef.capturingDependency = true;
-    try {
-      await target.update();
-    } catch {
-      // ignore
-    } finally {
-      ComputedRef.capturingDependency = false;
-    }
-
-    const effect = () => target.update();
-
-    for (const dep of ComputedRef.dependencies) {
-      dep.watch(effect);
-    }
-
-    if (callback) {
-      target.watch(callback);
-      target.check();
-    }
+    captureDependencies(this, callback);
   }
 
   /**
    * Updates the computed value by calling the getter function.
    * It also triggers the observers with the new value.
    */
-  async update() {
-    this.__value = (await this.getter()) as T;
+  update() {
+    this.#value = this.getter();
     this.check();
   }
 
@@ -176,7 +168,7 @@ export class ComputedRef<T, V = any> implements Ref<T> {
    * Triggers the observers.
    */
   public check(): void {
-    for (const fn of this.observers) {
+    for (const fn of this.#observers) {
       fn(this.value);
     }
   }
@@ -186,7 +178,15 @@ export class ComputedRef<T, V = any> implements Ref<T> {
    * @param effect The observer function.
    */
   public watch(effect: AnyFunction): void {
-    this.observers.push(effect);
+    this.#observers.push(effect);
+  }
+
+  toString() {
+    return String(this.value);
+  }
+
+  valueOf() {
+    return this.value;
   }
 }
 
@@ -200,7 +200,7 @@ export function markAsReactive(context: any): void {
 
 export function watchValue<T>(valueGetter: Ref<T> | (() => T), effect: (value: T) => void): VoidFunction {
   let lastValue: T | undefined;
-  const getter = isRef<T>(valueGetter) ? async () => await valueGetter.value : async () => unref(await valueGetter());
+  const getter = isRef<T>(valueGetter) ? () => valueGetter.value : async () => unref(await valueGetter());
 
   return async function () {
     let value = await getter();
@@ -252,7 +252,7 @@ export function reactive<T extends object>(object: T, effect: VoidFunction): T {
   });
 }
 
-export function computedRef<T>(getter: () => T, effect?: AnyFunction): Ref<Awaited<T>> {
+export function computedRef<T>(getter: () => T, effect?: AnyFunction): Ref<T> {
   return new ComputedRef(getter, effect);
 }
 
