@@ -10,6 +10,6 @@ export function pop() {
   return stack.pop();
 }
 
-export function getCurrentContext(): RuntimeContext {
-  return stack[stack.length - 1];
+export function getCurrentContext<T = RuntimeContext>(): T {
+  return stack[stack.length - 1] as T;
 }

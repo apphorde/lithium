@@ -1,6 +1,6 @@
 {
   "name": "@li3/plugins",
-  "version": "0.0.47",
+  "version": "0.0.48",
   "exports": {
     ".": {
       "default": "./index.js",

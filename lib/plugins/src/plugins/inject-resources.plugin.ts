@@ -1,12 +1,17 @@
 import { createBlobModule } from '@li3/scope';
 import { Plugins, RuntimeContext, getCurrentContext } from '@li3/runtime';
 
+interface Extension extends RuntimeContext {
+  stylesheets: string[];
+  scripts: string[];
+}
+
 export function loadCss(url: string): void {
-  getCurrentContext().stylesheets.push(url);
+  getCurrentContext<Extension>().stylesheets.push(url);
 }
 
 export function loadScript(url: string): void {
-  getCurrentContext().scripts.push(url);
+  getCurrentContext<Extension>().scripts.push(url);
 }
 
 RuntimeContext.use(() => ({
@@ -16,7 +21,7 @@ RuntimeContext.use(() => ({
 
 Plugins.use({
   async init($el: RuntimeContext) {
-    const { element, stylesheets, scripts } = $el;
+    const { element, stylesheets, scripts } = $el as Extension;
 
     // TODO wait for scripts and stylesheets before component is mounted
     stylesheets.map((url) => adoptStyleSheet(element as HTMLElement, url));
