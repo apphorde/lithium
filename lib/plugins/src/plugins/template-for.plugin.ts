@@ -31,7 +31,16 @@ Plugins.use({
 export function templateForOf(template: HTMLTemplateElement, $el: RuntimeContext) {
   const nodeCache: NodeCacheEntry[] = [];
   const expression = template.getAttribute('for');
-  const [iteration, source] = expression.split('of').map((s) => s.trim());
+  const [iteration, source] = expression.split(' of ').map((s) => s.trim());
+
+  if (!source || !iteration) {
+    if (getOption('debugEnabled')) {
+      throw new Error('TemplateFor directive requires an expression with "of" keyword. Example: for="item of items"');
+    }
+
+    return;
+  }
+
   const [itemName, indexName] = iteration.includes('[')
     ? iteration
         .slice(1, -1)
