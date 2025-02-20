@@ -142,11 +142,14 @@ export class ComputedRef<T, V = any> implements Ref<T> {
   static async captureDependencies(target: ComputedRef<any>, callback?: AnyFunction) {
     ComputedRef.dependencies = [];
 
+    ComputedRef.capturingDependency = true;
     try {
-      ComputedRef.capturingDependency = true;
       await target.update();
+    } catch {
+      // ignore
+    } finally {
       ComputedRef.capturingDependency = false;
-    } catch {}
+    }
 
     const effect = () => target.update();
 
