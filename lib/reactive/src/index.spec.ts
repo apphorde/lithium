@@ -21,8 +21,6 @@ describe('reactive values', () => {
   });
 });
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 describe('computed and value ref', () => {
   it('should observe a change in a computed value', async () => {
     const values = [];

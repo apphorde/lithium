@@ -130,7 +130,7 @@ export class ValueRef<T> implements Ref<T> {
  *    source1.value = 3; // logs 5
  *    source2.value = 3; // logs 6
  */
-export class ComputedRef<T, V = any> implements Ref<T> {
+export class ComputedRef<T> implements Ref<T> {
   public readonly __isRef = true as true;
   #observers: Function[] = [];
   #value: T;
@@ -203,7 +203,7 @@ export function watchValue<T>(valueGetter: Ref<T> | (() => T), effect: (value: T
   const getter = isRef<T>(valueGetter) ? () => valueGetter.value : async () => unref(await valueGetter());
 
   return async function () {
-    let value = await getter();
+    let value = (await getter()) as T;
 
     if (value !== lastValue && !Number.isNaN(value)) {
       lastValue = value;
