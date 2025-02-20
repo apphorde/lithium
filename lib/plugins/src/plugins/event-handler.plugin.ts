@@ -12,7 +12,7 @@ Plugins.use({
 
 export function createEventBinding($el: RuntimeContext, element: Element, attribute: string, expression: string): void {
   const [eventName, ...flags] = attribute.split('.');
-  const exec = compileExpression($el, expression, ['$event', '$flags']);
+  const eventHandler = compileExpression($el, expression, ['$event', '$flags']);
   const options = {};
 
   for (const flag of flags) {
@@ -24,7 +24,7 @@ export function createEventBinding($el: RuntimeContext, element: Element, attrib
     eventName,
     (e: Event) => {
       try {
-        exec(e, flags);
+        eventHandler(e, flags);
       } catch (e) {
         console.error('event failed', expression, e);
       }

@@ -2,9 +2,9 @@ import { type RuntimeContext, type AnyFunction, getOption } from '@li3/runtime';
 import { computedRef } from '@li3/reactive';
 
 const fnCache = new Map();
-const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
+const modCache = new Map();
 
-export function compileExpression($el: RuntimeContext, expression: string, args: string[] = []): AnyFunction {
+export function compileExpression($el: RuntimeContext, expression: string, args: string[] = []) {
   if (getOption('useModuleExpressions')) {
     return compileExpressionBlob($el, expression, args);
   }
@@ -12,23 +12,8 @@ export function compileExpression($el: RuntimeContext, expression: string, args:
   return compileExpressionEval($el, expression, args);
 }
 
-export function createBlobModule(code: string, type = 'text/javascript') {
-  const blob = new Blob([code], { type });
-  const url = URL.createObjectURL(blob);
-  const modPromise = import(url);
-  modPromise.then(() => URL.revokeObjectURL(url));
-  return modPromise;
-}
-
-const modCache = new Map();
-
-export function compileExpressionBlob($el: RuntimeContext, expression: string, args: string[] = []) {
-  const fargs = ['__s', ...args].join(', ');
-  const fasync = expression.includes('await ') ? 'async ' : '';
-  const code = `export default ${fasync}function(${fargs}) {
-    const {${$el.stateKeys.filter(key => expression.includes(key)).join(', ')}} = __s;
-    return ${expression};
-  }`;
+export function compileExpressionBlob($el: RuntimeContext, expression: string, args: string[] = []): AnyFunction {
+  const code = `export default function(${args.join(', ')}) { ${createFunctionBody($el, expression)} }`;
 
   if (!modCache.has(code)) {
     modCache.set(code, createBlobModule(code));
@@ -38,36 +23,49 @@ export function compileExpressionBlob($el: RuntimeContext, expression: string, a
 
   return async function (...args: any[]) {
     const fn = await mod;
-    return fn.default($el.view, ...args);
+    return fn.default.apply($el.view, args);
   };
 }
 
 export function compileExpressionEval($el: RuntimeContext, expression: string, args: string[] = []): AnyFunction {
-  const code = `
-  const {${$el.stateKeys.filter(key => expression.includes(key)).join(', ')}} = __s;
-  return ${expression}
-  `;
+  const code = createFunctionBody($el, expression);
   const cacheKey = code + args;
   let fn = fnCache.get(cacheKey);
 
   if (!fn) {
-    let finalCode = code;
-
-    if (getOption('useDomParser') && typeof DOMParser !== 'undefined') {
-      const parsed = new DOMParser().parseFromString(code, 'text/html');
-      finalCode = parsed.body.innerText.trim();
-    }
-
-    const functionType = expression.includes('await ') ? AsyncFunction : Function;
-
-    fn = functionType('__s', ...args, finalCode);
+    fn = Function(...args, code);
     fnCache.set(cacheKey, fn);
   }
 
-  return fn.bind(null, $el.view);
+  return (...args: any[]) => fn.apply($el.view, args);
 }
 
-export function wrapTryCatch(exp: string, fn: AnyFunction) {
+export function computedEffect<T>($el: RuntimeContext, expression: string, effect: (v: T) => void) {
+  const fn = compileExpressionEval($el, expression);
+  const computed = wrapInTryCatch(expression, fn);
+  const ref = computedRef(computed, effect);
+  return ref;
+}
+
+export function createBlobModule(code: string, type = 'text/javascript') {
+  const blob = new Blob([code], { type });
+  const url = URL.createObjectURL(blob);
+  const modPromise = import(url);
+  modPromise.then(() => URL.revokeObjectURL(url));
+
+  return modPromise;
+}
+
+function createFunctionBody<T extends RuntimeContext>($el: T, expression: string) {
+  const keys = $el.stateKeys.filter((key) => expression.includes(key)).join(', ');
+
+  return `
+    const {${keys}} = this;
+    return ${expression};
+  `;
+}
+
+function wrapInTryCatch(source: string, fn: AnyFunction) {
   if (getOption('debugEnabled')) {
     return () => fn();
   }
@@ -76,14 +74,7 @@ export function wrapTryCatch(exp: string, fn: AnyFunction) {
     try {
       return fn();
     } catch (e) {
-      console.log('Error: ' + exp, e);
+      console.log('Error: ' + source, e);
     }
   };
-}
-
-export function computedEffect<T>($el: RuntimeContext, expression: string, effect: (v: T) => void) {
-  const fn = compileExpression($el, expression);
-  const computed = wrapTryCatch(expression, fn);
-  const ref = computedRef(computed, effect);
-  return ref;
 }

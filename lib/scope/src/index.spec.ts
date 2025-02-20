@@ -5,7 +5,6 @@ import assert from 'node:assert';
 import { createRuntimeContext, createState, setOption } from '@li3/runtime';
 
 setOption('useModuleExpressions', false);
-setOption('useDomParser', false);
 
 describe('computedEffect', () => {
   it('should observe a change in an object', async () => {

@@ -1,8 +1,7 @@
 const options = {
   cachedTemplateFor: false,
   debugEnabled: false,
-  useDomParser: false,
-  useModuleExpressions: true,
+  useModuleExpressions: false,
 };
 
 export function setOption<T extends keyof typeof options>(option: T, value: (typeof options)[T]) {
