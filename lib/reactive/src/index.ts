@@ -24,7 +24,6 @@ let capturingDependency = false;
 
 function captureDependencies(target: ComputedRef<any>, callback?: AnyFunction) {
   capturingDependency = true;
-  console.log('capture', effects);
   const effect = () => target.update();
   effects.push(effect);
 
@@ -34,6 +33,7 @@ function captureDependencies(target: ComputedRef<any>, callback?: AnyFunction) {
     // ignore
   } finally {
     capturingDependency = false;
+    effects.pop();
   }
 
   if (callback) {
