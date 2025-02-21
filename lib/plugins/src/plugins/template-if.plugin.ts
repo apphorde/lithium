@@ -42,5 +42,5 @@ export async function templateIf(template: HTMLTemplateElement, $el: RuntimeCont
   }
 
   const expression = template.getAttribute('if');
-  computedEffect($el, expression, updateDom);
+  queueMicrotask(() => computedEffect($el, expression, updateDom));
 }

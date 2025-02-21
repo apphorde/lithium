@@ -9,18 +9,18 @@ export class ComponentInstance {
 }
 
 export function createState($el: RuntimeContext): void {
-  // TODO check if state keys and prop names have a conflict
   const baseState = new ComponentInstance();
-  const componentState = Object.assign(baseState, $el.setup($el) || {});
+  const componentState = Object.assign(baseState, $el.parent || {}, $el.setup($el) || {});
+  Object.assign(componentState, $el.props);
+
   Plugins.apply('setup', [$el, componentState]);
+  $el.state = componentState;
+  $el.stateKeys = Object.keys($el.state);
 
-  const combinedState = { ...$el.props, ...componentState };
-  $el.state = $el.parent ? Object.assign(Object.create($el.parent.state), combinedState) : combinedState;
-  $el.stateKeys = [...new Set(Object.keys(combinedState).concat($el.parent?.stateKeys ?? []))];
+  defineViewGetters($el);
+}
 
-  Object.freeze($el.state);
-  Object.freeze($el.stateKeys);
-
+function defineViewGetters($el: RuntimeContext) {
   for (const key of $el.stateKeys) {
     Object.defineProperty($el.view, key, {
       configurable: false,

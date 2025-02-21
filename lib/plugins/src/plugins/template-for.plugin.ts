@@ -82,7 +82,7 @@ export function templateForOf(template: HTMLTemplateElement, $el: RuntimeContext
     }
   }
 
-  computedEffect($el, source, onListChange);
+  queueMicrotask(() => computedEffect($el, source, onListChange));
 }
 
 function findLastNode(nodeCache: NodeCacheEntry[]) {

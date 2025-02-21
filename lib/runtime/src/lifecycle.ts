@@ -1,7 +1,7 @@
 import { tpl, traverseDom, isElement, isFragment, clearElement, mapContentToSlots } from '@li3/dom';
 import { CreateRuntimeOptions, RuntimeContext } from './types.js';
 import { Plugins } from './plugin.js';
-import { createState } from './reactive.js';
+import { createState } from './create-state.js';
 import { push, pop } from './stack.js';
 import { getOption } from './options.js';
 
