@@ -18,38 +18,62 @@ export function createStore<
     type.push([next[0], next[1]]);
   }
 
-  async function dispatch<K extends keyof Actions>(action: K, payload?: Actions[K] extends Reducer<infer P> ? P : any) {
-    let nextState = { ...state.value };
+  let transaction = { active: false, state: null as State | null };
+  const getState = () => (transaction.active ? transaction.state : state.value);
+  const setState = (s: State) => (transaction.active ? (transaction.state = s) : (state.value = s));
 
-    try {
-      for (const reducer of reducers) {
-        if (reducer[0] === action) {
-          nextState = reducer[1](nextState, payload) ?? nextState;
+  return {
+    events,
+    select<V>(selector: (state: State) => V): Ref<V> {
+      return computedRef(() => selector(state.value));
+    },
+    get<V>(selector: (state: State) => V): V {
+      return selector(getState());
+    },
+    async dispatch<K extends keyof Actions>(action: K, payload?: Actions[K] extends Reducer<infer P> ? P : any) {
+      let nextState = transaction.active ? transaction.state : state.value;
+
+      try {
+        for (const reducer of reducers) {
+          if (reducer[0] === action) {
+            nextState = reducer[1](nextState, payload) ?? nextState;
+          }
         }
+
+        setState(nextState);
+
+        for (const effect of effects) {
+          if (effect[0] === action) {
+            // FIXME effects can still mutate state
+            await effect[1](getState(), payload);
+          }
+        }
+      } catch (error) {
+        if (!transaction.active) {
+          events.dispatchEvent(new CustomEvent('error', { detail: String(error) }));
+        }
+        return;
       }
 
-      state.value = nextState;
-
-      for (const effect of effects) {
-        if (effect[0] === action) {
-          await effect[1](state.value, payload);
-        }
+      if (!transaction.active) {
+        events.dispatchEvent(new CustomEvent('dispatch', { detail: { type: action, payload } }));
       }
-    } catch (error) {
-      events.dispatchEvent(new ErrorEvent('error', { error: String(error) }));
-      return;
-    }
+    },
 
-    events.dispatchEvent(new CustomEvent('dispatch', { detail: { type: action, payload } }));
-  }
-
-  function get<V>(selector: (state: State) => V): V {
-    return selector(state.value);
-  }
-
-  function select<V>(selector: (state: State) => V): Ref<V> {
-    return computedRef(() => selector(state.value));
-  }
-
-  return { events, select, get, dispatch };
+    async transaction(handler: () => any) {
+      try {
+        transaction.active = true;
+        transaction.state = state.value;
+        await handler();
+        transaction.active = false;
+        state.value = transaction.state;
+        events.dispatchEvent(new CustomEvent('commit', { detail: state.value }));
+      } catch (error) {
+        events.dispatchEvent(new CustomEvent('error', { detail: String(error) }));
+      } finally {
+        transaction.active = false;
+        transaction.state = null;
+      }
+    },
+  };
 }

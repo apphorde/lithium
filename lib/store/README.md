@@ -46,3 +46,21 @@ dispatch('remove'); // logs 1 again
 // counter is a computed value
 const counter = select((s) => s.count);
 ```
+
+## Transactions
+
+Stores can push multiple changes and run side effects within a single update cycle.
+That can be done with a `.transaction()` call in the store:
+
+```js
+
+store.events.addEventListener('commit', (state) => {...})
+store.transaction(async () => {
+  await store.dispatch('increment', 1);
+  await store.dispatch('increment', 10);
+  await store.dispatch('decrement', 5);
+});
+```
+
+All intermediate states are not propagated to any selector.
+When all actions are completely dispatched, the state is pushed into the store and all computed values reflect the changes.
