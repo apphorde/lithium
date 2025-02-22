@@ -51,8 +51,6 @@ export function templateForOf(template: HTMLTemplateElement, $el: RuntimeContext
   const context: TemplateForRuntimeContext = { itemName, indexName, nodeCache, $el, template };
 
   function onListChange(list: any[]) {
-    list = unref(list);
-
     if (!template.parentNode || !Array.isArray(list)) {
       resize(context, 0);
       return;

@@ -36,7 +36,6 @@ export class RuntimeContext {
 
     Object.assign(
       this,
-      ...RuntimeContext.extensions.map((f) => f()),
       {
         state: {},
         stateKeys: [],
