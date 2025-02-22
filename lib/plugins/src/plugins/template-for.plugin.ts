@@ -1,6 +1,5 @@
 import { mount, defineProps } from '@li3/browser';
 import { getOption, Plugins, type RuntimeContext } from '@li3/runtime';
-import { unref } from '@li3/reactive';
 import { computedEffect } from '@li3/scope';
 
 const VM = Symbol('@@FOR');
