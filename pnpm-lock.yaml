@@ -60,22 +60,22 @@ importers:
   lib/browser:
     dependencies:
       '@li3/dom':
-        specifier: workspace:*
+        specifier: latest
         version: link:../dom
       '@li3/reactive':
-        specifier: workspace:*
+        specifier: latest
         version: link:../reactive
       '@li3/runtime':
-        specifier: workspace:*
+        specifier: latest
         version: link:../runtime
       '@li3/scope':
-        specifier: workspace:*
+        specifier: latest
         version: link:../scope
 
   lib/cli:
     dependencies:
       '@li3/sfc':
-        specifier: workspace:*
+        specifier: latest
         version: link:../sfc
 
   lib/dom: {}
@@ -85,19 +85,19 @@ importers:
   lib/plugins:
     dependencies:
       '@li3/browser':
-        specifier: workspace:*
+        specifier: latest
         version: link:../browser
       '@li3/dom':
-        specifier: workspace:*
+        specifier: latest
         version: link:../dom
       '@li3/reactive':
-        specifier: workspace:*
+        specifier: latest
         version: link:../reactive
       '@li3/runtime':
-        specifier: workspace:*
+        specifier: latest
         version: link:../runtime
       '@li3/scope':
-        specifier: workspace:*
+        specifier: latest
         version: link:../scope
 
   lib/reactive: {}
@@ -105,25 +105,25 @@ importers:
   lib/runtime:
     dependencies:
       '@li3/dom':
-        specifier: workspace:*
+        specifier: latest
         version: link:../dom
       '@li3/reactive':
-        specifier: workspace:*
+        specifier: latest
         version: link:../reactive
 
   lib/scope:
     dependencies:
       '@li3/reactive':
-        specifier: workspace:*
+        specifier: latest
         version: link:../reactive
       '@li3/runtime':
-        specifier: workspace:*
+        specifier: latest
         version: link:../runtime
 
   lib/sfc:
     dependencies:
       '@li3/html-parser':
-        specifier: workspace:*
+        specifier: latest
         version: link:../html-parser
       acorn:
         specifier: latest
@@ -132,19 +132,19 @@ importers:
   lib/store:
     dependencies:
       '@li3/reactive':
-        specifier: workspace:*
+        specifier: latest
         version: link:../reactive
 
   lib/web:
     dependencies:
       '@li3/browser':
-        specifier: workspace:*
+        specifier: latest
         version: link:../browser
       '@li3/plugins':
-        specifier: workspace:*
+        specifier: latest
         version: link:../plugins
       '@li3/reactive':
-        specifier: workspace:*
+        specifier: latest
         version: link:../reactive
 
 packages:

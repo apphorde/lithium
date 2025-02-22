@@ -1,6 +1,6 @@
 {
   "name": "@li3/cli",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "exports": {
     ".": {
       "default": "./index.js",
@@ -11,6 +11,6 @@
     "li3": "./index.js"
   },
   "dependencies": {
-    "@li3/sfc": "workspace:*"
+    "@li3/sfc": "latest"
   }
 }

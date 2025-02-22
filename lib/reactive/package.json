@@ -1,6 +1,6 @@
 {
   "name": "@li3/reactive",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "exports": {
     ".": {
       "default": "./index.js",

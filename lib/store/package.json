@@ -1,6 +1,6 @@
 {
   "name": "@li3/store",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "exports": {
     ".": {
       "default": "./index.js",
@@ -8,6 +8,6 @@
     }
   },
   "dependencies": {
-    "@li3/reactive": "workspace:*"
+    "@li3/reactive": "latest"
   }
 }

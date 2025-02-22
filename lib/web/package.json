@@ -1,6 +1,6 @@
 {
   "name": "@li3/web",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "exports": {
     ".": {
       "default": "./index.js",
@@ -8,8 +8,8 @@
     }
   },
   "dependencies": {
-    "@li3/reactive": "workspace:*",
-    "@li3/plugins": "workspace:*",
-    "@li3/browser": "workspace:*"
+    "@li3/reactive": "latest",
+    "@li3/plugins": "latest",
+    "@li3/browser": "latest"
   }
 }
