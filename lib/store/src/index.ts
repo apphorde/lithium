@@ -1,24 +1,14 @@
 import { valueRef, computedRef, type Ref } from '@li3/reactive';
 
-export type Reducer<A, T = any> = (state: T, action: A) => T;
-export type Effect<A, T = any> = (state: T, action: A) => void | Promise<void>;
+export type Action<A, T = any> = (state: T, action: A) => void | Promise<void> | Promise<T> | T;
 
-export function createStore<
-  State,
-  Payload extends any,
-  Actions extends Record<string, Reducer<Payload, State> | Effect<Payload, State>>,
->(initialState: State, actions: Actions) {
+export function createStore<State, Payload extends any, Actions extends Record<string, Action<Payload, State>>>(
+  initialState: State,
+  actions: Actions,
+) {
   const events = new EventTarget();
-  const reducers = [];
-  const effects = [];
   const state = valueRef(initialState);
-
-  for (const next of Object.entries(actions)) {
-    const type = Object.getPrototypeOf(next[1]).constructor === Function ? reducers : effects;
-    type.push([next[0], next[1]]);
-  }
-
-  let transaction = { active: false, state: null as State | null };
+  const transaction = { active: false, state: null as State | null };
   const getState = () => (transaction.active ? transaction.state : state.value);
   const setState = (s: State) => (transaction.active ? (transaction.state = s) : (state.value = s));
 
@@ -30,23 +20,18 @@ export function createStore<
     get<V>(selector: (state: State) => V): V {
       return selector(getState());
     },
-    async dispatch<K extends keyof Actions>(action: K, payload?: Actions[K] extends Reducer<infer P> ? P : any) {
-      let nextState = transaction.active ? transaction.state : state.value;
+    async dispatch<K extends keyof Actions>(action: K, payload?: Actions[K] extends Action<infer P> ? P : any): Promise<void> {
+      if (!actions[action]) {
+        return;
+      }
 
       try {
-        for (const reducer of reducers) {
-          if (reducer[0] === action) {
-            nextState = reducer[1](nextState, payload) ?? nextState;
-          }
-        }
+        const current = transaction.active ? transaction.state : state.value;
+        const response = await actions[action](current, payload as Payload);
 
-        setState(nextState);
-
-        for (const effect of effects) {
-          if (effect[0] === action) {
-            // FIXME effects can still mutate state
-            await effect[1](getState(), payload);
-          }
+        console.log(transaction.active, action, payload, response)
+        if (response) {
+          setState({ ...response });
         }
       } catch (error) {
         if (!transaction.active) {
