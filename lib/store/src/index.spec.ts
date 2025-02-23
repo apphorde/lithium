@@ -10,7 +10,7 @@ describe('store', () => {
         increment: (state, payload: number) => ({ count: state.count + payload }),
         decrement: (state, payload: number) => ({ count: state.count - payload }),
         async incrementAsync(_state, payload: number) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, 100));
           await store.dispatch('increment', payload);
         },
       },
@@ -34,22 +34,26 @@ describe('store', () => {
   });
 
   it('should not dispatch events until a state transition is commited', async () => {
+
     const store = createStore(
       { count: 0 },
       {
-        increment: (state, payload: number) => ({ count: state.count + payload }),
+        increment(state, payload: number) { state.count += payload  },
         async incrementAsync(_state, payload: number) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          await new Promise((resolve) => setTimeout(resolve, 100));
           await store.dispatch('increment', payload);
         },
       },
     );
 
+    const selectorValue = store.select(state => state.count);
     const onDispatch = mock.fn();
     const onCommit = mock.fn();
     const count = (state) => state.count;
     store.events.addEventListener('dispatch', onDispatch);
     store.events.addEventListener('commit', onCommit);
+
+    assert.strictEqual(0, selectorValue.value, 'state change effect triggered');
 
     await store.transaction(async () => {
       await store.dispatch('increment', 1);
@@ -62,6 +66,7 @@ describe('store', () => {
       assert.strictEqual(111, store.get(count), 'increment inside transaction has wrong value');
     });
 
+    assert.strictEqual(111, selectorValue.value, 'state change effect not triggered');
     assert.strictEqual(111, store.get(count), 'transaction failed');
     assert.strictEqual(0, onDispatch.mock.callCount(), 'dispatch was emitted');
     assert.strictEqual(1, onCommit.mock.callCount(), 'commit was not emitted');

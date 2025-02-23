@@ -20,7 +20,10 @@ export function createStore<State, Payload extends any, Actions extends Record<s
     get<V>(selector: (state: State) => V): V {
       return selector(getState());
     },
-    async dispatch<K extends keyof Actions>(action: K, payload?: Actions[K] extends Action<infer P> ? P : any): Promise<void> {
+    async dispatch<K extends keyof Actions>(
+      action: K,
+      payload?: Actions[K] extends Action<infer P> ? P : any,
+    ): Promise<void> {
       if (!actions[action]) {
         return;
       }
@@ -29,7 +32,7 @@ export function createStore<State, Payload extends any, Actions extends Record<s
         const current = transaction.active ? transaction.state : state.value;
         const response = await actions[action](current, payload as Payload);
 
-        console.log(transaction.active, action, payload, response)
+        console.log(transaction.active, action, payload, response);
         if (response) {
           setState({ ...response });
         }
@@ -48,7 +51,7 @@ export function createStore<State, Payload extends any, Actions extends Record<s
     async transaction(handler: () => any) {
       try {
         transaction.active = true;
-        transaction.state = state.value;
+        transaction.state = { ...state.value };
         await handler();
         transaction.active = false;
         state.value = transaction.state;
