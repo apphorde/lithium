@@ -7,23 +7,29 @@ export function createStore<State, Payload extends any, Actions extends Record<s
   initialState: State,
   actions: Actions,
 ) {
+  let dev;
   const events = new EventTarget();
   const state = valueRef(initialState);
   const transaction = { active: false, state: null as State | null };
   const getState = () => (transaction.active ? transaction.state : state.value);
   const setState = (s: State) => (transaction.active ? (transaction.state = s) : (state.value = s));
 
+  if ((window as any).__REDUX_DEVTOOLS_EXTENSION__) {
+    dev = (window as any).__REDUX_DEVTOOLS_EXTENSION__.connect();
+    dev.init(state.value);
+  }
+
   async function dispatch<K extends keyof Actions>(
     action: K,
-    payload?: Actions[K] extends Action<infer P> ? P : any,
+    ...args: ActionParameters<Actions[K]>
   ): Promise<void> {
     try {
       const current = transaction.active ? transaction.state : state.value;
-      const response = await actions[action](current, payload as Payload);
+      const response = await actions[action](current, ...args);
 
-      console.log(transaction.active, action, payload, response);
       if (response) {
         setState({ ...response });
+        dev?.send(action, state.value);
       }
     } catch (error) {
       if (!transaction.active) {
@@ -33,7 +39,7 @@ export function createStore<State, Payload extends any, Actions extends Record<s
     }
 
     if (!transaction.active) {
-      events.dispatchEvent(new CustomEvent('dispatch', { detail: { type: action, payload } }));
+      events.dispatchEvent(new CustomEvent('dispatch', { detail: { type: action, payload: args } }));
     }
   }
 
@@ -62,7 +68,7 @@ export function createStore<State, Payload extends any, Actions extends Record<s
   }
 
   const entries = Object.keys(actions);
-  const actionMap = Object.fromEntries(entries.map((key) => [key, dispatch.bind(null, key)])) as {
+  const mappedActions = Object.fromEntries(entries.map((key) => [key, dispatch.bind(null, key)])) as {
     [K in keyof Actions]: (...args: ActionParameters<Actions[K]>) => any;
   };
 
@@ -71,6 +77,6 @@ export function createStore<State, Payload extends any, Actions extends Record<s
     select,
     get,
     transaction: startTransaction,
-    store: actionMap,
+    store: mappedActions,
   };
 }
