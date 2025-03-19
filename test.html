@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTML Element Showcase</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      color: #00698f;
+    }
+    p {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Headings -->
+  <h1>Heading 1</h1>
+  <h2>Heading 2</h2>
+  <h3>Heading 3</h3>
+  <h4>Heading 4</h4>
+  <h5>Heading 5</h5>
+  <h6>Heading 6</h6>
+
+  <!-- Paragraphs -->
+  <p>This is a paragraph of text.</p>
+  <p>This is another paragraph of text.</p>
+
+  <!-- Divs and Spans -->
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <span>This is a span element.</span>
+      </div>
+      <div class="col-md-6">
+        <span>This is another span element.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lists -->
+  <h2>Unordered List</h2>
+  <ul>
+    <li>Item 1</li>
+    <li>Item 2</li>
+    <li>Item 3</li>
+  </ul>
+
+  <h2>Ordered List</h2>
+  <ol>
+    <li>Item 1</li>
+    <li>Item 2</li>
+    <li>Item 3</li>
+  </ol>
+
+  <!-- Tables -->
+  <h2>Table</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Column 1</th>
+        <th>Column 2</th>
+        <th>Column 3</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Cell 1</td>
+        <td>Cell 2</td>
+        <td>Cell 3</td>
+      </tr>
+      <tr>
+        <td>Cell 4</td>
+        <td>Cell 5</td>
+        <td>Cell 6</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Forms -->
+  <h2>Form</h2>
+  <form>
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name"><br><br>
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email"><br><br>
+    <input type="submit" value="Submit">
+  </form>
+
+  <!-- Images and Iframes -->
+  <h2>Image</h2>
+  <img src="https://placehold.co/600x400/EEE/31343C" alt="Placeholder Image">
+
+  <h2>Ifame</h2>
+  <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ=0" allowfullscreen></iframe>
+
+  <!-- Links and Anchors -->
+  <h2>Link</h2>
+  <a href="https://www.example.com">Visit Example.com</a>
+
+  <h2>Anchor</h2>
+  <a href="#anchor">Jump to Anchor</a>
+  <p>This is a paragraph that links to an anchor.</p>
+  <a name="anchor"></a>
+
+  <!-- Semantic Elements -->
+  <h2>Header</h2>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <h2>Footer</h2>
+  <footer>
+    <p>&copy; 2023 Example.com</p>
+  </footer>
+
+  <h2>Main</h2>
+  <main>
+    <section>
+      <h2>Section Heading</h2>
+      <p>This is a section of content.</p>
+    </section>
+  </main>
+
+  <!-- Elements -->
+  <h2>Canvas</h2>
+  <canvas id="canvas" width="200" height="100"></canvas>
+
+  <h2>SVG</h2>
+  <svg width="100" height="100">
+    <circle cx="50" cy="50" r="40" fill="red" />
+  </svg>
+
+  <h2>Audio</h2>
+  <audio controls>
+    <source src="https://example.com/audio.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+  </audio>
+
+  <h2>Video</h2>
+  <video controls>
+    <source src="https://example.com/video.mp4" type="video/mp4">
+    Your browser does not support the video element.
+  </video>
+
+  <!-- Elements -->
+  <h2>Role Attribute</h2>
+  <div role="button">Click me!</div>
+
+  <h2>ARIA</h2>
+  <button aria-label="Submit Button">Submit</button>
+
+  <h2>Screen Reader Text</h2>
+  <p role="">This text is for screen readers only.</p>
+
+  <!-- Other Elements -->
+  <h2>Time Element</h2>
+  <time datetime="2023-02-20T14:30:00">February 20, 2023, 2:30 PM</time>
+
+  <h2>Progress Element</h2>
+  <progress value="50" max="100"></progress>
+
+  <h2>Meter Element</h2>
+  <meter value="50" min="0" max="100"></meter>
+
+  <!-- HTML5 Elements -->
+  <h2>Article Element</h2>
+  <article>
+    <h2>Article Heading</h2>
+    <p>This is an article of content.</p>
+  </article>
+
+  <h2>Aside Element</h2>
+  <aside>
+    <p>This is an aside of content.</p>
+  </aside>
+
+  <h2>Datalist Element</h2>
+  <input list="datalist" name="datalist">
+  <datalist id="datalist">
+    <option value="Option 1">
+    <option value="Option 2">
+    <option value="Option 3">
+  </datalist>
+
+  <h2>Keygen Element</h2>
+  <form>
+    <keygen name="keygen" challenge="challenge">
+  </form>
+
+  <h2>Command Element</h2>
+  <command name="command" icon="icon" label="Label">
+  </command>
+
+  <h2>Details Element</h2>
+  <details>
+    <summary>Summary</summary>
+    <p>This is a details element.</p>
+  </details>
+
+  <h2>Summary Element</h2>
+  <summary>Summary</summary>
+
+  <h2>Menu Element</h2>
+  <menu>
+    <li><a href="#">Item 1</a></li>
+    <li><a href="#">Item 2</a></li>
+    <li><a href="#">Item 3</a></li>
+  </menu>
+
+  <h2>Menuitem Element</h2>
+  <menuitem label="Item 1" icon="icon"></menuitem>
+
+  <h2>Output Element</h2>
+  <output for="input" name="output"></output>
+
+  <h2>Progressbar Element</h2>
+  <progress value="50" max="100"></progress>
+
+  <h2>Canvas Element</h2>
+  <canvas id="canvas" width="200" height="100"></canvas>
+
+  <h2>SVG Element</h2>
+  <svg width="100" height="100">
+    <circle cx="50" cy="50" r="40" fill="red" />
+  </svg>
+
+  <h2>Audio Element</h2>
+  <audio controls>
+    <source src="https://example.com/audio.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+  </audio>
+
+  <h2>Video Element</h2>
+  <video controls>
+    <source src="https://example.com/video.mp4" type="video/mp4">
+    Your browser does not support the video element.
+  </video>
+
+  <!-- Other Elements -->
