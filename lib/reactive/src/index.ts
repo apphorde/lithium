@@ -1,5 +1,5 @@
-export * from './reactive.js';
-export * from './ref.js';
+export * from "./reactive.js";
+export * from "./ref.js";
 
 type TFunction<T> = (...args: any[]) => T;
 interface SignalInit<T> {
@@ -8,10 +8,12 @@ interface SignalInit<T> {
 }
 
 interface Signal<T> {
+  readonly __isRef: true;
   value: T;
 }
 
 interface Effect<T> {
+  readonly __isRef: true;
   readonly value: T;
   dispose(): void;
 }
@@ -39,6 +41,9 @@ function _signal<T>(init: SignalInit<T>) {
 
   if (!init.compute) {
     return {
+      get __isRef() {
+        return true;
+      },
       get value() {
         if (capture) {
           dependencies.add(effects.at(-1));
@@ -69,6 +74,9 @@ function _signal<T>(init: SignalInit<T>) {
   capture = false;
 
   return {
+    get __isRef() {
+      return true;
+    },
     get value() {
       if (capture) {
         dependencies.add(effects.at(-1));
