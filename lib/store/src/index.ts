@@ -14,8 +14,8 @@ export function createStore<State, Payload extends any, Actions extends Record<s
   const getState = () => (transaction.active ? transaction.state : state.value);
   const setState = (s: State) => (transaction.active ? (transaction.state = s) : (state.value = s));
 
-  if ((window as any).__REDUX_DEVTOOLS_EXTENSION__) {
-    dev = (window as any).__REDUX_DEVTOOLS_EXTENSION__.connect();
+  if ((globalThis as any).__REDUX_DEVTOOLS_EXTENSION__) {
+    dev = (globalThis as any).__REDUX_DEVTOOLS_EXTENSION__.connect();
     dev.init(state.value);
   }
 
