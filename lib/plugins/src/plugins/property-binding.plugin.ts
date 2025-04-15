@@ -8,6 +8,10 @@ Plugins.use({
       createPropertyBinding($el, node, dashToCamelCase(attribute.replace('bind-', '')), value);
     }
 
+    if (attribute.startsWith('prop-')) {
+      createPropertyBinding($el, node, dashToCamelCase(attribute.replace('prop-', '')), value);
+    }
+
     if (attribute.startsWith('attr-')) {
       createAttributeBinding($el, node, dashToCamelCase(attribute.replace('attr-', '')), value);
     }
