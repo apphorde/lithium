@@ -140,7 +140,7 @@ Here's a quick example:
               type="text"
               class="mt-2 p-2 border rounded bg-white w-full text-black"
               on-input="setName($event.target.value)"
-              bind-value="name"
+              prop-value="name"
             />
             <hr class="border-t my-3" />
             <p class="text-xl font-bold">Hello, {{ name || 'stranger' }}.</p>
@@ -189,7 +189,7 @@ Here's a quick example:
 
       <code-block title="Bind a property or attribute">
         <template>
-          <button attr-lang="language" bind-disabled="isDisabled"></button>
+          <button attr-lang="language" prop-disabled="isDisabled"></button>
         </template>
       </code-block>
 
@@ -339,7 +339,7 @@ Here's a quick example:
       <code-block language="javascript" title="Repeating templates: template[for..of]">
         <template>
           <template for="item of links">
-            <li><a bind-href="item.href">{{ item.label }}</a></li>
+            <li><a prop-href="item.href">{{ item.label }}</a></li>
           </template>
         </template>
       </code-block>
