@@ -1,4 +1,4 @@
-import { type Signal, valueRef } from '@li3/reactive';
+import { type Signal } from '@li3/reactive';
 import { isElement, getAttribute } from '@li3/dom';
 import { RuntimeContext } from './types.js';
 import { Plugins } from './plugin.js';
