@@ -45,6 +45,7 @@ export function computedEffect<T>($el: RuntimeContext, expression: string, effec
   const computed = wrapInTryCatch(expression, fn);
   const signal = effect(computed);
   observer(signal, effectFn);
+  effectFn(signal.value);
 
   return signal;
 }
