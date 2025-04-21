@@ -1,4 +1,4 @@
-import { reactive, computedRef, valueRef } from './index.js';
+import { reactive, computedRef, valueRef, signal, effect } from './index.js';
 import { describe, it, mock } from 'node:test';
 import assert from 'node:assert';
 
@@ -44,3 +44,28 @@ describe('computed and value ref', () => {
     assert.strictEqual(15, computed2.value, 'computed2 ref value is incorrect after dependency change');
   });
 });
+
+describe('signal', () => {
+  it('should observe change in a signal', async () => {
+    const values = [];
+    const source1 = signal(1);
+    const source2 = signal(10);
+    const computed1 = effect(() => source1.value + source2.value);
+    effect(() => values.push(computed1.value));
+    const computed2 = effect(() => source1.value + computed1.value);
+    effect(() => values.push(computed2.value));
+
+    assert.strictEqual(11, computed1.value, 'computed1 ref value is incorrect');
+    assert.strictEqual(12, computed2.value, 'computed2 ref value is incorrect');
+    assert.deepStrictEqual(values, [11, 12], 'callback was not triggered correctly');
+
+    values.length = 0;
+    source1.value = 5;
+    assert.strictEqual(15, computed1.value, 'computed1 ref value is incorrect after dependency change');
+    assert.deepStrictEqual(values, [15, 20], 'callback was not triggered correctly');
+
+    source2.value = 5;
+    assert.strictEqual(10, computed1.value, 'computed1 ref value is incorrect after dependency change');
+    assert.strictEqual(15, computed2.value, 'computed2 ref value is incorrect after dependency change');
+  });
+})
