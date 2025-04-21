@@ -67,7 +67,7 @@ export function defineEvent(name: string): any {
   return emitEvent.bind(null, el, name);
 }
 
-export function defineProps(definitions: string[] | Record<string, PropDefinition<any>>): Record<string, Ref<any>> {
+export function defineProps(definitions: string[] | Record<string, PropDefinition<any>>): Record<string, Signal<any>> {
   const $el = getCurrentContext();
   const propertyNames = !Array.isArray(definitions) ? Object.keys(definitions) : definitions;
 
@@ -82,7 +82,7 @@ export function defineProp<T>(property: string, definition?: PropDefinition<T>):
   const $el = getCurrentContext();
   const initialValue = getPropValue($el, property, definition);
   const signal = $(initialValue);
-  
+
   createInputRef<T>($el, property, signal);
   $el.props[property] = signal;
 
