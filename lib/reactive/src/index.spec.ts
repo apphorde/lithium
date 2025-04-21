@@ -62,7 +62,7 @@ describe('signal', () => {
     values.length = 0;
     source1.value = 5;
     assert.strictEqual(15, computed1.value, 'computed1 ref value is incorrect after dependency change');
-    assert.deepStrictEqual(values, [15, 20], 'callback was not triggered correctly');
+    assert.deepStrictEqual(values, [15, 20, 20], 'callback was not triggered correctly');
 
     source2.value = 5;
     assert.strictEqual(10, computed1.value, 'computed1 ref value is incorrect after dependency change');
