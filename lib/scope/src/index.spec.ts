@@ -1,8 +1,8 @@
-import { valueRef } from '@li3/reactive';
+import { signal } from '@li3/reactive';
+import { createRuntimeContext, createState, setOption } from '@li3/runtime';
 import { computedEffect } from './index.js';
 import { describe, it, mock } from 'node:test';
 import assert from 'node:assert';
-import { createRuntimeContext, createState, setOption } from '@li3/runtime';
 
 setOption('useModuleExpressions', false);
 
@@ -10,7 +10,7 @@ describe('computedEffect', () => {
   it('should observe a change in an object', async () => {
 
     const callback = mock.fn();
-    const name = valueRef('Bob');
+    const name = signal('Bob');
     const context = createRuntimeContext({
       element: {} as any,
       setup() {

@@ -1,4 +1,4 @@
-import { type Ref } from '@li3/reactive';
+import { type Signal } from '@li3/reactive';
 
 export type LifeCycleFunction = (runtime: LifeCycleObject) => void;
 export type UpdateLifeCycleFunction = (
@@ -66,7 +66,7 @@ export class RuntimeContext {
   state: any;
   initialValues: any;
   view: any;
-  props: Record<string, Ref<any>>;
+  props: Record<string, Signal<any>>;
   parent?: RuntimeContext;
 
   init: Array<LifeCycleFunction>;

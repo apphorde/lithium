@@ -1,5 +1,5 @@
 import { type RuntimeContext, type AnyFunction, getOption } from '@li3/runtime';
-import { computedRef } from '@li3/reactive';
+import { type Signal, observer, effect } from '@li3/reactive';
 
 const fnCache = new Map();
 const modCache = new Map();
@@ -40,11 +40,13 @@ export function compileExpressionEval($el: RuntimeContext, expression: string, a
   return (...args: any[]) => fn.apply($el.view, args);
 }
 
-export function computedEffect<T>($el: RuntimeContext, expression: string, effect: (v: T) => void) {
+export function computedEffect<T>($el: RuntimeContext, expression: string, effectFn: (v: T) => void): Signal<T> {
   const fn = compileExpressionEval($el, expression);
   const computed = wrapInTryCatch(expression, fn);
-  const ref = computedRef(computed, effect);
-  return ref;
+  const signal = effect(computed);
+  observer(signal, effectFn);
+
+  return signal;
 }
 
 export function createBlobModule(code: string, type = 'text/javascript') {

@@ -1,5 +1,4 @@
 export * from "./reactive.js";
-export * from "./ref.js";
 import { reactive } from './reactive.js'
 
 type TFunction<T> = (...args: any[]) => T;
@@ -109,4 +108,12 @@ export function effect<T>(compute: TFunction<T>, options?: Omit<SignalInit<T>, '
 
 export function observer<T>(signal: Signal<T>, effect: TFunction<T>) {
   signal[$watch](effect);
+}
+
+export function isRef<X = any>(t: any): t is Signal<X> {
+  return typeof t !== 'object' ? false : t && t.__isRef;
+}
+
+export function unref<T>(v: T | Signal<T>): T {
+  return isRef(v) ? v.value : v;
 }
