@@ -21,7 +21,7 @@ export interface ReactiveOptions {
  *    value.watch((value) => console.log(value));
  *    value.value = 2; // logs 2
  */
-export class Signal<T> implements Ref<T> {
+export class RefSignal<T> implements Ref<T> {
   public readonly __isRef = true as true;
   #value: T;
   #observers: Function[] = [];
@@ -87,7 +87,7 @@ export class Signal<T> implements Ref<T> {
 }
 
 export function valueRef<T>(initialValue: T | null, effect?: AnyFunction, options?: ReactiveOptions): Ref<T> {
-  const $ref = new Signal(initialValue, options);
+  const $ref = new RefSignal(initialValue, options);
 
   if (effect) {
     $ref.watch(effect);
@@ -101,7 +101,7 @@ export function computedRef<T>(getter: () => T, effect?: AnyFunction): Ref<T> {
   try {
     const fn = () => ($ref.value = getter());
     effects.push(fn);
-    const $ref = new Signal(getter());
+    const $ref = new RefSignal(getter());
     effects.pop();
 
     if (effect) {

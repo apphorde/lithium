@@ -1,4 +1,4 @@
-import { valueRef, computedRef, type Ref } from '@li3/reactive';
+import { signal, effect, type Signal } from '@li3/reactive';
 
 type Action<Args, T = any> = (state: T, ...args: Args[]) => void | Promise<void> | Promise<T> | T;
 type ActionParameters<T> = T extends (state: any, ...args: infer P) => any ? P : never;
@@ -9,7 +9,7 @@ export function createStore<State, Payload extends any, Actions extends Record<s
 ) {
   let dev;
   const events = new EventTarget();
-  const state = valueRef(initialState);
+  const state = signal(initialState);
   const transaction = { active: false, state: null as State | null };
   const getState = () => (transaction.active ? transaction.state : state.value);
   const setState = (s: State) => (transaction.active ? (transaction.state = s) : (state.value = s));
@@ -43,8 +43,8 @@ export function createStore<State, Payload extends any, Actions extends Record<s
     }
   }
 
-  function select<V>(selector: (state: State) => V): Ref<V> {
-    return computedRef(() => selector(state.value));
+  function select<V>(selector: (state: State) => V): Signal<V> {
+    return effect(() => selector(state.value));
   }
 
   function get<V>(selector: (state: State) => V): V {

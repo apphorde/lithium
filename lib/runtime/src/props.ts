@@ -1,4 +1,4 @@
-import { type Ref, valueRef } from '@li3/reactive';
+import { type Signal, valueRef } from '@li3/reactive';
 import { isElement, getAttribute } from '@li3/dom';
 import { RuntimeContext } from './types.js';
 import { Plugins } from './plugin.js';
@@ -29,24 +29,24 @@ export function getPropValue<T>($el: RuntimeContext, property: string, definitio
   }
 }
 
-export function createInputRef<T = any>($el: RuntimeContext, name: string, initialValue?: T): Ref<T> {
-  const $ref = valueRef<T>(initialValue);
+export function triggerPropUpdate<T>($el: RuntimeContext, prop: string, oldValue: T | undefined, newValue: T | undefined) {
+  Plugins.apply('update', [$el, prop, oldValue, newValue]);
+  $el.update.forEach((f) => f($el, prop, oldValue, newValue));
+}
 
+export function createInputRef<T = any>($el: RuntimeContext, name: string, signal: Signal<T>): Signal<T> {
   if (!isElement($el.element)) {
-    return $ref;
+    return;
   }
 
   Object.defineProperty($el.element, name, {
     get() {
-      return $ref.value;
+      return signal.value;
     },
     set(value) {
-      const oldValue = $ref.value;
-      $ref.value = value;
-      Plugins.apply('update', [$el, name, oldValue, value]);
-      $el.update.forEach((f) => f($el, name, oldValue, value));
+      const oldValue = signal.value;
+      signal.value = value;
+      triggerPropUpdate($el, name, oldValue, value);
     },
   });
-
-  return $ref;
 }

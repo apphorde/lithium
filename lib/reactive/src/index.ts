@@ -3,18 +3,18 @@ export * from "./ref.js";
 import { reactive } from './reactive.js'
 
 type TFunction<T> = (...args: any[]) => T;
-interface SignalInit<T> {
+export interface SignalInit<T> {
   value?: T;
   compute?: TFunction<T>;
   shallow?: boolean;
 }
 
-interface Signal<T> {
+export interface Signal<T> {
   readonly __isRef: true;
   value: T;
 }
 
-interface Effect<T> {
+export interface Effect<T> {
   readonly __isRef: true;
   readonly value: T;
   dispose(): void;

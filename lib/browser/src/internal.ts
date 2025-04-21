@@ -5,7 +5,7 @@ export function getShadowDomOptions(template: HTMLTemplateElement): ShadowRootIn
   const source = template.getAttribute('shadow-dom') || '';
 
   if (source) {
-    return source.startsWith('{') ? JSON.parse(source) : { mode: source };
+    return source.startsWith('{') ? JSON.parse(source) : { mode: source as ShadowRootMode };
   }
 }
 

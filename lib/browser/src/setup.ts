@@ -1,5 +1,5 @@
 import { defineEventOnElement, emitEvent, isElement } from '@li3/dom';
-import { type Ref, valueRef, computedRef } from '@li3/reactive';
+import { type Signal, signal as $, effect as $$, observer } from '@li3/reactive';
 import {
   AnyFunction,
   createInputRef,
@@ -78,25 +78,33 @@ export function defineProps(definitions: string[] | Record<string, PropDefinitio
   return $el.props;
 }
 
-export function defineProp<T>(property: string, definition?: PropDefinition<T>): Ref<T> {
+export function defineProp<T>(property: string, definition?: PropDefinition<T>): Signal<T> {
   const $el = getCurrentContext();
   const initialValue = getPropValue($el, property, definition);
-  const $ref = createInputRef<T>($el, property, initialValue);
-  $el.props[property] = $ref;
+  const signal = $(initialValue);
+  
+  createInputRef<T>($el, property, signal);
+  $el.props[property] = signal;
 
-  return $ref;
+  return signal;
 }
 
-export function computed<T>(fn: () => T, effect?: AnyFunction): Ref<T> {
-  return computedRef(fn, effect);
+export function computed<T>(fn: () => T, effect?: AnyFunction): Signal<T> {
+  const signal = $$(fn);
+
+  if (effect) {
+    observer(signal, effect);
+  }
+
+  return signal;
 }
 
-export function ref<T>(value?: T, options?): Ref<T> {
-  return valueRef(value, options);
+export function ref<T>(value?: T, options?): Signal<T> {
+  return $(value, options);
 }
 
-export function shallowRef<T>(value?: T): Ref<T> {
-  return ref<T>(value, { shallow: true });
+export function shallowRef<T>(value?: T): Signal<T> {
+  return $(value, { shallow: true });
 }
 
 type InjectionEvent<T> = CustomEvent & { result?: T };
