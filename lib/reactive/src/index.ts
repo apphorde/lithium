@@ -48,7 +48,7 @@ function makeSignal<T>(initialValue: T, isShallow: boolean): Signal<T> {
   } as Signal<T>;
 }
 
-export function effect<T>(fn: Function): Effect<T> {
+export function effect<T>(fn: TFunction<T>): Effect<T> {
   const dependencies = new Set<Function>();
   let v: T;
 
@@ -84,7 +84,7 @@ export function effect<T>(fn: Function): Effect<T> {
   } as Effect<T>;
 }
 
-function checkSignal(dependencies: Set<Function>) {
+function checkSignal(dependencies: Set<Function>): void {
   for (const f of dependencies) {
     if (disposed.has(f)) {
       dependencies.delete(f);
