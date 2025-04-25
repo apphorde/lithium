@@ -44,8 +44,10 @@ export function computedEffect<T>($el: RuntimeContext, expression: string, effec
   const fn = compileExpressionEval($el, expression);
   const computed = wrapInTryCatch(expression, fn);
   const signal = effect(computed);
-  observer(signal, effectFn);
-  effectFn(signal.value);
+  const applyChange = () => effectFn(signal.value)
+
+  observer(signal, applyChange);
+  applyChange();
 
   return signal;
 }
