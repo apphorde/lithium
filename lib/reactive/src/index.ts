@@ -2,9 +2,7 @@ export * from "./reactive.js";
 import { reactive } from './reactive.js'
 
 type TFunction<T> = (...args: any[]) => T;
-export interface SignalInit<T> {
-  value?: T;
-  compute?: TFunction<T>;
+export interface SignalInit {
   shallow?: boolean;
 }
 
@@ -24,52 +22,40 @@ const effects = [Function.prototype];
 const disposed = new WeakMap<Function, boolean>();
 const $watch = Symbol('');
 
-function _signal<T>(init: { value: T }): Signal<T>;
-function _signal<T>(init: { compute: TFunction<T> }): Effect<T>;
-function _signal<T>(init: SignalInit<T>) {
+function makeSignal<T>(initialValue: T, isShallow: boolean): Signal<T> {
   const dependencies = new Set<Function>();
-  const shallow = !!init.shallow;
-  let v = init.value;
+  let v: T = initialValue;
 
-  function check() {
-    for (const f of dependencies) {
-      if (disposed.has(f)) {
-        dependencies.delete(f);
-        continue;
+  return {
+    [$watch]<T>(effect: TFunction<T>) {
+      dependencies.add(effect);
+    },
+    get __isRef() {
+      return true;
+    },
+    get value() {
+      if (capture) {
+        dependencies.add(effects.at(-1));
       }
 
-      f();
-    }
-  }
+      return v;
+    },
 
-  if (!init.compute) {
-    return {
-      [$watch]<T>(effect: TFunction<T>) {
-        dependencies.add(effect);
-      },
-      get __isRef() {
-        return true;
-      },
-      get value() {
-        if (capture) {
-          dependencies.add(effects.at(-1));
-        }
+    set value(newValue) {
+      v = isShallow ? newValue : reactive(newValue as object, () => checkSignal(dependencies)) as T;
+      checkSignal(dependencies);
+    },
+  } as Signal<T>;
+}
 
-        return v;
-      },
+export function effect<T>(fn: Function): Effect<T> {
+  const dependencies = new Set<Function>();
+  let v: T;
 
-      set value(newValue) {
-        v = shallow ? newValue : reactive(newValue as object, check) as T;
-        check();
-      },
-    } as Signal<T>;
-  }
-
-  const fn = init.compute;
-  const callback = () => {
+  function callback () {
     v = fn();
-    check();
-  };
+    checkSignal(dependencies);
+  }
 
   effects.push(callback);
   capture = true;
@@ -98,12 +84,18 @@ function _signal<T>(init: SignalInit<T>) {
   } as Effect<T>;
 }
 
-export function signal<T>(value: T, options?: Omit<SignalInit<T>, 'value' | 'computed'>) {
-  return _signal<T>({ value, ...options });
+function checkSignal(dependencies: Set<Function>) {
+  for (const f of dependencies) {
+    if (disposed.has(f)) {
+      dependencies.delete(f);
+    } else {
+      f();
+    }
+  }
 }
 
-export function effect<T>(compute: TFunction<T>, options?: Omit<SignalInit<T>, 'value' | 'computed'>) {
-  return _signal<T>({ compute, ...options });
+export function signal<T>(value: T, options?: SignalInit) {
+  return makeSignal<T>(value, !!options.shallow);
 }
 
 export function observer<T>(signal: Signal<T>, effect: TFunction<T>) {
