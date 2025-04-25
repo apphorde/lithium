@@ -95,7 +95,7 @@ function checkSignal(dependencies: Set<Function>): void {
 }
 
 export function signal<T>(value: T, options?: SignalInit) {
-  return makeSignal<T>(value, !!options.shallow);
+  return makeSignal<T>(value, !!options?.shallow);
 }
 
 export function observer<T>(signal: Signal<T>, effect: TFunction<T>) {
