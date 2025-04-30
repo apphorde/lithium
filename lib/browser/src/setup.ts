@@ -138,3 +138,5 @@ export function inject<T>(token: any): T {
 
   return result;
 }
+
+export { observer as watch };

@@ -18,10 +18,12 @@ const startTag = '<';
 const endTag = '>';
 const closeScriptTag = '</script>';
 const startComment = '!--';
+const endComment = '-->';
 const docType = '!doctype';
 const forwardSlash = '/';
 const backSlash = '\\';
 const space = ' ';
+const tab = '\t';
 const newLine = '\n';
 const equals = '=';
 const doubleQuote = `"`;
@@ -295,7 +297,7 @@ export class Parser {
 
       if ((this.currentTag as ElementNode).tag !== tagToClose) {
         this.throwError(
-          new SyntaxError(`Expected closing "${(this.currentTag as ElementNode).tag}", found "${tagToClose}"`),
+          new SyntaxError(`Expected closing "${(this.currentTag as ElementNode).tag}", found "${tagToClose}" at ${this.position}`),
         );
       }
 
@@ -308,21 +310,21 @@ export class Parser {
     if (this.getCurrent() === startTag) {
       this.skip(); // <
 
-      const tagName = this.skipUntil(() => {
-        const char = this.getCurrent();
-
-        return char === forwardSlash || char === space || char === newLine || char === endTag;
-      });
-
-      if (tagName === startComment) {
-        const comment = this.skipUntil(() => this.getCurrent() === '-' && this.getNext() === '-');
+      if (startComment === this.lookAhead(3)) {
+        this.skip(3); // !--
+        const comment = this.skipUntil(() => endComment === this.lookAhead(3));
         this.currentTag.children.push({
           type: 'comment',
           text: comment.trim(),
         });
-        this.skip(3);
+        this.skip(3); // -->
         return;
       }
+
+      const tagName = this.skipUntil(() => {
+        const char = this.getCurrent();
+        return char === forwardSlash || char === space || char === tab || char === newLine || char === endTag;
+      });
 
       if (tagName.toLowerCase() === docType) {
         const docType = this.skipUntil(() => this.getCurrent() === endTag);

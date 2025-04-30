@@ -42,8 +42,8 @@ function makeSignal<T>(initialValue: T, isShallow: boolean): Signal<T> {
     },
 
     set value(newValue) {
-      v = isShallow ? newValue : reactive(newValue as object, () => checkSignal(dependencies)) as T;
-      checkSignal(dependencies);
+      v = isShallow ? newValue : reactive(newValue as object, () => checkSignal(dependencies, v)) as T;
+      checkSignal(dependencies, v);
     },
   } as Signal<T>;
 }
@@ -54,7 +54,7 @@ export function effect<T>(fn: TFunction<T>): Effect<T> {
 
   function callback () {
     v = fn();
-    checkSignal(dependencies);
+    checkSignal(dependencies, v);
   }
 
   effects.push(callback);
@@ -84,12 +84,12 @@ export function effect<T>(fn: TFunction<T>): Effect<T> {
   } as Effect<T>;
 }
 
-function checkSignal(dependencies: Set<Function>): void {
+function checkSignal<T>(dependencies: Set<Function>, v: T): void {
   for (const f of dependencies) {
     if (disposed.has(f)) {
       dependencies.delete(f);
     } else {
-      f();
+      f(v);
     }
   }
 }
