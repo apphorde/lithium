@@ -170,7 +170,7 @@ describe('html parser', () => {
   });
 
   it('should throw an error when closing the wrong tag', () => {
-    expect(() => parse(`<div></span>`)).toThrowError('Expected closing "div", found "span"');
+    expect(() => parse(`<div></span>`)).toThrowError('Expected closing "div", found "span" at 1:12');
   });
 
   it('should parse comments and text', () => {
