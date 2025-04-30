@@ -159,7 +159,7 @@ export class Parser {
   }
 
   skipSpaces() {
-    const condition = () => this.getCurrent() !== space && this.getCurrent() !== newLine;
+    const condition = () => this.getCurrent() !== space && this.getCurrent() !== tab && this.getCurrent() !== newLine;
 
     if (!condition()) {
       this.skipUntil(condition);
@@ -209,7 +209,7 @@ export class Parser {
 
     this.iterate(() => {
       const char = this.getCurrent();
-      if (char === newLine || char === space || char === equals || char === forwardSlash || char === endTag) {
+      if (char === newLine || char === space || char === tab || char === equals || char === forwardSlash || char === endTag) {
         return true;
       }
 
