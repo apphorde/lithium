@@ -46,7 +46,7 @@ export function createComponent(name: string, def: ComponentDefinition | AnyFunc
  */
 export async function createComponentFromTemplate(template: HTMLTemplateElement | string, name = '') {
   if (typeof template === 'string') {
-    template = tpl(template);
+    template = tpl(template) as HTMLTemplateElement;
   }
 
   name ||= template.getAttribute('component');

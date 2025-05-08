@@ -135,6 +135,12 @@ importers:
         specifier: latest
         version: link:../reactive
 
+  lib/use:
+    dependencies:
+      '@li3/reactive':
+        specifier: latest
+        version: link:../reactive
+
   lib/web:
     dependencies:
       '@li3/browser':
