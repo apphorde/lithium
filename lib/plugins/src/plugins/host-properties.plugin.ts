@@ -1,7 +1,7 @@
 import { isElement } from '@li3/dom';
 import { Plugins, RuntimeContext, getCurrentContext } from '@li3/runtime';
 
-export interface HostPropertiesExtension extends RuntimeContext {
+export type HostPropertiesExtension = RuntimeContext & {
   hostClasses: string[];
 }
 

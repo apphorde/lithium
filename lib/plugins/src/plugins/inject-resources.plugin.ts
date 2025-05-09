@@ -1,7 +1,7 @@
 import { createBlobModule } from '@li3/scope';
 import { Plugins, RuntimeContext, getCurrentContext } from '@li3/runtime';
 
-export interface InjectResourcesExtension extends RuntimeContext {
+export type InjectResourcesExtension = RuntimeContext & {
   stylesheets: string[];
   scripts: string[];
 }
