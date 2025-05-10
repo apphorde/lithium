@@ -1,6 +1,6 @@
 import { tpl } from '@li3/dom';
 import { activateContext, AnyFunction, ComponentDefinition, createRuntimeContext, RuntimeContext } from '@li3/runtime';
-import { getComponentFromTemplate, loadTemplate } from './internal.js';
+import { getComponentFromTemplate, loadTemplates } from './internal.js';
 
 const DefineComponent = Symbol('@@def');
 
@@ -63,8 +63,10 @@ export async function createComponentFromTemplate(template: HTMLTemplateElement 
  * Loads a component from a URL and registers it as a custom element
  */
 export async function loadAndParse(url: string | URL): Promise<void> {
-  const t = await loadTemplate(url);
-  return createComponentFromTemplate(t);
+  const components = await loadTemplates(url);
+  for (const tpl of components) {
+    await createComponentFromTemplate(tpl);
+  }
 }
 
 const mounted = Symbol();

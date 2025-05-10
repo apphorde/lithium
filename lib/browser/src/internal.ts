@@ -27,21 +27,20 @@ export async function getComponentFromTemplate(template: HTMLTemplateElement): P
 }
 
 /**
- * Loads a component template from a URL. The source must be a valid HTML template element,
+ * Loads a component template (or components) from a URL. The source must be a valid HTML template element,
  * with a <script setup> block if the component requires a setup function.
- * <style> tags are also supported as usual.
+ * <style> tags are also supported, as usual.
  *
  * @param url
  * @returns
  */
-export async function loadTemplate(url: string | URL) {
+export async function loadTemplates(url: string | URL): Promise<HTMLTemplateElement[]> {
   const req = await fetch(url);
 
   if (req.ok) {
     const html = await req.text();
     const dom = new DOMParser().parseFromString(html, 'text/html');
-    const template = dom.querySelector('template');
-    return template;
+    return Array.from(dom.querySelectorAll('template'));
   }
 
   throw new Error('Unable to load ' + url + ': ' + req.statusText);
