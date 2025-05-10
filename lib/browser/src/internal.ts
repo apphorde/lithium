@@ -40,7 +40,7 @@ export async function loadTemplates(url: string | URL): Promise<HTMLTemplateElem
   if (req.ok) {
     const html = await req.text();
     const dom = new DOMParser().parseFromString(html, 'text/html');
-    return Array.from(dom.querySelectorAll('template'));
+    return Array.from(dom.querySelectorAll('template[component]'));
   }
 
   throw new Error('Unable to load ' + url + ': ' + req.statusText);
