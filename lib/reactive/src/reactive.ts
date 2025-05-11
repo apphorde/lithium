@@ -1,15 +1,18 @@
-const reactiveTag = Symbol('reactive');
+const reactiveTag = Symbol("reactive");
 
 export function canBeReactive(object: any): boolean {
-  return object !== null && object !== undefined && typeof object === 'object' && !object[reactiveTag];
+  return (
+    object !== null &&
+    object !== undefined &&
+    typeof object === "object" &&
+    !object[reactiveTag]
+  );
 }
 
-export function markAsReactive(context: any): void {
-  Object.defineProperty(context, reactiveTag, {
-    value: true,
-    enumerable: false,
-    configurable: false,
-  });
+const deref = Symbol();
+
+export function unrefReactive(p: any) {
+  return p && p[deref];
 }
 
 export function reactive<T extends object>(object: T, effect: VoidFunction): T {
@@ -17,22 +20,32 @@ export function reactive<T extends object>(object: T, effect: VoidFunction): T {
     return object;
   }
 
-  markAsReactive(object);
-
   const values = Object.entries(object);
   for (const [key, next] of values) {
-    if (typeof next === 'object' && next !== null) {
+    if (typeof next === "object" && next !== null) {
       (object as any)[key] = reactive(next, effect);
     }
   }
 
   return new Proxy(object, {
+    get(target, p) {
+      if (p === reactiveTag) {
+        return true;
+      }
+
+      if (p === deref) {
+        return object;
+      }
+
+      return target[p];
+    },
+
     set(target, p, value) {
       if ((target as any)[p] === value) {
         return false;
       }
 
-      if (typeof value === 'object' && value !== null) {
+      if (typeof value === "object" && value !== null) {
         value = reactive(value, effect);
       }
 

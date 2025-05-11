@@ -1,5 +1,5 @@
 export * from "./reactive.js";
-import { reactive } from './reactive.js'
+import { reactive, unrefReactive } from "./reactive.js";
 
 type TFunction<T> = (...args: any[]) => T;
 export interface SignalInit {
@@ -20,7 +20,7 @@ export interface Effect<T> {
 let capture = false;
 const effects = [Function.prototype];
 const disposed = new WeakMap<Function, boolean>();
-const $watch = Symbol('');
+const $watch = Symbol("");
 
 function makeSignal<T>(initialValue: T, isShallow: boolean): Signal<T> {
   const dependencies = new Set<Function>();
@@ -42,7 +42,20 @@ function makeSignal<T>(initialValue: T, isShallow: boolean): Signal<T> {
     },
 
     set value(newValue) {
-      v = isShallow ? newValue : reactive(newValue as object, () => checkSignal(dependencies, v)) as T;
+      const identical =
+        (isShallow && v === newValue) ||
+        unrefReactive(v) === unrefReactive(newValue);
+
+      if (identical) {
+        return;
+      }
+
+      v = isShallow
+        ? (v = newValue)
+        : (reactive(newValue as object, () =>
+            checkSignal(dependencies, v)
+          ) as T);
+
       checkSignal(dependencies, v);
     },
   } as Signal<T>;
@@ -52,7 +65,7 @@ export function effect<T>(fn: TFunction<T>): Effect<T> {
   const dependencies = new Set<Function>();
   let v: T;
 
-  function callback () {
+  function callback() {
     v = fn();
     checkSignal(dependencies, v);
   }
@@ -103,7 +116,7 @@ export function observer<T>(signal: Signal<T>, effect: TFunction<T>) {
 }
 
 export function isRef<X = any>(t: any): t is Signal<X> {
-  return typeof t !== 'object' ? false : t && t.__isRef;
+  return typeof t !== "object" ? false : t && t.__isRef;
 }
 
 export function unref<T>(v: T | Signal<T>): T {
