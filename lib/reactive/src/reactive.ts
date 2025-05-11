@@ -12,7 +12,7 @@ export function canBeReactive(object: any): boolean {
 const deref = Symbol();
 
 export function unrefReactive(p: any) {
-  return p && p[deref];
+  return typeof p === 'object' && p ? p[deref] : p;
 }
 
 export function reactive<T extends object>(object: T, effect: VoidFunction): T {
