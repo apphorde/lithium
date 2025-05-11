@@ -1,5 +1,5 @@
-import { markAsReactive, isRef } from '@li3/reactive';
-import { getOption, Plugins, RuntimeContext } from '@li3/runtime';
+import { signal } from '@li3/reactive';
+import { getCurrentContext, getOption, Plugins, RuntimeContext } from '@li3/runtime';
 
 Plugins.use({
   attribute($el: RuntimeContext, node: Element, attribute: string, refName: string) {
@@ -10,8 +10,7 @@ Plugins.use({
 });
 
 export function setElementRefValue($el: RuntimeContext, node: Element, refName: string) {
-  if (isRef($el.state[refName])) {
-    markAsReactive(node);
+  if ($el.state[refName]) {
     $el.state[refName].value = node;
     return;
   }
@@ -19,4 +18,8 @@ export function setElementRefValue($el: RuntimeContext, node: Element, refName: 
   if (getOption('debugEnabled')) {
     console.warn('Ref not found in state: ' + refName, $el.state);
   }
+}
+
+export function templateRef(name: string) {
+  getCurrentContext().state[name] = signal(null, { shallow: true });
 }

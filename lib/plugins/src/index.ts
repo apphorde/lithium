@@ -6,7 +6,7 @@ export { createAttributeBinding, createPropertyBinding } from './plugins/propert
 export { createEventBinding } from './plugins/event-handler.plugin.js';
 export { addScriptToPage, adoptStyleSheet, injectStylesheetOnElement, loadCss, loadScript } from './plugins/inject-resources.plugin.js';
 export { createClassBinding } from './plugins/set-class.plugin.js';
-export { setElementRefValue } from './plugins/set-element-ref.plugin.js';
+export { setElementRefValue, templateRef } from './plugins/set-element-ref.plugin.js';
 export { createStyleBinding } from './plugins/set-style.plugin.js';
 export { applyHostAttributes, hostClasses } from './plugins/host-properties.plugin.js';
 export { templateForOf } from './plugins/template-for.plugin.js';
