@@ -152,6 +152,9 @@ importers:
       '@li3/reactive':
         specifier: latest
         version: link:../reactive
+      '@li3/store':
+        specifier: latest
+        version: link:../store
 
 packages:
 

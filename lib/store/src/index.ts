@@ -1,4 +1,4 @@
-import { signal, effect, type Signal } from '@li3/reactive';
+import { signal, effect, type Effect } from '@li3/reactive';
 
 type Action<Args, T = any> = (state: T, ...args: Args[]) => void | Promise<void> | Promise<T> | T;
 type ActionParameters<T> = T extends (state: any, ...args: infer P) => any ? P : never;
@@ -41,7 +41,7 @@ export function createStore<State, Payload extends any, Actions extends Record<s
     }
   }
 
-  function select<V>(selector: (state: State) => V): Signal<V> {
+  function select<V>(selector: (state: State) => V): Effect<V> {
     return effect(() => selector(state.value));
   }
 
