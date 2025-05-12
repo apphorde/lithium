@@ -1,4 +1,5 @@
 import { signal, effect, type Effect } from '@li3/reactive';
+import { getCurrentContext } from '@li3/runtime';
 
 type Action<Args, T = any> = (state: T, ...args: Args[]) => void | Promise<void> | Promise<T> | T;
 type ActionParameters<T> = T extends (state: any, ...args: infer P) => any ? P : never;
@@ -8,6 +9,7 @@ export function createStore<State, Payload extends any, Actions extends Record<s
   actions: Actions,
 ) {
   let dev;
+  const effects: Effect<any>[] = [];
   const events = new EventTarget();
   const state = signal(initialState);
   const transaction = { active: false, state: null as State | null };
@@ -28,7 +30,6 @@ export function createStore<State, Payload extends any, Actions extends Record<s
         setState({ ...response });
         dev?.send(action, state.value);
       }
-
     } catch (error) {
       if (!transaction.active) {
         events.dispatchEvent(new CustomEvent('error', { detail: String(error) }));
@@ -70,11 +71,34 @@ export function createStore<State, Payload extends any, Actions extends Record<s
     [K in keyof Actions]: (...args: ActionParameters<Actions[K]>) => any;
   };
 
+  function useStore() {
+    const ctx = getCurrentContext();
+
+    if (ctx) {
+      ctx.destroy.push(() => {
+        for (const f of effects) {
+          f.dispose();
+        }
+
+        effects.length = 0;
+      });
+    }
+
+    return {
+      events,
+      select,
+      get,
+      transaction: startTransaction,
+      store: mappedActions,
+    };
+  }
+
   return {
     events,
     select,
     get,
     transaction: startTransaction,
     store: mappedActions,
+    useStore,
   };
 }

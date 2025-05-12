@@ -99,6 +99,9 @@ importers:
       '@li3/scope':
         specifier: latest
         version: link:../scope
+      '@li3/store':
+        specifier: latest
+        version: link:../store
 
   lib/reactive: {}
 
@@ -152,9 +155,6 @@ importers:
       '@li3/reactive':
         specifier: latest
         version: link:../reactive
-      '@li3/store':
-        specifier: latest
-        version: link:../store
 
 packages:
 

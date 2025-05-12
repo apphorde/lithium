@@ -1,6 +1,6 @@
 {
   "name": "@li3/store",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "exports": {
     ".": {
       "default": "./index.js",
@@ -8,6 +8,7 @@
     }
   },
   "dependencies": {
-    "@li3/reactive": "latest"
+    "@li3/reactive": "latest",
+    "@li3/runtime": "latest"
   }
 }

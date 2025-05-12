@@ -1,6 +1,6 @@
 {
   "name": "@li3/web",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "exports": {
     ".": {
       "default": "./index.js",
@@ -10,7 +10,6 @@
   "dependencies": {
     "@li3/reactive": "latest",
     "@li3/plugins": "latest",
-    "@li3/store": "latest",
     "@li3/browser": "latest"
   }
 }
