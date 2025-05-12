@@ -4,3 +4,4 @@ node_modules/
 lib/**/index.d.ts
 lib/**/index.js
 site/docs
+.rollup.cache/
