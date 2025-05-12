@@ -9,7 +9,6 @@ export function createStore<State, Payload extends any, Actions extends Record<s
   actions: Actions,
 ) {
   let dev;
-  const effects: Effect<any>[] = [];
   const events = new EventTarget();
   const state = signal(initialState);
   const transaction = { active: false, state: null as State | null };
@@ -73,6 +72,7 @@ export function createStore<State, Payload extends any, Actions extends Record<s
 
   function useStore() {
     const ctx = getCurrentContext();
+    const effects: Effect<any>[] = [];
 
     if (ctx) {
       ctx.destroy.push(() => {
@@ -82,6 +82,12 @@ export function createStore<State, Payload extends any, Actions extends Record<s
 
         effects.length = 0;
       });
+    }
+
+    function select<V>(selector: (state: State) => V): Effect<V> {
+      const $ = effect(() => selector(state.value));
+      effects.push($);
+      return $;
     }
 
     return {
