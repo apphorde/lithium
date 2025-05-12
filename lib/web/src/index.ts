@@ -19,7 +19,7 @@ export function createStore(...args: Parameters<typeof storeFactory>) {
   return {
     ...store,
     select: (selector: any) => {
-      const effect = selecxt(selector);
+      const effect = select(selector);
       effects.push(effect);
       return effect;
     },
