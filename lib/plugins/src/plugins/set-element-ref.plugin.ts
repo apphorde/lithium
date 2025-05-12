@@ -21,5 +21,5 @@ export function setElementRefValue($el: RuntimeContext, node: Element, refName: 
 }
 
 export function templateRef(name: string) {
-  getCurrentContext().state[name] = signal(null, { shallow: true });
+  return getCurrentContext().state[name] = signal(null, { shallow: true });
 }

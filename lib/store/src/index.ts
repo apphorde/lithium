@@ -22,7 +22,7 @@ export function createStore<State, Payload extends any, Actions extends Record<s
 
   async function dispatch<K extends keyof Actions>(action: K, ...args: ActionParameters<Actions[K]>): Promise<void> {
     try {
-      const current = transaction.active ? transaction.state : state.value;
+      const current = getState();
       const response = await actions[action](current, ...args);
 
       if (response) {
