@@ -1,17 +1,3 @@
 {
-  "files": []
-  // "references": [
-  //   { "path": "lib/browser" },
-  //   { "path": "lib/cli" },
-  //   { "path": "lib/dom" },
-  //   { "path": "lib/html-parser" },
-  //   { "path": "lib/plugins" },
-  //   { "path": "lib/reactive" },
-  //   { "path": "lib/runtime" },
-  //   { "path": "lib/scope" },
-  //   { "path": "lib/sfc" },
-  //   { "path": "lib/store" },
-  //   { "path": "lib/use" },
-  //   { "path": "lib/web" }
-  // ]
+  "compilerOptions": {}
 }
