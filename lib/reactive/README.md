@@ -17,16 +17,21 @@ const reactiveObject = reactive(object, callback);
 reactiveObject.name = 'Alice';
 reactiveObject.address = { street: '1 Main St', number: 123 };
 reactiveObject.address.number = 456;
+
+// get back the original object
+const originalObject = unwrap(reactiveObject);
 ```
 
 Observe value holders (Refs):
 
 ```js
-import { valueRef, computedRef } from '@li3/reactive';
+import { signal, effect, observer } from '@li3/reactive';
 
-const value1 = valueRef(1);
-const value2 = valueRef(2);
-const computed = computedRef(() => value1.value + value2.value, console.log);
+const value1 = signal(1);
+const value2 = signal(2);
+const computed = effect(() => value1.value + value2.value);
+
+observer(computed, console.log);
 
 // outputs "3" to console
 

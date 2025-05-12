@@ -1,12 +1,8 @@
-const reactiveTag = Symbol("reactive");
+const reactiveTag = Symbol('reactive');
+const unwrapTag = Symbol('unwrap');
 
 export function canBeObserved(object: any): boolean {
-  return (
-    object !== null &&
-    object !== undefined &&
-    typeof object === "object" &&
-    !object[reactiveTag]
-  );
+  return object !== null && object !== undefined && typeof object === 'object' && !object[reactiveTag];
 }
 
 export function reactive<T extends object>(object: T, effect: VoidFunction): T {
@@ -16,7 +12,7 @@ export function reactive<T extends object>(object: T, effect: VoidFunction): T {
 
   const values = Object.entries(object);
   for (const [key, next] of values) {
-    if (typeof next === "object" && next !== null) {
+    if (typeof next === 'object' && next !== null) {
       (object as any)[key] = reactive(next, effect);
     }
   }
@@ -27,6 +23,10 @@ export function reactive<T extends object>(object: T, effect: VoidFunction): T {
         return true;
       }
 
+      if (p === unwrapTag) {
+        return object;
+      }
+
       return target[p];
     },
 
@@ -35,7 +35,7 @@ export function reactive<T extends object>(object: T, effect: VoidFunction): T {
         return false;
       }
 
-      if (typeof value === "object" && value !== null) {
+      if (typeof value === 'object' && value !== null) {
         value = reactive(value, effect);
       }
 
@@ -49,4 +49,24 @@ export function reactive<T extends object>(object: T, effect: VoidFunction): T {
       return true;
     },
   });
+}
+
+/**
+ * Unwraps a reactive object to its original form.
+ * This is useful when you want to access the original object
+ * without the reactive proxy.
+ *
+ * @param {object} object The proxy object to unwrap
+ * @returns {object} the original object
+ */
+export function unwrap<T extends object>(object: T): T {
+  if (object === null || object === undefined) {
+    return object;
+  }
+
+  if (object[unwrapTag]) {
+    return object[unwrapTag];
+  }
+
+  return object;
 }
