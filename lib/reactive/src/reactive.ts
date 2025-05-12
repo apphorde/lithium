@@ -1,6 +1,6 @@
 const reactiveTag = Symbol("reactive");
 
-export function canBeReactive(object: any): boolean {
+export function canBeObserved(object: any): boolean {
   return (
     object !== null &&
     object !== undefined &&
@@ -9,14 +9,8 @@ export function canBeReactive(object: any): boolean {
   );
 }
 
-const deref = Symbol();
-
-export function unrefReactive(p: any) {
-  return typeof p === 'object' && p ? p[deref] : p;
-}
-
 export function reactive<T extends object>(object: T, effect: VoidFunction): T {
-  if (!canBeReactive(object)) {
+  if (!canBeObserved(object)) {
     return object;
   }
 
@@ -31,10 +25,6 @@ export function reactive<T extends object>(object: T, effect: VoidFunction): T {
     get(target, p) {
       if (p === reactiveTag) {
         return true;
-      }
-
-      if (p === deref) {
-        return object;
       }
 
       return target[p];

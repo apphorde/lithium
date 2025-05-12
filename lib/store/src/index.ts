@@ -19,10 +19,7 @@ export function createStore<State, Payload extends any, Actions extends Record<s
     dev.init(state.value);
   }
 
-  async function dispatch<K extends keyof Actions>(
-    action: K,
-    ...args: ActionParameters<Actions[K]>
-  ): Promise<void> {
+  async function dispatch<K extends keyof Actions>(action: K, ...args: ActionParameters<Actions[K]>): Promise<void> {
     try {
       const current = transaction.active ? transaction.state : state.value;
       const response = await actions[action](current, ...args);
@@ -31,6 +28,7 @@ export function createStore<State, Payload extends any, Actions extends Record<s
         setState({ ...response });
         dev?.send(action, state.value);
       }
+
     } catch (error) {
       if (!transaction.active) {
         events.dispatchEvent(new CustomEvent('error', { detail: String(error) }));
@@ -67,8 +65,8 @@ export function createStore<State, Payload extends any, Actions extends Record<s
     }
   }
 
-  const entries = Object.keys(actions);
-  const mappedActions = Object.fromEntries(entries.map((key) => [key, dispatch.bind(null, key)])) as {
+  const actionNames = Object.keys(actions);
+  const mappedActions = Object.fromEntries(actionNames.map((key) => [key, dispatch.bind(null, key)])) as {
     [K in keyof Actions]: (...args: ActionParameters<Actions[K]>) => any;
   };
 

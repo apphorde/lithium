@@ -7,7 +7,6 @@
     "moduleResolution": "Bundler",
     "sourceMap": false,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "composite": true
+    "noUnusedParameters": true
   }
 }

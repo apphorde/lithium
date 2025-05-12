@@ -1,5 +1,5 @@
 export * from './reactive.js';
-import { reactive, unrefReactive } from './reactive.js';
+import { reactive } from './reactive.js';
 
 type TFunction<T> = (...args: any[]) => T;
 export interface SignalInit {
@@ -26,6 +26,10 @@ function makeSignal<T>(initialValue: T, isShallow: boolean): Signal<T> {
   const dependencies = new Set<Function>();
   let v: T = initialValue;
 
+  if (!isShallow && typeof v === 'object' && v !== null) {
+    v = reactive(v as object, () => checkSignal(dependencies, v)) as T;
+  }
+
   return {
     [$watch]<T>(effect: TFunction<T>) {
       dependencies.add(effect);
@@ -35,22 +39,21 @@ function makeSignal<T>(initialValue: T, isShallow: boolean): Signal<T> {
     },
     get value() {
       if (capture) {
-        dependencies.add(effects.at(-1));
+        dependencies.add(effects.at(-1) as Function);
       }
 
       return v;
     },
 
     set value(newValue) {
-      const identical = isShallow ? v === newValue : unrefReactive(v) === unrefReactive(newValue);
-
-      if (identical) {
-        return;
+      if (!isShallow && typeof newValue === 'object' && newValue !== null) {
+        newValue = reactive(newValue as object, () => checkSignal(dependencies, v)) as T;
       }
 
-      v = isShallow ? (v = newValue) : (reactive(newValue as object, () => checkSignal(dependencies, v)) as T);
-
-      checkSignal(dependencies, v);
+      if (v !== newValue) {
+        v = newValue;
+        checkSignal(dependencies, v);
+      }
     },
   } as Signal<T>;
 }

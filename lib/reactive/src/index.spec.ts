@@ -44,4 +44,35 @@ describe('signal', () => {
     assert.strictEqual(10, computed1.value, 'computed1 ref value is incorrect after dependency change');
     assert.strictEqual(15, computed2.value, 'computed2 ref value is incorrect after dependency change');
   });
-})
+
+  it('should observe change in a signal with reactive objects', async () => {
+    const values = [];
+    const source1 = signal({ user: { name: 'alice' } });
+    const source2 = signal({ user: { name: 'bob' } }, { shallow: true });
+
+    effect(() => values.push(source1.value.user.name));
+    effect(() => values.push(source2.value.user.name));
+
+    effect(() => console.log(source1.value));
+    effect(() => console.log(source2.value));
+
+    // values represent the signal projections the first time the effect is called
+    assert.deepStrictEqual(values, ['alice', 'bob'], 'callback was not triggered correctly');
+
+    // values includes a deep-watched object change
+    source1.value.user.name = 'mary';
+    assert.deepStrictEqual(values, ['alice', 'bob', 'mary'], 'reactive object was not triggered correctly');
+
+    // values includes an object swap
+    source1.value = { user: { name: 'billy' } };
+    assert.deepStrictEqual(
+      values,
+      ['alice', 'bob', 'mary', 'billy'],
+      'reactive object swap was not triggered correctly',
+    );
+
+    // values do not include a shallow-watched object change
+    source2.value.user.name = 'john';
+    assert.deepStrictEqual(values, ['alice', 'bob', 'mary', 'billy'], 'shallow object should not trigger');
+  });
+});

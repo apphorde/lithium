@@ -11,7 +11,7 @@ describe('store', () => {
         decrement: (state, payload: number) => ({ count: state.count - payload }),
         async incrementAsync(_state, payload: number) {
           await new Promise((resolve) => setTimeout(resolve, 100));
-          await store.increment(payload);
+          return await store.increment(payload);
         },
       },
     );
@@ -21,16 +21,16 @@ describe('store', () => {
     events.addEventListener('dispatch', callback);
 
     await store.increment(1);
-    assert.strictEqual(1, get(count), 'increment is incorrect');
+    assert.strictEqual(get(count), 1, 'increment is incorrect');
 
     await store.decrement(1);
-    assert.strictEqual(0, get(count), 'decrement is incorrect');
+    assert.strictEqual(get(count), 0, 'decrement is incorrect');
 
     await store.incrementAsync(5);
-    assert.strictEqual(5, get(count), 'final state is incorrect');
+    assert.strictEqual(get(count), 5, 'final state is incorrect');
 
     // 4 calls: 3 dispatches + 1 dispatch inside incrementAsync
-    assert.strictEqual(4, callback.mock.callCount(), 'callback was not triggered correctly');
+    assert.strictEqual(callback.mock.callCount(), 4, 'callback was not triggered correctly');
   });
 
   it('should not dispatch events until a state transition is commited', async () => {
