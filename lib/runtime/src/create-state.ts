@@ -10,7 +10,7 @@ export class ComponentInstance {
 
 export function createState($el: RuntimeContext): void {
   const baseState = new ComponentInstance();
-  const componentState = Object.assign(baseState, $el.parent?.state || {}, $el.setup($el) || {});
+  const componentState = Object.assign(baseState, $el.parent?.state || {}, $el.setup($el) || {}, $el.state || {});
   Object.assign(componentState, $el.props);
 
   Plugins.apply('setup', [$el, componentState]);
