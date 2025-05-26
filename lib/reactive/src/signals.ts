@@ -110,6 +110,12 @@ function checkSignal<T>(dependencies: Set<Function>, v: T): void {
   }
 }
 
+export function hook<T>(initialValue?: T): [Signal<T>, (value: T) => void] {
+  const s = signal<T>(initialValue);
+  const set = (v: T) => s.value = v;
+  return [s, set];
+}
+
 export function observer<T>(signal: Signal<T>, effect: TFunction<T>) {
   signal.watch(effect);
 }
