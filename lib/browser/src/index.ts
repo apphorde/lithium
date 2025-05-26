@@ -1,11 +1,11 @@
-import { setOption } from '@li3/runtime';
-import * as API from './setup.js';
-import * as Component from './custom-elements.js';
-import { getComponentFromTemplate } from './internal.js';
-import { domReady } from '@li3/dom';
+import { setOption } from "@li3/runtime";
+import * as API from "./setup.js";
+import * as Component from "./custom-elements.js";
+import { getComponentFromTemplate } from "./internal.js";
+import { domReady } from "@li3/dom";
 
-export * from './setup.js';
-export { mount, createComponent } from './custom-elements.js';
+export * from "./setup.js";
+export { mount, createComponent } from "./custom-elements.js";
 export { Component };
 
 Object.assign(globalThis.Lithium, {
@@ -13,13 +13,13 @@ Object.assign(globalThis.Lithium, {
   Component: { ...Component },
 });
 
-if (window.name === 'debug') {
-  setOption('debugEnabled', true);
+if (window.name === "debug") {
+  setOption("debugEnabled", true);
 }
 
 domReady(function () {
-  const inline: HTMLTemplateElement[] = Array.from(document.querySelectorAll('template[component]'));
-  const apps: HTMLTemplateElement[] = Array.from(document.querySelectorAll('template[app]'));
+  const inline: HTMLTemplateElement[] = Array.from(document.querySelectorAll("template[component]"));
+  const apps: HTMLTemplateElement[] = Array.from(document.querySelectorAll("template[app]"));
 
   for (const template of inline) {
     Component.createComponentFromTemplate(template);

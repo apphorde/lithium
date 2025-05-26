@@ -17,7 +17,7 @@ First declare a store in a module
 
 ```js
 // count-store.js
-import { createStore } from '@li3/store';
+import { createStore } from "@li3/store";
 
 export default createStore(
   { count: 0 },
@@ -27,20 +27,20 @@ export default createStore(
     },
     remove(state, amount) {
       state.count -= amount;
-    }
-  }
+    },
+  },
 );
 ```
 
 Then import the store and dispatch actions:
 
 ```js
-import countStore from './count-store.js';
+import countStore from "./count-store.js";
 
 // it's safe to import the same store many times
 const { select, store } = countStore;
 
-store.add(10)
+store.add(10);
 store.remove(5);
 
 // counter is a computed value

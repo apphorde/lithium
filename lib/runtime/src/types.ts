@@ -1,4 +1,4 @@
-import { type Signal } from '@li3/reactive';
+import { type Signal } from "@li3/reactive";
 
 export type LifeCycleFunction = (runtime: LifeCycleObject) => void;
 export type UpdateLifeCycleFunction = (
@@ -34,21 +34,18 @@ export class RuntimeContext {
       Object.assign(this, f());
     }
 
-    Object.assign(
-      this,
-      {
-        state: {},
-        stateKeys: [],
-        parent: null,
-        props: {},
-        initialValues: {},
+    Object.assign(this, {
+      state: {},
+      stateKeys: [],
+      parent: null,
+      props: {},
+      initialValues: {},
 
-        init: [],
-        update: [],
-        destroy: [],
-        view: {},
-      },
-    );
+      init: [],
+      update: [],
+      destroy: [],
+      view: {},
+    });
 
     // prevent empty values from breaking expected behavior of runtime properties,
     // e.g. a context value returning null instead of object/array

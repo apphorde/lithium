@@ -1,7 +1,7 @@
-import { type Signal } from '@li3/reactive';
-import { isElement, getAttribute } from '@li3/dom';
-import { RuntimeContext } from './types.js';
-import { Plugins } from './plugin.js';
+import { type Signal } from "@li3/reactive";
+import { isElement, getAttribute } from "@li3/dom";
+import { RuntimeContext } from "./types.js";
+import { Plugins } from "./plugin.js";
 
 export type PropDefinition<T> = { type: Function; default: T | (() => T) };
 
@@ -20,8 +20,8 @@ export function getPropValue<T>($el: RuntimeContext, property: string, definitio
     return fromDom as T;
   }
 
-  if (definition && definition.hasOwnProperty('default')) {
-    if (typeof definition.default === 'function') {
+  if (definition && definition.hasOwnProperty("default")) {
+    if (typeof definition.default === "function") {
       return (definition.default as any)();
     }
 
@@ -29,8 +29,13 @@ export function getPropValue<T>($el: RuntimeContext, property: string, definitio
   }
 }
 
-export function triggerPropUpdate<T>($el: RuntimeContext, prop: string, oldValue: T | undefined, newValue: T | undefined) {
-  Plugins.apply('update', [$el, prop, oldValue, newValue]);
+export function triggerPropUpdate<T>(
+  $el: RuntimeContext,
+  prop: string,
+  oldValue: T | undefined,
+  newValue: T | undefined,
+) {
+  Plugins.apply("update", [$el, prop, oldValue, newValue]);
   $el.update.forEach((f) => f($el, prop, oldValue, newValue));
 }
 

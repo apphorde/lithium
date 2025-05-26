@@ -1,6 +1,6 @@
-import { unref } from '@li3/reactive';
-import type { RuntimeContext } from './types';
-import { Plugins } from './plugin.js';
+import { unref } from "@li3/reactive";
+import type { RuntimeContext } from "./types";
+import { Plugins } from "./plugin.js";
 
 export class ComponentInstance {
   static extend(properties) {
@@ -13,7 +13,7 @@ export function createState($el: RuntimeContext): void {
   const componentState = Object.assign(baseState, $el.parent?.state || {}, $el.setup($el) || {}, $el.state || {});
   Object.assign(componentState, $el.props);
 
-  Plugins.apply('setup', [$el, componentState]);
+  Plugins.apply("setup", [$el, componentState]);
   $el.state = componentState;
   $el.stateKeys = Object.keys($el.state);
 
@@ -28,7 +28,7 @@ function defineViewGetters($el: RuntimeContext) {
         return unref($el.state[key]);
       },
       set() {
-        throw new Error('State property is read-only');
+        throw new Error("State property is read-only");
       },
     });
   }

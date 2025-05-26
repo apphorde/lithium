@@ -10,22 +10,22 @@ import type {
   PackedCommentNode,
   PackedAttributes,
   ParserNode,
-} from './types';
+} from "./types";
 
-import { PackedTextNode } from './types';
+import { PackedTextNode } from "./types";
 
-const startTag = '<';
-const endTag = '>';
-const closeScriptTag = '</script>';
-const startComment = '!--';
-const endComment = '-->';
-const docType = '!doctype';
-const forwardSlash = '/';
-const backSlash = '\\';
-const space = ' ';
-const tab = '\t';
-const newLine = '\n';
-const equals = '=';
+const startTag = "<";
+const endTag = ">";
+const closeScriptTag = "</script>";
+const startComment = "!--";
+const endComment = "-->";
+const docType = "!doctype";
+const forwardSlash = "/";
+const backSlash = "\\";
+const space = " ";
+const tab = "\t";
+const newLine = "\n";
+const equals = "=";
 const doubleQuote = `"`;
 const implicitClose = /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/;
 
@@ -38,7 +38,7 @@ export class Parser {
   line = 1;
   column = 1;
   max = 0;
-  root: DocumentNode = { type: 'document', docType: 'html', children: [] };
+  root: DocumentNode = { type: "document", docType: "html", children: [] };
   currentTag: ElementNode | DocumentNode = this.root;
   stack: ElementNode[] = [this.currentTag as ElementNode];
 
@@ -50,7 +50,7 @@ export class Parser {
     this.iterate(() => {
       this.parseNext();
 
-      if (this.getCurrent() === '') {
+      if (this.getCurrent() === "") {
         return true;
       }
     });
@@ -83,10 +83,10 @@ export class Parser {
   throwError<T extends Error>(error: T) {
     const location = this.position;
     const { line, column } = this;
-    const source = this.html.split('\n')[line - 1];
+    const source = this.html.split("\n")[line - 1];
 
     Object.assign(error, {
-      origin: source + '\n' + ' '.repeat(column - 2) + '^',
+      origin: source + "\n" + " ".repeat(column - 2) + "^",
       location: location,
     });
 
@@ -167,7 +167,7 @@ export class Parser {
   }
 
   parseTextNode() {
-    const isScript = 'tag' in this.currentTag && this.currentTag.tag === 'script';
+    const isScript = "tag" in this.currentTag && this.currentTag.tag === "script";
     const condition = !isScript
       ? () => this.getCurrent() === startTag
       : () => this.getCurrent() === startTag && this.lookAhead(closeScriptTag.length) === closeScriptTag;
@@ -179,7 +179,7 @@ export class Parser {
     const text = this.skipUntil(condition);
     if (text) {
       this.currentTag.children.push({
-        type: 'text',
+        type: "text",
         text,
       });
       return true;
@@ -205,11 +205,18 @@ export class Parser {
   }
 
   parseAttributeName() {
-    let name = '';
+    let name = "";
 
     this.iterate(() => {
       const char = this.getCurrent();
-      if (char === newLine || char === space || char === tab || char === equals || char === forwardSlash || char === endTag) {
+      if (
+        char === newLine ||
+        char === space ||
+        char === tab ||
+        char === equals ||
+        char === forwardSlash ||
+        char === endTag
+      ) {
         return true;
       }
 
@@ -221,16 +228,16 @@ export class Parser {
       return name;
     }
 
-    this.expectedItemError('attribute name');
+    this.expectedItemError("attribute name");
   }
 
   parseAttributeValue() {
-    let value = '';
+    let value = "";
     this.expect(doubleQuote); // start quote
 
     if (this.getCurrent() === doubleQuote) {
       this.skip();
-      return '';
+      return "";
     }
 
     this.iterate(() => {
@@ -247,7 +254,7 @@ export class Parser {
       return value;
     }
 
-    this.expectedItemError('attribute value');
+    this.expectedItemError("attribute value");
   }
 
   parseAttribute() {
@@ -257,7 +264,7 @@ export class Parser {
       return false;
     }
 
-    let value = '';
+    let value = "";
 
     if (this.getCurrent() === equals) {
       this.skip();
@@ -271,7 +278,7 @@ export class Parser {
 
   openTag(tagName: string) {
     const newTag: ElementNode = {
-      type: 'element',
+      type: "element",
       tag: tagName,
       selfClose: false,
       attributes: [],
@@ -297,7 +304,9 @@ export class Parser {
 
       if ((this.currentTag as ElementNode).tag !== tagToClose) {
         this.throwError(
-          new SyntaxError(`Expected closing "${(this.currentTag as ElementNode).tag}", found "${tagToClose}" at ${this.position}`),
+          new SyntaxError(
+            `Expected closing "${(this.currentTag as ElementNode).tag}", found "${tagToClose}" at ${this.position}`,
+          ),
         );
       }
 
@@ -314,7 +323,7 @@ export class Parser {
         this.skip(3); // !--
         const comment = this.skipUntil(() => endComment === this.lookAhead(3));
         this.currentTag.children.push({
-          type: 'comment',
+          type: "comment",
           text: comment.trim(),
         });
         this.skip(3); // -->
@@ -365,7 +374,7 @@ export class Parser {
       return;
     }
 
-    if (this.getCurrent() === '') {
+    if (this.getCurrent() === "") {
       return;
     }
 
@@ -374,23 +383,23 @@ export class Parser {
 }
 
 export function parse(html: string | HTMLElement): DocumentNode {
-  return new Parser(typeof html === 'string' ? html : html.outerHTML).parse();
+  return new Parser(typeof html === "string" ? html : html.outerHTML).parse();
 }
 
 export function pack(doc: DocumentNode): PackedDocumentNode {
-  return ['#', doc.docType, doc.children.map(packNode)];
+  return ["#", doc.docType, doc.children.map(packNode)];
 }
 
 export function unpack(doc: PackedDocumentNode): DocumentNode {
-  return { type: 'document', docType: doc[1], children: (doc[2] || []).map(unpackNode) };
+  return { type: "document", docType: doc[1], children: (doc[2] || []).map(unpackNode) };
 }
 
 function packNode(node: TextNode | CommentNode | ElementNode): PackedChildNode {
-  if (node.type === 'comment') {
-    return <PackedCommentNode>['!', node.text];
+  if (node.type === "comment") {
+    return <PackedCommentNode>["!", node.text];
   }
 
-  if (node.type === 'text') {
+  if (node.type === "text") {
     return <PackedTextNode>node.text;
   }
 
@@ -402,16 +411,16 @@ function packNode(node: TextNode | CommentNode | ElementNode): PackedChildNode {
 }
 
 function unpackNode(node: PackedChildNode): ChildNode {
-  if (node[0] === '!') {
-    return { type: 'comment', text: String(node[1]) };
+  if (node[0] === "!") {
+    return { type: "comment", text: String(node[1]) };
   }
 
-  if (typeof node === 'string') {
-    return { type: 'text', text: node };
+  if (typeof node === "string") {
+    return { type: "text", text: node };
   }
 
   return {
-    type: 'element',
+    type: "element",
     tag: node[0],
     selfClose: isSelfClosingTag(node[0]),
     attributes: node[1] ? (node[1] as PackedAttributes).map((a) => ({ name: a[0], value: a[1] })) : [],
@@ -420,9 +429,9 @@ function unpackNode(node: PackedChildNode): ChildNode {
 }
 
 export function normalize<T extends ParserNode>(node: T) {
-  if ('children' in node) {
+  if ("children" in node) {
     node.children = node.children.filter((child) => {
-      if (child.type === 'text' && child.text.trim() === '') {
+      if (child.type === "text" && child.text.trim() === "") {
         return false;
       }
 

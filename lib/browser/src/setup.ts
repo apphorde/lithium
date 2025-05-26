@@ -1,5 +1,5 @@
-import { defineEventOnElement, emitEvent, isElement } from '@li3/dom';
-import { type Signal, signal as $, effect as $$, observer } from '@li3/reactive';
+import { defineEventOnElement, emitEvent, isElement } from "@li3/dom";
+import { type Signal, signal as $, effect as $$, observer } from "@li3/reactive";
 import {
   AnyFunction,
   createInputRef,
@@ -7,7 +7,7 @@ import {
   getCurrentContext,
   getPropValue,
   type PropDefinition,
-} from '@li3/runtime';
+} from "@li3/runtime";
 
 export function onInit(fn: VoidFunction): void {
   getCurrentContext().init.push(fn);
@@ -32,11 +32,11 @@ export function defineQuery(selector: string): QueryObject {
 
   return new Proxy({} as QueryObject, {
     get(_t, key) {
-      if (key === 'one') {
+      if (key === "one") {
         return root.querySelector(selector);
       }
 
-      if (key === 'many') {
+      if (key === "many") {
         return Array.from(root.querySelectorAll(selector));
       }
 
@@ -110,10 +110,10 @@ export function shallowRef<T>(value?: T): Signal<T> {
 type InjectionEvent<T> = CustomEvent & { result?: T };
 
 export function provide<T>(token: Symbol, provider): void {
-  const fn = typeof provider === 'function' ? provider : () => provider;
+  const fn = typeof provider === "function" ? provider : () => provider;
   const { element } = getCurrentContext();
 
-  element.addEventListener('$inject', (e: InjectionEvent<T>) => {
+  element.addEventListener("$inject", (e: InjectionEvent<T>) => {
     if (e.detail === token) {
       e.result = fn();
       e.stopPropagation();
@@ -123,7 +123,7 @@ export function provide<T>(token: Symbol, provider): void {
 
 export function inject<T>(token: any): T {
   const { element } = getCurrentContext();
-  const event = new CustomEvent('$inject', {
+  const event = new CustomEvent("$inject", {
     detail: token,
     bubbles: true,
   }) as CustomEvent & { result: T };
@@ -133,7 +133,7 @@ export function inject<T>(token: any): T {
   const result = event.result;
 
   if (!result) {
-    throw new Error('Injectable not found: ' + token);
+    throw new Error("Injectable not found: " + token);
   }
 
   return result;

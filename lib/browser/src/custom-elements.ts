@@ -1,8 +1,8 @@
-import { tpl } from '@li3/dom';
-import { activateContext, AnyFunction, ComponentDefinition, createRuntimeContext, RuntimeContext } from '@li3/runtime';
-import { getComponentFromTemplate, loadTemplates } from './internal.js';
+import { tpl } from "@li3/dom";
+import { activateContext, AnyFunction, ComponentDefinition, createRuntimeContext, RuntimeContext } from "@li3/runtime";
+import { getComponentFromTemplate, loadTemplates } from "./internal.js";
 
-const DefineComponent = Symbol('@@def');
+const DefineComponent = Symbol("@@def");
 
 /**
  * Create a custom element from a component definition
@@ -10,7 +10,7 @@ const DefineComponent = Symbol('@@def');
  * @param def The component definition. Can be a setup function or an object with a setup function and other options
  */
 export function createComponent(name: string, def: ComponentDefinition | AnyFunction): void {
-  if (typeof def === 'function') {
+  if (typeof def === "function") {
     def = { setup: def } as ComponentDefinition;
   }
 
@@ -44,15 +44,15 @@ export function createComponent(name: string, def: ComponentDefinition | AnyFunc
  * @param template The template element to create a component from
  * @param name Optional. Name of the custom element, if not provided it will be taken from the 'component' attribute
  */
-export async function createComponentFromTemplate(template: HTMLTemplateElement | string, name = '') {
-  if (typeof template === 'string') {
+export async function createComponentFromTemplate(template: HTMLTemplateElement | string, name = "") {
+  if (typeof template === "string") {
     template = tpl(template) as HTMLTemplateElement;
   }
 
-  name ||= template.getAttribute('component');
+  name ||= template.getAttribute("component");
 
   if (!name) {
-    throw new Error('Component name is required');
+    throw new Error("Component name is required");
   }
 
   const component = await getComponentFromTemplate(template);
@@ -83,12 +83,12 @@ export interface MountOptions {
  * @param options Optional. Props to pass to the component or a parent context to inherit from
  */
 export function mount(element: DocumentFragment | Element | string, def: ComponentDefinition, options?: MountOptions) {
-  if (typeof element === 'string') {
+  if (typeof element === "string") {
     element = document.querySelector(element);
   }
 
   if (!element) {
-    throw new Error('Target element not found');
+    throw new Error("Target element not found");
   }
 
   // custom element was moved betwen parents and does not need to mount again
@@ -114,8 +114,8 @@ export function mount(element: DocumentFragment | Element | string, def: Compone
 }
 
 export async function createApp(template: HTMLTemplateElement, spec: ComponentDefinition) {
-  const div = document.createElement('div');
-  div.style.display = 'contents';
+  const div = document.createElement("div");
+  div.style.display = "contents";
   template.parentNode.insertBefore(div, template);
 
   return mount(div, spec);

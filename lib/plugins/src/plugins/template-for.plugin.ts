@@ -1,8 +1,8 @@
-import { mount, defineProps } from '@li3/browser';
-import { getOption, Plugins, type RuntimeContext } from '@li3/runtime';
-import { computedEffect } from '@li3/scope';
+import { mount, defineProps } from "@li3/browser";
+import { getOption, Plugins, type RuntimeContext } from "@li3/runtime";
+import { computedEffect } from "@li3/scope";
 
-const VM = Symbol('@@FOR');
+const VM = Symbol("@@FOR");
 
 interface NodeCacheEntry {
   $el: RuntimeContext;
@@ -19,7 +19,7 @@ interface TemplateForRuntimeContext {
 
 Plugins.use({
   dom($el: RuntimeContext, dom: DocumentFragment | HTMLElement) {
-    const templates: HTMLTemplateElement[] = Array.from(dom.querySelectorAll('template[for]'));
+    const templates: HTMLTemplateElement[] = Array.from(dom.querySelectorAll("template[for]"));
 
     for (const t of templates) {
       templateForOf(t, $el);
@@ -29,23 +29,23 @@ Plugins.use({
 
 export function templateForOf(template: HTMLTemplateElement, $el: RuntimeContext) {
   const nodeCache: NodeCacheEntry[] = [];
-  const expression = template.getAttribute('for');
-  const [iteration, source] = expression.split(' of ').map((s) => s.trim());
+  const expression = template.getAttribute("for");
+  const [iteration, source] = expression.split(" of ").map((s) => s.trim());
 
   if (!source || !iteration) {
-    if (getOption('debugEnabled')) {
+    if (getOption("debugEnabled")) {
       throw new Error('TemplateFor directive requires an expression with "of" keyword. Example: for="item of items"');
     }
 
     return;
   }
 
-  const [itemName, indexName] = iteration.includes('[')
+  const [itemName, indexName] = iteration.includes("[")
     ? iteration
         .slice(1, -1)
-        .split(',')
+        .split(",")
         .map((s) => s.trim())
-    : [iteration, 'index'];
+    : [iteration, "index"];
 
   const context: TemplateForRuntimeContext = { itemName, indexName, nodeCache, $el, template };
 
@@ -55,7 +55,7 @@ export function templateForOf(template: HTMLTemplateElement, $el: RuntimeContext
       return;
     }
 
-    if (!getOption('cachedTemplateFor')) {
+    if (!getOption("cachedTemplateFor")) {
       resize(context, 0);
     }
 
@@ -74,7 +74,7 @@ export function templateForOf(template: HTMLTemplateElement, $el: RuntimeContext
     const lastNode = findLastNode(nodeCache) || template;
     template.parentNode.insertBefore(newNodes, lastNode);
 
-    if (getOption('debugEnabled')) {
+    if (getOption("debugEnabled")) {
       template[VM] = nodeCache;
     }
   }
@@ -148,7 +148,7 @@ function resize(context: TemplateForRuntimeContext, newLength: number, list?: an
 
 function createCacheEntry(context: TemplateForRuntimeContext, props: any): NodeCacheEntry {
   const { $el, template, itemName, indexName } = context;
-  const contextProperties = [itemName, indexName, '$first', '$last', '$odd', '$even'];
+  const contextProperties = [itemName, indexName, "$first", "$last", "$odd", "$even"];
 
   function setup() {
     defineProps(contextProperties);

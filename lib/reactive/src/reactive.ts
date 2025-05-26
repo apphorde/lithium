@@ -1,8 +1,8 @@
-const reactiveTag = Symbol('reactive');
-const unwrapTag = Symbol('unwrap');
+const reactiveTag = Symbol("reactive");
+const unwrapTag = Symbol("unwrap");
 
 export function canBeObserved(object: any): boolean {
-  return object !== null && object !== undefined && typeof object === 'object' && !object[reactiveTag];
+  return object !== null && object !== undefined && typeof object === "object" && !object[reactiveTag];
 }
 
 export function reactive<T extends object>(object: T, effect: VoidFunction): T {
@@ -12,7 +12,7 @@ export function reactive<T extends object>(object: T, effect: VoidFunction): T {
 
   const values = Object.entries(object);
   for (const [key, next] of values) {
-    if (typeof next === 'object' && next !== null) {
+    if (typeof next === "object" && next !== null) {
       (object as any)[key] = reactive(next, effect);
     }
   }
@@ -35,7 +35,7 @@ export function reactive<T extends object>(object: T, effect: VoidFunction): T {
         return false;
       }
 
-      if (typeof value === 'object' && value !== null) {
+      if (typeof value === "object" && value !== null) {
         value = reactive(value, effect);
       }
 

@@ -1,6 +1,6 @@
-import { setText } from '@li3/dom';
-import { computedEffect } from '@li3/scope';
-import { Plugins, type RuntimeContext } from '@li3/runtime';
+import { setText } from "@li3/dom";
+import { computedEffect } from "@li3/scope";
+import { Plugins, type RuntimeContext } from "@li3/runtime";
 
 Plugins.use({
   element($el: RuntimeContext, node: Text) {
@@ -8,7 +8,7 @@ Plugins.use({
       return;
     }
 
-    if (!node.parentElement?.hasAttribute('literal')) {
+    if (!node.parentElement?.hasAttribute("literal")) {
       createTextNodeBinding($el, node);
     }
   },
@@ -17,14 +17,14 @@ Plugins.use({
 export function createTextNodeBinding($el: RuntimeContext, node: Text) {
   const text = String(node.textContent);
 
-  if (!(text.includes('${') || text.includes('{{'))) {
+  if (!(text.includes("${") || text.includes("{{"))) {
     return;
   }
 
-  node.textContent = '';
+  node.textContent = "";
 
   const expression =
-    '`' + text.replace(/\{\{([\s\S]+?)}}/g, (_: any, inner: string) => '${ ' + inner.trim() + ' }') + '`';
+    "`" + text.replace(/\{\{([\s\S]+?)}}/g, (_: any, inner: string) => "${ " + inner.trim() + " }") + "`";
 
   computedEffect($el, expression, (v: string) => setText(node, v));
 }

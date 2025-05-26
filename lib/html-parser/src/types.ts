@@ -4,13 +4,13 @@ export interface ParserAttribute {
 }
 
 export interface DocumentNode {
-  type: 'document';
+  type: "document";
   docType: string;
   children: Children;
 }
 
 export interface ElementNode {
-  type: 'element';
+  type: "element";
   tag: string;
   selfClose: boolean;
   children: Children;
@@ -18,12 +18,12 @@ export interface ElementNode {
 }
 
 export interface CommentNode {
-  type: 'comment';
+  type: "comment";
   text: string;
 }
 
 export interface TextNode {
-  type: 'text';
+  type: "text";
   text: string;
 }
 
@@ -35,8 +35,8 @@ export type PackedAttributes = Array<[string, string]>;
 export type PackedChildren = Array<PackedChildNode>;
 export type PackedChildNode = PackedElementNode | PackedCommentNode | PackedTextNode;
 export type PackedTextNode = string;
-export type PackedCommentNode = ['!', string];
+export type PackedCommentNode = ["!", string];
 export type PackedElementNode = [string] | [string, PackedAttributes] | [string, PackedAttributes, PackedChildren];
-export type PackedDocumentNode = ['#', string] | ['#', string, PackedChildren];
+export type PackedDocumentNode = ["#", string] | ["#", string, PackedChildren];
 
 export type PackedParserNode = PackedDocumentNode | PackedChildNode;

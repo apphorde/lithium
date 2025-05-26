@@ -1,11 +1,11 @@
-import { type RuntimeContext, type AnyFunction, getOption } from '@li3/runtime';
-import { type Signal, observer, effect } from '@li3/reactive';
+import { type RuntimeContext, type AnyFunction, getOption } from "@li3/runtime";
+import { type Signal, observer, effect } from "@li3/reactive";
 
 const fnCache = new Map();
 const modCache = new Map();
 
 export function compileExpression($el: RuntimeContext, expression: string, args: string[] = []) {
-  if (getOption('useModuleExpressions')) {
+  if (getOption("useModuleExpressions")) {
     return compileExpressionBlob($el, expression, args);
   }
 
@@ -13,7 +13,7 @@ export function compileExpression($el: RuntimeContext, expression: string, args:
 }
 
 export function compileExpressionBlob($el: RuntimeContext, expression: string, args: string[] = []): AnyFunction {
-  const code = `export default function(${args.join(', ')}) { ${createFunctionBody($el, expression)} }`;
+  const code = `export default function(${args.join(", ")}) { ${createFunctionBody($el, expression)} }`;
 
   if (!modCache.has(code)) {
     modCache.set(code, createBlobModule(code));
@@ -44,7 +44,7 @@ export function computedEffect<T>($el: RuntimeContext, expression: string, effec
   const fn = compileExpressionEval($el, expression);
   const computed = wrapInTryCatch(expression, fn);
   const signal = effect(computed);
-  const applyChange = () => effectFn(signal.value)
+  const applyChange = () => effectFn(signal.value);
 
   observer(signal, applyChange);
   applyChange();
@@ -52,7 +52,7 @@ export function computedEffect<T>($el: RuntimeContext, expression: string, effec
   return signal;
 }
 
-export function createBlobModule(code: string, type = 'text/javascript') {
+export function createBlobModule(code: string, type = "text/javascript") {
   const blob = new Blob([code], { type });
   const url = URL.createObjectURL(blob);
   const modPromise = import(url);
@@ -62,7 +62,7 @@ export function createBlobModule(code: string, type = 'text/javascript') {
 }
 
 function createFunctionBody<T extends RuntimeContext>($el: T, expression: string) {
-  const keys = $el.stateKeys.filter((key) => expression.includes(key)).join(', ');
+  const keys = $el.stateKeys.filter((key) => expression.includes(key)).join(", ");
 
   return `
     const {${keys}} = this;
@@ -71,7 +71,7 @@ function createFunctionBody<T extends RuntimeContext>($el: T, expression: string
 }
 
 function wrapInTryCatch(source: string, fn: AnyFunction) {
-  if (getOption('debugEnabled')) {
+  if (getOption("debugEnabled")) {
     return () => fn();
   }
 
@@ -79,7 +79,7 @@ function wrapInTryCatch(source: string, fn: AnyFunction) {
     try {
       return fn();
     } catch (e) {
-      console.log('Error: ' + source, e);
+      console.log("Error: " + source, e);
     }
   };
 }

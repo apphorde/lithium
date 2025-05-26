@@ -1,18 +1,20 @@
 import { reactive } from "./reactive.js";
 
+const $ref = Symbol("ref");
+
 type TFunction<T> = (...args: any[]) => T;
 export interface SignalInit {
   shallow?: boolean;
 }
 
 export interface Signal<T> {
-  readonly __isRef: true;
+  readonly [$ref]: true;
   value: T;
   watch(fn: TFunction<T>): void;
 }
 
 export interface Effect<T> {
-  readonly __isRef: true;
+  readonly [$ref]: true;
   readonly readonly: true;
   readonly value: T;
   watch(fn: TFunction<T>): void;
@@ -36,7 +38,7 @@ export function signal<T>(initialValue: T, options?: SignalInit): Signal<T> {
     watch<T>(effect: TFunction<T>) {
       dependencies.add(effect);
     },
-    get __isRef() {
+    get [$ref]() {
       return true;
     },
     get value() {
@@ -48,9 +50,7 @@ export function signal<T>(initialValue: T, options?: SignalInit): Signal<T> {
     },
     set value(newValue) {
       if (!isShallow && typeof newValue === "object" && newValue !== null) {
-        newValue = reactive(newValue as object, () =>
-          checkSignal(dependencies, v)
-        ) as T;
+        newValue = reactive(newValue as object, () => checkSignal(dependencies, v)) as T;
       }
 
       if (v !== newValue) {
@@ -82,7 +82,7 @@ export function effect<T>(fn: TFunction<T>): Effect<T> {
     watch<T>(effect: TFunction<T>) {
       dependencies.add(effect);
     },
-    get __isRef() {
+    get [$ref]() {
       return true;
     },
     get readonly() {
@@ -114,10 +114,18 @@ export function observer<T>(signal: Signal<T>, effect: TFunction<T>) {
   signal.watch(effect);
 }
 
-export function isRef<X = any>(t: any): t is Signal<X> {
-  return typeof t !== "object" ? false : t && t.__isRef;
+export function isRef<X = any>(t: any): t is Signal<X> | Effect<X> {
+  return typeof t !== "object" ? false : t && t[$ref];
 }
 
 export function unref<T>(v: T | Signal<T>): T {
   return isRef(v) ? v.value : v;
+}
+
+export function isSignal<T>(t: any): t is Signal<T> {
+  return isRef(t) && !t["readonly"];
+}
+
+export function isEffect<T>(t: any): t is Effect<T> {
+  return isRef(t) && t["readonly"];
 }

@@ -1,5 +1,5 @@
-import { signal, effect, type Effect } from '@li3/reactive';
-import { getCurrentContext } from '@li3/runtime';
+import { signal, effect, type Effect } from "@li3/reactive";
+import { getCurrentContext } from "@li3/runtime";
 
 type Action<Args, T = any> = (state: T, ...args: Args[]) => void | Promise<void> | Promise<T> | T;
 type ActionParameters<T> = T extends (state: any, ...args: infer P) => any ? P : never;
@@ -31,13 +31,13 @@ export function createStore<State, Payload extends any, Actions extends Record<s
       }
     } catch (error) {
       if (!transaction.active) {
-        events.dispatchEvent(new CustomEvent('error', { detail: String(error) }));
+        events.dispatchEvent(new CustomEvent("error", { detail: String(error) }));
       }
       return;
     }
 
     if (!transaction.active) {
-      events.dispatchEvent(new CustomEvent('dispatch', { detail: { type: action, payload: args } }));
+      events.dispatchEvent(new CustomEvent("dispatch", { detail: { type: action, payload: args } }));
     }
   }
 
@@ -56,9 +56,9 @@ export function createStore<State, Payload extends any, Actions extends Record<s
       await handler();
       transaction.active = false;
       state.value = transaction.state;
-      events.dispatchEvent(new CustomEvent('commit', { detail: state.value }));
+      events.dispatchEvent(new CustomEvent("commit", { detail: state.value }));
     } catch (error) {
-      events.dispatchEvent(new CustomEvent('error', { detail: String(error) }));
+      events.dispatchEvent(new CustomEvent("error", { detail: String(error) }));
     } finally {
       transaction.active = false;
       transaction.state = null;

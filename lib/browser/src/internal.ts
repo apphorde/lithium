@@ -1,23 +1,23 @@
-import { type ComponentDefinition } from '@li3/runtime';
-import { createBlobModule } from '@li3/scope';
+import { type ComponentDefinition } from "@li3/runtime";
+import { createBlobModule } from "@li3/scope";
 
 export function getShadowDomOptions(template: HTMLTemplateElement): ShadowRootInit {
-  const source = template.getAttribute('shadow-dom') || '';
+  const source = template.getAttribute("shadow-dom") || "";
 
   if (source) {
-    return source.startsWith('{') ? JSON.parse(source) : { mode: source as ShadowRootMode };
+    return source.startsWith("{") ? JSON.parse(source) : { mode: source as ShadowRootMode };
   }
 }
 
 export async function getComponentFromTemplate(template: HTMLTemplateElement): Promise<ComponentDefinition> {
-  const setup = template.content.querySelector('script[setup]');
+  const setup = template.content.querySelector("script[setup]");
   const component: ComponentDefinition = { template, shadowDom: getShadowDomOptions(template) };
 
   if (setup) {
-    const href = setup.getAttribute('src');
+    const href = setup.getAttribute("src");
     const md = href
       ? await import(new URL(href, window.location.href).toString())
-      : await createBlobModule(setup.textContent.trim(), 'text/javascript');
+      : await createBlobModule(setup.textContent.trim(), "text/javascript");
 
     setup.remove();
     component.setup = md.default;
@@ -39,9 +39,9 @@ export async function loadTemplates(url: string | URL): Promise<HTMLTemplateElem
 
   if (req.ok) {
     const html = await req.text();
-    const dom = new DOMParser().parseFromString(html, 'text/html');
-    return Array.from(dom.querySelectorAll('template[component]'));
+    const dom = new DOMParser().parseFromString(html, "text/html");
+    return Array.from(dom.querySelectorAll("template[component]"));
   }
 
-  throw new Error('Unable to load ' + url + ': ' + req.statusText);
+  throw new Error("Unable to load " + url + ": " + req.statusText);
 }

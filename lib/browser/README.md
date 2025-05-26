@@ -12,15 +12,19 @@ Browser APIs used to declare Li3 components
     <button on-click="remove()">-</button>
   </div>
   <script setup>
-    import { ref } from '@li3/browser';
+    import { ref } from "@li3/browser";
 
     export default function () {
       const count = ref(0);
 
       return {
         count,
-        add() { count.value++; },
-        remove() { count.value--; },
+        add() {
+          count.value++;
+        },
+        remove() {
+          count.value--;
+        },
       };
     }
   </script>
@@ -30,7 +34,7 @@ Browser APIs used to declare Li3 components
 ## Using it with ESM
 
 ```js
-import { ref, createComponent } from '@li3/browser';
+import { ref, createComponent } from "@li3/browser";
 
 export const template = `
 <div>
@@ -38,17 +42,21 @@ export const template = `
   <button on-click="add()">+</button>
   <button on-click="remove()">-</button>
 </div>
-`
+`;
 
 export function setup() {
   const count = ref(0);
 
   return {
     count,
-    add() { count.value++; },
-    remove() { count.value--; },
+    add() {
+      count.value++;
+    },
+    remove() {
+      count.value--;
+    },
   };
 }
 
-createComponent('my-counter', { template, setup });
+createComponent("my-counter", { template, setup });
 ```
