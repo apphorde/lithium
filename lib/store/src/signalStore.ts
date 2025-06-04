@@ -1,4 +1,4 @@
-import { type Signal, type Effect } from "@li3/reactive";
+import { type Signal, type Effect, effect } from "@li3/reactive";
 // import { Plugins } from '@li3/runtime';
 
 type SignalOrEffect<T> = Signal<T> | Effect<T>;
@@ -9,7 +9,6 @@ type FactoryFunction<T, S extends SignalOrEffect<T>, F extends AnyFunction> = ()
 type Store<T> = Record<string, AnyFunction | SignalOrEffect<T>>;
 
 const storeMap = new Map<string, Store<any>>();
-const factoryMap = new Map<string, [FactoryFunction<any, any, any>, string[]]>();
 
 /**
  * Stores have signals and methods to interact with them.
@@ -46,9 +45,9 @@ export function useStore(store) {
   const effects = [];
   const { state, methods } = store;
 
-  onDestroy(function () {
-    for (const f of effects) f.dispose();
-  });
+  // onDestroy(function () {
+  //   for (const f of effects) f.dispose();
+  // });
 
   function select(f) {
     const $ = effect(() => f(state));
