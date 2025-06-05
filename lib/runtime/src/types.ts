@@ -45,6 +45,7 @@ export class RuntimeContext {
       update: [],
       destroy: [],
       view: {},
+      meta: {},
     });
 
     // prevent empty values from breaking expected behavior of runtime properties,
@@ -65,6 +66,7 @@ export class RuntimeContext {
   view: any;
   props: Record<string, Signal<any>>;
   parent?: RuntimeContext;
+  meta: Record<string, any>;
 
   init: Array<LifeCycleFunction>;
   update: Array<UpdateLifeCycleFunction>;
