@@ -1,5 +1,5 @@
 import { createBlobModule } from "@li3/scope";
-import { Plugins, RuntimeContext, getCurrentContext } from "@li3/runtime";
+import { onInitComponent, RuntimeContext, getCurrentContext } from "@li3/runtime";
 
 export type InjectResourcesExtension = RuntimeContext & {
   stylesheets: string[];
@@ -19,14 +19,12 @@ RuntimeContext.use(() => ({
   scripts: [],
 }));
 
-Plugins.use({
-  async init($el: RuntimeContext) {
-    const { element, stylesheets, scripts } = $el as InjectResourcesExtension;
+onInitComponent(async ($el: RuntimeContext) => {
+  const { element, stylesheets, scripts } = $el as InjectResourcesExtension;
 
-    // TODO wait for scripts and stylesheets before component is mounted
-    stylesheets.map((url) => adoptStyleSheet(element as HTMLElement, url));
-    scripts.map((src) => addScriptToPage(src));
-  },
+  // TODO wait for scripts and stylesheets before component is mounted
+  stylesheets.map((url) => adoptStyleSheet(element as HTMLElement, url));
+  scripts.map((src) => addScriptToPage(src));
 });
 
 export function injectStylesheetOnElement(el: HTMLElement | DocumentFragment, href: string) {

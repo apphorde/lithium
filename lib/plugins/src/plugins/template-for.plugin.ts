@@ -1,5 +1,5 @@
 import { mount, defineProps } from "@li3/browser";
-import { getOption, Plugins, type RuntimeContext } from "@li3/runtime";
+import { getOption, onCreateDom, type RuntimeContext } from "@li3/runtime";
 import { computedEffect } from "@li3/scope";
 
 const VM = Symbol("@@FOR");
@@ -17,14 +17,12 @@ interface TemplateForRuntimeContext {
   template: HTMLTemplateElement;
 }
 
-Plugins.use({
-  dom($el: RuntimeContext, dom: DocumentFragment | HTMLElement) {
-    const templates: HTMLTemplateElement[] = Array.from(dom.querySelectorAll("template[for]"));
+onCreateDom(($el: RuntimeContext, dom: DocumentFragment | HTMLElement) => {
+  const templates: HTMLTemplateElement[] = Array.from(dom.querySelectorAll("template[for]"));
 
-    for (const t of templates) {
-      templateForOf(t, $el);
-    }
-  },
+  for (const t of templates) {
+    templateForOf(t, $el);
+  }
 });
 
 export function templateForOf(template: HTMLTemplateElement, $el: RuntimeContext) {

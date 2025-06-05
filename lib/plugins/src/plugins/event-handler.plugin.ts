@@ -1,13 +1,11 @@
 import { setEventHandler } from "@li3/dom";
 import { compileExpression } from "@li3/scope";
-import { Plugins, RuntimeContext } from "@li3/runtime";
+import { onVisitAttribute, RuntimeContext } from "@li3/runtime";
 
-Plugins.use({
-  attribute($el, node: Element, attribute: string, value: string) {
-    if (attribute.startsWith("on-")) {
-      createEventBinding($el, node, attribute.replace("on-", ""), value);
-    }
-  },
+onVisitAttribute(($el, node: Element, attribute: string, value: string) =>{
+  if (attribute.startsWith("on-")) {
+    createEventBinding($el, node, attribute.replace("on-", ""), value);
+  }
 });
 
 export function createEventBinding($el: RuntimeContext, element: Element, attribute: string, expression: string): void {

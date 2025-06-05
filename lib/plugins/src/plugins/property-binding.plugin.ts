@@ -1,21 +1,19 @@
 import { setAttribute, setProperty } from "@li3/dom";
-import { Plugins, type RuntimeContext } from "@li3/runtime";
+import { onVisitAttribute, RuntimeContext } from "@li3/runtime";
 import { computedEffect } from "@li3/scope";
 
-Plugins.use({
-  attribute($el, node, attribute, value) {
-    if (attribute.startsWith("bind-")) {
-      createPropertyBinding($el, node, dashToCamelCase(attribute.replace("bind-", "")), value);
-    }
+onVisitAttribute(($el: RuntimeContext, node: Element, attribute, value) => {
+  if (attribute.startsWith("bind-")) {
+    createPropertyBinding($el, node, dashToCamelCase(attribute.replace("bind-", "")), value);
+  }
 
-    if (attribute.startsWith("prop-")) {
-      createPropertyBinding($el, node, dashToCamelCase(attribute.replace("prop-", "")), value);
-    }
+  if (attribute.startsWith("prop-")) {
+    createPropertyBinding($el, node, dashToCamelCase(attribute.replace("prop-", "")), value);
+  }
 
-    if (attribute.startsWith("attr-")) {
-      createAttributeBinding($el, node, dashToCamelCase(attribute.replace("attr-", "")), value);
-    }
-  },
+  if (attribute.startsWith("attr-")) {
+    createAttributeBinding($el, node, dashToCamelCase(attribute.replace("attr-", "")), value);
+  }
 });
 
 export function createPropertyBinding($el: RuntimeContext, element: Element, name: string, expression: string): void {

@@ -1,5 +1,5 @@
 import { isElement } from "@li3/dom";
-import { Plugins, RuntimeContext, getCurrentContext } from "@li3/runtime";
+import { onCreateDom, RuntimeContext, getCurrentContext } from "@li3/runtime";
 
 export type HostPropertiesExtension = RuntimeContext & {
   hostClasses: string[];
@@ -9,10 +9,8 @@ RuntimeContext.use(() => ({
   hostClasses: [],
 }));
 
-Plugins.use({
-  dom($el: RuntimeContext) {
-    applyHostAttributes($el as HostPropertiesExtension);
-  },
+onCreateDom(($el: RuntimeContext) => {
+  applyHostAttributes($el as HostPropertiesExtension);
 });
 
 export function applyHostAttributes($el: HostPropertiesExtension): void {

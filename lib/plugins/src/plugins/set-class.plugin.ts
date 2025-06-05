@@ -1,13 +1,11 @@
 import { setClassName } from "@li3/dom";
-import { Plugins, type RuntimeContext } from "@li3/runtime";
+import { onVisitAttribute, type RuntimeContext } from "@li3/runtime";
 import { computedEffect } from "@li3/scope";
 
-Plugins.use({
-  attribute($el, node, attribute, value) {
-    if (attribute.startsWith("class-")) {
-      createClassBinding($el, node, attribute.replace("class-", ""), value);
-    }
-  },
+onVisitAttribute(($el: RuntimeContext, node: Element, attribute, value) => {
+  if (attribute.startsWith("class-")) {
+    createClassBinding($el, node, attribute.replace("class-", ""), value);
+  }
 });
 
 export function createClassBinding(

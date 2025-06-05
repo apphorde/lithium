@@ -1,15 +1,13 @@
-import { Plugins, type RuntimeContext } from "@li3/runtime";
+import { onCreateDom, type RuntimeContext } from "@li3/runtime";
 import { mount } from "@li3/browser";
 import { computedEffect } from "@li3/scope";
 
-Plugins.use({
-  dom($el: RuntimeContext, dom: DocumentFragment | HTMLElement) {
-    const templates: HTMLTemplateElement[] = Array.from(dom.querySelectorAll("template[if]"));
+onCreateDom(($el: RuntimeContext, dom: DocumentFragment | HTMLElement) => {
+  const templates: HTMLTemplateElement[] = Array.from(dom.querySelectorAll("template[if]"));
 
-    for (const t of templates) {
-      templateIf(t, $el);
-    }
-  },
+  for (const t of templates) {
+    templateIf(t, $el);
+  }
 });
 
 export async function templateIf(template: HTMLTemplateElement, $el: RuntimeContext) {

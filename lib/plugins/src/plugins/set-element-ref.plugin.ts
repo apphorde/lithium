@@ -1,25 +1,30 @@
 import { signal } from "@li3/reactive";
-import { getCurrentContext, getOption, Plugins, RuntimeContext } from "@li3/runtime";
+import {
+  getCurrentContext,
+  onVisitAttribute,
+  RuntimeContext,
+} from "@li3/runtime";
 
-Plugins.use({
-  attribute($el: RuntimeContext, node: Element, attribute: string, refName: string) {
+onVisitAttribute(
+  ($el: RuntimeContext, node: Element, attribute: string, refName: string) => {
     if (attribute === "ref") {
-      setElementRefValue($el, node, refName.trim());
+      attachElementRef($el, node, refName.trim());
     }
-  },
-});
+  }
+);
 
-export function setElementRefValue($el: RuntimeContext, node: Element, refName: string) {
-  if ($el.state[refName]) {
-    $el.state[refName].value = node;
-    return;
+export function attachElementRef(
+  $el: RuntimeContext,
+  node: Element,
+  refName: string
+) {
+  if (!$el.state[refName]) {
+    $el.state[refName] = signal(null, { shallow: true });
   }
 
-  if (getOption("debugEnabled")) {
-    console.warn("Ref not found in state: " + refName, $el.state);
-  }
+  $el.state[refName].value = node;
 }
 
 export function templateRef(name: string) {
-  return (getCurrentContext().state[name] = signal(null, { shallow: true }));
+  return (getCurrentContext().state[name] ||= signal(null, { shallow: true }));
 }
