@@ -61,7 +61,7 @@ export function createDom($el: RuntimeContext): void {
   Plugins.apply("dom", [$el, dom]);
 
   traverseDom(dom, (node, attributes) => {
-    Plugins.apply("element", [$el, node]);
+    Plugins.apply("node", [$el, node]);
 
     if (!isElement(node) || !(Array.isArray(attributes) && attributes.length)) {
       return;

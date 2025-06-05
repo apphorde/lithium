@@ -34,7 +34,7 @@ export function createDispatcher<T extends string[]>(hookNames: T) {
 export const Plugins = createDispatcher([
   "setup",
   "dom",
-  "element",
+  "node",
   "attribute",
   "init",
   "update",
@@ -51,17 +51,17 @@ export function onCreateDom<T extends RuntimeContext>(f: ($el: T, dom: DocumentF
 }
 
 
-export function onVisitElement<T extends RuntimeContext, N extends Node>(f: ($el: T, node: N) => void) {
-  Plugins.use({ element: f });
+export function onVisitNode<T extends RuntimeContext, N extends Node>(f: ($el: T, node: N) => void) {
+  Plugins.use({ node: f });
 }
 
 
-export function onVisitAttribute<T extends RuntimeContext, N extends Node>(f: ($el: T, node: N, attribute: string, value: string) => void) {
+export function onVisitAttribute<T extends RuntimeContext, N extends Element>(f: ($el: T, node: N, attribute: string, value: string) => void) {
   Plugins.use({ attribute: f });
 }
 
 
-export function onInitContext<T extends RuntimeContext>(f: ($el: T) => void) {
+export function onInitComponent<T extends RuntimeContext>(f: ($el: T) => void) {
   Plugins.use({ init: f });
 }
 
@@ -74,7 +74,3 @@ export function onUpdateProp<T extends RuntimeContext>(f: ($el: T, prop: string,
 export function onDestroyComponent<T extends RuntimeContext>(f: ($el: T) => void) {
   Plugins.use({ destroy: f });
 }
-
-
-
-onVisitAttribute((_el, node: Element, _attribute, _value) => { console.log(node)})
