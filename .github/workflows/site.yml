@@ -93,7 +93,7 @@ jobs:
         with:
           images: ${{ env.IMAGE }}
           tags: |
-            type=raw,value=staging-pr-${{ github.event.pull_request.number }}
+            type=raw,value=staging
             type=sha,format=short
 
       - name: Set up Docker Buildx
