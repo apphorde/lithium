@@ -1,5 +1,7 @@
 name: Publish website
+
 on:
+  # Production image: unchanged behavior (push to main)
   push:
     branches:
       - main
@@ -9,12 +11,23 @@ on:
       - 'docs/**'
       - 'lib/**'
 
+  # Staging image: built for pull requests (same paths)
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.github/**'
+      - 'site/**'
+      - 'docs/**'
+      - 'lib/**'
+
 concurrency:
-  group: ${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  # PROD (unchanged): build/publish the main website image
   build:
+    if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
     uses: cloud-cli/workflows/.github/workflows/docker-ghcr-build.yml@main
     permissions:
       contents: read
@@ -26,3 +39,72 @@ jobs:
       type: static
       path: 'site'
       buildCommand: cd .. && npm i -g pnpm && pnpm i && pnpm nx run-many -t build,tsc && pnpm run docs
+
+  # STAGING: build/publish a PR-scoped image tag (no impact on production)
+  staging:
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      IMAGE: ghcr.io/${{ github.repository }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build libraries + typecheck
+        run: pnpm nx run-many -t build,tsc
+
+      - name: Generate docs site
+        run: pnpm run docs
+
+      - name: Create Dockerfile (static)
+        working-directory: site
+        run: |
+          cat > Dockerfile <<'EOF'
+          FROM ghcr.io/cloud-cli/static
+          COPY --chown=node:node . /home/app/dist
+          LABEL org.opencontainers.image.source="https://github.com/${{ github.repository }}"
+          EOF
+          cat Dockerfile
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=raw,value=staging-pr-${{ github.event.pull_request.number }}
+            type=sha,format=short
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push (staging)
+        uses: docker/build-push-action@v6
+        with:
+          context: site
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
