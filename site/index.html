@@ -29,13 +29,8 @@
       rel="stylesheet"
     />
 
-    <!-- Tailwind (pinned): use the prebuilt CSS bundle to avoid runtime CDN drift -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.17/dist/tailwind.min.css"
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
+    <!-- Tailwind (pinned): keep the CDN compiler, but lock the version to avoid drift -->
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
 
     <script type="importmap">
       {
