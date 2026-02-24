@@ -10,7 +10,14 @@ export function parseArgs(): Args {
         options[flag] = true;
       }
 
-      flag = next.slice(2);
+      const [name, value] = next.slice(2).split("=", 2);
+      if (value !== undefined) {
+        options[name] = value === "" ? true : value;
+        flag = "";
+        continue;
+      }
+
+      flag = name;
       continue;
     }
 
@@ -20,6 +27,10 @@ export function parseArgs(): Args {
     } else {
       args.push(next);
     }
+  }
+
+  if (flag) {
+    options[flag] = true;
   }
 
   return { args, options };

@@ -79,7 +79,7 @@ function wrapInTryCatch(source: string, fn: AnyFunction) {
     try {
       return fn();
     } catch (e) {
-      console.log("Error: " + source, e);
+      console.error("Error: " + source, e);
     }
   };
 }

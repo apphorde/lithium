@@ -25,8 +25,11 @@ export function createStore<State, Payload extends any, Actions extends Record<s
       const current = getState();
       const response = await actions[action](current, ...args);
 
-      if (response) {
-        setState({ ...response });
+      if (response !== undefined) {
+        const nextState =
+          typeof response === "object" && response !== null ? { ...(response as State) } : (response as State);
+
+        setState(nextState);
         dev?.send(action, state.value);
       }
     } catch (error) {

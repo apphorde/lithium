@@ -19,7 +19,7 @@ export function createDispatcher<T extends string[]>(hookNames: T) {
     },
 
     apply(hook: T[number], args: any[] = []) {
-      const plugins = hooks[hook];
+      const plugins = hooks[hook] || [];
       for (const plugin of plugins) {
         plugin[hook](...args);
       }

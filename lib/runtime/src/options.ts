@@ -1,11 +1,15 @@
-const options: Record<string, boolean> = {
+const options = {
   debugEnabled: false,
+  useModuleExpressions: false,
+  cachedTemplateFor: false,
 };
 
-export function setOption<T extends keyof typeof options>(option: T, value: (typeof options)[T]) {
+type OptionKey = keyof typeof options;
+
+export function setOption<T extends OptionKey>(option: T, value: (typeof options)[T]) {
   options[option] = value;
 }
 
-export function getOption(option: string) {
+export function getOption<T extends OptionKey>(option: T): (typeof options)[T] {
   return options[option];
 }
