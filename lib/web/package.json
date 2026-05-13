@@ -3,8 +3,12 @@
   "version": "0.1.7",
   "exports": {
     ".": {
-      "default": "./index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "default": "./index.js"
+    },
+    "./v2": {
+      "types": "./dist/v2.d.ts",
+      "default": "./dist/v2.ts"
     }
   },
   "dependencies": {
