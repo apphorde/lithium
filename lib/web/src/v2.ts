@@ -358,9 +358,9 @@ function importModule(code: BlobPart) {
 }
 
 export function findComponents() {
-  const components = [
-    ...document.querySelectorAll("template[component]"),
-  ] as HTMLTemplateElement[];
+  const components = Array.from(
+    document.querySelectorAll("template[component]"),
+  ) as HTMLTemplateElement[];
 
   for (const template of components) {
     const name = template.getAttribute("component") as string;
@@ -384,9 +384,9 @@ export function findComponents() {
 }
 
 export function findApps() {
-  const apps = [
-    ...document.querySelectorAll("template[app]"),
-  ] as HTMLTemplateElement[];
+  const apps = Array.from(
+    document.querySelectorAll("template[app]"),
+  ) as HTMLTemplateElement[];
 
   for (const template of apps) {
     const options: MountOptions = { template };
@@ -575,7 +575,7 @@ function bindAttribute(
 
       for (let i = 0; i < length; i++) {
         const dom = (node as HTMLTemplateElement).content.cloneNode(true);
-        forNodes.push(...dom.childNodes);
+        forNodes.push(...Array.from(dom.childNodes));
 
         const subContext = { [key]: value[i], [indexKey]: i };
         const reader = createContextReader(subContext, context);
@@ -597,7 +597,7 @@ function bindAttribute(
     effect(createFunction(source, keys, context), (value: any) => {
       if (value) {
         const dom = (node as HTMLTemplateElement).content.cloneNode(true);
-        ifNodes.push(...dom.childNodes);
+        ifNodes.push(...Array.from(dom.childNodes));
 
         walkNodes(dom, bindNode, context);
         setTimeout(() => {
