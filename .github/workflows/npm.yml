@@ -24,11 +24,11 @@ jobs:
       - name: Build and publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          CI: true
         run: |
           set -e
-          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
-          echo "//registry.npmjs.org/:always-auth=true" >> .npmrc
           which pnpm && echo 'pnpm OK' || npm i -g pnpm
+          pnpm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
           pnpm i --ignore-scripts
           npm run build-all
           npm run publish-all
