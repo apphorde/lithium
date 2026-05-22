@@ -19,13 +19,13 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Build packages
         run: |
           set -e
           which pnpm && echo 'pnpm OK' || npm i -g pnpm
-          pnpm i
+          pnpm i --ignore-scripts
           pnpm nx run-many -t build,tsc,test
 
       - name: Publish to AppHorde Registry

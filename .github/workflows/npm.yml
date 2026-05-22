@@ -29,6 +29,6 @@ jobs:
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
           echo "//registry.npmjs.org/:always-auth=true" >> .npmrc
           which pnpm && echo 'pnpm OK' || npm i -g pnpm
-          pnpm i
+          pnpm i --ignore-scripts
           npm run build-all
           npm run publish-all
