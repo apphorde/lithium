@@ -20,12 +20,24 @@
         "command": "rollup -c {projectRoot}/rollup.config.js"
       }
     },
-    "test": {
+    "unit": {
+      "cache": true
+    },
+    "nodeTest": {
       "dependsOn": ["build", "tsc"],
       "executor": "nx:run-commands",
       "options": {
         "command": "test -f {projectRoot}/src/index.spec.ts && npx tsx {projectRoot}/src/index.spec.ts"
       }
     }
-  }
+  },
+  "plugins": [
+    {
+      "plugin": "@nx/vitest",
+      "options": {
+        "testTargetName": "unit"
+      }
+    }
+  ],
+  "analytics": false
 }

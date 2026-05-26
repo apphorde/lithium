@@ -9,5 +9,12 @@
   },
   "repository": {
     "url": "https://github.com/apphorde/lithium"
+  },
+  "devDependencies": {
+    "@vitest/browser-playwright": "^4.1.7",
+    "vitest": "^4.1.7"
+  },
+  "scripts": {
+    "test:browser": "vitest"
   }
 }
