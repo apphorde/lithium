@@ -293,7 +293,7 @@ export function ref<T = any>(initial: T, isShallow = false) {
 }
 
 export function isRef(t: any): t is Signal {
-  return t && t[refSymbol];
+  return Boolean(t && t[refSymbol]);
 }
 
 export function computed<T = any>(fn: AnyFunction) {
@@ -398,7 +398,12 @@ export function defineEvent(name: string) {
   const root = getCurrentNode().root;
 
   return function emitter(value: any) {
-    root.dispatchEvent(new CustomEvent(name, { detail: value }));
+    const event = new CustomEvent(name, { detail: value });
+    root.dispatchEvent(event);
+    const handler = root['on' + name];
+    if (typeof handler === 'function') {
+      handler(event);
+    }
   };
 }
 
