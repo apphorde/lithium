@@ -1,4 +1,4 @@
-import { assert, describe, it } from 'vitest';
+import { assert, describe, it, expect, vi } from 'vitest';
 import {
   canBeObserved,
   compare,
@@ -17,10 +17,13 @@ import {
   templateRef,
   unwrap,
   watch,
+  noop,
+  defineComponent,
+  findApps,
+  load,
 } from './index.js';
 
-// import { expect, test } from 'vitest'
-// import { getByText } from '@testing-library/dom'
+import { getByText } from '@testing-library/dom';
 
 describe('@li3/web', () => {
   /*
@@ -164,5 +167,66 @@ describe('@li3/web', () => {
 
     unmount();
     assert.strictEqual(unmounted, true);
+  });
+
+  it('noop is a no-op', () => {
+    assert.strictEqual(noop(), undefined);
+  });
+
+  it('defineComponent registers and mounts custom element (shadow DOM) and unmounts', async () => {
+    const name = 'test-comp-' + Math.random().toString(36).slice(2, 8);
+    let unmounted = false;
+
+    const tpl = document.createElement('template');
+    tpl.innerHTML = '<div></div>';
+
+    defineComponent({
+      name,
+      template: tpl,
+      shadowDom: true,
+      setup: () => {
+        onUnmount(() => (unmounted = true));
+        return {};
+      },
+    });
+
+    const el = document.createElement(name);
+    document.body.appendChild(el);
+
+    // mount should have attached a shadow root and set DEBUG on it
+    const debug = (el.shadowRoot as any)[DEBUG];
+    assert.ok(debug && debug.runtime);
+
+    document.body.removeChild(el);
+    assert.strictEqual(unmounted, true);
+  });
+
+  it('findApps mounts templates with `app` attribute', () => {
+    const tpl = document.createElement('template');
+    tpl.setAttribute('app', '');
+    tpl.innerHTML = '<div>app</div>';
+    document.body.appendChild(tpl);
+
+    findApps();
+
+    const prev = tpl.previousElementSibling as Element | null;
+    assert.ok(prev && prev.nodeName === 'DIV');
+
+    // cleanup
+    prev?.remove();
+    tpl.remove();
+  });
+
+  it('load fetches components HTML and defines components', async () => {
+    const html = '<template component="comp-a"></template><template component="comp-b"></template>';
+
+    // mock fetch
+    (global as any).fetch = vi.fn(() => Promise.resolve({ ok: true, text: () => Promise.resolve(html) }));
+
+    const res = await load('http://example/');
+    const options = await Promise.all(res);
+
+    assert.strictEqual(options[0]?.name, 'comp-a');
+    assert.strictEqual(options[1]?.name, 'comp-b');
   });
 });
