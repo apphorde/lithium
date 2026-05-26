@@ -1,8 +1,0 @@
-{
-  "name": "@li3/reactive",
-  "targets": {
-    "build": {},
-    "tsc": {},
-    "test": {}
-  }
-}

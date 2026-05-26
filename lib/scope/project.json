@@ -1,8 +1,0 @@
-{
-  "name": "@li3/scope",
-  "targets": {
-    "build": {},
-    "tsc": {},
-    "test": {}
-  }
-}

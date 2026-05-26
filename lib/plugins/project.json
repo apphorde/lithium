@@ -1,7 +1,0 @@
-{
-  "name": "@li3/plugins",
-  "targets": {
-    "build": {},
-    "tsc": {}
-  }
-}
