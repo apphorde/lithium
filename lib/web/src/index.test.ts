@@ -14,7 +14,6 @@ import {
   onUpdate,
   reactive,
   ref,
-  templateRef,
   unwrap,
   watch,
   noop,
