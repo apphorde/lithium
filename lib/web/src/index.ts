@@ -1,7 +1,7 @@
 type AnyFunction = (...args: any[]) => any;
 
 type PropOptions<T = any> = {
-  default?: () => T | T;
+  default?: T | (() => T);
 };
 
 type RuntimeContext = {
@@ -32,33 +32,27 @@ type DefineComponentOptions = MountOptions & { name: string };
 
 const currentNodeStack: RuntimeContext[] = [];
 const signalsStack: Signal[] = [];
-const refSymbol = Symbol("ref");
-const contextRef = Symbol("context");
-const reactiveTag = Symbol("reactive");
-const unwrapTag = Symbol("unwrap");
+const refSymbol = Symbol('ref');
+const contextRef = Symbol('context');
+const reactiveTag = Symbol('reactive');
+const unwrapTag = Symbol('unwrap');
 
-export const DEBUG = Symbol("#");
+export const DEBUG = Symbol('#');
 
 export function noop() {}
 
-function getShadowDomOptions(
-  template: HTMLTemplateElement
-): ShadowRootInit | undefined {
-  const source = template.getAttribute("shadow-dom") || "";
+function getShadowDomOptions(template: HTMLTemplateElement): ShadowRootInit | undefined {
+  const source = template.getAttribute('shadow-dom') || '';
 
   if (source) {
-    return source.startsWith("{")
-      ? JSON.parse(source)
-      : { mode: source as ShadowRootMode };
+    return source.startsWith('{') ? JSON.parse(source) : { mode: source as ShadowRootMode };
   }
 }
 
 export function defineComponent(options: DefineComponentOptions) {
   const { name, template } = options;
   const shadowDom: ShadowRootInit | undefined =
-    options.shadowDom === true
-      ? { mode: "open" }
-      : getShadowDomOptions(template);
+    options.shadowDom === true ? { mode: 'open' } : getShadowDomOptions(template);
 
   class Component extends HTMLElement {
     unmount: Function | null = null;
@@ -115,7 +109,7 @@ export function mount(target: Element, options: MountOptions) {
   const reader = createContextReader(context);
   walkNodes(dom, bindNode, reader);
 
-  root.innerHTML = "";
+  root.innerHTML = '';
   root.appendChild(dom);
 
   for (const fn of runtime.mount) {
@@ -139,7 +133,7 @@ export function compare(a: any, b: any) {
     return false;
   }
 
-  if (typeA === "object") {
+  if (typeA === 'object') {
     if (a === null || b === null) {
       return a === b;
     }
@@ -170,7 +164,7 @@ export function compare(a: any, b: any) {
       return a.message === b.message;
     }
 
-    if (["string", "number", "function"].includes(typeA)) {
+    if (['string', 'number', 'function'].includes(typeA)) {
       return String(a) === String(b);
     }
 
@@ -181,12 +175,7 @@ export function compare(a: any, b: any) {
 }
 
 export function canBeObserved(object: any): boolean {
-  return (
-    object !== null &&
-    object !== undefined &&
-    typeof object === "object" &&
-    !object[reactiveTag]
-  );
+  return object !== null && object !== undefined && typeof object === 'object' && !object[reactiveTag];
 }
 
 export function reactive<T extends object>(object: T, effect: AnyFunction): T {
@@ -196,7 +185,7 @@ export function reactive<T extends object>(object: T, effect: AnyFunction): T {
 
   const values = Object.entries(object);
   for (const [key, next] of values) {
-    if (typeof next === "object" && next !== null) {
+    if (typeof next === 'object' && next !== null) {
       (object as any)[key] = reactive(next, effect);
     }
   }
@@ -219,7 +208,7 @@ export function reactive<T extends object>(object: T, effect: AnyFunction): T {
         return false;
       }
 
-      if (typeof value === "object" && value !== null) {
+      if (typeof value === 'object' && value !== null) {
         value = reactive(value, effect);
       }
 
@@ -277,7 +266,7 @@ export function ref<T = any>(initial: T, isShallow = false) {
       let lastValue = o.internalValue;
       o.internalValue = newValue;
 
-      if (!isShallow && typeof newValue === "object" && newValue !== null) {
+      if (!isShallow && typeof newValue === 'object' && newValue !== null) {
         newValue = reactive(newValue as object, (_, lastValue) => {
           notifyDependencies(o);
           notifyWatchers(o, lastValue);
@@ -309,7 +298,7 @@ export function computed<T = any>(fn: AnyFunction) {
     },
 
     set value(_) {
-      throw new Error("Computed value cannot be set");
+      throw new Error('Computed value cannot be set');
     },
 
     update(value = fn()) {
@@ -365,9 +354,7 @@ export function defineProp(name: PropertyKey, options: PropOptions = {}) {
   const { default: defaultValue } = options;
   const target = getCurrentNode().root;
   const hooks = getCurrentNode().update;
-  const current =
-    target[name] ??
-    (typeof defaultValue === "function" ? defaultValue() : defaultValue);
+  const current = target[name] ?? (typeof defaultValue === 'function' ? defaultValue() : defaultValue);
   const prop = ref(current);
 
   watch(prop, (value: any) => {
@@ -441,7 +428,7 @@ function getCurrentNode() {
   const t = currentNodeStack.at(-1);
 
   if (!t) {
-    throw new Error("Missing context for this component");
+    throw new Error('Missing context for this component');
   }
 
   return t;
@@ -463,17 +450,10 @@ function walkAttributes(node: Element, fn: AnyFunction, context: any) {
   }
 }
 
-function createFunction(
-  expression: string,
-  keys: string[],
-  context: any,
-  args: string[] = []
-) {
+function createFunction(expression: string, keys: string[], context: any, args: string[] = []) {
   return Function(
     ...args,
-    `const { ${keys
-      .filter((key: any) => expression.includes(key))
-      .join(", ")} } = this; return ${expression};`
+    `const { ${keys.filter((key: any) => expression.includes(key)).join(', ')} } = this; return ${expression};`,
   ).bind(context);
 }
 
@@ -519,110 +499,78 @@ function bindNode(node: Text | Element, context: any) {
 function bindText(node: Text, context: {}) {
   const template = node.textContent.trim();
 
-  if (!template || !template.includes("{{")) return;
+  if (!template || !template.includes('{{')) return;
 
   const keys = Object.keys(context);
-  const source =
-    "`" +
-    template.replace(
-      /{{(.*?)}}/g,
-      (_: any, exp: string) => "${" + exp.trim() + "}"
-    ) +
-    "`";
+  const source = '`' + template.replace(/{{(.*?)}}/g, (_: any, exp: string) => '${' + exp.trim() + '}') + '`';
 
-  effect(
-    createFunction(source, keys, context),
-    (v: any) => (node.textContent = v)
-  );
+  effect(createFunction(source, keys, context), (v: any) => (node.textContent = v));
 }
 
-function bindAttribute(
-  node: HTMLElement,
-  name: string,
-  value: string,
-  context: any
-) {
+function bindAttribute(node: HTMLElement, name: string, value: string, context: any) {
   const keys = Object.keys(context);
 
-  if (name === "ref") {
+  if (name === 'ref') {
     const key = value.trim();
     context[contextRef][key] = ref(node);
     return;
   }
 
-  if (name.startsWith("on-")) {
+  if (name.startsWith('on-')) {
     const key = name.slice(3);
-    const [event, ...tags] = key.split(".");
-    const modifiers = tags.reduce(
-      (acc: { [x: string]: boolean }, tag: string | number) => {
-        acc[tag] = true;
-        return acc;
-      },
-      {}
-    );
+    const [event, ...tags] = key.split('.');
+    const modifiers = tags.reduce((acc: { [x: string]: boolean }, tag: string | number) => {
+      acc[tag] = true;
+      return acc;
+    }, {});
 
-    const fn = createFunction(value, keys, context, ["$event"]);
-    node.addEventListener(
-      event,
-      (e: { stopPropagation: () => void; preventDefault: () => void }) => {
-        if (modifiers.stop) e.stopPropagation();
-        if (modifiers.prevent) e.preventDefault();
+    const fn = createFunction(value, keys, context, ['$event']);
+    node.addEventListener(event, (e: { stopPropagation: () => void; preventDefault: () => void }) => {
+      if (modifiers.stop) e.stopPropagation();
+      if (modifiers.prevent) e.preventDefault();
 
-        return fn(e);
-      }
-    );
+      return fn(e);
+    });
     node.removeAttribute(name);
     return;
   }
 
-  if (name.startsWith("attr-")) {
+  if (name.startsWith('attr-')) {
     const key = name.slice(5);
     const source = value.trim();
-    effect(createFunction(source, keys, context), (v: any) =>
-      node.setAttribute(key, v)
-    );
+    effect(createFunction(source, keys, context), (v: any) => node.setAttribute(key, v));
     node.removeAttribute(name);
     return;
   }
 
-  if (name.startsWith("bind-")) {
+  if (name.startsWith('bind-')) {
     const key = name.slice(5);
     const source = value.trim();
-    effect(
-      createFunction(source, keys, context),
-      (value: any) => ((node as any)[key] = value)
-    );
+    effect(createFunction(source, keys, context), (value: any) => ((node as any)[key] = value));
     node.removeAttribute(name);
     return;
   }
 
-  if (name.startsWith("class-")) {
+  if (name.startsWith('class-')) {
     const key = name.slice(6);
     const source = value.trim();
 
-    effect(createFunction(source, keys, context), (value: any) =>
-      node.classList.toggle(key, !!value)
-    );
+    effect(createFunction(source, keys, context), (value: any) => node.classList.toggle(key, !!value));
     node.removeAttribute(name);
     return;
   }
 
-  if (name.startsWith("style-")) {
-    const key = name
-      .slice(6)
-      .replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase());
+  if (name.startsWith('style-')) {
+    const key = name.slice(6).replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase());
     const source = value.trim();
-    effect(
-      createFunction(source, keys, context),
-      (value: any) => ((node.style as any)[key] = value)
-    );
+    effect(createFunction(source, keys, context), (value: any) => ((node.style as any)[key] = value));
     node.removeAttribute(name);
     return;
   }
 
-  if (node.nodeName === "TEMPLATE" && name === "for") {
+  if (node.nodeName === 'TEMPLATE' && name === 'for') {
     const source = value.trim();
-    const [left, expression] = source.split("of").map((s) => s.trim());
+    const [left, expression] = source.split('of').map((s) => s.trim());
     const forNodes: any[] = [];
 
     effect(createFunction(expression, keys, context), (value: any) => {
@@ -635,9 +583,7 @@ function bindAttribute(
       if (!Array.isArray(value)) return;
 
       const length = value.length;
-      const [key, indexKey] = left.includes("[")
-        ? left.slice(1, -1).split(",")
-        : [left, "index"];
+      const [key, indexKey] = left.includes('[') ? left.slice(1, -1).split(',') : [left, 'index'];
 
       for (let i = 0; i < length; i++) {
         const dom = (node as HTMLTemplateElement).content.cloneNode(true);
@@ -656,7 +602,7 @@ function bindAttribute(
     return;
   }
 
-  if (node.nodeName === "TEMPLATE" && name === "if") {
+  if (node.nodeName === 'TEMPLATE' && name === 'if') {
     const source = value.trim();
     const ifNodes: any[] = [];
 
@@ -681,46 +627,55 @@ function bindAttribute(
   }
 }
 
-function importModuleFromSource(code: BlobPart) {
-  const blob = URL.createObjectURL(
-    new Blob([code], { type: "text/javascript" })
-  );
-  const module = import(blob);
+async function importModuleFromSource(code: BlobPart) {
+  const blob = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }));
+  const module = await import(blob);
   URL.revokeObjectURL(blob);
   return module;
 }
 
+async function findSetupModule(template: HTMLTemplateElement) {
+  const setupCode = template.content.querySelector('script[setup]');
+
+  if (setupCode) {
+    const href = setupCode.getAttribute('href');
+    const code = setupCode.textContent;
+    const mod = href ? import(href) : importModuleFromSource(code);
+    setupCode.remove();
+
+    return (await mod).default;
+  }
+
+  return noop;
+}
+
 async function defineFromTemplate(template: HTMLTemplateElement) {
-  const name = template.getAttribute("component") as string;
+  const name = template.getAttribute('component') as string;
 
   if (!name) {
     return null;
   }
 
-  const options: DefineComponentOptions = { name, template };
-  const setupCode = template.content.querySelector("script[setup]");
-
-  if (setupCode) {
-    const href = setupCode.getAttribute("href");
-    const code = setupCode.textContent;
-    const mod = href ? import(href) : importModuleFromSource(code);
-    setupCode.remove();
-
-    options.setup = (await mod).default;
-  }
+  const options: DefineComponentOptions = {
+    name,
+    template,
+    setup: await findSetupModule(template),
+  };
 
   defineComponent(options);
   return options;
 }
 
-export function findApps() {
-  const apps = Array.from(
-    document.querySelectorAll("template[app]")
-  ) as HTMLTemplateElement[];
+export async function findApps() {
+  const apps = Array.from(document.querySelectorAll('template[app]')) as HTMLTemplateElement[];
 
   for (const template of apps) {
-    const options: MountOptions = { template };
-    const root = document.createElement("div");
+    const options: MountOptions = {
+      template,
+      setup: await findSetupModule(template),
+    };
+
+    const root = document.createElement('div');
     template.parentNode!.insertBefore(root, template);
 
     mount(root, options);
@@ -730,28 +685,26 @@ export function findApps() {
 export async function load(href: string | URL) {
   const response = await fetch(new URL(href, window.location.href));
   if (!response.ok) {
-    throw new Error("Failed to load components from " + href);
+    throw new Error('Failed to load components from ' + href);
   }
 
   const html = await response.text();
-  const dom = new DOMParser().parseFromString(html, "text/html");
-  const nodes = dom.querySelectorAll("template[component]");
+  const dom = new DOMParser().parseFromString(html, 'text/html');
+  const nodes = dom.querySelectorAll('template[component]');
 
   return (Array.from(nodes) as HTMLTemplateElement[]).map(defineFromTemplate);
 }
 
 function autoInitialize() {
-  const list = Array.from(
-    document.querySelectorAll("template[component]")
-  ) as HTMLTemplateElement[];
+  const list = Array.from(document.querySelectorAll('template[component]')) as HTMLTemplateElement[];
 
   list.forEach(defineFromTemplate);
 
   findApps();
 }
 
-if (document.readyState === "complete") {
+if (document.readyState === 'complete') {
   autoInitialize();
 } else {
-  window.addEventListener("DOMContentLoaded", autoInitialize);
+  window.addEventListener('DOMContentLoaded', autoInitialize);
 }

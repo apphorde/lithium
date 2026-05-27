@@ -1,4 +1,4 @@
-import { assert, describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   canBeObserved,
   compare,
@@ -26,6 +26,10 @@ import {
 import { getByText } from '@testing-library/dom';
 
 describe('@li3/web', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
   /*
   Public API:
 
@@ -59,63 +63,378 @@ describe('@li3/web', () => {
 
   */
 
-  it('should create a reactive reference to a value', async () => {
-    const r = ref(1);
-    assert.strictEqual(r.value, 1);
-    r.value = 2;
-    assert.strictEqual(r.value, 2);
-    assert.strictEqual(isRef(r), true);
-    assert.strictEqual(isRef({}), false);
+  describe('canBeObserved', () => {
+    it('returns false for null and primitive values, and true for objects', () => {
+      expect(canBeObserved(null)).toBe(false);
+      expect(canBeObserved(undefined)).toBe(false);
+      expect(canBeObserved(123)).toBe(false);
+      expect(canBeObserved('text')).toBe(false);
+      expect(canBeObserved({})).toBe(true);
+      expect(canBeObserved([])).toBe(true);
+    });
   });
 
-  it('should create a computed property that updates when dependencies change', async () => {
-    const a = ref(1);
-    const c = computed(() => a.value + 1);
-    assert.strictEqual(c.value, 2);
+  describe('compare', () => {
+    it('compares supported values correctly', () => {
+      const sameObj = { a: 1 };
+      expect(compare([1, 2, 3], [1, 2, 3])).toBe(true);
+      expect(compare(new Date(1000), new Date(1000))).toBe(true);
+      expect(compare(/abc/i, /abc/i)).toBe(true);
+      expect(compare(new Error('x'), new Error('x'))).toBe(true);
+      expect(compare(sameObj, sameObj)).toBe(true);
+      expect(compare({ a: 1 }, { a: 1 })).toBe(false);
+    });
+  });
+  describe('computed', () => {
+    it('should create a computed property that updates when dependencies change', async () => {
+      const a = ref(1);
+      const c = computed(() => a.value + 1);
+      expect(c.value).toBe(2);
 
-    a.value = 3;
-    assert.strictEqual(c.value, 4);
+      a.value = 3;
+      expect(c.value).toBe(4);
 
-    assert.throws(() => ((c as any).value = 0));
+      expect(() => ((c as any).value = 0)).toThrow();
 
-    const seen: any[] = [];
-    const unsub = watch(a, (v: any) => seen.push(v));
-    a.value = 4;
-    unsub();
-    a.value = 5;
-    assert.ok(seen.length >= 2);
+      const seen: any[] = [];
+      const unsub = watch(a, (v: any) => seen.push(v));
+      a.value = 4;
+      unsub();
+      a.value = 5;
+      expect(seen.length).toBeGreaterThanOrEqual(2);
 
-    const eff: any[] = [];
-    effect(
-      () => a.value * 2,
-      (v: any) => eff.push(v),
-    );
-    a.value = 10;
-    assert.ok(eff.length > 0);
+      const eff: any[] = [];
+      effect(
+        () => a.value * 2,
+        (v: any) => eff.push(v),
+      );
+      a.value = 10;
+      expect(eff.length).toBeGreaterThan(0);
+    });
+  });
+  describe('DEBUG', () => {
+    it('stores runtime debug info on mount target', () => {
+      const template = document.createElement('template');
+      template.innerHTML = '<div></div>';
+      const target = document.createElement('div') as any;
+      const unmount = mount(target, { template, setup: () => ({}) });
+
+      expect(target[DEBUG]).toBeDefined();
+      expect(target[DEBUG].runtime).toBeDefined();
+      expect(target[DEBUG].context).toBeDefined();
+      unmount();
+    });
   });
 
-  it('reactive, canBeObserved, unwrap and compare behavior', async () => {
-    const o: any = { a: 1 };
-    assert.strictEqual(canBeObserved(o), true);
+  describe('defineEvent', () => {
+    it('emits a custom event from the component root', () => {
+      const target = document.createElement('div') as any;
+      const template = document.createElement('template');
+      template.innerHTML = '<span></span>';
+      const emitted: any[] = [];
+      target.addEventListener('test', (event: any) => emitted.push(event.detail));
 
-    const changes: any[] = [];
-    const p = reactive(o, (v: any, last: any) => changes.push({ v, last }));
+      const setup = () => {
+        const emit = defineEvent('test');
+        return { emit };
+      };
 
-    assert.strictEqual(canBeObserved(p), false);
-    assert.strictEqual(unwrap(p), o);
+      const unmount = mount(target, { template, setup });
+      const ctx = target[DEBUG].context as any;
+      ctx.emit('hello');
 
-    p.a = 2;
-    delete p.a;
-    assert.ok(changes.length >= 2);
+      expect(emitted).toEqual(['hello']);
+      unmount();
+    });
+  });
 
-    // compare: objects / arrays / dates / regex / errors should compare true when equal
-    // assert.strictEqual(compare([1, 2, 3], [1, 2, 3]), true);
-    assert.strictEqual(compare(new Date(1000), new Date(1000)), true);
-    assert.strictEqual(compare(/abc/i, /abc/i), true);
-    assert.strictEqual(compare(new Error('x'), new Error('x')), true);
+  describe('defineProp', () => {
+    it('creates a reactive property on the component root and triggers update hooks', () => {
+      const template = document.createElement('template');
+      template.innerHTML = '<span></span>';
+      const target = document.createElement('div') as any;
 
-    // primitives return false per implementation
-    assert.strictEqual(compare(1, 1), false);
+      let updated = false;
+      const setup = () => {
+        const count = defineProp('count', { default: 1 });
+        onUpdate(() => {
+          updated = true;
+        });
+        return { count };
+      };
+
+      const unmount = mount(target, { template, setup });
+      expect(target.count).toBe(1);
+      target.count = 2;
+      expect(target.count).toBe(2);
+      expect(updated).toBe(true);
+      unmount();
+    });
+  });
+
+  describe('effect', () => {
+    it('runs effect functions when dependencies change', () => {
+      const value = ref(2);
+      const seen: any[] = [];
+      effect(
+        () => value.value * 3,
+        (next) => seen.push(next),
+      );
+
+      expect(seen[0]).toBe(6);
+      value.value = 3;
+      expect(seen[seen.length - 1]).toBe(9);
+    });
+  });
+
+  describe('isRef', () => {
+    it('identifies refs and computed values as refs', () => {
+      const r = ref(1);
+      const c = computed(() => r.value + 1);
+      expect(isRef(r)).toBe(true);
+      expect(isRef(c)).toBe(true);
+      expect(isRef({})).toBe(false);
+    });
+  });
+
+  describe('mount', () => {
+    it('renders template content into the target element', () => {
+      const template = document.createElement('template');
+      template.innerHTML = '<span>hello</span>';
+      const target = document.createElement('div') as any;
+
+      mount(target, { template, setup: () => ({}) });
+      expect(target.innerHTML).toContain('hello');
+    });
+
+    it('binds text expressions and on-click event handlers', () => {
+      const template = document.createElement('template');
+      template.innerHTML = '<button on-click="increment()">click</button><span>{{value}}</span>';
+      const target = document.createElement('div') as any;
+      let count = 1;
+
+      mount(target, {
+        template,
+        setup: () => {
+          const value = ref(count);
+          const increment = () => {
+            count += 1;
+            value.value = count;
+          };
+          return { value, increment };
+        },
+      });
+
+      const button = getByText(target, 'click');
+      button.click();
+      expect(getByText(target, '2')).toBeTruthy();
+    });
+  });
+
+  describe('onMount', () => {
+    it('calls mount hooks when component is mounted', () => {
+      const template = document.createElement('template');
+      template.innerHTML = '<div></div>';
+      const target = document.createElement('div') as any;
+      let mounted = false;
+      mount(target, {
+        template,
+        setup: () => {
+          onMount(() => {
+            mounted = true;
+          });
+          return {};
+        },
+      });
+      expect(mounted).toBe(true);
+    });
+  });
+
+  describe('onUnmount', () => {
+    it('calls unmount hooks when component is unmounted', () => {
+      const template = document.createElement('template');
+      template.innerHTML = '<div></div>';
+      const target = document.createElement('div') as any;
+      let unmounted = false;
+      const unmount = mount(target, {
+        template,
+        setup: () => {
+          onUnmount(() => {
+            unmounted = true;
+          });
+          return {};
+        },
+      });
+      unmount();
+      expect(unmounted).toBe(true);
+    });
+  });
+
+  describe('onUpdate', () => {
+    it('calls update hooks when root props change', () => {
+      const template = document.createElement('template');
+      template.innerHTML = '<div></div>';
+      const target = document.createElement('div') as any;
+      let updated = false;
+      const unmount = mount(target, {
+        template,
+        setup: () => {
+          const count = defineProp('count', { default: 0 });
+          onUpdate(() => {
+            updated = true;
+          });
+          return { count };
+        },
+      });
+      target.count = 1;
+      expect(updated).toBe(true);
+      unmount();
+    });
+  });
+
+  describe('reactive', () => {
+    it('reactive, canBeObserved, unwrap and compare behavior', async () => {
+      const o: any = { a: 1 };
+      expect(canBeObserved(o)).toBe(true);
+
+      const changes: any[] = [];
+      const p = reactive(o, (v: any, last: any) => changes.push({ v, last }));
+
+      expect(canBeObserved(p)).toBe(false);
+      expect(unwrap(p)).toBe(o);
+
+      p.a = 2;
+      delete p.a;
+      expect(changes.length).toBeGreaterThanOrEqual(2);
+
+      // compare: objects / arrays / dates / regex / errors should compare true when equal
+      expect(compare([1, 2, 3], [1, 2, 3])).toBe(true);
+      expect(compare(new Date(1000), new Date(1000))).toBe(true);
+      expect(compare(/abc/i, /abc/i)).toBe(true);
+      expect(compare(new Error('x'), new Error('x'))).toBe(true);
+
+      // primitives return false per implementation
+      expect(compare(1, 1)).toBe(false);
+    });
+  });
+  describe('ref', () => {
+    it('should create a reactive reference to a value', async () => {
+      const r = ref(1);
+      expect(r.value).toBe(1);
+      r.value = 2;
+      expect(r.value).toBe(2);
+      expect(isRef(r)).toBe(true);
+      expect(isRef({})).toBe(false);
+    });
+  });
+  describe('templateRef', () => {
+    it('exposes the referenced element inside component setup', () => {
+      const template = document.createElement('template');
+      template.innerHTML = '<div ref="myRef"></div>';
+      const target = document.createElement('div') as any;
+      const setup = () => {
+        const myRef = templateRef('myRef');
+        return { myRef };
+      };
+      mount(target, { template, setup });
+      expect(target[DEBUG].context.myRef.value).not.toBeNull();
+    });
+  });
+
+  describe('unwrap', () => {
+    it('returns raw values for non-reactive objects', () => {
+      const raw = { a: 1 };
+      expect(unwrap(raw)).toBe(raw);
+      expect(unwrap(null)).toBeNull();
+    });
+  });
+
+  describe('watch', () => {
+    it('invokes callback when watched value changes', () => {
+      const r = ref(1);
+      const seen: any[] = [];
+      const unsub = watch(r, (next) => seen.push(next));
+      expect(seen[0]).toBe(1);
+      r.value = 2;
+      expect(seen[seen.length - 1]).toBe(2);
+      unsub();
+    });
+  });
+
+  describe('noop', () => {
+    it('is a no-op function', () => {
+      expect(noop()).toBeUndefined();
+    });
+  });
+
+  describe('defineComponent', () => {
+    it('registers and mounts custom element (shadow DOM) and unmounts', async () => {
+      const name = 'test-comp-' + Math.random().toString(36).slice(2, 8);
+      let unmounted = false;
+
+      const tpl = document.createElement('template');
+      tpl.innerHTML = '<div></div>';
+
+      defineComponent({
+        name,
+        template: tpl,
+        shadowDom: true,
+        setup: () => {
+          onUnmount(() => (unmounted = true));
+          return {};
+        },
+      });
+
+      const el = document.createElement(name);
+      document.body.appendChild(el);
+
+      // mount should have attached a shadow root and set DEBUG on it
+      const debug = (el.shadowRoot as any)[DEBUG];
+      expect(debug && debug.runtime).toBeTruthy();
+
+      document.body.removeChild(el);
+      expect(unmounted).toBe(true);
+    });
+  });
+  describe('findApps', () => {
+    it('mounts templates with `app` attribute', () => {
+      const tpl = document.createElement('template');
+      tpl.setAttribute('app', '');
+      tpl.innerHTML = '<div>app</div>';
+      document.body.appendChild(tpl);
+
+      findApps();
+
+      const prev = tpl.previousElementSibling as Element | null;
+      expect(prev).not.toBeNull();
+      expect(prev?.nodeName).toBe('DIV');
+
+      prev?.remove();
+      tpl.remove();
+    });
+  });
+
+  describe('load', () => {
+    it('loads HTML component templates and returns definitions', async () => {
+      const html = '<template component="comp-a"></template><template component="comp-b"></template>';
+      const originalFetch = (global as any).fetch;
+      (global as any).fetch = vi.fn(() => Promise.resolve({ ok: true, text: () => Promise.resolve(html) }));
+
+      const res = await load('http://example/');
+      const options = await Promise.all(res);
+
+      expect(options[0]?.name).toBe('comp-a');
+      expect(options[1]?.name).toBe('comp-b');
+      (global as any).fetch = originalFetch;
+    });
+
+    it('throws when fetch returns a non-ok response', async () => {
+      const originalFetch = (global as any).fetch;
+      (global as any).fetch = vi.fn(() => Promise.resolve({ ok: false, status: 404, text: () => Promise.resolve('') }));
+
+      await expect(load('http://example/')).rejects.toThrow('Failed to load components from http://example/');
+      (global as any).fetch = originalFetch;
+    });
   });
 
   it('defineProp, defineEvent, templateRef and lifecycle hooks via mount', async () => {
@@ -138,7 +457,9 @@ describe('@li3/web', () => {
       onUpdate(() => (updated = true));
       onUnmount(() => (unmounted = true));
 
-      const handleEvent = () => { emit(count.value + 1); };
+      const handleEvent = () => {
+        emit(count.value + 1);
+      };
 
       return { el, handleEvent };
     };
@@ -148,86 +469,25 @@ describe('@li3/web', () => {
     const ctx = (target as any)[DEBUG].context as any;
 
     // props defined on the root
-    assert.strictEqual(target.count, 1);
+    expect(target.count).toBe(1);
     target.count = 2;
-    assert.strictEqual(target.count, 2);
+    expect(target.count).toBe(2);
 
     // templateRef present in context
-    assert.isNotNull(ctx.el);
+    expect(ctx.el).not.toBeNull();
 
     // emitter should dispatch an event to the root
-    const onAdd =  vi.fn();
+    const onAdd = vi.fn();
     target.addEventListener('add', onAdd);
     getByText(target, 'add').click();
 
-    assert.ok(onAdd.mock.calls.length > 0);
-    // assert.strictEqual(target._last.detail, 'hello');
+    expect(onAdd).toHaveBeenCalled();
 
-    assert.strictEqual(mounted, true);
+    expect(mounted).toBe(true);
 
     unmount();
-    assert.strictEqual(unmounted, true);
-    assert.strictEqual(updated, true);
+    expect(unmounted).toBe(true);
+    expect(updated).toBe(true);
   });
 
-  it('noop is a no-op', () => {
-    assert.strictEqual(noop(), undefined);
-  });
-
-  it('defineComponent registers and mounts custom element (shadow DOM) and unmounts', async () => {
-    const name = 'test-comp-' + Math.random().toString(36).slice(2, 8);
-    let unmounted = false;
-
-    const tpl = document.createElement('template');
-    tpl.innerHTML = '<div></div>';
-
-    defineComponent({
-      name,
-      template: tpl,
-      shadowDom: true,
-      setup: () => {
-        onUnmount(() => (unmounted = true));
-        return {};
-      },
-    });
-
-    const el = document.createElement(name);
-    document.body.appendChild(el);
-
-    // mount should have attached a shadow root and set DEBUG on it
-    const debug = (el.shadowRoot as any)[DEBUG];
-    assert.ok(debug && debug.runtime);
-
-    document.body.removeChild(el);
-    assert.strictEqual(unmounted, true);
-  });
-
-  it('findApps mounts templates with `app` attribute', () => {
-    const tpl = document.createElement('template');
-    tpl.setAttribute('app', '');
-    tpl.innerHTML = '<div>app</div>';
-    document.body.appendChild(tpl);
-
-    findApps();
-
-    const prev = tpl.previousElementSibling as Element | null;
-    assert.ok(prev && prev.nodeName === 'DIV');
-
-    // cleanup
-    prev?.remove();
-    tpl.remove();
-  });
-
-  it('load fetches components HTML and defines components', async () => {
-    const html = '<template component="comp-a"></template><template component="comp-b"></template>';
-
-    // mock fetch
-    (global as any).fetch = vi.fn(() => Promise.resolve({ ok: true, text: () => Promise.resolve(html) }));
-
-    const res = await load('http://example/');
-    const options = await Promise.all(res);
-
-    assert.strictEqual(options[0]?.name, 'comp-a');
-    assert.strictEqual(options[1]?.name, 'comp-b');
-  });
 });
