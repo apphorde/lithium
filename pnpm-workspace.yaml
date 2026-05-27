@@ -1,2 +1,6 @@
 packages:
   - 'lib/*'
+allowBuilds:
+  core-js: true
+  esbuild: true
+  nx: true

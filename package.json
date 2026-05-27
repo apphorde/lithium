@@ -27,12 +27,5 @@
     "docs": "pnpm typedoc --footerLastModified",
     "build-all": "pnpm nx run-many -t build,tsc",
     "publish-all": "pnpm publish --no-git-checks --access public -r"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "core-js",
-      "esbuild",
-      "nx"
-    ]
   }
 }
