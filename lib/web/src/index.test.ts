@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeAll } from 'vitest';
 import {
   canBeObserved,
   compare,
@@ -9,8 +9,8 @@ import {
   effect,
   isRef,
   mount,
-  onMount,
-  onUnmount,
+  onInit,
+  onDestroy,
   onUpdate,
   reactive,
   ref,
@@ -26,42 +26,9 @@ import {
 import { getByText } from '@testing-library/dom';
 
 describe('@li3/web', () => {
-  afterEach(() => {
-    document.body.innerHTML = '';
+  beforeAll(() => {
+    window.name = 'debug';
   });
-
-  /*
-  Public API:
-
-  Reactive values and references
-    ref(value)                               Creates a reactive wrapper to a value (a signal)
-    computed(fn)                             Creates a computed property that updates when its dependencies change (other computed or refs)
-    templateRef(refName: string)             Finds an element with a `ref` attribute in the view and creates a reactive wrapper to it
-    hook(value)                              Creates a reactive wrapper using React style hooks (e.g. const [value, setValue] = hook(initialValue))
-    watch(ref, callback)                     Watches a reactive source and calls the callback when it changes
-    effect(fn, effectFn)                     Runs a function and tracks its dependencies, re-running the effectFn when they change
-    reactive(object, effect)                 Creates a reactive version of an object that triggers an effect when it changes
-    canBeObserved(object)                    Checks if an object can be observed for reactivity (internal use only)
-
-  Lifecycle Hooks:
-    onMounted(fn)                            Called just before the component is mounted (i.e. inserted into the DOM)
-    onUnmounted(fn)                          Called just before the component is unmounted (i.e. removed from the DOM)
-    onUpdated(fn)                            Called just before the component inputs have changed (i.e. one or more props have changed)
-
-  Component setup definitions:
-    defineProp(name, options)                    Defines a prop for a component with the given name and options (type, default value, etc.)
-    defineEvent(name)                            Defines a custom event that the component can emit with the given name
-
-  Component definition:
-    defineComponent(options)                 Defines a custom element with the given options (name, template, shadowDom and setup function)
-    mount(targetElement, options)            Mounts a component to a target element with the given options
-    unwrap(object)                           Unwraps a reactive reference or computed property to get its underlying value
-    load(href)                               Loads one or more components (as HTML) from a source and registers the  as a custom element
-
-  Internals:
-    compare(a, b)                            Compares two values for equality, handling reactive references and computed properties
-
-  */
 
   describe('canBeObserved', () => {
     it('returns false for null and primitive values, and true for objects', () => {
@@ -120,6 +87,7 @@ describe('@li3/web', () => {
       expect(eff.length).toBeGreaterThan(0);
     });
   });
+
   describe('DEBUG', () => {
     it('stores runtime debug info on mount target', () => {
       const template = document.createElement('template');
@@ -138,9 +106,9 @@ describe('@li3/web', () => {
     it('emits a custom event from the component root', () => {
       const target = document.createElement('div') as any;
       const template = document.createElement('template');
-      template.innerHTML = '<span></span>';
+      template.innerHTML = '<button on-click="emit(1)">click</button>';
       const emitted: any[] = [];
-      target.addEventListener('test', (event: any) => emitted.push(event.detail));
+      target.ontest = (event: any) => emitted.push(event.detail);
 
       const setup = () => {
         const emit = defineEvent('test');
@@ -148,34 +116,41 @@ describe('@li3/web', () => {
       };
 
       const unmount = mount(target, { template, setup });
-      const ctx = target[DEBUG].context as any;
-      ctx.emit('hello');
+      getByText(target, 'click').click();
 
-      expect(emitted).toEqual(['hello']);
+      expect(emitted).toEqual([1]);
       unmount();
     });
   });
 
-  describe('defineProp', () => {
-    it('creates a reactive property on the component root and triggers update hooks', () => {
+  describe('defineProp and onUpdate', () => {
+    it('creates a reactive property on the component root and triggers update hooks', async () => {
       const template = document.createElement('template');
       template.innerHTML = '<span></span>';
       const target = document.createElement('div') as any;
 
-      let updated = false;
+      let updateCount = 0;
+
       const setup = () => {
         const count = defineProp('count', { default: 1 });
+
         onUpdate(() => {
-          updated = true;
+          updateCount++;
         });
+
         return { count };
       };
 
       const unmount = mount(target, { template, setup });
       expect(target.count).toBe(1);
       target.count = 2;
+
       expect(target.count).toBe(2);
-      expect(updated).toBe(true);
+
+      // wait for update hooks to run
+      await new Promise((resolve) => setTimeout(resolve, 5));
+
+      expect(updateCount).toBe(1);
       unmount();
     });
   });
@@ -184,6 +159,7 @@ describe('@li3/web', () => {
     it('runs effect functions when dependencies change', () => {
       const value = ref(2);
       const seen: any[] = [];
+
       effect(
         () => value.value * 3,
         (next) => seen.push(next),
@@ -211,7 +187,7 @@ describe('@li3/web', () => {
       template.innerHTML = '<span>hello</span>';
       const target = document.createElement('div') as any;
 
-      mount(target, { template, setup: () => ({}) });
+      mount(target, { template });
       expect(target.innerHTML).toContain('hello');
     });
 
@@ -239,64 +215,43 @@ describe('@li3/web', () => {
     });
   });
 
-  describe('onMount', () => {
-    it('calls mount hooks when component is mounted', () => {
+  describe('onInit', () => {
+    it('calls init hooks when component is initialized', () => {
       const template = document.createElement('template');
       template.innerHTML = '<div></div>';
       const target = document.createElement('div') as any;
-      let mounted = false;
+      let initialized = false;
+
       mount(target, {
         template,
         setup: () => {
-          onMount(() => {
-            mounted = true;
+          onInit(() => {
+            initialized = true;
           });
           return {};
         },
       });
-      expect(mounted).toBe(true);
+      expect(initialized).toBe(true);
     });
   });
 
-  describe('onUnmount', () => {
-    it('calls unmount hooks when component is unmounted', () => {
+  describe('onDestroy', () => {
+    it('calls destroy hooks when component is destroyed', () => {
       const template = document.createElement('template');
       template.innerHTML = '<div></div>';
       const target = document.createElement('div') as any;
-      let unmounted = false;
+      let destroyed = false;
       const unmount = mount(target, {
         template,
         setup: () => {
-          onUnmount(() => {
-            unmounted = true;
+          onDestroy(() => {
+            destroyed = true;
           });
           return {};
         },
       });
       unmount();
-      expect(unmounted).toBe(true);
-    });
-  });
-
-  describe('onUpdate', () => {
-    it('calls update hooks when root props change', () => {
-      const template = document.createElement('template');
-      template.innerHTML = '<div></div>';
-      const target = document.createElement('div') as any;
-      let updated = false;
-      const unmount = mount(target, {
-        template,
-        setup: () => {
-          const count = defineProp('count', { default: 0 });
-          onUpdate(() => {
-            updated = true;
-          });
-          return { count };
-        },
-      });
-      target.count = 1;
-      expect(updated).toBe(true);
-      unmount();
+      expect(destroyed).toBe(true);
     });
   });
 
@@ -312,7 +267,7 @@ describe('@li3/web', () => {
       expect(changes).toBe(3);
 
       // watch newly added objects
-      p.a = { c: 1 }
+      p.a = { c: 1 };
       expect(changes).toBe(4);
 
       p.a.c = 2;
@@ -330,6 +285,7 @@ describe('@li3/web', () => {
       expect(isRef({})).toBe(false);
     });
   });
+
   describe('templateRef', () => {
     it('exposes the referenced element inside component setup', () => {
       const template = document.createElement('template');
@@ -349,6 +305,8 @@ describe('@li3/web', () => {
       const raw = { a: 1 };
       expect(unwrap(raw)).toBe(raw);
       expect(unwrap(null)).toBeNull();
+      expect(unwrap(undefined)).toBeUndefined();
+      expect(unwrap(ref(1))).toBe(1);
     });
   });
 
@@ -383,7 +341,7 @@ describe('@li3/web', () => {
         template: tpl,
         shadowDom: true,
         setup: () => {
-          onUnmount(() => (unmounted = true));
+          onDestroy(() => (unmounted = true));
           return {};
         },
       });
@@ -399,6 +357,7 @@ describe('@li3/web', () => {
       expect(unmounted).toBe(true);
     });
   });
+
   describe('findApps', () => {
     it('mounts templates with `app` attribute', async () => {
       const tpl = document.createElement('template');
@@ -438,58 +397,5 @@ describe('@li3/web', () => {
       await expect(load('http://example/')).rejects.toThrow('Failed to load components from http://example/');
       (global as any).fetch = originalFetch;
     });
-  });
-
-  it('defineProp, defineEvent, templateRef and lifecycle hooks via mount', async () => {
-    const html = `<div ref="el">{{ count }} <button on-click="handleEvent()">add</button></div>`;
-    const template = document.createElement('template');
-    template.innerHTML = html;
-
-    const target = document.createElement('div') as any;
-
-    let mounted = false;
-    let updated = false;
-    let unmounted = false;
-
-    const setup = () => {
-      const count = defineProp('count', { default: () => 1 });
-      const emit = defineEvent('add');
-      const el = templateRef('el');
-
-      onMount(() => (mounted = true));
-      onUpdate(() => (updated = true));
-      onUnmount(() => (unmounted = true));
-
-      const handleEvent = () => {
-        emit(count.value + 1);
-      };
-
-      return { el, handleEvent };
-    };
-
-    const unmount = mount(target, { template, setup });
-
-    const ctx = (target as any)[DEBUG].context as any;
-
-    // props defined on the root
-    expect(target.count).toBe(1);
-    target.count = 2;
-    expect(target.count).toBe(2);
-
-    // templateRef present in context
-    expect(ctx.el).not.toBeNull();
-
-    // emitter should dispatch an event to the root
-    const onAdd = vi.fn();
-    target.addEventListener('add', onAdd);
-    getByText(target, 'add').click();
-
-    expect(onAdd).toHaveBeenCalled();
-
-    expect(mounted).toBe(true);
-
-    unmount();
-    expect(unmounted).toBe(true);
-    expect(updated).toBe(true);
   });
 });

@@ -1,14 +1,50 @@
 # @li3/web
 
-Browser APIs used to declare Li3 components
+## Public API
 
-## Feature flags
+**Reactive values and references**:
 
-| Feature              | Description                                             | Default |
-| -------------------- | ------------------------------------------------------- | ------- |
-| debugEnabled         | Enable debug logs and throw exceptions                  | false   |
-| useModuleExpressions | Use URL and import() to create expresions as modules    | false   |
-| cachedTemplateFor    | Optimize DOM manipulation of template[for] with a cache | false   |
+```txt
+    ref(value)                               Creates a reactive wrapper to a value (like a signal)
+    computed(fn)                             Creates a computed property that updates when its dependencies change (e.g. other computed or refs)
+    templateRef(refName: string)             Creates a ref and finds an element with a `ref={refName}` attribute in the view
+    hook(value)                              Creates a reactive wrapper using React style hooks (e.g. const [value, setValue] = hook(initialValue))
+    watch(ref, callback)                     Watches a reactive source and calls the callback when it changes
+    effect(fn, effectFn)                     Runs a function and tracks its dependencies, re-running the effectFn when they change (wraps fn in computed)
+    reactive(object, effect)                 Creates a reactive version of an object that triggers an effect when it changes
+```
 
-Set `window.name` to `debug` in any page to enable debugging on spot.
-The name persists after a page reload.
+**Lifecycle Hooks:**
+
+```txt
+    onInit(fn)                               Called just before the component is initialized
+    onDestroy(fn)                            Called just before the component is destroyed
+    onUpdate(fn)                             Called just before the component inputs have changed (i.e. one or more props have changed)
+
+```
+
+**Component setup definitions:**
+
+```txt
+    defineProp(name, options)                Defines a prop for a component with the given name and options (type, default value, etc.)
+    defineEvent(name)                        Defines a custom event that the component can emit with the given name
+```
+
+**Component definition:**
+
+```txt
+    defineComponent(options)                 Defines a custom element with the given options (name, template, shadowDom and setup function)
+    mount(targetElement, options)            Mounts a component to a target element with the given options
+    unwrap(object)                           Unwraps a reactive reference or computed property to get its underlying value
+    load(href)                               Loads one or more components (as HTML) from a source and registers the  as a custom element
+```
+
+**Internals:**
+
+```txt
+    compare(a, b)                            Compares two values for equality, handling reactive references and computed properties
+    canBeObserved(object)                    Checks if an object can be observed for reactivity (internal use only)
+    isRef(x)                                 Check if a value was created with ref()
+```
+
+Set `window.name` to `debug` in any page to attach component context to components

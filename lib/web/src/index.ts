@@ -116,7 +116,9 @@ export function mount(target: Element, options: MountOptions) {
     fn();
   }
 
-  (root as any)[DEBUG] = { options, context: reader, runtime };
+  if (window.name === 'debug') {
+    (root as any)[DEBUG] = { options, context: reader, runtime };
+  }
 
   return function () {
     for (const fn of runtime.unmount) {
@@ -245,6 +247,10 @@ export function unwrap<T = any>(object: T): T {
     return (object as any)[unwrapTag];
   }
 
+  if (isRef(object)) {
+    return object.value;
+  }
+
   return object;
 }
 
@@ -340,15 +346,23 @@ export function effect(fn: AnyFunction, effectFn: AnyFunction) {
   return watch(computed(fn), effectFn);
 }
 
-export function onMount(fn: any) {
+export function onInit(fn: any) {
   getCurrentNode().mount.push(fn);
 }
 
+const debounce = (fn: any) => {
+  let timer: any = 0;
+  return function (...args: any[]) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), 1);
+  };
+};
+
 export function onUpdate(fn: any) {
-  getCurrentNode().update.push(fn);
+  getCurrentNode().update.push(debounce(fn));
 }
 
-export function onUnmount(fn: any) {
+export function onDestroy(fn: any) {
   getCurrentNode().unmount.push(fn);
 }
 
