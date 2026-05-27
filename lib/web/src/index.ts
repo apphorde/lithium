@@ -669,9 +669,9 @@ async function findSetupModule(template: HTMLTemplateElement) {
   const setupCode = template.content.querySelector('script[setup]');
 
   if (setupCode) {
-    const href = setupCode.getAttribute('href');
+    const url = setupCode.getAttribute('src');
     const code = setupCode.textContent;
-    const mod = href ? import(href) : importModuleFromSource(code);
+    const mod = url ? import(new URL(url, window.location.href).toString()) : importModuleFromSource(code);
     setupCode.remove();
 
     return (await mod).default;
