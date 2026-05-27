@@ -3,7 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lithium - A Modern Frontend Library</title>
+
+    <title>Lithium (Li³) — Reactive UI with Web APIs</title>
+    <meta
+      name="description"
+      content="Lithium (Li³) is a lightweight library for building reactive interfaces with modern Web APIs — no compiler required."
+    />
+    <meta name="theme-color" content="#3b0a57" />
+
+    <!-- Open Graph / Twitter -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Lithium (Li³) — Reactive UI with Web APIs" />
+    <meta
+      property="og:description"
+      content="A lightweight library for building reactive interfaces with modern Web APIs — no compiler required."
+    />
+    <meta property="og:url" content="https://github.com/apphorde/lithium" />
+    <meta name="twitter:card" content="summary" />
+
+    <!-- Typography: load the font we reference in CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Fricolage+Grotesque:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind (pinned): keep the CDN compiler, but lock the version to avoid drift -->
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+
     <script type="importmap">
       {
         "imports": {
@@ -12,363 +40,507 @@
         }
       }
     </script>
+
     <script type="module">
       import '@li3/web';
       import '@sodium/markdown-block';
     </script>
-    <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
       :root {
-        --primary: #411e5c;
-      }
-
-      .bg-primary {
-        background-color: var(--primary);
-      }
-
-      .border-primary {
-        border-color: var(--primary);
-      }
-
-      .text-primary {
-        color: var(--primary);
+        --bg0: #14031f;
+        --bg1: #2b0640;
+        --primary: #8b5cf6; /* violet-500 */
+        --primary2: #22d3ee; /* cyan-400 */
+        --card: rgba(255, 255, 255, 0.06);
+        --stroke: rgba(255, 255, 255, 0.12);
       }
 
       body {
         font-family:
-          Fricolage Grotesque,
+          'Fricolage Grotesque',
           ui-sans-serif,
           system-ui,
           sans-serif,
           'Apple Color Emoji',
           'Segoe UI Emoji',
           'Segoe UI Symbol',
-          'Noto Color Emoji' !important;
-        background: #30074fc8;
+          'Noto Color Emoji';
+        background:
+          radial-gradient(1200px 600px at 20% 10%, rgba(139, 92, 246, 0.28), transparent 60%),
+          radial-gradient(900px 520px at 90% 20%, rgba(34, 211, 238, 0.20), transparent 55%),
+          radial-gradient(900px 520px at 50% 90%, rgba(236, 72, 153, 0.12), transparent 55%),
+          linear-gradient(180deg, var(--bg0), var(--bg1));
+        color: rgb(248 250 252);
+        min-height: 100vh;
       }
 
-      .contents-children > * {
-        display: contents;
+      .serif {
+        font-family: 'Fraunces', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+      }
+
+      .glass {
+        background: var(--card);
+        border: 1px solid var(--stroke);
+        backdrop-filter: blur(10px);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.85rem 1.05rem;
+        border-radius: 0.85rem;
+        font-weight: 700;
+        transition:
+          transform 120ms ease,
+          background 120ms ease,
+          border-color 120ms ease,
+          box-shadow 120ms ease;
+      }
+
+      .btn:focus-visible {
+        outline: none;
+        box-shadow:
+          0 0 0 4px rgba(139, 92, 246, 0.35),
+          0 0 0 1px rgba(255, 255, 255, 0.22);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.95), rgba(34, 211, 238, 0.85));
+        color: #0b0710;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+      .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: rgb(248 250 252);
+      }
+      .btn-secondary:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.22);
+      }
+
+      a.link {
+        text-decoration: underline;
+        text-decoration-color: rgba(255, 255, 255, 0.35);
+        text-underline-offset: 3px;
+      }
+      a.link:hover {
+        text-decoration-color: rgba(255, 255, 255, 0.65);
       }
 
       markdown-block > * {
         margin-bottom: 1rem !important;
       }
+
+      /* Tailwind CSS bundle can be aggressive; keep code blocks readable */
+      pre,
+      code {
+        font-family:
+          ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Monaco,
+          Consolas,
+          'Liberation Mono',
+          'Courier New',
+          monospace;
+      }
     </style>
   </head>
 
-  <body class="text-gray-100 antialiased">
-    <section class="my-16 flex items-center justify-center px-8">
-      <div class="max-w-2xl">
-        <h1 class="font-bold mb-6 font-serif">
-          <span class="text-5xl mr-4 mb-2 inline-block">lithium</span><br />
-          <span class="text-md italic mr-2">(lith·i·um)</span>
-          <span class="text-md rounded">noun</span>
-        </h1>
+  <body class="antialiased">
+    <!-- Top nav -->
+    <header class="mx-auto max-w-6xl px-6 pt-6">
+      <div class="glass rounded-2xl px-4 py-3 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-3">
+          <span
+            class="inline-flex h-9 w-9 items-center justify-center rounded-xl"
+            style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.75), rgba(34, 211, 238, 0.65))"
+            aria-hidden="true"
+          >
+            <span class="font-black text-black">Li³</span>
+          </span>
+          <div>
+            <div class="font-extrabold leading-none">Lithium</div>
+            <div class="text-xs text-white/70 leading-none">Reactive UI with Web APIs</div>
+          </div>
+        </a>
 
-        <p class="text-xl mb-8 font-serif">
-          A lightweight library to build reactive interfaces.<br />
-          Embraces the Web API's of today and provides an out-of-box experience.
-        </p>
-        <div class="flex flex-wrap gap-4">
-          <a
-            href="/docs"
-            class="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transform hover:-translate-y-0.5 transition-all"
-          >
-            Read the Docs
+        <nav class="flex items-center gap-2">
+          <a class="btn btn-secondary text-sm" href="/docs">Docs</a>
+          <a class="btn btn-secondary text-sm" href="https://github.com/apphorde/lithium" target="_blank" rel="noreferrer">
+            GitHub
           </a>
-          <a
-            href="https://github.com/apphorde/lithium"
-            target="_blank"
-            class="px-6 py-3 bg-white text-primary border border-primary rounded-lg font-semibold hover:bg-gray-50 transform hover:-translate-y-0.5 transition-all"
-          >
-            View on GitHub
-          </a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <main class="mx-auto max-w-6xl px-6">
+      <section class="pt-14 pb-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div class="lg:col-span-7">
+            <h1 class="serif font-bold tracking-tight text-4xl md:text-5xl lg:text-6xl leading-[1.05]">
+              Build reactive interfaces
+              <span
+                class="text-transparent bg-clip-text"
+                style="background-image: linear-gradient(135deg, rgba(139, 92, 246, 1), rgba(34, 211, 238, 1))"
+                >without a compiler</span
+              >
+            </h1>
+
+            <p class="mt-6 text-lg md:text-xl text-white/85 max-w-2xl">
+              Lithium (Li³) is a lightweight library that embraces modern Web APIs.
+              Start from plain HTML, progressively enhance, and stay in control.
+            </p>
+
+            <div class="mt-8 flex flex-wrap gap-3">
+              <a href="/docs" class="btn btn-primary">Read the docs</a>
+              <a href="#quickstart" class="btn btn-secondary">Quickstart</a>
+              <a href="#why" class="btn btn-secondary">Why Lithium?</a>
+            </div>
+
+            <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="glass rounded-2xl p-4">
+                <div class="text-xs uppercase tracking-wider text-white/60">Core idea</div>
+                <div class="mt-2 font-semibold">Declarative HTML + setup()</div>
+              </div>
+              <div class="glass rounded-2xl p-4">
+                <div class="text-xs uppercase tracking-wider text-white/60">No build step</div>
+                <div class="mt-2 font-semibold">Import maps + ES modules</div>
+              </div>
+              <div class="glass rounded-2xl p-4">
+                <div class="text-xs uppercase tracking-wider text-white/60">Progressive</div>
+                <div class="mt-2 font-semibold">Enhance what you already have</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5">
+            <div class="glass rounded-2xl overflow-hidden">
+              <div class="px-5 py-4 border-b border-white/10 flex items-center justify-between">
+                <div class="text-sm font-bold">Quick start</div>
+                <a class="text-xs link" href="/docs">See full docs</a>
+              </div>
+
+              <div class="p-5">
+                <p class="text-sm text-white/75">
+                  Lithium uses <span class="font-semibold">import maps</span> and a <span class="font-semibold">module script</span>.
+                </p>
+
+                <div class="mt-4">
+                  <code-block title="1) Import map" language="html">
+                    <pre>
+&lt;script type="importmap"&gt;
+  {
+    "imports": {
+      "@li3/": "https://cdn.li3.dev/@li3/"
+    }
+  }
+&lt;/script&gt;</pre
+                    >
+                  </code-block>
+                </div>
+
+                <div class="mt-4">
+                  <code-block title="2) Load Lithium" language="html">
+                    <pre>
+&lt;script type="module"&gt;
+  import '@li3/web';
+&lt;/script&gt;</pre
+                    >
+                  </code-block>
+                </div>
+
+                <div class="mt-4">
+                  <code-block title="3) Declare an app" language="html" srcelement="#hello-app"></code-block>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 text-xs text-white/55">
+              Tip: Lithium is happiest when you keep HTML readable and let JavaScript provide behavior.
+            </div>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <feature-section id="get-started">
-      <span slot="title">1 minute intro:</span>
-      <span slot="subtitle">So, what is Lithium exactly?</span>
+      <!-- Why -->
+      <section id="why" class="py-10">
+        <div class="glass rounded-3xl p-6 md:p-10">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div class="lg:col-span-5">
+              <div class="text-xs uppercase tracking-wider text-white/60">Why Lithium</div>
+              <h2 class="serif text-3xl md:text-4xl font-bold mt-3">A predictable mental model</h2>
+              <p class="mt-4 text-white/80 leading-relaxed">
+                Lithium keeps the shape of your UI in HTML and the logic in a small, explicit <code>setup()</code>.
+                You can use it for tiny sprinkles or bigger apps — and it stays understandable.
+              </p>
 
-      <markdown-block class="block text-sm my-8">
-        <pre>
-It's a library to write reactive web interfaces using a simple and predictable mental model.
-This model works for all skill levels: beginner, advanced and AI developers.
+              <div class="mt-6 flex flex-wrap gap-3">
+                <a href="/docs" class="btn btn-primary">Explore the API</a>
+                <a href="https://github.com/apphorde/lithium" class="btn btn-secondary" target="_blank" rel="noreferrer">
+                  Star on GitHub
+                </a>
+              </div>
+            </div>
 
-I know what you are thinking! Oh, yet another framework! _sigh_ no thanks.
+            <div class="lg:col-span-7">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <feature-card>
+                  <span slot="icon">⚡</span>
+                  <span slot="title">Start fast</span>
+                  <p class="text-sm text-white/75">
+                    No toolchain required. Import it, write HTML, ship.
+                  </p>
+                </feature-card>
 
-So what makes **Lithium** different?
+                <feature-card>
+                  <span slot="icon">🧩</span>
+                  <span slot="title">Composable primitives</span>
+                  <p class="text-sm text-white/75">
+                    Props, events, refs, computed values, watchers, lifecycle hooks.
+                  </p>
+                </feature-card>
 
-We **_embrace_** the web platform, instead of putting it away as abstractions.
+                <feature-card>
+                  <span slot="icon">🧠</span>
+                  <span slot="title">Readable templates</span>
+                  <p class="text-sm text-white/75">
+                    Bind attributes/props/events with a clear, minimal syntax.
+                  </p>
+                </feature-card>
 
-Using [inline components and a declarative API](/docs), we can define the _shape_ of a component, and let the implementation details aside.
-Then we can pick and choose which implementation you want to use, again with standard API's and put them together to bring life to your user interface (UI).
+                <feature-card>
+                  <span slot="icon">🌱</span>
+                  <span slot="title">Progressive enhancement</span>
+                  <p class="text-sm text-white/75">
+                    Enhance existing server-rendered HTML without special SSR tooling.
+                  </p>
+                </feature-card>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-Here's a quick example:
-</pre
-        >
-      </markdown-block>
+      <!-- Template syntax (kept, but simplified and more scannable) -->
+      <section id="syntax" class="py-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-4">
+            <div class="text-xs uppercase tracking-wider text-white/60">Template syntax</div>
+            <h2 class="serif text-3xl font-bold mt-3">Make HTML dynamic</h2>
+            <p class="mt-4 text-white/80">
+              Bind attributes, props, and events — or toggle styles and classes — without hiding your markup.
+            </p>
+            <p class="mt-4 text-white/70 text-sm">
+              Want more examples? Head to <a class="link" href="/docs">the documentation</a>.
+            </p>
+          </div>
 
-      <code-block class="mb-8" title="Load the library">
-        <template>
-          <script type="importmap">
-            {
-              "imports": {
-                "@li3/": "https://cdn.li3.dev/@li3/"
-              }
-            }
-          </script>
-          <script type="module">
-            import '@li3/web';
-          </script>
-        </template>
-      </code-block>
+          <div class="lg:col-span-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <code-block title="Bind a property or attribute" language="html">
+                <template>
+                  <button attr-lang="language" prop-disabled="isDisabled"></button>
+                </template>
+              </code-block>
 
-      <code-block class="mb-8" title="Declare an application" srcelement="#hello-app"></code-block>
+              <code-block title="Listen to events" language="html" footnote="Use .stop and .prevent modifiers.">
+                <template>
+                  <form on-submit.prevent.stop="onSubmit($event)"></form>
+                </template>
+              </code-block>
 
-      <div class="mb-8">
-        <template id="hello-app" app>
-          <form
-            class="md:w-2/3 mx-auto bg-white rounded-lg p-5 mb-6 shadow border border-gray-300 text-gray-800 text-xs"
-            on-submit.prevent="sayMyName()"
-          >
-            <label class="py-2">What is your name?</label>
-            <input
-              type="text"
-              class="mt-2 p-2 border rounded bg-white w-full text-black"
-              on-input="setName($event.target.value)"
-              prop-value="name"
-            />
-            <hr class="border-t my-3" />
-            <p class="text-xl font-bold">Hello, {{ name || 'stranger' }}.</p>
-          </form>
-          <script setup>
-            import { ref } from '@li3/web';
+              <code-block title="Add/remove CSS classes" language="html" footnote="Multiple classes can be separated by a dot.">
+                <template>
+                  <input class-border-red.bg-yellow="isInvalid()" />
+                </template>
+              </code-block>
 
-            export default function setup() {
-              const name = ref('');
+              <code-block title="Set styles" language="html">
+                <template>
+                  <div style-display="shouldBeVisible ? 'block' : 'none'"></div>
+                </template>
+              </code-block>
+            </div>
+          </div>
+        </div>
+      </section>
 
-              function setName(v) {
-                name.value = v;
-              }
+      <!-- Setup API (kept, tightened copy) -->
+      <section id="setup-api" class="py-10">
+        <div class="glass rounded-3xl p-6 md:p-10">
+          <div class="text-xs uppercase tracking-wider text-white/60">Declarative component API</div>
+          <h2 class="serif text-3xl md:text-4xl font-bold mt-3">A small API that covers the essentials</h2>
 
-              function sayMyName() {
-                alert(name.value);
-              }
+          <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
+            <code-block language="javascript" title="Declare element inputs (props)">
+              <pre>
+import { defineProp, defineProps } from '@li3/web';
 
-              return { name, sayMyName, setName };
-            }
-          </script>
-          <script setup>
-            import { ref } from '@li3/web';
+export default function setup() {
+  // short form
+  const foo = defineProp('foo');
+  const bar = defineProp('bar', 123);
 
-            export default function setup() {
-              const name = ref('');
+  // long form with defaults
+  const { baz } = defineProps({
+    baz: { default: 'hello' }
+  });
 
-              function setName(v) {
-                name.value = v;
-              }
+  return { foo, bar, baz };
+}</pre
+              >
+            </code-block>
 
-              function sayMyName() {
-                alert(name.value);
-              }
+            <code-block language="javascript" title="Declare outputs (events)">
+              <pre>
+import { defineEvent, defineEvents } from '@li3/web';
 
-              return { name, sayMyName, setName };
-            }
-          </script>
-        </template>
-      </div>
-    </feature-section>
+export default function setup() {
+  const emit = defineEvents(['update', 'remove']);
+  emit('update', { value: 123 });
 
-    <feature-section id="bindings">
-      <span slot="title">Template syntax</span>
-      <span slot="subtitle">Add life to your static HTML text</span>
+  const onUpdate = defineEvent('update');
+  onUpdate(123);
+}</pre
+              >
+            </code-block>
 
-      <code-block title="Bind a property or attribute">
-        <template>
-          <button attr-lang="language" prop-disabled="isDisabled"></button>
-        </template>
-      </code-block>
+            <code-block language="javascript" title="Reactive values + watchers">
+              <pre>
+import { ref, unref, computed, watch } from '@li3/web';
 
-      <code-block title="Listen to events" footnote="'stop' and 'prevent' modifiers have special meaning.">
-        <template>
-          <form on-submit.prevent.stop="onSubmit($event)"></form>
-        </template>
-      </code-block>
+export default function setup() {
+  const name = ref('Joe');
+  const greeting = computed(() => 'Hello, ' + unref(name));
 
-      <code-block title="Add/remove CSS classes" footnote="Multiple classes can be separated by a dot.">
-        <template>
-          <input class-border-red.bg-yellow="isInvalid()" />
-        </template>
-      </code-block>
+  watch(() => unref(name), (value) => {
+    // ...
+  });
 
-      <code-block title="Set styles">
-        <template>
-          <div style-display="shouldBeVisible ? 'block' : 'none'"></div>
-        </template>
-      </code-block>
-    </feature-section>
+  return { name, greeting };
+}</pre
+              >
+            </code-block>
 
-    <feature-section id="setup-api">
-      <span slot="title">Declarative Component API</span>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 justify-items-stretch items-stretch">
-        <code-block language="javascript" title="Declare element inputs (props):">
-          <pre>
-          import { defineProp, defineProps } from '@li3/web';
+            <code-block language="javascript" title="Lifecycle hooks">
+              <pre>
+import { onInit, onUpdate, onDestroy } from '@li3/web';
 
-          export default function setup() {
-            // short form
-            const foo = defineProp('foo');
-            const bar = defineProp('foo', 123);
+export default function setup() {
+  onInit(() => {
+    // called once on mount
+  });
 
-            // long form with defaults
-            const { foo, bar } = defineProps({
-              foo: String,
-              bar: { default: 123 }
-            });
-          }
-      </pre
-          >
-        </code-block>
+  onUpdate(() => {
+    // called when a prop changes
+  });
 
-        <code-block language="javascript" title="Declare outputs (events):">
-          <pre>
-        import { defineEvent, defineEvents } from '@li3/web';
+  onDestroy(() => {
+    // called once on unmount
+  });
+}</pre
+              >
+            </code-block>
+          </div>
 
-        export default function setup() {
-          // short form
-          const emit = defineEvents(['update', 'remove']);
-          emit('update', { value: 123 });
+          <div class="mt-8 text-white/75">
+            Need more? Head to <a class="link" href="/docs">the full documentation</a>.
+          </div>
+        </div>
+      </section>
 
-          // long form, with individual emitters
-          const onUpdate = defineEvent('update');
-          onUpdate(123)
-        }
-      </pre
-          >
-        </code-block>
+      <!-- Quickstart demo template used by code-block (kept) -->
+      <section id="quickstart" class="py-10">
+        <div class="glass rounded-3xl p-6 md:p-10">
+          <div class="text-xs uppercase tracking-wider text-white/60">1-minute demo</div>
+          <h2 class="serif text-3xl md:text-4xl font-bold mt-3">Hello, stranger</h2>
+          <p class="mt-4 text-white/80 max-w-2xl">
+            This is a tiny example that shows how templates and <code>setup()</code> work together.
+          </p>
 
-        <code-block language="javascript" title="Create reactive values (ref/computed) and watchers:">
-          <pre>
-          import { ref, unref, computed, watch } from '@li3/web';
+          <div class="mt-8">
+            <template id="hello-app" app>
+              <form
+                class="md:w-2/3 mx-auto bg-white rounded-2xl p-5 mb-6 shadow border border-gray-200 text-gray-900 text-sm"
+                on-submit.prevent="sayMyName()"
+              >
+                <label class="block font-semibold">What is your name?</label>
+                <input
+                  type="text"
+                  class="mt-2 p-2 border rounded-lg bg-white w-full text-black"
+                  on-input="setName($event.target.value)"
+                  prop-value="name"
+                />
+                <hr class="border-t my-3" />
+                <p class="text-xl font-bold">Hello, {{ name || 'stranger' }}.</p>
+              </form>
+              <script setup>
+                import { ref } from '@li3/web';
 
-          export default function setup() {
-            const name = ref('Joe');
-            const greeting = computed(() => 'Hello, ' + unref(name));
+                export default function setup() {
+                  const name = ref('');
 
-            function isEmpty() {
-              return !!unref(name);
-            }
+                  function setName(v) {
+                    name.value = v;
+                  }
 
-            watch(() => unref(name), (value) => { /**/ });
+                  function sayMyName() {
+                    alert(name.value);
+                  }
 
-            return { name, greeting, isEmpty }
-          }
-        </pre
-          >
-        </code-block>
-
-        <code-block language="javascript" title="Use lifecycle events">
-          <pre>
-          import { onInit, onUpdate, onDestroy } from '@li3/web';
-
-          export default function setup() {
-            onInit(function() {
-              // called once on mount
-            });
-
-            onUpdate(function() {
-              // called every time a prop changes
-            });
-
-            onDestroy(function() {
-              // called once on unmount
-            });
-          }
-        </pre
-          >
-        </code-block>
-
-        <code-block language="javascript" title="Access DOM nodes (.one or .many)">
-          <template>
-            <script type="module">
-              import { defineQuery } from '@li3/web';
-
-              function setup() {
-                const inputs = defineQuery('input');
-
-                function something() {
-                  const value = inputs.one.value;
-                  const valid = [...inputs.many].every((input) => isValid(input));
+                  return { name, sayMyName, setName };
                 }
-              }
-            </script>
-          </template>
-        </code-block>
+              </script>
+            </template>
 
-        <code-block language="javascript" title="Load scripts and styles">
-          <template>
-            <script type="module">
-              import { loadCss, loadScript } from '@li3/web';
+            <div class="text-sm text-white/80 mt-6">
+              Want the full story? Start at <a class="link" href="/docs">the docs</a>.
+            </div>
+          </div>
+        </div>
+      </section>
 
-              function setup() {
-                loadCss('http://example.com/main.css');
-                loadScript('http://example.com/index.js');
-              }
-            </script>
-          </template>
-        </code-block>
-      </div>
-    </feature-section>
+      <footer class="py-12 text-center text-sm text-white/65">
+        <div class="mx-auto max-w-3xl">
+          <p>
+            Released under the MIT License.
+            <span class="mx-2">•</span>
+            <a class="link" href="https://github.com/apphorde/lithium" target="_blank" rel="noreferrer">GitHub</a>
+            <span class="mx-2">•</span>
+            <a class="link" href="/docs">Docs</a>
+          </p>
+          <p class="mt-3">Copyright © 2024 Li³: Lithium web components</p>
+        </div>
+      </footer>
+    </main>
 
-    <feature-section id="loops">
-      <span slot="title">Conditionals and loops</span>
-      <span slot="subtitle">Repeat a template or add/remove elements based on a condition</span>
-
-      <code-block language="javascript" title="Conditional templates: template[if]">
-        <template>
-          <template if="condition">
-            <div>Show me</div>
-          </template>
-        </template>
-      </code-block>
-
-      <code-block language="javascript" title="Repeating templates: template[for..of]">
-        <template>
-          <template for="item of links">
-            <li><a prop-href="item.href">{{ item.label }}</a></li>
-          </template>
-        </template>
-      </code-block>
-
-      <p class="mt-12 text-xl mb-8">
-        Need more? Head to <a class="underline" href="/docs">the full documentation</a> to see the API and more
-        examples!
-      </p>
-    </feature-section>
-
-    <footer class="py-8 px-8 text-center">
-      <p>Released under the MIT License.<br /></p>
-      <p class="mt-2">Copyright © 2024 Li3: Lithium web components</p>
-    </footer>
+    <!-- Components -->
 
     <template component="code-block">
-      <div
-        class="bg-white rounded-lg shadow border border-gray-300 text-gray-800 text-xs relative flex flex-col h-full"
-      >
+      <div class="rounded-2xl border border-white/10 bg-white/95 text-gray-900 text-xs relative flex flex-col h-full overflow-hidden">
         <button
-          class="absolute right-0 top-0 m-1 text-xs px-2 py-1 bg-white text-gray-800 border rounded"
+          class="absolute right-0 top-0 m-2 text-xs px-2 py-1 bg-white text-gray-900 border rounded-lg hover:bg-gray-50"
           on-click="onCopy()"
         >
           copy
         </button>
-        <div class="empty:hidden text-xs px-4 py-3 uppercase bg-gray-100 rounded-t-lg font-bold text-green-700">
+        <div class="empty:hidden text-xs px-4 py-3 uppercase bg-gray-100 font-bold text-gray-700">
           {{ title || '' }}
         </div>
-        <slot class="font-mono whitespace-pre overflow-x-auto block w-full px-4 my-4"></slot>
-        <small class="empty:hidden px-4 py-2 block text-xs border-t">{{ footnote || '' }}</small>
+        <slot class="whitespace-pre overflow-x-auto block w-full px-4 my-4"></slot>
+        <small class="empty:hidden px-4 py-2 block text-xs border-t border-gray-200 text-gray-600">{{ footnote || '' }}</small>
       </div>
 
       <script setup>
@@ -403,7 +575,7 @@ Here's a quick example:
             });
           });
 
-          hostClasses('mb-6 block');
+          hostClasses('mb-4 block');
 
           return {
             onCopy() {
@@ -415,41 +587,13 @@ Here's a quick example:
     </template>
 
     <template component="feature-card">
-      <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border text-gray-800">
-        <div class="text-4xl mb-4">
-          <slot name="icon"></slot>
+      <div class="glass rounded-2xl p-5 md:p-6">
+        <div class="text-2xl" aria-hidden="true"><slot name="icon"></slot></div>
+        <h3 class="mt-3 text-lg font-extrabold"><slot name="title"></slot></h3>
+        <div class="mt-2 text-white/80">
+          <slot></slot>
         </div>
-        <h3 class="text-xl font-bold mb-4">
-          <slot name="title"></slot>
-        </h3>
-        <slot></slot>
       </div>
-    </template>
-
-    <template component="li-card">
-      <div class="p-8 bg-white/15 rounded-2xl text-white shadow-xl">
-        <slot class="contents"></slot>
-      </div>
-    </template>
-
-    <template component="feature-section">
-      <section class="mb-16 mx-8 md:mx-4 lg:mx-0">
-        <div class="max-w-4xl mx-auto">
-          <li-card>
-            <h2 class="text-sm uppercase py-2 font-bold">
-              <slot name="title"></slot>
-            </h2>
-            <h3 class="text-3xl mt-3 mb-6 font-semi font-serif">
-              <slot name="subtitle"></slot>
-            </h3>
-            <slot></slot>
-          </li-card>
-        </div>
-      </section>
-    </template>
-
-    <template component="inline-code">
-      <slot class="font-mono rounded bg-gray-100 p-1 inline-block text-gray-800 text-sm"></slot>
     </template>
   </body>
 </html>
