@@ -164,14 +164,18 @@ export function compare(a: any, b: any) {
       return a.message === b.message;
     }
 
-    if (['string', 'number', 'function'].includes(typeA)) {
-      return String(a) === String(b);
-    }
-
     return a === b;
   }
 
-  return false;
+  if (typeA === 'function') {
+    return String(a) === String(b);
+  }
+
+  if (Number.isNaN(a) && Number.isNaN(b)) {
+    return true;
+  }
+
+  return a === b;
 }
 
 export function canBeObserved(object: any): boolean {
@@ -212,15 +216,13 @@ export function reactive<T extends object>(object: T, effect: AnyFunction): T {
         value = reactive(value, effect);
       }
 
-      const lastValue = target[p];
       target[p] = value;
-      effect(value, lastValue);
+      effect();
       return true;
     },
     deleteProperty(target: any, p) {
-      const lastValue = target[p];
       delete target[p];
-      effect(undefined, lastValue);
+      effect();
       return true;
     },
   });
@@ -267,7 +269,7 @@ export function ref<T = any>(initial: T, isShallow = false) {
       o.internalValue = newValue;
 
       if (!isShallow && typeof newValue === 'object' && newValue !== null) {
-        newValue = reactive(newValue as object, (_, lastValue) => {
+        newValue = reactive(newValue as object, () => {
           notifyDependencies(o);
           notifyWatchers(o, lastValue);
         });

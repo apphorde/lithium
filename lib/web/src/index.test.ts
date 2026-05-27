@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   canBeObserved,
   compare,
@@ -77,6 +77,13 @@ describe('@li3/web', () => {
   describe('compare', () => {
     it('compares supported values correctly', () => {
       const sameObj = { a: 1 };
+      expect(compare(1, 1)).toBe(true);
+      expect(compare('text', 'text')).toBe(true);
+      expect(compare(true, true)).toBe(true);
+      expect(compare(false, false)).toBe(true);
+      expect(compare(null, null)).toBe(true);
+      expect(compare(undefined, undefined)).toBe(true);
+
       expect(compare([1, 2, 3], [1, 2, 3])).toBe(true);
       expect(compare(new Date(1000), new Date(1000))).toBe(true);
       expect(compare(/abc/i, /abc/i)).toBe(true);
@@ -85,6 +92,7 @@ describe('@li3/web', () => {
       expect(compare({ a: 1 }, { a: 1 })).toBe(false);
     });
   });
+
   describe('computed', () => {
     it('should create a computed property that updates when dependencies change', async () => {
       const a = ref(1);
@@ -293,30 +301,25 @@ describe('@li3/web', () => {
   });
 
   describe('reactive', () => {
-    it('reactive, canBeObserved, unwrap and compare behavior', async () => {
-      const o: any = { a: 1 };
-      expect(canBeObserved(o)).toBe(true);
-
-      const changes: any[] = [];
-      const p = reactive(o, (v: any, last: any) => changes.push({ v, last }));
-
-      expect(canBeObserved(p)).toBe(false);
-      expect(unwrap(p)).toBe(o);
+    it('should observe changes in an object', async () => {
+      const o: any = { a: 1, b: { c: 2 } };
+      let changes = 0;
+      const p = reactive(o, () => changes++);
 
       p.a = 2;
+      p.b.c = 4;
       delete p.a;
-      expect(changes.length).toBeGreaterThanOrEqual(2);
+      expect(changes).toBe(3);
 
-      // compare: objects / arrays / dates / regex / errors should compare true when equal
-      expect(compare([1, 2, 3], [1, 2, 3])).toBe(true);
-      expect(compare(new Date(1000), new Date(1000))).toBe(true);
-      expect(compare(/abc/i, /abc/i)).toBe(true);
-      expect(compare(new Error('x'), new Error('x'))).toBe(true);
+      // watch newly added objects
+      p.a = { c: 1 }
+      expect(changes).toBe(4);
 
-      // primitives return false per implementation
-      expect(compare(1, 1)).toBe(false);
+      p.a.c = 2;
+      expect(changes).toBe(5);
     });
   });
+
   describe('ref', () => {
     it('should create a reactive reference to a value', async () => {
       const r = ref(1);
@@ -397,13 +400,13 @@ describe('@li3/web', () => {
     });
   });
   describe('findApps', () => {
-    it('mounts templates with `app` attribute', () => {
+    it('mounts templates with `app` attribute', async () => {
       const tpl = document.createElement('template');
       tpl.setAttribute('app', '');
       tpl.innerHTML = '<div>app</div>';
       document.body.appendChild(tpl);
 
-      findApps();
+      await findApps();
 
       const prev = tpl.previousElementSibling as Element | null;
       expect(prev).not.toBeNull();
@@ -489,5 +492,4 @@ describe('@li3/web', () => {
     expect(unmounted).toBe(true);
     expect(updated).toBe(true);
   });
-
 });
