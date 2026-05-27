@@ -103,11 +103,9 @@ export function mount(target: Element, options: MountOptions) {
   } finally {
     currentNodeStack.pop();
   }
-
-  Object.assign(context, runtime.props, runtime.refs);
-
-  const reader = createContextReader(context);
-  walkNodes(dom, bindNode, reader);
+  const mergedContext = Object.assign({}, context, runtime.props, runtime.refs);
+  const readOnlyContext = createReadOnlyContext(mergedContext);
+  walkNodes(dom, bindNode, readOnlyContext);
 
   parentElement.innerHTML = '';
   parentElement.appendChild(dom);
@@ -117,7 +115,7 @@ export function mount(target: Element, options: MountOptions) {
   }
 
   if (window.name === 'debug') {
-    (parentElement as any)[DEBUG] = { options, context: reader };
+    (parentElement as any)[DEBUG] = { options, context: readOnlyContext };
   }
 
   const unmountHooks = runtime.unmount;
@@ -484,13 +482,14 @@ function walkAttributes(node: Element, fn: AnyFunction, context: any) {
 }
 
 function createFunction(expression: string, keys: string[], context: any, args: string[] = []) {
+  const k = keys.filter((key: any) => expression.includes(key)).join(', ').trim();
   return Function(
     ...args,
-    `const { ${keys.filter((key: any) => expression.includes(key)).join(', ')} } = this; return ${expression};`,
+    (k ? `const { ${k} } = this;` : '') + `return ${expression};`,
   ).bind(context);
 }
 
-function createContextReader(context: any, parent?: any) {
+function createReadOnlyContext(context: any) {
   context[contextRef] = context;
 
   return new Proxy(context, {
@@ -502,16 +501,10 @@ function createContextReader(context: any, parent?: any) {
 
         return target[key];
       }
+    },
 
-      if (!parent) return;
-
-      if (parent[key] !== undefined) {
-        if (parent[key] && parent[key][refSymbol]) {
-          return parent[key].value;
-        }
-
-        return parent[key];
-      }
+    set() {
+      throw new Error('View contexts are read-only');
     },
   });
 }
@@ -623,8 +616,12 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
         const dom = (node as HTMLTemplateElement).content.cloneNode(true);
         forNodes.push(...Array.from(dom.childNodes));
 
-        const subContext = { [key]: value[i], [indexKey]: i };
-        const reader = createContextReader(subContext, context);
+        const subContext = {
+          [key]: value[i],
+          [indexKey]: i,
+        };
+
+        const reader = createReadOnlyContext(Object.assign({}, context, subContext));
         walkNodes(dom, bindNode, reader);
 
         setTimeout(() => {
