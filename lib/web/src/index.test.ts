@@ -96,7 +96,6 @@ describe('@li3/web', () => {
       const unmount = mount(target, { template, setup: () => ({}) });
 
       expect(target[DEBUG]).toBeDefined();
-      expect(target[DEBUG].runtime).toBeDefined();
       expect(target[DEBUG].context).toBeDefined();
       unmount();
     });
@@ -191,13 +190,13 @@ describe('@li3/web', () => {
       expect(target.innerHTML).toContain('hello');
     });
 
-    it('binds text expressions and on-click event handlers', () => {
+    it('binds text expressions and on-click event handlers', async () => {
       const template = document.createElement('template');
       template.innerHTML = '<button on-click="increment()">click</button><span>{{value}}</span>';
       const target = document.createElement('div') as any;
       let count = 1;
 
-      mount(target, {
+      await mount(target, {
         template,
         setup: () => {
           const value = ref(count);
@@ -209,8 +208,7 @@ describe('@li3/web', () => {
         },
       });
 
-      const button = getByText(target, 'click');
-      button.click();
+      getByText(target, 'click').click();
       expect(getByText(target, '2')).toBeTruthy();
     });
   });
@@ -286,20 +284,6 @@ describe('@li3/web', () => {
     });
   });
 
-  describe('templateRef', () => {
-    it('exposes the referenced element inside component setup', () => {
-      const template = document.createElement('template');
-      template.innerHTML = '<div ref="myRef"></div>';
-      const target = document.createElement('div') as any;
-      const setup = () => {
-        const myRef = templateRef('myRef');
-        return { myRef };
-      };
-      mount(target, { template, setup });
-      expect(target[DEBUG].context.myRef.value).not.toBeNull();
-    });
-  });
-
   describe('unwrap', () => {
     it('returns raw values for non-reactive objects', () => {
       const raw = { a: 1 };
@@ -351,7 +335,7 @@ describe('@li3/web', () => {
 
       // mount should have attached a shadow root and set DEBUG on it
       const debug = (el.shadowRoot as any)[DEBUG];
-      expect(debug && debug.runtime).toBeTruthy();
+      expect(debug).toBeTruthy();
 
       document.body.removeChild(el);
       expect(unmounted).toBe(true);

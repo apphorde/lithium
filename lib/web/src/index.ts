@@ -1,11 +1,11 @@
-type AnyFunction = (...args: any[]) => any;
+export type AnyFunction = (...args: any[]) => any;
 
-type PropOptions<T = any> = {
+export type PropOptions<T = any> = {
   default?: T | (() => T);
 };
 
-type RuntimeContext = {
-  root: any;
+export type RuntimeContext = {
+  element: any;
   mount: AnyFunction[];
   update: AnyFunction[];
   unmount: AnyFunction[];
@@ -13,7 +13,7 @@ type RuntimeContext = {
   refs: Record<PropertyKey, any>;
 };
 
-type Signal<T = any> = {
+export type Signal<T = any> = {
   [refSymbol]: boolean;
   internalValue: T | undefined;
   dependencies: Set<Signal>;
@@ -22,20 +22,20 @@ type Signal<T = any> = {
   update(value?: T): void;
 };
 
-type MountOptions = {
+export type MountOptions = {
   template: HTMLTemplateElement;
   setup?: Function;
   shadowDom?: boolean;
 };
 
-type DefineComponentOptions = MountOptions & { name: string };
+export type DefineComponentOptions = MountOptions & { name: string };
 
 const currentNodeStack: RuntimeContext[] = [];
 const signalsStack: Signal[] = [];
-const refSymbol = Symbol('ref');
-const contextRef = Symbol('context');
-const reactiveTag = Symbol('reactive');
-const unwrapTag = Symbol('unwrap');
+const refSymbol = Symbol('$');
+const contextRef = Symbol('#');
+const reactiveTag = Symbol('#');
+const unwrapTag = Symbol('#');
 
 export const DEBUG = Symbol('#');
 
@@ -82,13 +82,13 @@ export function defineComponent(options: DefineComponentOptions) {
 }
 
 export function mount(target: Element, options: MountOptions) {
-  const root = target.shadowRoot || target;
+  const parentElement = target.shadowRoot || target;
   const { template, setup = noop } = options;
   const dom = template.content.cloneNode(true);
 
   let context;
   const runtime: RuntimeContext = {
-    root: target,
+    element: target,
     mount: [],
     update: [],
     unmount: [],
@@ -109,19 +109,20 @@ export function mount(target: Element, options: MountOptions) {
   const reader = createContextReader(context);
   walkNodes(dom, bindNode, reader);
 
-  root.innerHTML = '';
-  root.appendChild(dom);
+  parentElement.innerHTML = '';
+  parentElement.appendChild(dom);
 
   for (const fn of runtime.mount) {
     fn();
   }
 
   if (window.name === 'debug') {
-    (root as any)[DEBUG] = { options, context: reader, runtime };
+    (parentElement as any)[DEBUG] = { options, context: reader };
   }
 
+  const unmountHooks = runtime.unmount;
   return function () {
-    for (const fn of runtime.unmount) {
+    for (const fn of unmountHooks) {
       fn();
     }
   };
@@ -366,27 +367,43 @@ export function onDestroy(fn: any) {
   getCurrentNode().unmount.push(fn);
 }
 
-export function defineProp(name: PropertyKey, options: PropOptions = {}) {
-  const { default: defaultValue } = options;
-  const target = getCurrentNode().root;
-  const hooks = getCurrentNode().update;
-  const current = target[name] ?? (typeof defaultValue === 'function' ? defaultValue() : defaultValue);
+function getPropValue<T extends keyof Element>(element: Element, name: T, defaultValue: any) {
+  const value = element[name];
+
+  if (value !== undefined) {
+    return value;
+  }
+
+  const attr = element.getAttribute(name);
+
+  if (attr !== null) {
+    return attr;
+  }
+
+  if (defaultValue !== undefined) {
+    return typeof defaultValue === 'function' ? defaultValue() : defaultValue;
+  }
+}
+
+export function defineProp(name: string, options: PropOptions = {}) {
+  const { element, update } = getCurrentNode();
+  const current = getPropValue(element, name as keyof Element, options.default);
   const prop = ref(current);
 
   watch(prop, (value: any) => {
-    if (target[name] !== value) {
-      target[name] = value;
+    if (element[name] !== value) {
+      element[name] = value;
     }
   });
 
-  Object.defineProperty(target, name, {
+  Object.defineProperty(element, name, {
     get() {
       return prop.value;
     },
     set(value) {
       prop.value = value;
 
-      for (const fn of hooks) {
+      for (const fn of update) {
         fn();
       }
     },
@@ -398,12 +415,12 @@ export function defineProp(name: PropertyKey, options: PropOptions = {}) {
 }
 
 export function defineEvent(name: string) {
-  const root = getCurrentNode().root;
+  const { element } = getCurrentNode();
 
   return function emitter(value: any) {
     const event = new CustomEvent(name, { detail: value });
-    root.dispatchEvent(event);
-    const handler = root['on' + name];
+    element.dispatchEvent(event);
+    const handler = element['on' + name];
     if (typeof handler === 'function') {
       handler(event);
     }
@@ -528,7 +545,8 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
 
   if (name === 'ref') {
     const key = value.trim();
-    context[contextRef][key] = ref(node);
+    context[contextRef][key] ||= ref(null);
+    context[contextRef][key].value = node;
     return;
   }
 
@@ -691,10 +709,10 @@ export async function findApps() {
       setup: await findSetupModule(template),
     };
 
-    const root = document.createElement('div');
-    template.parentNode!.insertBefore(root, template);
+    const app = document.createElement('div');
+    template.parentNode!.insertBefore(app, template);
 
-    mount(root, options);
+    mount(app, options);
   }
 }
 
