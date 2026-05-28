@@ -486,11 +486,11 @@ function walkAttributes(node: Element, fn: AnyFunction, context: any) {
 }
 
 function createFunction(expression: string, keys: string[], context: any, args: string[] = []) {
-  const k = keys.filter((key: any) => expression.includes(key)).join(', ').trim();
-  return Function(
-    ...args,
-    (k ? `const { ${k} } = this;` : '') + `return ${expression};`,
-  ).bind(context);
+  const k = keys
+    .filter((key: any) => expression.includes(key))
+    .join(', ')
+    .trim();
+  return Function(...args, (k ? `const { ${k} } = this;` : '') + `return ${expression};`).bind(context);
 }
 
 function createReadOnlyContext(context: any) {
@@ -543,7 +543,7 @@ const mappedProperties: Record<string, string> = {
 };
 
 export function setClassName(el: Element, classNames: string, value: any): void {
-  for (const cls of classNames.split(".").filter(Boolean)) {
+  for (const cls of classNames.split('.').filter(Boolean)) {
     el.classList.toggle(cls, value);
   }
 }
@@ -567,7 +567,7 @@ export function setAttribute(el: Element, attribute: string, value: boolean): vo
     return;
   }
 
-  if (typeof value === "boolean" && value === false) {
+  if (typeof value === 'boolean' && value === false) {
     el.removeAttribute(attribute);
     return;
   }
@@ -758,6 +758,7 @@ export async function findApps() {
 
 export async function load(href: string | URL) {
   const response = await fetch(new URL(href, window.location.href));
+
   if (!response.ok) {
     throw new Error('Failed to load components from ' + href);
   }
@@ -767,6 +768,33 @@ export async function load(href: string | URL) {
   const nodes = dom.querySelectorAll('template[component]');
 
   return (Array.from(nodes) as HTMLTemplateElement[]).map(defineFromTemplate);
+}
+
+const stylesheetCache = new Map<string, Promise<CSSStyleSheet>>();
+let _importCssModule: any = importModuleFromSource(
+  'export default function(href) { return import(href, { with: { type: "css" } }) }',
+);
+
+async function importCssModule(href: string) {
+  if (typeof _importCssModule !== 'function') {
+    _importCssModule = (await _importCssModule).default;
+  }
+
+  return (await _importCssModule(href)).default;
+}
+
+export function loadCss(href: string | URL) {
+  href = String(href);
+  const element = getElement();
+
+  if (!stylesheetCache.has(href)) {
+    stylesheetCache.set(href, importCssModule(href));
+  }
+
+  const stylesheet = stylesheetCache.get(href);
+  stylesheetCache.get(href)?.then((s) => (element.shadowRoot || document).adoptedStyleSheets.push(s));
+
+  return stylesheet;
 }
 
 function autoInitialize() {
