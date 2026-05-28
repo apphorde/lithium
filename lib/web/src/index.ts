@@ -473,7 +473,7 @@ function walkNodes(tree: { childNodes: any }, fn: AnyFunction, context: any) {
   for (const node of tree.childNodes) {
     fn(node, context);
 
-    if (node.nodeType === Node.ELEMENT_NODE) {
+    if (node.nodeType === Node.ELEMENT_NODE && !node.hasAttribute('do-not-render')) {
       walkNodes(node, fn, context);
     }
   }
@@ -537,6 +537,44 @@ function bindText(node: Text, context: {}) {
   effect(createFunction(source, keys, context), (v: any) => (node.textContent = v));
 }
 
+const mappedProperties: Record<string, string> = {
+  innerhtml: 'innerHTML',
+  baseurl: 'baseURL',
+};
+
+export function setClassName(el: Element, classNames: string, value: any): void {
+  for (const cls of classNames.split(".").filter(Boolean)) {
+    el.classList.toggle(cls, value);
+  }
+}
+
+export function setStyle(el: any, key: string, value: any): void {
+  el.style[key] = value;
+}
+
+export function setText(el: Text, text: any): void {
+  el.textContent = String(text);
+}
+
+export function setProperty(node: any, key: string, value: any) {
+  const mappedKey = mappedProperties[key] || key;
+  node[mappedKey] = value;
+}
+
+const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
+export function setAttribute(el: Element, attribute: string, value: boolean): void {
+  if (!validAttribute.test(attribute)) {
+    return;
+  }
+
+  if (typeof value === "boolean" && value === false) {
+    el.removeAttribute(attribute);
+    return;
+  }
+
+  el.setAttribute(attribute, String(value));
+}
+
 function bindAttribute(node: HTMLElement, name: string, value: string, context: any) {
   const keys = Object.keys(context);
 
@@ -550,13 +588,14 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
   if (name.startsWith('on-')) {
     const key = name.slice(3);
     const [event, ...tags] = key.split('.');
-    const modifiers = tags.reduce((acc: { [x: string]: boolean }, tag: string | number) => {
-      acc[tag] = true;
-      return acc;
-    }, {});
+    const modifiers: any = {};
+
+    for (const tag of tags) {
+      modifiers[tag] = true;
+    }
 
     const fn = createFunction(value, keys, context, ['$event']);
-    node.addEventListener(event, (e: { stopPropagation: () => void; preventDefault: () => void }) => {
+    node.addEventListener(event, (e: Event) => {
       if (modifiers.stop) e.stopPropagation();
       if (modifiers.prevent) e.preventDefault();
 
@@ -569,7 +608,7 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
   if (name.startsWith('attr-')) {
     const key = name.slice(5);
     const source = value.trim();
-    effect(createFunction(source, keys, context), (v: any) => node.setAttribute(key, v));
+    effect(createFunction(source, keys, context), (v: any) => setAttribute(node, key, v));
     node.removeAttribute(name);
     return;
   }
@@ -577,7 +616,7 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
   if (name.startsWith('bind-')) {
     const key = name.slice(5);
     const source = value.trim();
-    effect(createFunction(source, keys, context), (value: any) => ((node as any)[key] = value));
+    effect(createFunction(source, keys, context), (value: any) => setProperty(node, key, value));
     node.removeAttribute(name);
     return;
   }
@@ -586,7 +625,7 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
     const key = name.slice(6);
     const source = value.trim();
 
-    effect(createFunction(source, keys, context), (value: any) => node.classList.toggle(key, !!value));
+    effect(createFunction(source, keys, context), (value: any) => setClassName(node, key, value));
     node.removeAttribute(name);
     return;
   }
@@ -594,7 +633,7 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
   if (name.startsWith('style-')) {
     const key = name.slice(6).replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase());
     const source = value.trim();
-    effect(createFunction(source, keys, context), (value: any) => ((node.style as any)[key] = value));
+    effect(createFunction(source, keys, context), (value: any) => setStyle(node, key, value));
     node.removeAttribute(name);
     return;
   }
