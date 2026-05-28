@@ -234,16 +234,11 @@ Here's a quick example:
 
         <code-block language="javascript" title="Declare outputs (events):">
           <pre>
-        import { defineEvent, defineEvents } from '@li3/web';
+        import { defineEvent } from '@li3/web';
 
         export default function setup() {
-          // short form
-          const emit = defineEvents(['update', 'remove']);
-          emit('update', { value: 123 });
-
-          // long form, with individual emitters
           const onUpdate = defineEvent('update');
-          onUpdate(123)
+          onUpdate(123);
         }
       </pre
           >
@@ -288,36 +283,6 @@ Here's a quick example:
           }
         </pre
           >
-        </code-block>
-
-        <code-block language="javascript" title="Access DOM nodes (.one or .many)">
-          <template>
-            <script type="module">
-              import { defineQuery } from '@li3/web';
-
-              function setup() {
-                const inputs = defineQuery('input');
-
-                function something() {
-                  const value = inputs.one.value;
-                  const valid = [...inputs.many].every((input) => isValid(input));
-                }
-              }
-            </script>
-          </template>
-        </code-block>
-
-        <code-block language="javascript" title="Load scripts and styles">
-          <template>
-            <script type="module">
-              import { loadCss, loadScript } from '@li3/web';
-
-              function setup() {
-                loadCss('http://example.com/main.css');
-                loadScript('http://example.com/index.js');
-              }
-            </script>
-          </template>
         </code-block>
       </div>
     </feature-section>
