@@ -723,7 +723,13 @@ async function findSetupModule(template: HTMLTemplateElement) {
   return noop;
 }
 
-async function defineFromTemplate(template: HTMLTemplateElement) {
+export async function defineFromTemplate(template: HTMLTemplateElement | string) {
+  if (typeof template === 'string') {
+    const t = String(template).trim();
+    template = document.createElement('template');
+    template.innerHTML = t;
+  }
+
   const name = template.getAttribute('component') as string;
 
   if (!name) {
