@@ -28,7 +28,7 @@ export type MountOptions = {
   shadowDom?: boolean;
 };
 
-export type DefineComponentOptions = MountOptions & { name: string };
+export type DefineComponentOptions = MountOptions & { name: string, template: HTMLTemplateElement | string };
 
 const currentNodeStack: RuntimeContext[] = [];
 const signalsStack: Signal[] = [];
@@ -50,9 +50,10 @@ function getShadowDomOptions(template: HTMLTemplateElement): ShadowRootInit | un
 }
 
 export function defineComponent(options: DefineComponentOptions) {
-  const { name, template } = options;
+  const { name } = options;
+  options.template = typeof options.template === 'string' ? tpl(options.template) : options.template;
   const shadowDom: ShadowRootInit | undefined =
-    options.shadowDom === true ? { mode: 'open' } : getShadowDomOptions(template);
+    options.shadowDom === true ? { mode: 'open' } : getShadowDomOptions(options.template);
 
   class Component extends HTMLElement {
     unmount: Function | null = null;
@@ -723,11 +724,16 @@ async function findSetupModule(template: HTMLTemplateElement) {
   return noop;
 }
 
+export function tpl(s: string) {
+  const template = document.createElement('template');
+  template.innerHTML = String(s).trim();
+
+  return template;
+}
+
 export async function defineFromTemplate(template: HTMLTemplateElement | string) {
   if (typeof template === 'string') {
-    const t = String(template).trim();
-    template = document.createElement('template');
-    template.innerHTML = t;
+    template = tpl(template);
   }
 
   const name = template.getAttribute('component') as string;
