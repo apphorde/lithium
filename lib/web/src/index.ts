@@ -740,6 +740,13 @@ async function defineFromTemplate(template: HTMLTemplateElement) {
   return options;
 }
 
+export function defineFromString(html: string) {
+  const dom = new DOMParser().parseFromString(html, 'text/html');
+  const nodes = dom.querySelectorAll('template[component]');
+
+  return (Array.from(nodes) as HTMLTemplateElement[]).map(defineFromTemplate);
+}
+
 export async function findApps() {
   const apps = Array.from(document.querySelectorAll('template[app]')) as HTMLTemplateElement[];
 
@@ -764,10 +771,7 @@ export async function load(href: string | URL) {
   }
 
   const html = await response.text();
-  const dom = new DOMParser().parseFromString(html, 'text/html');
-  const nodes = dom.querySelectorAll('template[component]');
-
-  return (Array.from(nodes) as HTMLTemplateElement[]).map(defineFromTemplate);
+  return defineFromString(html);
 }
 
 const stylesheetCache = new Map<string, Promise<CSSStyleSheet>>();
