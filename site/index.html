@@ -337,22 +337,21 @@ Here's a quick example:
 
       <script setup>
         import { load, highlight } from 'https://highlight.jsfn.run/index.mjs';
-        import { defineProp, defineQuery, onInit, hostClasses } from '@li3/web';
+        import { defineProp, onInit } from '@li3/web';
 
         load();
 
-        export default function codeBlock({ element }) {
+        export default function codeBlock() {
+          const element = getElement();
           const title = defineProp('title', '');
           const footnote = defineProp('footnote', '');
           const language = defineProp('language', 'html');
           const srcElement = defineProp('srcElement', '');
-          const pre = defineQuery('pre');
-          const template = defineQuery('template');
           const source =
             (srcElement.value && document.querySelector(srcElement.value)?.outerHTML) ||
-            (pre.one || template.one || element).innerHTML.trim() ||
+            (element.querySelector('pre') || element.querySelector('template') || element).innerHTML.trim() ||
             '';
-          const slot = defineQuery('slot');
+
           const lines = source.split('\n');
           const padding = lines
             .filter((line) => line.trim() && line.startsWith(' '))
@@ -362,12 +361,12 @@ Here's a quick example:
           const trimmedSource = lines.map((line) => line.replace(toReplace, '')).join('\n');
 
           onInit(async () => {
-            slot.one.innerHTML = await highlight(trimmedSource, {
+            element.querySelector('slot').innerHTML = await highlight(trimmedSource, {
               language: language.value || 'html',
             });
           });
 
-          hostClasses('mb-6 block');
+          element.className += ' mb-6 block';
 
           return {
             onCopy() {
