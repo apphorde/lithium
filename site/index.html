@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lithium - A Modern Frontend Library</title>
+    <title>Lithium - The Modern Web in 7kb</title>
     <script type="importmap">
       {
         "imports": {
@@ -67,8 +67,8 @@
         </h1>
 
         <p class="text-xl mb-8 font-serif">
-          A lightweight library to build reactive interfaces.<br />
-          Embraces the Web API's of today and provides an out-of-box experience.
+          The lightest metal and least dense of all solid elements.<br />
+          It's also the name of a very light frontend library, with the modern web in mind, and only 7kb.
         </p>
         <div class="flex flex-wrap gap-4">
           <a
@@ -89,22 +89,27 @@
     </section>
 
     <feature-section id="get-started">
-      <span slot="title">1 minute intro:</span>
-      <span slot="subtitle">So, what is Lithium exactly?</span>
+      <span slot="title">How to use it?</span>
+      <span slot="subtitle">All you need to know in 1 minute:</span>
 
       <markdown-block class="block text-sm my-8">
         <pre>
-It's a library to write reactive web interfaces using a simple and predictable mental model.
-This model works for all skill levels: beginner, advanced and AI developers.
+The modern web in a few KBs.
 
-I know what you are thinking! Oh, yet another framework! _sigh_ no thanks.
+Lithium uses standard Web API's and sticks mostly to HTML, instead of inventing a new language on top of it.
 
-So what makes **Lithium** different?
+Just follow a few basic rules of markup:
 
-We **_embrace_** the web platform, instead of putting it away as abstractions.
+- All props down, all changes up via events
+- Values in templates are always read-only
+- `&lt;template for="x of y">&lt;/template&gt;` to repeat
+- `&lt;template if="xyz">&lt;/template&gt;` to add/remove
+- `&lt;div bind-xyz="expression"&gt;` to bind a property to a reactive expression
+- `&lt;button on-xyz="handler()"&gt;` to listen to an event xyz (`element.onxyz` = ... also works)
+- Use `&lt;script setup=""&gt;` to define a component/app behavior
+- Use `ref()` and `computed()` to create reactive values
 
-Using [inline components and a declarative API](/docs), we can define the _shape_ of a component, and let the implementation details aside.
-Then we can pick and choose which implementation you want to use, again with standard API's and put them together to bring life to your user interface (UI).
+By using [inline components and a declarative API](/docs), an entire app could fit into one file.
 
 Here's a quick example:
 </pre
@@ -216,18 +221,12 @@ Here's a quick example:
       <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 justify-items-stretch items-stretch">
         <code-block language="javascript" title="Declare element inputs (props):">
           <pre>
-          import { defineProp, defineProps } from '@li3/web';
+          import { defineProp } from '@li3/web';
 
           export default function setup() {
-            // short form
-            const foo = defineProp('foo');
-            const bar = defineProp('foo', 123);
-
-            // long form with defaults
-            const { foo, bar } = defineProps({
-              foo: String,
-              bar: { default: 123 }
-            });
+            const string = defineProp('string');
+            const number = defineProp('number', { default: 123 });
+            const object = defineProp('other', { default: () => ({ hello: 'world' }) });
           }
       </pre
           >

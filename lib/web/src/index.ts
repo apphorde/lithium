@@ -81,6 +81,10 @@ export function defineComponent(options: DefineComponentOptions) {
   customElements.define(name, Component);
 }
 
+export function getElement() {
+  return getCurrentNode().element;
+}
+
 export function mount(target: Element, options: MountOptions) {
   const parentElement = target.shadowRoot || target;
   const { template, setup = noop } = options;
