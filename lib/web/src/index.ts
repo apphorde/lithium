@@ -25,7 +25,7 @@ export type Signal<T = any> = {
 export type MountOptions = {
   template: HTMLTemplateElement;
   setup?: Function;
-  shadowDom?: boolean;
+  shadowDom?: boolean | string | ShadowRootInit;
 };
 
 export type DefineComponentOptions = MountOptions & { name: string, template: HTMLTemplateElement | string };
@@ -54,6 +54,8 @@ export function defineComponent(options: DefineComponentOptions) {
   options.template = typeof options.template === 'string' ? tpl(options.template) : options.template;
   const shadowDom: ShadowRootInit | undefined =
     options.shadowDom === true ? { mode: 'open' } : getShadowDomOptions(options.template);
+
+  options.shadowDom = shadowDom;
 
   class Component extends HTMLElement {
     unmount: Function | null = null;
@@ -258,7 +260,7 @@ export function unwrap<T = any>(object: T): T {
   return object;
 }
 
-export function ref<T = any>(initial: T, isShallow = false) {
+export function ref<T = any>(initial?: T, isShallow = false) {
   const o: Signal = {
     [refSymbol]: true,
     internalValue: initial,
@@ -291,6 +293,10 @@ export function ref<T = any>(initial: T, isShallow = false) {
   };
 
   return o;
+}
+
+export function shallowRef<T>(value?: T) {
+  return ref<T>(value, true);
 }
 
 export function isRef(t: any): t is Signal {
