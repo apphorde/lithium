@@ -113,9 +113,19 @@ export function mount(target: Element, options: MountOptions) {
   const mergedContext = Object.assign({}, context, runtime.props, runtime.refs);
   const readOnlyContext = createReadOnlyContext(mergedContext);
   walkNodes(dom, bindNode, readOnlyContext);
+  const nodes = target.shadowRoot ? [] : [...target.childNodes];
 
   parentElement.innerHTML = '';
   parentElement.appendChild(dom);
+
+  if (nodes.length) {
+    const s = this.querySelector('slot');
+    if (s) {
+      const f = document.createDocumentFragment();
+      for (const n of nodes) f.append(n);
+      s.parentNode.insertBefore(f, s);
+    }
+  }
 
   for (const fn of runtime.mount) {
     fn();
