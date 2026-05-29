@@ -113,7 +113,7 @@ export function mount(target: Element, options: MountOptions) {
   const mergedContext = Object.assign({}, context, runtime.props, runtime.refs);
   const readOnlyContext = createReadOnlyContext(mergedContext);
   walkNodes(dom, bindNode, readOnlyContext);
-  const nodes = target.shadowRoot ? [] : [...target.childNodes];
+  const nodes = target.shadowRoot ? [] : Array.from(target.childNodes);
 
   parentElement.innerHTML = '';
   parentElement.appendChild(dom);
