@@ -119,11 +119,15 @@ export function mount(target: Element, options: MountOptions) {
   parentElement.appendChild(dom);
 
   if (nodes.length) {
-    const s = this.querySelector('slot');
+    const s = target.querySelector('slot');
+
     if (s) {
       const f = document.createDocumentFragment();
-      for (const n of nodes) f.append(n);
-      s.parentNode.insertBefore(f, s);
+      for (const n of nodes) {
+        f.append(n);
+      }
+
+      s.parentNode!.insertBefore(f, s);
     }
   }
 
