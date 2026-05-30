@@ -13,8 +13,16 @@
       }
     </script>
     <script type="module">
-      import '@li3/web';
-      import '@sodium/markdown-block';
+      import "@li3/web";
+      import "@sodium/markdown-block";
+      import { loadCss } from "@li3/web";
+
+      window.loadTailwind = function () {
+        loadCss(
+          "https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css",
+        );
+      }
+      </script>
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -40,10 +48,10 @@
           ui-sans-serif,
           system-ui,
           sans-serif,
-          'Apple Color Emoji',
-          'Segoe UI Emoji',
-          'Segoe UI Symbol',
-          'Noto Color Emoji' !important;
+          "Apple Color Emoji",
+          "Segoe UI Emoji",
+          "Segoe UI Symbol",
+          "Noto Color Emoji" !important;
         background: #30074fc8;
       }
 
@@ -68,7 +76,8 @@
 
         <p class="text-xl mb-8 font-serif">
           The lightest metal and least dense of all solid elements.<br />
-          It's also the name of a very light frontend library, with the modern web in mind, and only 7kb.
+          It's also the name of a very light frontend library, with the modern
+          web in mind, and only 7kb.
         </p>
         <div class="flex flex-wrap gap-4">
           <a
@@ -126,12 +135,16 @@ Here's a quick example:
             }
           </script>
           <script type="module">
-            import '@li3/web';
+            import "@li3/web";
           </script>
         </template>
       </code-block>
 
-      <code-block class="mb-8" title="Declare an application" srcelement="#hello-app"></code-block>
+      <code-block
+        class="mb-8"
+        title="Declare an application"
+        srcelement="#hello-app"
+      ></code-block>
 
       <div class="mb-8">
         <template id="hello-app" app>
@@ -150,10 +163,10 @@ Here's a quick example:
             <p class="text-xl font-bold">Hello, {{ name || 'stranger' }}.</p>
           </form>
           <script setup>
-            import { ref } from '@li3/web';
+            import { ref } from "@li3/web";
 
             export default function setup() {
-              const name = ref('');
+              const name = ref("");
 
               function setName(v) {
                 name.value = v;
@@ -167,10 +180,10 @@ Here's a quick example:
             }
           </script>
           <script setup>
-            import { ref } from '@li3/web';
+            import { ref } from "@li3/web";
 
             export default function setup() {
-              const name = ref('');
+              const name = ref("");
 
               function setName(v) {
                 name.value = v;
@@ -197,13 +210,19 @@ Here's a quick example:
         </template>
       </code-block>
 
-      <code-block title="Listen to events" footnote="'stop' and 'prevent' modifiers have special meaning.">
+      <code-block
+        title="Listen to events"
+        footnote="'stop' and 'prevent' modifiers have special meaning."
+      >
         <template>
           <form on-submit.prevent.stop="onSubmit($event)"></form>
         </template>
       </code-block>
 
-      <code-block title="Add/remove CSS classes" footnote="Multiple classes can be separated by a dot.">
+      <code-block
+        title="Add/remove CSS classes"
+        footnote="Multiple classes can be separated by a dot."
+      >
         <template>
           <input class-border-red.bg-yellow="isInvalid()" />
         </template>
@@ -218,8 +237,13 @@ Here's a quick example:
 
     <feature-section id="setup-api">
       <span slot="title">Declarative Component API</span>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 justify-items-stretch items-stretch">
-        <code-block language="javascript" title="Declare element inputs (props):">
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 gap-x-6 justify-items-stretch items-stretch"
+      >
+        <code-block
+          language="javascript"
+          title="Declare element inputs (props):"
+        >
           <pre>
           import { defineProp } from '@li3/web';
 
@@ -244,7 +268,10 @@ Here's a quick example:
           >
         </code-block>
 
-        <code-block language="javascript" title="Create reactive values (ref/computed) and watchers:">
+        <code-block
+          language="javascript"
+          title="Create reactive values (ref/computed) and watchers:"
+        >
           <pre>
           import { ref, unref, computed, watch } from '@li3/web';
 
@@ -289,9 +316,14 @@ Here's a quick example:
 
     <feature-section id="loops">
       <span slot="title">Conditionals and loops</span>
-      <span slot="subtitle">Repeat a template or add/remove elements based on a condition</span>
+      <span slot="subtitle"
+        >Repeat a template or add/remove elements based on a condition</span
+      >
 
-      <code-block language="javascript" title="Conditional templates: template[if]">
+      <code-block
+        language="javascript"
+        title="Conditional templates: template[if]"
+      >
         <template>
           <template if="condition">
             <div>Show me</div>
@@ -299,7 +331,10 @@ Here's a quick example:
         </template>
       </code-block>
 
-      <code-block language="javascript" title="Repeating templates: template[for..of]">
+      <code-block
+        language="javascript"
+        title="Repeating templates: template[for..of]"
+      >
         <template>
           <template for="item of links">
             <li><a prop-href="item.href">{{ item.label }}</a></li>
@@ -308,8 +343,9 @@ Here's a quick example:
       </code-block>
 
       <p class="mt-12 text-xl mb-8">
-        Need more? Head to <a class="underline" href="/docs">the full documentation</a> to see the API and more
-        examples!
+        Need more? Head to
+        <a class="underline" href="/docs">the full documentation</a> to see the
+        API and more examples!
       </p>
     </feature-section>
 
@@ -328,45 +364,66 @@ Here's a quick example:
         >
           copy
         </button>
-        <div class="empty:hidden text-xs px-4 py-3 uppercase bg-gray-100 rounded-t-lg font-bold text-green-700">
+        <div
+          class="empty:hidden text-xs px-4 py-3 uppercase bg-gray-100 rounded-t-lg font-bold text-green-700"
+        >
           {{ title || '' }}
         </div>
-        <slot class="font-mono whitespace-pre overflow-x-auto block w-full px-4 my-4"></slot>
-        <small class="empty:hidden px-4 py-2 block text-xs border-t">{{ footnote || '' }}</small>
+        <slot
+          class="font-mono whitespace-pre overflow-x-auto block w-full px-4 my-4"
+        ></slot>
+        <small class="empty:hidden px-4 py-2 block text-xs border-t"
+          >{{ footnote || '' }}</small
+        >
       </div>
 
       <script setup>
-        import { load, highlight } from 'https://highlight.jsfn.run/index.mjs';
-        import { defineProp, onInit, getElement } from '@li3/web';
+        import { load, highlight } from "https://highlight.jsfn.run/index.mjs";
+        import { defineProp, onInit, getElement } from "@li3/web";
 
         load();
 
         export default function codeBlock() {
           const element = getElement();
-          const title = defineProp('title', '');
-          const footnote = defineProp('footnote', '');
-          const language = defineProp('language', 'html');
-          const srcElement = defineProp('srcElement', '');
+          const title = defineProp("title", "");
+          const footnote = defineProp("footnote", "");
+          const language = defineProp("language", "html");
+          const srcElement = defineProp("srcElement", "");
           const source =
-            (srcElement.value && document.querySelector(srcElement.value)?.outerHTML) ||
-            (element.querySelector('pre') || element.querySelector('template') || element).innerHTML.trim() ||
-            '';
+            (srcElement.value &&
+              document.querySelector(srcElement.value)?.outerHTML) ||
+            (
+              element.querySelector("pre") ||
+              element.querySelector("template") ||
+              element
+            ).innerHTML.trim() ||
+            "";
 
-          const lines = source.split('\n');
+          const lines = source.split("\n");
           const padding = lines
-            .filter((line) => line.trim() && line.startsWith(' '))
-            .reduce((prev, line) => Math.min(prev, line.indexOf(line.trim())), lines[0].length);
+            .filter((line) => line.trim() && line.startsWith(" "))
+            .reduce(
+              (prev, line) => Math.min(prev, line.indexOf(line.trim())),
+              lines[0].length,
+            );
 
-          const toReplace = ' '.repeat(padding);
-          const trimmedSource = lines.map((line) => line.replace(toReplace, '')).join('\n');
+          const toReplace = " ".repeat(padding);
+          const trimmedSource = lines
+            .map((line) => line.replace(toReplace, ""))
+            .join("\n");
 
           onInit(async () => {
-            element.querySelector('slot').innerHTML = await highlight(trimmedSource, {
-              language: language.value || 'html',
-            });
+            element.querySelector("slot").innerHTML = await highlight(
+              trimmedSource,
+              {
+                language: language.value || "html",
+              },
+            );
           });
 
-          element.className += ' mb-6 block';
+          element.className += " mb-6 block";
+
+          window.loadTailwind();
 
           return {
             onCopy() {
@@ -378,7 +435,9 @@ Here's a quick example:
     </template>
 
     <template component="feature-card">
-      <div class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border text-gray-800">
+      <div
+        class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border text-gray-800"
+      >
         <div class="text-4xl mb-4">
           <slot name="icon"></slot>
         </div>
@@ -387,12 +446,22 @@ Here's a quick example:
         </h3>
         <slot></slot>
       </div>
+      <script setup>
+        export default function() {
+          window.loadTailwind();
+        }
+      </script>
     </template>
 
-    <template component="li-card">
+    <template component="li-card" shadow-dom="open">
       <div class="p-8 bg-white/15 rounded-2xl text-white shadow-xl">
         <slot class="contents"></slot>
       </div>
+      <script setup>
+        export default function() {
+          window.loadTailwind();
+        }
+      </script>
     </template>
 
     <template component="feature-section">
@@ -409,10 +478,22 @@ Here's a quick example:
           </li-card>
         </div>
       </section>
+      <script setup>
+        export default function() {
+          window.loadTailwind();
+        }
+      </script>
     </template>
 
     <template component="inline-code">
-      <slot class="font-mono rounded bg-gray-100 p-1 inline-block text-gray-800 text-sm"></slot>
+      <slot
+        class="font-mono rounded bg-gray-100 p-1 inline-block text-gray-800 text-sm"
+      ></slot>
+      <script setup>
+        export default function() {
+          window.loadTailwind();
+        }
+      </script>
     </template>
   </body>
 </html>
