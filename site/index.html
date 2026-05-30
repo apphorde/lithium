@@ -383,18 +383,19 @@ Here's a quick example:
         load();
 
         export default function codeBlock() {
-          const element = getElement();
+          const root = getElement().shadowRoot;
           const title = defineProp("title", "");
           const footnote = defineProp("footnote", "");
           const language = defineProp("language", "html");
           const srcElement = defineProp("srcElement", "");
+
           const source =
             (srcElement.value &&
               document.querySelector(srcElement.value)?.outerHTML) ||
             (
-              element.querySelector("pre") ||
-              element.querySelector("template") ||
-              element
+              root.querySelector("pre") ||
+              root.querySelector("template") ||
+              root
             ).innerHTML.trim() ||
             "";
 
@@ -412,7 +413,7 @@ Here's a quick example:
             .join("\n");
 
           onInit(async () => {
-            element.querySelector("slot").innerHTML = await highlight(
+            root.querySelector("slot").innerHTML = await highlight(
               trimmedSource,
               {
                 language: language.value || "html",
@@ -420,7 +421,7 @@ Here's a quick example:
             );
           });
 
-          element.className += " mb-6 block";
+          root.className += " mb-6 block";
 
           window.loadTailwind();
 
