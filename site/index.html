@@ -21,8 +21,7 @@
         loadCss(
           "https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css",
         );
-      }
-      </script>
+      };
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -354,7 +353,7 @@ Here's a quick example:
       <p class="mt-2">Copyright © 2024 Li3: Lithium web components</p>
     </footer>
 
-    <template component="code-block">
+    <template component="code-block" shadow-dom="open">
       <div
         class="bg-white rounded-lg shadow border border-gray-300 text-gray-800 text-xs relative flex flex-col h-full"
       >
@@ -434,7 +433,7 @@ Here's a quick example:
       </script>
     </template>
 
-    <template component="feature-card">
+    <template component="feature-card" shadow-dom="open">
       <div
         class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border text-gray-800"
       >
@@ -447,7 +446,7 @@ Here's a quick example:
         <slot></slot>
       </div>
       <script setup>
-        export default function() {
+        export default function () {
           window.loadTailwind();
         }
       </script>
@@ -458,13 +457,13 @@ Here's a quick example:
         <slot class="contents"></slot>
       </div>
       <script setup>
-        export default function() {
+        export default function () {
           window.loadTailwind();
         }
       </script>
     </template>
 
-    <template component="feature-section">
+    <template component="feature-section" shadow-dom="open">
       <section class="mb-16 mx-8 md:mx-4 lg:mx-0">
         <div class="max-w-4xl mx-auto">
           <li-card>
@@ -479,18 +478,18 @@ Here's a quick example:
         </div>
       </section>
       <script setup>
-        export default function() {
+        export default function () {
           window.loadTailwind();
         }
       </script>
     </template>
 
-    <template component="inline-code">
+    <template component="inline-code" shadow-dom="open">
       <slot
         class="font-mono rounded bg-gray-100 p-1 inline-block text-gray-800 text-sm"
       ></slot>
       <script setup>
-        export default function() {
+        export default function () {
           window.loadTailwind();
         }
       </script>
