@@ -23,7 +23,6 @@
         );
       };
     </script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
       :root {
         --primary: #411e5c;
@@ -51,7 +50,7 @@
           "Segoe UI Emoji",
           "Segoe UI Symbol",
           "Noto Color Emoji" !important;
-        background: #30074fc8;
+          background: #30074fc8;
       }
 
       .contents-children > * {
@@ -65,8 +64,8 @@
   </head>
 
   <body class="text-gray-100 antialiased">
-    <section class="my-16 flex items-center justify-center px-8">
-      <div class="max-w-2xl">
+    <section class="min-h-screen flex items-center justify-center px-4 md:px-8">
+      <div class="max-w-2xl w-full">
         <h1 class="font-bold mb-6 font-serif">
           <span class="text-5xl mr-4 mb-2 inline-block">lithium</span><br />
           <span class="text-md italic mr-2">(lith·i·um)</span>
@@ -81,7 +80,7 @@
         <div class="flex flex-wrap gap-4">
           <a
             href="/docs"
-            class="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transform hover:-translate-y-0.5 transition-all"
+            class="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-opacity-80 transform hover:-translate-y-0.5 transition-all"
           >
             Read the Docs
           </a>
@@ -348,9 +347,9 @@ Here's a quick example:
       </p>
     </feature-section>
 
-    <footer class="py-8 px-8 text-center">
-      <p>Released under the MIT License.<br /></p>
-      <p class="mt-2">Copyright © 2024 Li3: Lithium web components</p>
+    <footer class="py-12 px-4 md:px-8 text-center border-t border-white/10">
+      <p class="text-gray-300">Released under the MIT License.<br /></p>
+      <p class="mt-2 text-gray-400">Copyright © 2024 Li3: Lithium web components</p>
     </footer>
 
     <template component="code-block" shadow-dom="open">
@@ -495,5 +494,7 @@ Here's a quick example:
         }
       </script>
     </template>
+
+    <script defer src="https://cdn.tailwindcss.com"></script>
   </body>
 </html>
