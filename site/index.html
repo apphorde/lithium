@@ -13,14 +13,12 @@
       }
     </script>
     <script type="module">
-      import "@li3/web";
-      import "@sodium/markdown-block";
-      import { loadCss } from "@li3/web";
+      import '@li3/web';
+      import '@sodium/markdown-block';
+      import { loadCss } from '@li3/web';
 
       window.loadTailwind = function () {
-        loadCss(
-          "https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css",
-        );
+        loadCss('https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css');
       };
     </script>
     <style>
@@ -46,11 +44,11 @@
           ui-sans-serif,
           system-ui,
           sans-serif,
-          "Apple Color Emoji",
-          "Segoe UI Emoji",
-          "Segoe UI Symbol",
-          "Noto Color Emoji" !important;
-          background: #30074fc8;
+          'Apple Color Emoji',
+          'Segoe UI Emoji',
+          'Segoe UI Symbol',
+          'Noto Color Emoji' !important;
+        background: #30074fc8;
       }
 
       .contents-children > * {
@@ -61,90 +59,342 @@
         margin-bottom: 1rem !important;
       }
     </style>
+    <style>
+      /* Import Vintage Style Fonts */
+      @import url('https://googleapis.com');
+
+      :root {
+        --cherry-red: #c21d30;
+        --cream: #fff9eb;
+        --retro-teal: #2b7a78;
+        --ink-black: #1a1a1a;
+        --polka-dot: radial-gradient(#c21d30 20%, transparent 20%);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--cream);
+        color: var(--ink-black);
+        overflow-x: hidden;
+      }
+
+      /* Polka Dot Header & Hero */
+      header {
+        background-image: var(--polka-dot);
+        background-size: 24px 24px;
+        background-color: #ffe6cc;
+        padding: 20px;
+        text-align: center;
+        border-bottom: 8px double var(--cherry-red);
+      }
+
+      .logo {
+        font-family: 'Pinyon Script', cursive;
+        font-size: 3.5rem;
+        color: var(--cherry-red);
+        font-weight: bold;
+        text-shadow: 1px 1px 0px #fff;
+      }
+
+      .hero {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 60px 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        align-items: center;
+      }
+
+      .hero-text h1 {
+        font-family: 'Abril Fatface', serif;
+        font-size: 4rem;
+        color: var(--cherry-red);
+        line-height: 1.1;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .hero-text p {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+        color: #444;
+        line-height: 1.6;
+      }
+
+      /* Retro Badge Button */
+      .btn-retro {
+        display: inline-block;
+        font-family: 'Abril Fatface', serif;
+        background-color: var(--retro-teal);
+        color: white;
+        padding: 15px 35px;
+        font-size: 1.3rem;
+        text-decoration: none;
+        border-radius: 50px;
+        border: 3px solid var(--cream);
+        box-shadow:
+          0 0 0 4px var(--retro-teal),
+          4px 4px 0px 4px var(--ink-black);
+        transition: all 0.2s ease;
+        text-transform: uppercase;
+      }
+
+      .btn-retro:hover {
+        transform: translateY(-2px);
+        box-shadow:
+          0 0 0 4px var(--retro-teal),
+          6px 6px 0px 4px var(--ink-black);
+      }
+
+      .hero-image {
+        position: relative;
+        text-align: center;
+      }
+
+      /* Frame simulating vintage pin-up poster placeholder */
+      .pinup-frame {
+        width: 100%;
+        max-width: 400px;
+        height: 500px;
+        margin: 0 auto;
+        background: #e0d5be;
+        border: 15px solid #fff;
+        box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+        transform: rotate(-2deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        position: relative;
+      }
+
+      .pinup-frame::before {
+        content: '★ ★ ★';
+        font-size: 1.5rem;
+        color: var(--cherry-red);
+        margin-bottom: 10px;
+      }
+
+      /* Features Section */
+      .features {
+        background-color: var(--ink-black);
+        color: var(--cream);
+        padding: 80px 20px;
+        border-top: 5px solid var(--cherry-red);
+        border-bottom: 5px solid var(--cherry-red);
+      }
+
+      .section-title {
+        text-align: center;
+        font-family: 'Abril Fatface', serif;
+        font-size: 3rem;
+        color: var(--cream);
+        margin-bottom: 50px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      .grid {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(512px, 1fr));
+        gap: 40px;
+      }
+
+      .card {
+        background: #262626;
+        padding: 40px 30px;
+        border: 2px dashed var(--cherry-red);
+        border-radius: 8px;
+        text-align: center;
+        transition: transform 0.3s ease;
+      }
+
+      .card:hover {
+        transform: scale(1.03);
+      }
+
+      .card-icon {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        display: block;
+      }
+
+      .card h3 {
+        font-family: 'Abril Fatface', serif;
+        font-size: 1.6rem;
+        color: var(--cream);
+        margin-bottom: 15px;
+        letter-spacing: 1px;
+      }
+
+      .card p {
+        font-size: 0.95rem;
+        color: #ccc;
+        line-height: 1.6;
+      }
+
+      /* Banner Split */
+      .ribbon-banner {
+        background-color: var(--cherry-red);
+        color: white;
+        text-align: center;
+        padding: 15px 0;
+        font-family: 'Abril Fatface', serif;
+        font-size: 1.5rem;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+      }
+
+      /* Footer */
+      footer {
+        background-color: var(--cream);
+        text-align: center;
+        padding: 40px 20px;
+        font-size: 0.9rem;
+        color: #666;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .hero {
+          grid-template-columns: 1fr;
+          text-align: center;
+          padding: 40px 20px;
+        }
+        .hero-text h1 {
+          font-size: 2.8rem;
+        }
+        .pinup-frame {
+          height: 400px;
+          transform: none;
+          margin-top: 30px;
+        }
+      }
+    </style>
   </head>
+  <body>
+    <!-- Header -->
+    <header>
+      <div class="logo">Let The Good Times Roll</div>
+    </header>
 
-  <body class="text-gray-100 antialiased">
-    <section class="min-h-screen flex items-center justify-center px-4 md:px-8">
-      <div class="max-w-2xl w-full">
-        <h1 class="font-bold mb-6 font-serif">
-          <span class="text-5xl mr-4 mb-2 inline-block">lithium</span><br />
-          <span class="text-md italic mr-2">(lith·i·um)</span>
-          <span class="text-md rounded">noun</span>
-        </h1>
-
-        <p class="text-xl mb-8 font-serif">
-          The lightest metal and least dense of all solid elements.<br />
-          It's also the name of a very light frontend library, with the modern
-          web in mind, and only 7kb.
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-text">
+        <h1>Like the old days,<br />but Modern APIs.</h1>
+        <p>
+          Step back into the golden era of web components, simple concepts, and less build steps. With modern Web API's
+          and a few primitives, we can make programming for the web great again.
         </p>
-        <div class="flex flex-wrap gap-4">
-          <a
-            href="/docs"
-            class="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-opacity-80 transform hover:-translate-y-0.5 transition-all"
-          >
-            Read the Docs
-          </a>
-          <a
-            href="https://github.com/apphorde/lithium"
-            target="_blank"
-            class="px-6 py-3 bg-white text-primary border border-primary rounded-lg font-semibold hover:bg-gray-50 transform hover:-translate-y-0.5 transition-all"
-          >
-            View on GitHub
-          </a>
-        </div>
+        <a href="#features" class="btn-retro">Explore the concepts</a>
       </div>
+      <!-- div class="hero-image">
+        <div class="pinup-frame">
+          <p
+            style="
+              font-family: 'Abril Fatface', serif;
+              font-size: 1.5rem;
+              color: #777;
+            "
+          >
+            [ Insert Pin-Up Illustration ]
+          </p>
+          <p style="font-size: 0.9rem; color: #999; margin-top: 10px">
+            High-waist swimsuits, victory rolls & red lips
+          </p>
+        </div>
+      </div -->
     </section>
 
-    <feature-section id="get-started">
-      <span slot="title">How to use it?</span>
-      <span slot="subtitle">All you need to know in 1 minute:</span>
+    <!-- Ribbon Split -->
+    <div class="ribbon-banner">★ Modern Apps in 7kb ★</div>
 
-      <markdown-block class="block text-sm my-8">
-        <pre>
-The modern web in a few KBs.
+    <section class="features" id="features">
+      <h2 class="section-title">The Retro Experience</h2>
 
-Lithium uses standard Web API's and sticks mostly to HTML, instead of inventing a new language on top of it.
+      <p>
+        Lithium uses standard Web API's and sticks mostly to HTML, instead of inventing a new language on top of it.
+        Just follow a few basic rules of markup:
+      </p>
+      <ul>
+        <li>All props down, all changes up via events</li>
+        <li>Values in templates are always read-only</li>
+        <li><code>&lt;template for="x of y">&lt;/template&gt;</code> to repeat</li>
+        <li><code>&lt;template if="xyz">&lt;/template&gt;</code> to add/remove</li>
+        <li><code>&lt;div bind-xyz="expression"&gt;</code> to bind a property to a reactive expression</li>
+        <li>
+          <code>&lt;button on-xyz="handler()"&gt;</code> to listen to an event xyz (`element.onxyz` = ... also works)
+        </li>
+        <li>Use <code>&lt;script setup=""&gt;</code> to define a component/app behavior</li>
+        <li>- Use <code>ref()</code> and <code>computed()</code> to create reactive values</li>
+      </ul>
+      <p class="mb-8">
+        By using [inline components and a declarative API](/docs), an entire app could fit into one file.
+      </p>
 
-Just follow a few basic rules of markup:
-
-- All props down, all changes up via events
-- Values in templates are always read-only
-- `&lt;template for="x of y">&lt;/template&gt;` to repeat
-- `&lt;template if="xyz">&lt;/template&gt;` to add/remove
-- `&lt;div bind-xyz="expression"&gt;` to bind a property to a reactive expression
-- `&lt;button on-xyz="handler()"&gt;` to listen to an event xyz (`element.onxyz` = ... also works)
-- Use `&lt;script setup=""&gt;` to define a component/app behavior
-- Use `ref()` and `computed()` to create reactive values
-
-By using [inline components and a declarative API](/docs), an entire app could fit into one file.
-
-Here's a quick example:
-</pre
-        >
-      </markdown-block>
-
-      <code-block class="mb-8" title="Load the library">
-        <template>
-          <script type="importmap">
-            {
-              "imports": {
-                "@li3/": "https://cdn.li3.dev/@li3/"
+      <div class="grid">
+        <code-block class="mb-8" title="Load the library">
+          <template>
+            <script type="importmap">
+              {
+                "imports": {
+                  "@li3/": "https://cdn.li3.dev/@li3/"
+                }
               }
-            }
-          </script>
-          <script type="module">
-            import "@li3/web";
-          </script>
-        </template>
-      </code-block>
+            </script>
+            <script type="module">
+              import '@li3/web';
+            </script>
+          </template>
+        </code-block>
 
-      <code-block
-        class="mb-8"
-        title="Declare an application"
-        srcelement="#hello-app"
-      ></code-block>
+        <code-block class="mb-8" title="Declare an application" srcelement="#hello-app"></code-block>
 
-      <div class="mb-8">
+        <code-block title="Template syntax">
+          <template>
+            <form on-submit.prevent.stop="onSubmit($event)">
+              <button
+                ref="btn1"
+                attr-lang="language"
+                prop-disabled="isDisabled"
+                class-disabled="isDisabled"
+                style-background-color="isDisabled ? 'gray' : 'white'"
+              >
+                Hello, {{ name }}
+              </button>
+            </form>
+          </template>
+        </code-block>
+
+        <code-block title="Component syntax">
+          <template component="hello-world">
+            <script setup>
+              import { defineProp, defineEvent, ref, computed, watch, effect } from '@li3/web';
+
+              export default function () {
+                const input = defineProp('input');
+                const output = defineEvent('output');
+                const localValue = ref(1);
+                const computedValue = computed(() => localValue * 2);
+                // expose what is needed
+                return { computedValue };
+              }
+            </script>
+          </template>
+        </code-block>
+      </div>
+
+      <div class="my-8">
         <template id="hello-app" app>
           <form
             class="md:w-2/3 mx-auto bg-white rounded-lg p-5 mb-6 shadow border border-gray-300 text-gray-800 text-xs"
@@ -161,10 +411,10 @@ Here's a quick example:
             <p class="text-xl font-bold">Hello, {{ name || 'stranger' }}.</p>
           </form>
           <script setup>
-            import { ref } from "@li3/web";
+            import { ref } from '@li3/web';
 
             export default function setup() {
-              const name = ref("");
+              const name = ref('');
 
               function setName(v) {
                 name.value = v;
@@ -178,10 +428,10 @@ Here's a quick example:
             }
           </script>
           <script setup>
-            import { ref } from "@li3/web";
+            import { ref } from '@li3/web';
 
             export default function setup() {
-              const name = ref("");
+              const name = ref('');
 
               function setName(v) {
                 name.value = v;
@@ -196,305 +446,74 @@ Here's a quick example:
           </script>
         </template>
       </div>
-    </feature-section>
 
-    <feature-section id="bindings">
-      <span slot="title">Template syntax</span>
-      <span slot="subtitle">Add life to your static HTML text</span>
-
-      <code-block title="Bind a property or attribute">
-        <template>
-          <button attr-lang="language" prop-disabled="isDisabled"></button>
-        </template>
-      </code-block>
-
-      <code-block
-        title="Listen to events"
-        footnote="'stop' and 'prevent' modifiers have special meaning."
-      >
-        <template>
-          <form on-submit.prevent.stop="onSubmit($event)"></form>
-        </template>
-      </code-block>
-
-      <code-block
-        title="Add/remove CSS classes"
-        footnote="Multiple classes can be separated by a dot."
-      >
-        <template>
-          <input class-border-red.bg-yellow="isInvalid()" />
-        </template>
-      </code-block>
-
-      <code-block title="Set styles">
-        <template>
-          <div style-display="shouldBeVisible ? 'block' : 'none'"></div>
-        </template>
-      </code-block>
-    </feature-section>
-
-    <feature-section id="setup-api">
-      <span slot="title">Declarative Component API</span>
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 gap-x-6 justify-items-stretch items-stretch"
-      >
-        <code-block
-          language="javascript"
-          title="Declare element inputs (props):"
-        >
-          <pre>
-          import { defineProp } from '@li3/web';
-
-          export default function setup() {
-            const string = defineProp('string');
-            const number = defineProp('number', { default: 123 });
-            const object = defineProp('other', { default: () => ({ hello: 'world' }) });
-          }
-      </pre
-          >
-        </code-block>
-
-        <code-block language="javascript" title="Declare outputs (events):">
-          <pre>
-        import { defineEvent } from '@li3/web';
-
-        export default function setup() {
-          const onUpdate = defineEvent('update');
-          onUpdate(123);
-        }
-      </pre
-          >
-        </code-block>
-
-        <code-block
-          language="javascript"
-          title="Create reactive values (ref/computed) and watchers:"
-        >
-          <pre>
-          import { ref, unref, computed, watch } from '@li3/web';
-
-          export default function setup() {
-            const name = ref('Joe');
-            const greeting = computed(() => 'Hello, ' + unref(name));
-
-            function isEmpty() {
-              return !!unref(name);
-            }
-
-            watch(() => unref(name), (value) => { /**/ });
-
-            return { name, greeting, isEmpty }
-          }
-        </pre
-          >
-        </code-block>
-
-        <code-block language="javascript" title="Use lifecycle events">
-          <pre>
-          import { onInit, onUpdate, onDestroy } from '@li3/web';
-
-          export default function setup() {
-            onInit(function() {
-              // called once on mount
-            });
-
-            onUpdate(function() {
-              // called every time a prop changes
-            });
-
-            onDestroy(function() {
-              // called once on unmount
-            });
-          }
-        </pre
-          >
-        </code-block>
-      </div>
-    </feature-section>
-
-    <feature-section id="loops">
-      <span slot="title">Conditionals and loops</span>
-      <span slot="subtitle"
-        >Repeat a template or add/remove elements based on a condition</span
-      >
-
-      <code-block
-        language="javascript"
-        title="Conditional templates: template[if]"
-      >
-        <template>
-          <template if="condition">
-            <div>Show me</div>
-          </template>
-        </template>
-      </code-block>
-
-      <code-block
-        language="javascript"
-        title="Repeating templates: template[for..of]"
-      >
-        <template>
-          <template for="item of links">
-            <li><a prop-href="item.href">{{ item.label }}</a></li>
-          </template>
-        </template>
-      </code-block>
-
-      <p class="mt-12 text-xl mb-8">
-        Need more? Head to
-        <a class="underline" href="/docs">the full documentation</a> to see the
-        API and more examples!
-      </p>
-    </feature-section>
-
-    <footer class="py-12 px-4 md:px-8 text-center border-t border-white/10">
-      <p class="text-gray-300">Released under the MIT License.<br /></p>
-      <p class="mt-2 text-gray-400">Copyright © 2024 Li3: Lithium web components</p>
-    </footer>
-
-    <template component="code-block" shadow-dom="open">
-      <div
-        class="bg-white rounded-lg shadow border border-gray-300 text-gray-800 text-xs relative flex flex-col h-full"
-      >
-        <button
-          class="absolute right-0 top-0 m-1 text-xs px-2 py-1 bg-white text-gray-800 border rounded"
-          on-click="onCopy()"
-        >
-          copy
-        </button>
+      <template component="code-block" shadow-dom="open">
         <div
-          class="empty:hidden text-xs px-4 py-3 uppercase bg-gray-100 rounded-t-lg font-bold text-green-700"
+          class="bg-white rounded-lg shadow border border-gray-300 text-gray-800 text-xs relative flex flex-col h-full"
         >
-          {{ title || '' }}
+          <button
+            class="absolute right-0 top-0 m-1 text-xs px-2 py-1 bg-white text-gray-800 border rounded"
+            on-click="onCopy()"
+          >
+            copy
+          </button>
+          <div class="empty:hidden text-xs px-4 py-3 uppercase bg-gray-100 rounded-t-lg font-bold text-green-700">
+            {{ title || '' }}
+          </div>
+          <slot class="font-mono whitespace-pre overflow-x-auto block w-full px-4 my-4"></slot>
+          <small class="empty:hidden px-4 py-2 block text-xs border-t">{{ footnote || '' }}</small>
         </div>
-        <slot
-          class="font-mono whitespace-pre overflow-x-auto block w-full px-4 my-4"
-        ></slot>
-        <small class="empty:hidden px-4 py-2 block text-xs border-t"
-          >{{ footnote || '' }}</small
-        >
-      </div>
 
-      <script setup>
-        import { load, highlight } from "https://highlight.jsfn.run/index.mjs";
-        import { defineProp, onInit, getElement } from "@li3/web";
+        <script setup>
+          import { load, highlight } from 'https://highlight.jsfn.run/index.mjs';
+          import { defineProp, onInit, getElement } from '@li3/web';
 
-        load();
+          load();
 
-        export default function codeBlock() {
-          const root = getElement().shadowRoot;
-          const title = defineProp("title", "");
-          const footnote = defineProp("footnote", "");
-          const language = defineProp("language", "html");
-          const srcElement = defineProp("srcElement", "");
+          export default function codeBlock() {
+            const root = getElement().shadowRoot;
+            const title = defineProp('title', '');
+            const footnote = defineProp('footnote', '');
+            const language = defineProp('language', 'html');
+            const srcElement = defineProp('srcElement', '');
 
-          const source =
-            (srcElement.value &&
-              document.querySelector(srcElement.value)?.outerHTML) ||
-            (
-              root.querySelector("pre") ||
-              root.querySelector("template") ||
-              root
-            ).innerHTML.trim() ||
-            "";
+            const source =
+              (srcElement.value && document.querySelector(srcElement.value)?.outerHTML) ||
+              (root.querySelector('pre') || root.querySelector('template') || root).innerHTML.trim() ||
+              '';
 
-          const lines = source.split("\n");
-          const padding = lines
-            .filter((line) => line.trim() && line.startsWith(" "))
-            .reduce(
-              (prev, line) => Math.min(prev, line.indexOf(line.trim())),
-              lines[0].length,
-            );
+            const lines = source.split('\n');
+            const padding = lines
+              .filter((line) => line.trim() && line.startsWith(' '))
+              .reduce((prev, line) => Math.min(prev, line.indexOf(line.trim())), lines[0].length);
 
-          const toReplace = " ".repeat(padding);
-          const trimmedSource = lines
-            .map((line) => line.replace(toReplace, ""))
-            .join("\n");
+            const toReplace = ' '.repeat(padding);
+            const trimmedSource = lines.map((line) => line.replace(toReplace, '')).join('\n');
 
-          onInit(async () => {
-            root.querySelector("slot").innerHTML = await highlight(
-              trimmedSource,
-              {
-                language: language.value || "html",
+            onInit(async () => {
+              root.querySelector('slot').innerHTML = await highlight(trimmedSource, {
+                language: language.value || 'html',
+              });
+            });
+
+            root.className += ' mb-6 block';
+
+            window.loadTailwind();
+
+            return {
+              onCopy() {
+                navigator.clipboard.writeText(trimmedSource);
               },
-            );
-          });
-
-          root.className += " mb-6 block";
-
-          window.loadTailwind();
-
-          return {
-            onCopy() {
-              navigator.clipboard.writeText(trimmedSource);
-            },
-          };
-        }
-      </script>
-    </template>
-
-    <template component="feature-card" shadow-dom="open">
-      <div
-        class="p-8 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow border text-gray-800"
-      >
-        <div class="text-4xl mb-4">
-          <slot name="icon"></slot>
-        </div>
-        <h3 class="text-xl font-bold mb-4">
-          <slot name="title"></slot>
-        </h3>
-        <slot></slot>
-      </div>
-      <script setup>
-        export default function () {
-          window.loadTailwind();
-        }
-      </script>
-    </template>
-
-    <template component="li-card" shadow-dom="open">
-      <div class="p-8 bg-white/15 rounded-2xl text-white shadow-xl">
-        <slot class="contents"></slot>
-      </div>
-      <script setup>
-        export default function () {
-          window.loadTailwind();
-        }
-      </script>
-    </template>
-
-    <template component="feature-section" shadow-dom="open">
-      <section class="mb-16 mx-8 md:mx-4 lg:mx-0">
-        <div class="max-w-4xl mx-auto">
-          <li-card>
-            <h2 class="text-sm uppercase py-2 font-bold">
-              <slot name="title"></slot>
-            </h2>
-            <h3 class="text-3xl mt-3 mb-6 font-semi font-serif">
-              <slot name="subtitle"></slot>
-            </h3>
-            <slot></slot>
-          </li-card>
-        </div>
-      </section>
-      <script setup>
-        export default function () {
-          window.loadTailwind();
-        }
-      </script>
-    </template>
-
-    <template component="inline-code" shadow-dom="open">
-      <slot
-        class="font-mono rounded bg-gray-100 p-1 inline-block text-gray-800 text-sm"
-      ></slot>
-      <script setup>
-        export default function () {
-          window.loadTailwind();
-        }
-      </script>
-    </template>
+            };
+          }
+        </script>
+      </template>
+    </section>
 
     <script defer src="https://cdn.tailwindcss.com"></script>
+    <!-- Footer -->
+    <footer>
+      <p>&copy; 2026 Cherry Bomb Boutique. All rights reserved. Made for the retro souls.</p>
+    </footer>
   </body>
 </html>
