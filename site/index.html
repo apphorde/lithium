@@ -343,7 +343,7 @@
       </p>
 
       <div class="grid">
-        <code-block class="mb-8" title="Load the library">
+        <code-block class="mb-8 block" title="Load the library">
           <template>
             <script type="importmap">
               {
@@ -358,9 +358,9 @@
           </template>
         </code-block>
 
-        <code-block class="mb-8" title="Declare an application" srcelement="#hello-app"></code-block>
+        <code-block class="mb-8 block" title="Declare an application" srcelement="#hello-app"></code-block>
 
-        <code-block title="Template syntax">
+        <code-block class="mb-8 block" title="Template syntax">
           <template>
             <form on-submit.prevent.stop="onSubmit($event)">
               <button
@@ -376,21 +376,22 @@
           </template>
         </code-block>
 
-        <code-block title="Component syntax">
-          <template component="hello-world">
-            <script setup>
+        <code-block language="html" class="mb-8 block" title="Component syntax">
+          &lt;template component="hello-world">
+            &lt;script setup>
               import { defineProp, defineEvent, ref, computed, watch, effect } from '@li3/web';
 
               export default function () {
                 const input = defineProp('input');
-                const output = defineEvent('output');
+                const onOutput = defineEvent('output');
                 const localValue = ref(1);
                 const computedValue = computed(() => localValue * 2);
-                // expose what is needed
-                return { computedValue };
+
+                // exposed properties and methods
+                return { computedValue, onOutput };
               }
-            </script>
-          </template>
+            &lt;/script>
+          &lt;/template>
         </code-block>
       </div>
 
@@ -427,7 +428,7 @@
               return { name, sayMyName, setName };
             }
           </script>
-          <script setup>
+          &lt;script setup>
             import { ref } from '@li3/web';
 
             export default function setup() {
@@ -443,7 +444,7 @@
 
               return { name, sayMyName, setName };
             }
-          </script>
+          &lt;/script>
         </template>
       </div>
 
@@ -473,9 +474,9 @@
           export default function codeBlock() {
             const root = getElement().shadowRoot;
             const title = defineProp('title', '');
-            const footnote = defineProp('footnote', '');
-            const language = defineProp('language', 'html');
-            const srcElement = defineProp('srcElement', '');
+            const footnote = defineProp('footnote', { default: '' });
+            const language = defineProp('language', { default: 'html' });
+            const srcElement = defineProp('srcElement', { default: '' });
 
             const source =
               (srcElement.value && document.querySelector(srcElement.value)?.outerHTML) ||
@@ -488,15 +489,14 @@
               .reduce((prev, line) => Math.min(prev, line.indexOf(line.trim())), lines[0].length);
 
             const toReplace = ' '.repeat(padding);
-            const trimmedSource = lines.map((line) => line.replace(toReplace, '')).join('\n');
+            const lt = /&lt;/g
+            const trimmedSource = lines.map((line) => line.replace(toReplace, '').replace(lt, '<')).join('\n');
 
             onInit(async () => {
               root.querySelector('slot').innerHTML = await highlight(trimmedSource, {
                 language: language.value || 'html',
               });
             });
-
-            root.className += ' mb-6 block';
 
             window.loadTailwind();
 
