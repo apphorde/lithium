@@ -754,9 +754,16 @@ function bindAttribute(
   if (node.nodeName === "TEMPLATE" && name === "if") {
     const source = value.trim();
     const ifNodes: any[] = [];
+    let lastValue: any;
 
     effect(createFunction(source, keys, context), (value: any) => {
-      if (value) {
+      if (compare(value, lastValue)) {
+        return;
+      }
+
+      lastValue = value;
+
+      if (value && !ifNodes.length) {
         const dom = (node as HTMLTemplateElement).content.cloneNode(true);
         ifNodes.push(...Array.from(dom.childNodes));
 
@@ -764,10 +771,14 @@ function bindAttribute(
         setTimeout(() => {
           (node as any).parentNode.insertBefore(dom, node);
         });
-      } else {
+        return;
+      }
+
+      if (!value && ifNodes.length) {
         for (const node of ifNodes) {
           node.remove();
         }
+
         ifNodes.length = 0;
       }
     });
@@ -851,7 +862,7 @@ export async function findApps() {
     };
 
     const app = document.createElement("div");
-    app.style.display = 'contents';
+    app.style.display = "contents";
     template.parentNode!.insertBefore(app, template);
 
     mount(app, options);
