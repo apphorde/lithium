@@ -1,3 +1,5 @@
+import { elementRoles } from 'aria-query';
+
 export type AnyFunction = (...args: any[]) => any;
 
 export type PropOptions<T = any> = {
@@ -25,6 +27,7 @@ export type Signal<T = any> = {
 export type MountOptions = {
   template: HTMLTemplateElement;
   setup?: Function;
+  styles?: CSSStyleSheet[];
   shadowDom?: boolean | string | ShadowRootInit;
 };
 
@@ -128,6 +131,10 @@ export function mount(target: Element, options: MountOptions) {
 
   parentElement.innerHTML = "";
   parentElement.appendChild(dom);
+
+  if (options.styles?.length) {
+    (target.shadowRoot || document).adoptedStyleSheets.push(...options.styles);
+  }
 
   for (const fn of runtime.mount) {
     fn();
@@ -813,6 +820,24 @@ async function findSetupModule(template: HTMLTemplateElement) {
   return noop;
 }
 
+function findStyleSheets(template: HTMLTemplateElement): CSSStyleSheet[] {
+  const styleTags = Array.from(
+    template.content.querySelectorAll("style"),
+  ) as HTMLStyleElement[];
+
+  if (!styleTags.length) {
+    return [];
+  }
+
+  return styleTags
+    .map((tag) => {
+      const sheet = tag.sheet;
+      tag.remove();
+      return sheet;
+    })
+    .filter(Boolean) as CSSStyleSheet[];
+}
+
 export function tpl(s: string) {
   const template = document.createElement("template");
   template.innerHTML = String(s).trim();
@@ -837,6 +862,7 @@ export async function defineFromTemplate(
     name,
     template,
     setup: await findSetupModule(template),
+    styles: findStyleSheets(template),
   };
 
   defineComponent(options);
