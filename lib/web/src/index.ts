@@ -851,6 +851,7 @@ export async function findApps() {
     };
 
     const app = document.createElement("div");
+    app.style.display = 'contents';
     template.parentNode!.insertBefore(app, template);
 
     mount(app, options);
