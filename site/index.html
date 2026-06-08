@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lithium - The Modern Web in 7kb</title>
+    <title>Lithium - Pure Web API Framework</title>
     <script type="importmap">
       {
         "imports": {
@@ -14,506 +14,397 @@
     </script>
     <script type="module">
       import '@li3/web';
-      import '@sodium/markdown-block';
       import { loadCss } from '@li3/web';
 
       window.loadTailwind = function () {
         loadCss('https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css');
       };
     </script>
-    <style>
-      :root {
-        --primary: #411e5c;
-      }
 
-      .bg-primary {
-        background-color: var(--primary);
-      }
-
-      .border-primary {
-        border-color: var(--primary);
-      }
-
-      .text-primary {
-        color: var(--primary);
-      }
-
-      body {
-        font-family:
-          Fricolage Grotesque,
-          ui-sans-serif,
-          system-ui,
-          sans-serif,
-          'Apple Color Emoji',
-          'Segoe UI Emoji',
-          'Segoe UI Symbol',
-          'Noto Color Emoji' !important;
-        background: #30074fc8;
-      }
-
-      .contents-children > * {
-        display: contents;
-      }
-
-      markdown-block > * {
-        margin-bottom: 1rem !important;
-      }
-    </style>
-    <style>
-      /* Import Vintage Style Fonts */
-      @import url('https://googleapis.com');
-
-      :root {
-        --cherry-red: #c21d30;
-        --cream: #fff9eb;
-        --retro-teal: #2b7a78;
-        --ink-black: #1a1a1a;
-        --polka-dot: radial-gradient(#c21d30 20%, transparent 20%);
-      }
-
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
-      body {
-        font-family: 'Poppins', sans-serif;
-        background-color: var(--cream);
-        color: var(--ink-black);
-        overflow-x: hidden;
-      }
-
-      /* Polka Dot Header & Hero */
-      header {
-        background-image: var(--polka-dot);
-        background-size: 24px 24px;
-        background-color: #ffe6cc;
-        padding: 20px;
-        text-align: center;
-        border-bottom: 8px double var(--cherry-red);
-      }
-
-      .logo {
-        font-family: 'Pinyon Script', cursive;
-        font-size: 3.5rem;
-        color: var(--cherry-red);
-        font-weight: bold;
-        text-shadow: 1px 1px 0px #fff;
-      }
-
-      .hero {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 60px 20px;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 40px;
-        align-items: center;
-      }
-
-      .hero-text h1 {
-        font-family: 'Abril Fatface', serif;
-        font-size: 4rem;
-        color: var(--cherry-red);
-        line-height: 1.1;
-        margin-bottom: 20px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-      }
-
-      .hero-text p {
-        font-size: 1.2rem;
-        margin-bottom: 30px;
-        color: #444;
-        line-height: 1.6;
-      }
-
-      /* Retro Badge Button */
-      .btn-retro {
-        display: inline-block;
-        font-family: 'Abril Fatface', serif;
-        background-color: var(--retro-teal);
-        color: white;
-        padding: 15px 35px;
-        font-size: 1.3rem;
-        text-decoration: none;
-        border-radius: 50px;
-        border: 3px solid var(--cream);
-        box-shadow:
-          0 0 0 4px var(--retro-teal),
-          4px 4px 0px 4px var(--ink-black);
-        transition: all 0.2s ease;
-        text-transform: uppercase;
-      }
-
-      .btn-retro:hover {
-        transform: translateY(-2px);
-        box-shadow:
-          0 0 0 4px var(--retro-teal),
-          6px 6px 0px 4px var(--ink-black);
-      }
-
-      .hero-image {
-        position: relative;
-        text-align: center;
-      }
-
-      /* Frame simulating vintage pin-up poster placeholder */
-      .pinup-frame {
-        width: 100%;
-        max-width: 400px;
-        height: 500px;
-        margin: 0 auto;
-        background: #e0d5be;
-        border: 15px solid #fff;
-        box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
-        transform: rotate(-2deg);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        position: relative;
-      }
-
-      .pinup-frame::before {
-        content: '★ ★ ★';
-        font-size: 1.5rem;
-        color: var(--cherry-red);
-        margin-bottom: 10px;
-      }
-
-      /* Features Section */
-      .features {
-        background-color: var(--ink-black);
-        color: var(--cream);
-        padding: 80px 20px;
-        border-top: 5px solid var(--cherry-red);
-        border-bottom: 5px solid var(--cherry-red);
-      }
-
-      .section-title {
-        text-align: center;
-        font-family: 'Abril Fatface', serif;
-        font-size: 3rem;
-        color: var(--cream);
-        margin-bottom: 50px;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-      }
-
-      .grid {
-        max-width: 1200px;
-        margin: 0 auto;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(512px, 1fr));
-        gap: 40px;
-      }
-
-      .card {
-        background: #262626;
-        padding: 40px 30px;
-        border: 2px dashed var(--cherry-red);
-        border-radius: 8px;
-        text-align: center;
-        transition: transform 0.3s ease;
-      }
-
-      .card:hover {
-        transform: scale(1.03);
-      }
-
-      .card-icon {
-        font-size: 3rem;
-        margin-bottom: 20px;
-        display: block;
-      }
-
-      .card h3 {
-        font-family: 'Abril Fatface', serif;
-        font-size: 1.6rem;
-        color: var(--cream);
-        margin-bottom: 15px;
-        letter-spacing: 1px;
-      }
-
-      .card p {
-        font-size: 0.95rem;
-        color: #ccc;
-        line-height: 1.6;
-      }
-
-      /* Banner Split */
-      .ribbon-banner {
-        background-color: var(--cherry-red);
-        color: white;
-        text-align: center;
-        padding: 15px 0;
-        font-family: 'Abril Fatface', serif;
-        font-size: 1.5rem;
-        letter-spacing: 4px;
-        text-transform: uppercase;
-      }
-
-      /* Footer */
-      footer {
-        background-color: var(--cream);
-        text-align: center;
-        padding: 40px 20px;
-        font-size: 0.9rem;
-        color: #666;
-      }
-
-      /* Responsive adjustments */
-      @media (max-width: 768px) {
-        .hero {
-          grid-template-columns: 1fr;
-          text-align: center;
-          padding: 40px 20px;
-        }
-        .hero-text h1 {
-          font-size: 2.8rem;
-        }
-        .pinup-frame {
-          height: 400px;
-          transform: none;
-          margin-top: 30px;
-        }
-      }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            backgroundImage: {
+              'gradient-primary': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              'gradient-accent': 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            },
+            colors: {
+              lithium: '#667eea',
+              'lithium-dark': '#764ba2',
+            },
+          },
+        },
+      };
+    </script>
   </head>
-  <body>
-    <!-- Header -->
-    <header>
-      <div class="logo">Let The Good Times Roll</div>
-    </header>
+  <body class="font-sans text-gray-900 antialiased bg-white">
+    <!-- Navigation -->
+    <nav class="flex justify-between items-center px-8 py-4 bg-white border-b border-gray-100">
+      <a href="#" class="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">Li³</a>
+      <div class="hidden md:flex gap-8">
+        <a href="#philosophy" class="text-gray-600 hover:text-lithium transition-colors font-medium">Philosophy</a>
+        <a href="#concepts" class="text-gray-600 hover:text-lithium transition-colors font-medium">Concepts</a>
+        <a href="#examples" class="text-gray-600 hover:text-lithium transition-colors font-medium">Examples</a>
+        <a
+          href="https://github.com/apphorde/lithium"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-gray-600 hover:text-lithium transition-colors font-medium"
+          >GitHub</a
+        >
+      </div>
+    </nav>
 
     <!-- Hero Section -->
-    <section class="hero">
-      <div class="hero-text">
-        <h1>Like the old days,<br />but Modern APIs.</h1>
-        <p>
-          Step back into the golden era of web components, simple concepts, and less build steps. With modern Web API's
-          and a few primitives, we can make programming for the web great again.
-        </p>
-        <a href="#features" class="btn-retro">Explore the concepts</a>
-      </div>
-      <!-- div class="hero-image">
-        <div class="pinup-frame">
-          <p
-            style="
-              font-family: 'Abril Fatface', serif;
-              font-size: 1.5rem;
-              color: #777;
-            "
-          >
-            [ Insert Pin-Up Illustration ]
-          </p>
-          <p style="font-size: 0.9rem; color: #999; margin-top: 10px">
-            High-waist swimsuits, victory rolls & red lips
-          </p>
-        </div>
-      </div -->
-    </section>
+    <section class="relative min-h-screen bg-gradient-to-br from-white via-purple-50 to-white overflow-hidden">
+      <div
+        class="absolute top-0 right-0 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
+      ></div>
+      <div
+        class="absolute bottom-0 left-0 w-96 h-96 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
+        style="animation-delay: 2s"
+      ></div>
 
-    <!-- Ribbon Split -->
-    <div class="ribbon-banner">★ Modern Apps in 7kb ★</div>
-
-    <section class="features" id="features">
-      <h2 class="section-title">The Retro Experience</h2>
-
-      <p>
-        Lithium uses standard Web API's and sticks mostly to HTML, instead of inventing a new language on top of it.
-        Just follow a few basic rules of markup:
-      </p>
-      <ul>
-        <li>All props down, all changes up via events</li>
-        <li>Values in templates are always read-only</li>
-        <li><code>&lt;template for="x of y">&lt;/template&gt;</code> to repeat</li>
-        <li><code>&lt;template if="xyz">&lt;/template&gt;</code> to add/remove</li>
-        <li><code>&lt;div bind-xyz="expression"&gt;</code> to bind a property to a reactive expression</li>
-        <li>
-          <code>&lt;button on-xyz="handler()"&gt;</code> to listen to an event xyz (`element.onxyz` = ... also works)
-        </li>
-        <li>Use <code>&lt;script setup=""&gt;</code> to define a component/app behavior</li>
-        <li>- Use <code>ref()</code> and <code>computed()</code> to create reactive values</li>
-      </ul>
-      <p class="mb-8">
-        By using [inline components and a declarative API](/docs), an entire app could fit into one file.
-      </p>
-
-      <div class="grid">
-        <code-block class="mb-8 block" title="Load the library">
-          <template>
-            <script type="importmap">
-              {
-                "imports": {
-                  "@li3/": "https://cdn.li3.dev/@li3/"
-                }
-              }
-            </script>
-            <script type="module">
-              import '@li3/web';
-            </script>
-          </template>
-        </code-block>
-
-        <code-block class="mb-8 block" title="Declare an application" srcelement="#hello-app"></code-block>
-
-        <code-block class="mb-8 block" title="Template syntax">
-          <template>
-            <form on-submit.prevent.stop="onSubmit($event)">
-              <button
-                ref="btn1"
-                attr-lang="language"
-                prop-disabled="isDisabled"
-                class-disabled="isDisabled"
-                style-background-color="isDisabled ? 'gray' : 'white'"
-              >
-                Hello, {{ name }}
-              </button>
-            </form>
-          </template>
-        </code-block>
-
-        <code-block language="html" class="mb-8 block" title="Component syntax">
-          &lt;template component="hello-world">
-            &lt;script setup>
-              import { defineProp, defineEvent, ref, computed, watch, effect } from '@li3/web';
-
-              export default function () {
-                const input = defineProp('input');
-                const onOutput = defineEvent('output');
-                const localValue = ref(1);
-                const computedValue = computed(() => localValue * 2);
-
-                // exposed properties and methods
-                return { computedValue, onOutput };
-              }
-            &lt;/script>
-          &lt;/template>
-        </code-block>
-      </div>
-
-      <div class="my-8">
-        <template id="hello-app" app>
-          <form
-            class="md:w-2/3 mx-auto bg-white rounded-lg p-5 mb-6 shadow border border-gray-300 text-gray-800 text-xs"
-            on-submit.prevent="sayMyName()"
-          >
-            <label class="py-2">What is your name?</label>
-            <input
-              type="text"
-              class="mt-2 p-2 border rounded bg-white w-full text-black"
-              on-input="setName($event.target.value)"
-              prop-value="name"
-            />
-            <hr class="border-t my-3" />
-            <p class="text-xl font-bold">Hello, {{ name || 'stranger' }}.</p>
-          </form>
-          <script setup>
-            import { ref } from '@li3/web';
-
-            export default function setup() {
-              const name = ref('');
-
-              function setName(v) {
-                name.value = v;
-              }
-
-              function sayMyName() {
-                alert(name.value);
-              }
-
-              return { name, sayMyName, setName };
-            }
-          </script>
-          &lt;script setup>
-            import { ref } from '@li3/web';
-
-            export default function setup() {
-              const name = ref('');
-
-              function setName(v) {
-                name.value = v;
-              }
-
-              function sayMyName() {
-                alert(name.value);
-              }
-
-              return { name, sayMyName, setName };
-            }
-          &lt;/script>
-        </template>
-      </div>
-
-      <template component="code-block" shadow-dom="open">
-        <div
-          class="bg-white rounded-lg shadow border border-gray-300 text-gray-800 text-xs relative flex flex-col h-full"
-        >
-          <button
-            class="absolute right-0 top-0 m-1 text-xs px-2 py-1 bg-white text-gray-800 border rounded"
-            on-click="onCopy()"
-          >
-            copy
-          </button>
-          <div class="empty:hidden text-xs px-4 py-3 uppercase bg-gray-100 rounded-t-lg font-bold text-green-700">
-            {{ title || '' }}
+      <div
+        class="relative max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between px-8 py-20 md:py-32 gap-12"
+      >
+        <div class="flex-1 max-w-3xl">
+          <div class="inline-block mb-4">
+            <span class="px-4 py-2 bg-purple-100 text-lithium rounded-full text-sm font-semibold">Pure Web APIs</span>
           </div>
-          <slot class="font-mono whitespace-pre overflow-x-auto block w-full px-4 my-4"></slot>
-          <small class="empty:hidden px-4 py-2 block text-xs border-t">{{ footnote || '' }}</small>
+          <h1 class="text-6xl md:text-7xl font-bold mb-6 leading-tight">
+            <span class="bg-gradient-primary bg-clip-text text-transparent">Lithium</span>
+          </h1>
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-8">
+            The UI runtime that speaks your language: HTML
+          </h2>
+          <p class="text-xl text-gray-700 mb-8 leading-relaxed">
+            Stop learning new syntax. Lithium harnesses the power of standard Web APIs and extends them naturally with a
+            few simple markup rules. Write less, do more.
+          </p>
+          <div class="flex flex-wrap gap-4">
+            <a
+              href="#concepts"
+              class="px-8 py-4 bg-gradient-primary text-white rounded-xl font-semibold hover:shadow-lg transform hover:-translate-y-1 transition-all"
+            >
+              Learn the Concepts
+            </a>
+            <a
+              href="https://github.com/apphorde/lithium"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="px-8 py-4 bg-white text-lithium border-2 border-lithium rounded-xl font-semibold hover:bg-purple-50 transform hover:-translate-y-1 transition-all"
+            >
+              View on GitHub →
+            </a>
+          </div>
         </div>
 
-        <script setup>
-          import { load, highlight } from 'https://highlight.jsfn.run/index.mjs';
-          import { defineProp, onInit, getElement } from '@li3/web';
+        <div class="flex-1 relative">
+          <div class="bg-gray-900 rounded-2xl p-8 shadow-2xl">
+            <div class="text-green-400 font-mono text-sm md:text-base space-y-2">
+              <div>
+                &lt;button
+                <div class="ml-4">
+                  <div>
+                    <span class="text-yellow-400">class-font-bold</span>=<span class="text-yellow-400"
+                      >"counter > 2"</span
+                    >
+                  </div>
+                  <div>
+                    <span class="text-yellow-400">bind-disabled</span>=<span class="text-yellow-400"
+                      >"counter > 5"</span
+                    >
+                  </div>
+                  <div>
+                    <span class="text-yellow-400">attr-aria-disabled</span>=<span class="text-yellow-400"
+                      >"counter > 5"</span
+                    >
+                  </div>
+                  <div>
+                    <span class="text-pink-400">on-click</span>=<span class="text-yellow-400">"increment()"</span>
+                  </div>
+                </div>
+                &gt;
+              </div>
+              <div class="ml-4">
+                &lt;p&gt;<span class="text-yellow-400">Count: {{ <span class="text-purple-300">count</span> }}</span
+                >&lt;/p&gt;
+              </div>
 
-          load();
+              <div>&lt;/div&gt;</div>
+              <div class="mt-4 text-blue-300">
+                <div>&lt;script <span class="text-pink-400">setup</span>&gt;</div>
+                <div class="ml-4 mb-4">
+                  <span class="text-pink-400">import</span> { <span class="text-yellow-300">ref</span> }
+                  <span class="text-pink-400">from</span>
+                  <span class="text-green-400">"@li3/web"</span>
+                </div>
+                <div class="ml-4">
+                  <span class="text-pink-400">export default</span>
+                  <span class="text-yellow-400">function</span>() {
 
-          export default function codeBlock() {
-            const root = getElement().shadowRoot;
-            const title = defineProp('title', '');
-            const footnote = defineProp('footnote', { default: '' });
-            const language = defineProp('language', { default: 'html' });
-            const srcElement = defineProp('srcElement', { default: '' });
-
-            const source =
-              (srcElement.value && document.querySelector(srcElement.value)?.outerHTML) ||
-              (root.querySelector('pre') || root.querySelector('template') || root).innerHTML.trim() ||
-              '';
-
-            const lines = source.split('\n');
-            const padding = lines
-              .filter((line) => line.trim() && line.startsWith(' '))
-              .reduce((prev, line) => Math.min(prev, line.indexOf(line.trim())), lines[0].length);
-
-            const toReplace = ' '.repeat(padding);
-            const lt = /&lt;/g
-            const trimmedSource = lines.map((line) => line.replace(toReplace, '').replace(lt, '<')).join('\n');
-
-            onInit(async () => {
-              root.querySelector('slot').innerHTML = await highlight(trimmedSource, {
-                language: language.value || 'html',
-              });
-            });
-
-            window.loadTailwind();
-
-            return {
-              onCopy() {
-                navigator.clipboard.writeText(trimmedSource);
-              },
-            };
-          }
-        </script>
-      </template>
+                  <div class="ml-4">const count = <span class="text-yellow-400">ref(0)</span></div>
+                  <div class="ml-4">const <span class="text-yellow-300">increment</span> = () =&gt; count.value++</div>
+                  <div class="ml-4"><span class="text-pink-400">return</span> { count, increment };</div>
+                  <div>}</div>
+                </div>
+                <div>&lt;/script&gt;</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <script defer src="https://cdn.tailwindcss.com"></script>
+    <!-- Philosophy Section -->
+    <section id="philosophy" class="py-24 px-8 bg-gray-50 border-t border-gray-200">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-5xl font-bold text-gray-900 mb-4">Built on Web Fundamentals</h2>
+          <p class="text-xl text-gray-700 max-w-3xl mx-auto">
+            Lithium doesn't invent a new language. It embraces HTML, CSS, and JavaScript as they are, adding minimal,
+            intuitive extensions.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <div class="bg-white p-8 rounded-2xl shadow-lg border-l-4 border-lithium">
+            <div class="text-4xl mb-4">📥</div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">All Props Down, All Changes Up via Events</h3>
+            <p class="text-gray-700 mb-4">
+              Data flows down through properties, changes flow up through events. This creates a clear, predictable data
+              pattern that mirrors how the web has always worked.
+            </p>
+          </div>
+
+          <div class="bg-white p-8 rounded-2xl shadow-lg border-l-4 border-pink-500">
+            <div class="text-4xl mb-4">🔐</div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-4">Read-Only Templates</h3>
+            <p class="text-gray-700 mb-4">
+              Templates are declarative and read-only. State changes don't come from the template—they flow through your
+              component logic via events and ref updates.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Concepts Section -->
+    <section id="concepts" class="py-24 px-8 bg-white">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-5xl font-bold text-gray-900 mb-4">Core Concepts</h2>
+          <p class="text-xl text-gray-700">Simple rules that make everything powerful</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Concept 1 -->
+          <div
+            class="bg-gradient-to-br from-purple-50 to-transparent p-8 rounded-2xl border border-purple-200 hover:shadow-xl transition-shadow"
+          >
+            <div class="inline-block mb-4 p-3 bg-gradient-primary rounded-lg">
+              <span class="text-2xl">🔁</span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;template for="x of y"&gt;</h3>
+            <p class="text-gray-700 mb-4">Render lists with natural iteration syntax</p>
+            <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
+              <span class="text-cyan-400">&lt;template</span>
+              <span class="text-yellow-400">for="item of items"</span>&gt;<br />
+              <div class="ml-4">&lt;li&gt;{{item}}&lt;/li&gt;<br /></div>
+              <span class="text-cyan-400">&lt;/template&gt;</span>
+            </code>
+          </div>
+
+          <!-- Concept 2 -->
+          <div
+            class="bg-gradient-to-br from-pink-50 to-transparent p-8 rounded-2xl border border-pink-200 hover:shadow-xl transition-shadow"
+          >
+            <div class="inline-block mb-4 p-3 bg-gradient-accent rounded-lg">
+              <span class="text-2xl">❓</span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;template if="xyz"&gt;</h3>
+            <p class="text-gray-700 mb-4">Conditionally render DOM elements</p>
+            <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
+              <span class="text-cyan-400">&lt;template</span>
+              <span class="text-yellow-400">if="isVisible"</span>&gt;
+              <div class="ml-4">&lt;div&gt;Hidden until true&lt;/div&gt;</div>
+
+              <span class="text-cyan-400">&lt;/template&gt;</span>
+            </code>
+          </div>
+
+          <!-- Concept 3 -->
+          <div
+            class="bg-gradient-to-br from-blue-50 to-transparent p-8 rounded-2xl border border-blue-200 hover:shadow-xl transition-shadow"
+          >
+            <div class="inline-block mb-4 p-3 bg-blue-400 rounded-lg">
+              <span class="text-2xl">🎯</span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;div bind-xyz="expr"&gt;</h3>
+            <p class="text-gray-700 mb-4">Bind properties to reactive expressions</p>
+            <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
+              <span class="text-cyan-400">&lt;button</span>
+              <span class="text-yellow-400">bind-disabled="isActive"</span><span class="text-cyan-400">&gt;</span
+              ><br />click me<br /><span class="text-cyan-400">&lt;/button&gt;</span>
+            </code>
+          </div>
+
+          <!-- Concept 4 -->
+          <div
+            class="bg-gradient-to-br from-green-50 to-transparent p-8 rounded-2xl border border-green-200 hover:shadow-xl transition-shadow"
+          >
+            <div class="inline-block mb-4 p-3 bg-green-400 rounded-lg">
+              <span class="text-2xl">🔊</span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;button on-xyz="handler()"&gt;</h3>
+            <p class="text-gray-700 mb-4">Listen to events and trigger handlers</p>
+            <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
+              <span class="text-cyan-400">&lt;button </span>
+              <div class="ml-4">
+                on-click="<span class="text-yellow-400">deleteItem(id)</span>"<span class="text-cyan-400">&gt;</span>
+                Delete
+              </div>
+              <span class="text-cyan-400">&lt;/button&gt;</span>
+            </code>
+          </div>
+
+          <!-- Concept 5 -->
+          <div
+            class="bg-gradient-to-br from-indigo-50 to-transparent p-8 rounded-2xl border border-indigo-200 hover:shadow-xl transition-shadow"
+          >
+            <div class="inline-block mb-4 p-3 bg-indigo-400 rounded-lg">
+              <span class="text-2xl">⚙️</span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;script setup&gt;</h3>
+            <p class="text-gray-700 mb-4">Define component behavior and state</p>
+            <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
+              <span class="text-cyan-400">&lt;script setup&gt; <br /></span>
+              <span class="text-red-400">export default </span>
+              <span class="text-yellow-400">function() {</span>
+              <div class="ml-4">
+                const count = ref(0);<br />
+                return { count };
+                <br />
+              </div>
+              <span class="text-yellow-400">}</span><br />
+              <span class="text-cyan-400">&lt;/script&gt;</span>
+            </code>
+          </div>
+
+          <!-- Concept 6 -->
+          <div
+            class="bg-gradient-to-br from-yellow-50 to-transparent p-8 rounded-2xl border border-yellow-200 hover:shadow-xl transition-shadow"
+          >
+            <div class="inline-block mb-4 p-3 bg-yellow-400 rounded-lg">
+              <span class="text-2xl">💡</span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-3">ref(), computed(), watch()</h3>
+            <p class="text-gray-700 mb-4">Create reactive values and derived state</p>
+            <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
+              const count = <span class="text-yellow-400">ref(0);</span><br />
+              const double =
+              <span class="text-yellow-400">computed(() => count.value * 2)</span><br />
+              <span class="text-yellow-400">watch(count, () => ...)</span>
+            </code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Examples Section -->
+    <section id="examples" class="py-24 px-8 bg-gray-50 border-t border-gray-200">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-5xl font-bold text-gray-900 mb-4">One-File Applications</h2>
+          <p class="text-xl text-gray-700">Entire apps in a single file with inline components and a declarative API</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
+          <div class="bg-gray-900 p-8 text-green-400 font-mono text-sm overflow-x-auto">
+            <div class="text-blue-300">&lt;!-- Counter App --&gt;</div>
+            <div>&lt;template app&gt;</div>
+            <div class="ml-4">&lt;h1&gt;{{title}}&lt;/h1&gt;</div>
+            <div class="ml-4">&lt;div class-warning="count &gt; 10"&gt;</div>
+            <div class="ml-8">&lt;p&gt;Count: &lt;strong&gt;{{count}}&lt;/strong&gt;&lt;/p&gt;</div>
+            <div class="ml-8">&lt;template if="count &gt; 0"&gt;</div>
+            <div class="ml-12">&lt;p class="text-sm text-gray-500"&gt;You've clicked {{count}} times&lt;/p&gt;</div>
+            <div class="ml-8">&lt;/template&gt;</div>
+            <div class="ml-4">&lt;/div&gt;</div>
+            <div class="ml-4">&lt;div class="button-group"&gt;</div>
+            <div class="ml-8">&lt;button on-click="increment()"&gt;Increment&lt;/button&gt;</div>
+            <div class="ml-8">&lt;button on-click="reset()"&gt;Reset&lt;/button&gt;</div>
+            <div class="ml-4">&lt;/div&gt;</div>
+
+            <div class="mt-4 ml-4">
+              <div class="text-blue-300">&lt;script setup&gt;</div>
+              <div class="ml-4">const title = <span class="text-yellow-400">'Counter App'</span></div>
+              <div class="ml-4">const count = <span class="text-cyan-400">ref</span>(0)</div>
+              <div class="ml-4">const <span class="text-green-300">increment</span> = () =&gt; count.value++</div>
+              <div class="ml-4">const <span class="text-green-300">reset</span> = () =&gt; count.value = 0</div>
+              <div class="text-blue-300">&lt;/script&gt;</div>
+            </div>
+            <div>&lt;/template&gt;</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+          <div class="bg-white p-8 rounded-2xl border border-gray-200">
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Minimal Syntax</h3>
+            <p class="text-gray-700">Only learn the extensions you need. HTML stays HTML.</p>
+          </div>
+          <div class="bg-white p-8 rounded-2xl border border-gray-200">
+            <h3 class="text-lg font-bold text-gray-900 mb-2">No Build Required</h3>
+            <p class="text-gray-700">Works instantly in the browser with no compilation step.</p>
+          </div>
+          <div class="bg-white p-8 rounded-2xl border border-gray-200">
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Progressive Enhancement</h3>
+            <p class="text-gray-700">Add reactivity to existing HTML incrementally.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-24 px-8 bg-gradient-primary text-white">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-5xl font-bold mb-6">Ready to simplify your frontend?</h2>
+        <p class="text-xl mb-8 opacity-90">
+          Start building with Lithium today. It takes just minutes to get up and running.
+        </p>
+        <a
+          href="https://github.com/apphorde/lithium"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-block px-8 py-4 bg-white text-lithium rounded-xl font-bold hover:shadow-lg transform hover:-translate-y-1 transition-all"
+        >
+          Star on GitHub →
+        </a>
+      </div>
+    </section>
+
     <!-- Footer -->
-    <footer>
-      <p>&copy; 2026 Cherry Bomb Boutique. All rights reserved. Made for the retro souls.</p>
+    <footer class="bg-gray-900 text-gray-400 py-12 px-8">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+        <div>
+          <h3 class="text-white font-bold text-xl mb-2">Lithium</h3>
+          <p>Pure Web APIs, Beautifully Extended</p>
+        </div>
+        <div class="flex gap-8 text-sm">
+          <a
+            href="https://github.com/apphorde/lithium"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:text-white transition-colors"
+            >GitHub</a
+          >
+          <a href="#philosophy" class="hover:text-white transition-colors">Docs</a>
+          <a href="#concepts" class="hover:text-white transition-colors">API</a>
+        </div>
+        <p class="text-sm">Released under the MIT License</p>
+      </div>
     </footer>
   </body>
 </html>
