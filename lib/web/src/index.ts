@@ -555,6 +555,7 @@ function bindText(node: Text, context: {}) {
 const mappedProperties: Record<string, string> = {
   innerhtml: 'innerHTML',
   baseuri: 'baseURI',
+  class: 'className'
 };
 
 function setClassName(el: Element, classNames: string, value: any): void {
