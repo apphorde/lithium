@@ -15,7 +15,7 @@
 
   <script setup>
     import { load, highlight } from 'https://highlight.jsfn.run/index.mjs';
-    import { defineProp, onInit, getElement } from '@li3/web';
+    import { defineProp, onInit, getElement, loadCss } from '@li3/web';
 
     load();
 
@@ -25,6 +25,8 @@
       const footnote = defineProp('footnote', { default: '' });
       const language = defineProp('language', { default: 'html' });
       const srcElement = defineProp('srcElement', { default: '' });
+
+      loadCss('https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css');
 
       const source =
         (srcElement.value && document.querySelector(srcElement.value)?.outerHTML) ||
@@ -45,8 +47,6 @@
           language: language.value || 'html',
         });
       });
-
-      window.loadTailwind();
 
       return {
         onCopy() {
