@@ -1,5 +1,3 @@
-import { elementRoles } from 'aria-query';
-
 export type AnyFunction = (...args: any[]) => any;
 
 export type PropOptions<T = any> = {
