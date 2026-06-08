@@ -3,40 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lithium - Pure Web API Framework</title>
+    <link rel="component" href="/code-block.html" />
+    <title>Lithium - Pure Web UI library</title>
     <script type="importmap">
       {
         "imports": {
-          "@li3/": "https://at-li3.static.apphor.de/",
-          "@sodium/": "https://at-sodium.static.apphor.de/"
+          "@li3/": "https://at-li3.static.apphor.de/"
         }
       }
     </script>
     <script type="module">
       import '@li3/web';
-      import { loadCss } from '@li3/web';
-
-      window.loadTailwind = function () {
-        loadCss('https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css');
-      };
-    </script>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            backgroundImage: {
-              'gradient-primary': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              'gradient-accent': 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-            },
-            colors: {
-              lithium: '#667eea',
-              'lithium-dark': '#764ba2',
-            },
-          },
-        },
-      };
     </script>
   </head>
   <body class="font-sans text-gray-900 antialiased bg-white">
@@ -340,10 +317,13 @@
 
             <div class="mt-4 ml-4">
               <div class="text-blue-300">&lt;script setup&gt;</div>
-              <div class="ml-4">const title = <span class="text-yellow-400">'Counter App'</span></div>
-              <div class="ml-4">const count = <span class="text-cyan-400">ref</span>(0)</div>
-              <div class="ml-4">const <span class="text-green-300">increment</span> = () =&gt; count.value++</div>
-              <div class="ml-4">const <span class="text-green-300">reset</span> = () =&gt; count.value = 0</div>
+              <div class="ml-4"><span class="text-pink-400">export default </span><span class="text-yellow-400">function</span>() {
+                <div class="ml-4">const title = <span class="text-yellow-400">ref(</span>'Counter App'</span><span class="text-yellow-400">)</span></div>
+                <div class="ml-4">const <span class="text-cyan-400">count</span> = <span class="text-yellow-400">ref</span>(0)</div>
+                <div class="ml-4">const <span class="text-cyan-400">increment</span> = () =&gt; count.value++</div>
+                <div class="ml-4">const <span class="text-cyan-400">reset</span> = () =&gt; count.value = 0</div>
+              }
+              </div>
               <div class="text-blue-300">&lt;/script&gt;</div>
             </div>
             <div>&lt;/template&gt;</div>
@@ -406,5 +386,22 @@
         <p class="text-sm">Released under the MIT License</p>
       </div>
     </footer>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            backgroundImage: {
+              'gradient-primary': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              'gradient-accent': 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            },
+            colors: {
+              lithium: '#667eea',
+              'lithium-dark': '#764ba2',
+            },
+          },
+        },
+      };
+    </script>
   </body>
 </html>

@@ -552,7 +552,7 @@ function bindText(node: Text, context: {}) {
   effect(createFunction(source, keys, context), (v: any) => (node.textContent = v));
 }
 
-const mappedProperties: Record<string, keyof HTMLElement | keyof SVGElement> = {
+const mappedProperties: Record<string, string> = {
   innerhtml: 'innerHTML',
   baseuri: 'baseURI',
 };
