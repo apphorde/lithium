@@ -608,7 +608,10 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
   if (name.startsWith('on-')) {
     const key = name.slice(3);
     const [event, ...tags] = key.split('.');
-    const modifiers: any = {};
+    const modifiers: any = {
+      // Safari's default is true
+      passive: false,
+    };
 
     for (const tag of tags) {
       modifiers[tag] = true;
