@@ -36,37 +36,28 @@ export type DefineComponentOptions = MountOptions & {
 
 const currentNodeStack: RuntimeContext[] = [];
 const signalsStack: Signal[] = [];
-const refSymbol = Symbol("$");
-const contextRef = Symbol("#");
-const reactiveTag = Symbol("#");
-const unwrapTag = Symbol("#");
+const refSymbol = Symbol('$');
+const contextRef = Symbol('#');
+const reactiveTag = Symbol('#');
+const unwrapTag = Symbol('#');
 
-export const DEBUG = Symbol("#");
+export const DEBUG = Symbol('#');
 
-export function noop() {}
+function noop() {}
 
-function getShadowDomOptions(
-  template: HTMLTemplateElement,
-): ShadowRootInit | undefined {
-  const source = template.getAttribute("shadow-dom") || "";
+function getShadowDomOptions(template: HTMLTemplateElement): ShadowRootInit | undefined {
+  const source = template.getAttribute('shadow-dom') || '';
 
   if (source) {
-    return source.startsWith("{")
-      ? JSON.parse(source)
-      : { mode: source as ShadowRootMode };
+    return source.startsWith('{') ? JSON.parse(source) : { mode: source as ShadowRootMode };
   }
 }
 
-export function defineComponent(options: DefineComponentOptions) {
+function defineComponent(options: DefineComponentOptions) {
   const { name } = options;
-  options.template =
-    typeof options.template === "string"
-      ? tpl(options.template)
-      : options.template;
+  options.template = typeof options.template === 'string' ? tpl(options.template) : options.template;
   const shadowDom: ShadowRootInit | undefined =
-    options.shadowDom === true
-      ? { mode: "open" }
-      : getShadowDomOptions(options.template);
+    options.shadowDom === true ? { mode: 'open' } : getShadowDomOptions(options.template);
 
   options.shadowDom = shadowDom;
 
@@ -97,11 +88,11 @@ export function defineComponent(options: DefineComponentOptions) {
   customElements.define(name, Component);
 }
 
-export function getElement() {
+function getElement() {
   return getCurrentNode().element;
 }
 
-export function mount(target: Element, options: MountOptions) {
+function mount(target: Element, options: MountOptions) {
   const parentElement = target.shadowRoot || target;
   const { template, setup = noop } = options;
   const dom = template.content.cloneNode(true);
@@ -127,7 +118,7 @@ export function mount(target: Element, options: MountOptions) {
   const readOnlyContext = createReadOnlyContext(mergedContext);
   walkNodes(dom, bindNode, readOnlyContext);
 
-  parentElement.innerHTML = "";
+  parentElement.innerHTML = '';
   parentElement.appendChild(dom);
 
   if (options.styles?.length) {
@@ -138,7 +129,7 @@ export function mount(target: Element, options: MountOptions) {
     fn();
   }
 
-  if (window.name === "debug") {
+  if (window.name === 'debug') {
     (parentElement as any)[DEBUG] = { options, context: readOnlyContext };
   }
 
@@ -150,7 +141,7 @@ export function mount(target: Element, options: MountOptions) {
   };
 }
 
-export function compare(a: any, b: any) {
+function compare(a: any, b: any) {
   const typeA = typeof a;
   const typeB = typeof b;
 
@@ -158,7 +149,7 @@ export function compare(a: any, b: any) {
     return false;
   }
 
-  if (typeA === "object") {
+  if (typeA === 'object') {
     if (a === null || b === null) {
       return a === b;
     }
@@ -192,7 +183,7 @@ export function compare(a: any, b: any) {
     return a === b;
   }
 
-  if (typeA === "function") {
+  if (typeA === 'function') {
     return String(a) === String(b);
   }
 
@@ -203,23 +194,18 @@ export function compare(a: any, b: any) {
   return a === b;
 }
 
-export function canBeObserved(object: any): boolean {
-  return (
-    object !== null &&
-    object !== undefined &&
-    typeof object === "object" &&
-    !object[reactiveTag]
-  );
+function canBeObserved(object: any): boolean {
+  return object !== null && object !== undefined && typeof object === 'object' && !object[reactiveTag];
 }
 
-export function reactive<T extends object>(object: T, effect: AnyFunction): T {
+function reactive<T extends object>(object: T, effect: AnyFunction): T {
   if (!canBeObserved(object)) {
     return object;
   }
 
   const values = Object.entries(object);
   for (const [key, next] of values) {
-    if (typeof next === "object" && next !== null) {
+    if (typeof next === 'object' && next !== null) {
       (object as any)[key] = reactive(next, effect);
     }
   }
@@ -242,7 +228,7 @@ export function reactive<T extends object>(object: T, effect: AnyFunction): T {
         return false;
       }
 
-      if (typeof value === "object" && value !== null) {
+      if (typeof value === 'object' && value !== null) {
         value = reactive(value, effect);
       }
 
@@ -266,7 +252,7 @@ export function reactive<T extends object>(object: T, effect: AnyFunction): T {
  * @param {object} object The proxy object to unwrap
  * @returns {object} the original object
  */
-export function unwrap<T = any>(object: T): T {
+function unwrap<T = any>(object: T): T {
   if (object === null || object === undefined) {
     return object;
   }
@@ -282,7 +268,7 @@ export function unwrap<T = any>(object: T): T {
   return object;
 }
 
-export function ref<T = any>(initial?: T, isShallow = false) {
+function ref<T = any>(initial?: T, isShallow = false) {
   const o: Signal = {
     [refSymbol]: true,
     internalValue: initial,
@@ -302,7 +288,7 @@ export function ref<T = any>(initial?: T, isShallow = false) {
       let lastValue = o.internalValue;
       o.internalValue = newValue;
 
-      if (!isShallow && typeof newValue === "object" && newValue !== null) {
+      if (!isShallow && typeof newValue === 'object' && newValue !== null) {
         newValue = reactive(newValue as object, () => {
           notifyDependencies(o);
           notifyWatchers(o, lastValue);
@@ -317,15 +303,15 @@ export function ref<T = any>(initial?: T, isShallow = false) {
   return o;
 }
 
-export function shallowRef<T>(value?: T) {
+function shallowRef<T>(value?: T) {
   return ref<T>(value, true);
 }
 
-export function isRef(t: any): t is Signal {
+function isRef(t: any): t is Signal {
   return Boolean(t && t[refSymbol]);
 }
 
-export function computed<T = any>(fn: AnyFunction) {
+function computed<T = any>(fn: AnyFunction) {
   const o: Signal<T> = {
     [refSymbol]: true,
     internalValue: undefined,
@@ -338,7 +324,7 @@ export function computed<T = any>(fn: AnyFunction) {
     },
 
     set value(_) {
-      throw new Error("Computed value cannot be set");
+      throw new Error('Computed value cannot be set');
     },
 
     update(value = fn()) {
@@ -365,7 +351,7 @@ export function computed<T = any>(fn: AnyFunction) {
   return o;
 }
 
-export function watch(target: Signal, fn: AnyFunction) {
+function watch(target: Signal, fn: AnyFunction) {
   target.watchers.add(fn);
   fn(target.value);
 
@@ -374,11 +360,11 @@ export function watch(target: Signal, fn: AnyFunction) {
   };
 }
 
-export function effect(fn: AnyFunction, effectFn: AnyFunction) {
+function effect(fn: AnyFunction, effectFn: AnyFunction) {
   return watch(computed(fn), effectFn);
 }
 
-export function onInit(fn: any) {
+function onInit(fn: any) {
   getCurrentNode().mount.push(fn);
 }
 
@@ -390,19 +376,15 @@ const debounce = (fn: any) => {
   };
 };
 
-export function onUpdate(fn: any) {
+function onUpdate(fn: any) {
   getCurrentNode().update.push(debounce(fn));
 }
 
-export function onDestroy(fn: any) {
+function onDestroy(fn: any) {
   getCurrentNode().unmount.push(fn);
 }
 
-function getPropValue<T extends keyof Element>(
-  element: Element,
-  name: T,
-  defaultValue: any,
-) {
+function getPropValue<T extends keyof Element>(element: Element, name: T, defaultValue: any) {
   const value = element[name];
 
   if (value !== undefined) {
@@ -416,11 +398,11 @@ function getPropValue<T extends keyof Element>(
   }
 
   if (defaultValue !== undefined) {
-    return typeof defaultValue === "function" ? defaultValue() : defaultValue;
+    return typeof defaultValue === 'function' ? defaultValue() : defaultValue;
   }
 }
 
-export function defineProp(name: string, options: PropOptions = {}) {
+function defineProp(name: string, options: PropOptions = {}) {
   const { element, update } = getCurrentNode();
   const current = getPropValue(element, name as keyof Element, options.default);
   const prop = ref(current);
@@ -449,20 +431,20 @@ export function defineProp(name: string, options: PropOptions = {}) {
   return prop;
 }
 
-export function defineEvent(name: string) {
+function defineEvent(name: string) {
   const { element } = getCurrentNode();
 
   return function emitter(value: any) {
     const event = new CustomEvent(name, { detail: value });
     element.dispatchEvent(event);
-    const handler = element["on" + name];
-    if (typeof handler === "function") {
+    const handler = element['on' + name];
+    if (typeof handler === 'function') {
       handler(event);
     }
   };
 }
 
-export function templateRef(name: string | number) {
+function templateRef(name: string | number) {
   const $ref = ref(null);
   getCurrentNode().refs[name] = $ref;
   return $ref;
@@ -496,7 +478,7 @@ function getCurrentNode() {
   const t = currentNodeStack.at(-1);
 
   if (!t) {
-    throw new Error("Missing context for this component");
+    throw new Error('Missing context for this component');
   }
 
   return t;
@@ -506,10 +488,7 @@ function walkNodes(tree: { childNodes: any }, fn: AnyFunction, context: any) {
   for (const node of tree.childNodes) {
     fn(node, context);
 
-    if (
-      node.nodeType === Node.ELEMENT_NODE &&
-      !node.hasAttribute("do-not-render")
-    ) {
+    if (node.nodeType === Node.ELEMENT_NODE && !node.hasAttribute('do-not-render')) {
       walkNodes(node, fn, context);
     }
   }
@@ -521,20 +500,12 @@ function walkAttributes(node: Element, fn: AnyFunction, context: any) {
   }
 }
 
-function createFunction(
-  expression: string,
-  keys: string[],
-  context: any,
-  args: string[] = [],
-) {
+function createFunction(expression: string, keys: string[], context: any, args: string[] = []) {
   const k = keys
     .filter((key: any) => expression.includes(key))
-    .join(", ")
+    .join(', ')
     .trim();
-  return Function(
-    ...args,
-    (k ? `const { ${k} } = this;` : "") + `return ${expression};`,
-  ).bind(context);
+  return Function(...args, (k ? `const { ${k} } = this;` : '') + `return ${expression};`).bind(context);
 }
 
 function createReadOnlyContext(context: any) {
@@ -552,7 +523,7 @@ function createReadOnlyContext(context: any) {
     },
 
     set() {
-      throw new Error("View contexts are read-only");
+      throw new Error('View contexts are read-only');
     },
   });
 }
@@ -573,62 +544,50 @@ function bindNode(node: Text | Element, context: any) {
 function bindText(node: Text, context: {}) {
   const template = node.textContent.trim();
 
-  if (!template || !template.includes("{{")) return;
+  if (!template || !template.includes('{{')) return;
 
   const keys = Object.keys(context);
-  const source =
-    "`" +
-    template.replace(
-      /{{(.*?)}}/g,
-      (_: any, exp: string) => "${" + exp.trim() + "}",
-    ) +
-    "`";
+  const source = '`' + template.replace(/{{(.*?)}}/g, (_: any, exp: string) => '${' + exp.trim() + '}') + '`';
 
-  effect(
-    createFunction(source, keys, context),
-    (v: any) => (node.textContent = v),
-  );
+  effect(createFunction(source, keys, context), (v: any) => (node.textContent = v));
 }
 
-const mappedProperties: Record<string, string> = {
-  innerhtml: "innerHTML",
-  baseurl: "baseURL",
+const mappedProperties: Record<string, keyof HTMLElement | keyof SVGElement> = {
+  innerhtml: 'innerHTML',
+  baseuri: 'baseURI',
 };
 
-export function setClassName(
-  el: Element,
-  classNames: string,
-  value: any,
-): void {
-  for (const cls of classNames.split(".").filter(Boolean)) {
+function setClassName(el: Element, classNames: string, value: any): void {
+  for (const cls of classNames.split('.').filter(Boolean)) {
     el.classList.toggle(cls, value);
   }
 }
 
-export function setStyle(el: any, key: string, value: any): void {
+function setStyle(el: any, key: string, value: any): void {
   el.style[key] = value;
 }
 
-export function setText(el: Text, text: any): void {
+function setText(el: Text, text: any): void {
   el.textContent = String(text);
 }
 
-export function setProperty(node: any, key: string, value: any) {
+function setProperty(node: any, key: string, value: any, modifiers: string[]): void {
   const mappedKey = mappedProperties[key] || key;
-  node[mappedKey] = value;
+
+  if (modifiers.includes('bool')) {
+    node.toggleAttribute(mappedKey, Boolean(value));
+  } else {
+    node[mappedKey] = value;
+  }
 }
 
 const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
-export function setAttribute(
-  el: Element,
-  attribute: string,
-  value: boolean,
-): void {
+function setAttribute(el: Element, attribute: string, value: boolean): void {
   if (!validAttribute.test(attribute)) {
     return;
   }
 
-  if (typeof value === "boolean" && value === false) {
+  if (typeof value === 'boolean' && value === false) {
     el.removeAttribute(attribute);
     return;
   }
@@ -636,31 +595,26 @@ export function setAttribute(
   el.setAttribute(attribute, String(value));
 }
 
-function bindAttribute(
-  node: HTMLElement,
-  name: string,
-  value: string,
-  context: any,
-) {
+function bindAttribute(node: HTMLElement, name: string, value: string, context: any) {
   const keys = Object.keys(context);
 
-  if (name === "ref") {
+  if (name === 'ref') {
     const key = value.trim();
     context[contextRef][key] ||= ref(null);
     context[contextRef][key].value = node;
     return;
   }
 
-  if (name.startsWith("on-")) {
+  if (name.startsWith('on-')) {
     const key = name.slice(3);
-    const [event, ...tags] = key.split(".");
+    const [event, ...tags] = key.split('.');
     const modifiers: any = {};
 
     for (const tag of tags) {
       modifiers[tag] = true;
     }
 
-    const fn = createFunction(value, keys, context, ["$event"]);
+    const fn = createFunction(value, keys, context, ['$event']);
     node.addEventListener(event, (e: Event) => {
       if (modifiers.stop) e.stopPropagation();
       if (modifiers.prevent) e.preventDefault();
@@ -671,52 +625,43 @@ function bindAttribute(
     return;
   }
 
-  if (name.startsWith("attr-")) {
+  if (name.startsWith('attr-')) {
     const key = name.slice(5);
     const source = value.trim();
-    effect(createFunction(source, keys, context), (v: any) =>
-      setAttribute(node, key, v),
-    );
+    effect(createFunction(source, keys, context), (v: any) => setAttribute(node, key, v));
     node.removeAttribute(name);
     return;
   }
 
-  if (name.startsWith("bind-")) {
+  if (name.startsWith('bind-')) {
     const key = name.slice(5);
     const source = value.trim();
-    effect(createFunction(source, keys, context), (value: any) =>
-      setProperty(node, key, value),
-    );
+    const [property, ...modifiers] = key.split('.');
+    effect(createFunction(source, keys, context), (value: any) => setProperty(node, property, value, modifiers));
     node.removeAttribute(name);
     return;
   }
 
-  if (name.startsWith("class-")) {
+  if (name.startsWith('class-')) {
     const key = name.slice(6);
     const source = value.trim();
 
-    effect(createFunction(source, keys, context), (value: any) =>
-      setClassName(node, key, value),
-    );
+    effect(createFunction(source, keys, context), (value: any) => setClassName(node, key, value));
     node.removeAttribute(name);
     return;
   }
 
-  if (name.startsWith("style-")) {
-    const key = name
-      .slice(6)
-      .replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase());
+  if (name.startsWith('style-')) {
+    const key = name.slice(6).replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase());
     const source = value.trim();
-    effect(createFunction(source, keys, context), (value: any) =>
-      setStyle(node, key, value),
-    );
+    effect(createFunction(source, keys, context), (value: any) => setStyle(node, key, value));
     node.removeAttribute(name);
     return;
   }
 
-  if (node.nodeName === "TEMPLATE" && name === "for") {
+  if (node.nodeName === 'TEMPLATE' && name === 'for') {
     const source = value.trim();
-    const [left, expression] = source.split("of").map((s) => s.trim());
+    const [left, expression] = source.split('of').map((s) => s.trim());
     const forNodes: any[] = [];
 
     effect(createFunction(expression, keys, context), (value: any) => {
@@ -729,9 +674,7 @@ function bindAttribute(
       if (!Array.isArray(value)) return;
 
       const length = value.length;
-      const [key, indexKey] = left.includes("[")
-        ? left.slice(1, -1).split(",")
-        : [left, "index"];
+      const [key, indexKey] = left.includes('[') ? left.slice(1, -1).split(',') : [left, 'index'];
 
       for (let i = 0; i < length; i++) {
         const dom = (node as HTMLTemplateElement).content.cloneNode(true);
@@ -742,9 +685,7 @@ function bindAttribute(
           [indexKey]: i,
         };
 
-        const reader = createReadOnlyContext(
-          Object.assign({}, context, subContext),
-        );
+        const reader = createReadOnlyContext(Object.assign({}, context, subContext));
         walkNodes(dom, bindNode, reader);
 
         setTimeout(() => {
@@ -756,7 +697,7 @@ function bindAttribute(
     return;
   }
 
-  if (node.nodeName === "TEMPLATE" && name === "if") {
+  if (node.nodeName === 'TEMPLATE' && name === 'if') {
     const source = value.trim();
     const ifNodes: any[] = [];
     let lastValue: any;
@@ -793,23 +734,19 @@ function bindAttribute(
 }
 
 async function importModuleFromSource(code: BlobPart) {
-  const blob = URL.createObjectURL(
-    new Blob([code], { type: "text/javascript" }),
-  );
+  const blob = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }));
   const module = await import(blob);
   URL.revokeObjectURL(blob);
   return module;
 }
 
 async function findSetupModule(template: HTMLTemplateElement) {
-  const setupCode = template.content.querySelector("script[setup]");
+  const setupCode = template.content.querySelector('script[setup]');
 
   if (setupCode) {
-    const url = setupCode.getAttribute("src");
+    const url = setupCode.getAttribute('src');
     const code = setupCode.textContent;
-    const mod = url
-      ? import(new URL(url, window.location.href).toString())
-      : importModuleFromSource(code);
+    const mod = url ? import(new URL(url, window.location.href).toString()) : importModuleFromSource(code);
     setupCode.remove();
 
     return (await mod).default;
@@ -819,9 +756,7 @@ async function findSetupModule(template: HTMLTemplateElement) {
 }
 
 function findStyleSheets(template: HTMLTemplateElement): CSSStyleSheet[] {
-  const styleTags = Array.from(
-    template.content.querySelectorAll("style"),
-  ) as HTMLStyleElement[];
+  const styleTags = Array.from(template.content.querySelectorAll('style')) as HTMLStyleElement[];
 
   if (!styleTags.length) {
     return [];
@@ -836,21 +771,19 @@ function findStyleSheets(template: HTMLTemplateElement): CSSStyleSheet[] {
     .filter(Boolean) as CSSStyleSheet[];
 }
 
-export function tpl(s: string) {
-  const template = document.createElement("template");
+function tpl(s: string) {
+  const template = document.createElement('template');
   template.innerHTML = String(s).trim();
 
   return template;
 }
 
-export async function defineFromTemplate(
-  template: HTMLTemplateElement | string,
-) {
-  if (typeof template === "string") {
+async function defineFromTemplate(template: HTMLTemplateElement | string) {
+  if (typeof template === 'string') {
     template = tpl(template);
   }
 
-  const name = template.getAttribute("component") as string;
+  const name = template.getAttribute('component') as string;
 
   if (!name) {
     return null;
@@ -867,17 +800,15 @@ export async function defineFromTemplate(
   return options;
 }
 
-export function defineFromString(html: string) {
-  const dom = new DOMParser().parseFromString(html, "text/html");
-  const nodes = dom.querySelectorAll("template[component]");
+function defineFromString(html: string) {
+  const dom = new DOMParser().parseFromString(html, 'text/html');
+  const nodes = dom.querySelectorAll('template[component]');
 
   return (Array.from(nodes) as HTMLTemplateElement[]).map(defineFromTemplate);
 }
 
-export async function findApps() {
-  const apps = Array.from(
-    document.querySelectorAll("template[app]"),
-  ) as HTMLTemplateElement[];
+async function findApps() {
+  const apps = Array.from(document.querySelectorAll('template[app]')) as HTMLTemplateElement[];
 
   for (const template of apps) {
     const options: MountOptions = {
@@ -885,19 +816,19 @@ export async function findApps() {
       setup: await findSetupModule(template),
     };
 
-    const app = document.createElement("div");
-    app.style.display = "contents";
+    const app = document.createElement('div');
+    app.style.display = 'contents';
     template.parentNode!.insertBefore(app, template);
 
     mount(app, options);
   }
 }
 
-export async function load(href: string | URL) {
+async function load(href: string | URL) {
   const response = await fetch(new URL(href, window.location.href));
 
   if (!response.ok) {
-    throw new Error("Failed to load components from " + href);
+    throw new Error('Failed to load components from ' + href);
   }
 
   const html = await response.text();
@@ -910,7 +841,7 @@ let _importCssModule: any = importModuleFromSource(
 );
 
 async function importCssModule(href: string) {
-  if (typeof _importCssModule !== "function") {
+  if (typeof _importCssModule !== 'function') {
     _importCssModule = (await _importCssModule).default;
   }
 
@@ -924,7 +855,7 @@ async function importCssModule(href: string) {
   }
 }
 
-export function loadCss(href: string | URL) {
+function loadCss(href: string | URL) {
   href = String(href);
   const element = getElement();
 
@@ -933,25 +864,58 @@ export function loadCss(href: string | URL) {
   }
 
   const stylesheet = stylesheetCache.get(href);
-  stylesheetCache
-    .get(href)
-    ?.then((s) => (element.shadowRoot || document).adoptedStyleSheets.push(s));
+  stylesheetCache.get(href)?.then((s) => (element.shadowRoot || document).adoptedStyleSheets.push(s));
 
   return stylesheet;
 }
 
 function autoInitialize() {
-  const list = Array.from(
-    document.querySelectorAll("template[component]"),
-  ) as HTMLTemplateElement[];
+  const components = Array.from(document.querySelectorAll('template[component]')) as HTMLTemplateElement[];
 
-  list.forEach(defineFromTemplate);
+  const links = Array.from(document.querySelectorAll('link[rel="component"]')) as HTMLLinkElement[];
+
+  components.forEach(defineFromTemplate);
+  links.forEach((l) => load(l.href));
 
   findApps();
 }
 
-if (document.readyState === "complete") {
+if (document.readyState === 'complete') {
   autoInitialize();
 } else {
-  window.addEventListener("DOMContentLoaded", autoInitialize);
+  window.addEventListener('DOMContentLoaded', autoInitialize);
 }
+
+export {
+  noop,
+  defineComponent,
+  mount,
+  compare,
+  canBeObserved,
+  ref,
+  shallowRef,
+  templateRef,
+  computed,
+  reactive,
+  watch,
+  effect,
+  isRef,
+  unwrap,
+  getElement,
+  onInit,
+  onUpdate,
+  onDestroy,
+  defineProp,
+  defineEvent,
+  loadCss,
+  setClassName,
+  setStyle,
+  setText,
+  setProperty,
+  setAttribute,
+  tpl,
+  load,
+  defineFromString,
+  defineFromTemplate,
+  findApps,
+};

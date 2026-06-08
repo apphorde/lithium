@@ -1,0 +1,58 @@
+<template component="code-block" shadow-dom="open">
+  <div class="bg-white rounded-lg shadow border border-gray-300 text-gray-800 text-xs relative flex flex-col h-full">
+    <button
+      class="absolute right-0 top-0 m-1 text-xs px-2 py-1 bg-white text-gray-800 border rounded"
+      on-click="onCopy()"
+    >
+      copy
+    </button>
+    <div class="empty:hidden text-xs px-4 py-3 uppercase bg-gray-100 rounded-t-lg font-bold text-green-700">
+      {{ title || '' }}
+    </div>
+    <slot class="font-mono whitespace-pre overflow-x-auto block w-full px-4 my-4"></slot>
+    <small class="empty:hidden px-4 py-2 block text-xs border-t">{{ footnote || '' }}</small>
+  </div>
+
+  <script setup>
+    import { load, highlight } from 'https://highlight.jsfn.run/index.mjs';
+    import { defineProp, onInit, getElement } from '@li3/web';
+
+    load();
+
+    export default function codeBlock() {
+      const root = getElement().shadowRoot;
+      const title = defineProp('title', '');
+      const footnote = defineProp('footnote', { default: '' });
+      const language = defineProp('language', { default: 'html' });
+      const srcElement = defineProp('srcElement', { default: '' });
+
+      const source =
+        (srcElement.value && document.querySelector(srcElement.value)?.outerHTML) ||
+        (root.querySelector('pre') || root.querySelector('template') || root).innerHTML.trim() ||
+        '';
+
+      const lines = source.split('\n');
+      const padding = lines
+        .filter((line) => line.trim() && line.startsWith(' '))
+        .reduce((prev, line) => Math.min(prev, line.indexOf(line.trim())), lines[0].length);
+
+      const toReplace = ' '.repeat(padding);
+      const lt = /&lt;/g;
+      const trimmedSource = lines.map((line) => line.replace(toReplace, '').replace(lt, '<')).join('\n');
+
+      onInit(async () => {
+        root.querySelector('slot').innerHTML = await highlight(trimmedSource, {
+          language: language.value || 'html',
+        });
+      });
+
+      window.loadTailwind();
+
+      return {
+        onCopy() {
+          navigator.clipboard.writeText(trimmedSource);
+        },
+      };
+    }
+  </script>
+</template>
