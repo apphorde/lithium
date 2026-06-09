@@ -641,7 +641,17 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
     const key = name.slice(5);
     const source = value.trim();
     const [property, ...modifiers] = key.split('.');
-    effect(createFunction(source, keys, context), (value: any) => setProperty(node, property, value, modifiers));
+
+    const fn = createFunction(source, keys, context);
+    if (key === 'class' && source.startsWith('{')) {
+      effect(fn, (map) => {
+        for (const [classNames, value] of Object.entries(map)) {
+          setClassName(node, classNames, value);
+        }
+      })
+    } else {
+      effect(fn, (value: any) => setProperty(node, property, value, modifiers));
+    }
     node.removeAttribute(name);
     return;
   }
