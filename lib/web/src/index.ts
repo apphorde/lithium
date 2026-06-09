@@ -565,7 +565,8 @@ function setClassName(el: Element, classNames: string, value: any): void {
 }
 
 function setStyle(el: any, key: string, value: any): void {
-  el.style[key] = value;
+  const toCamelCase = key.replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase());
+  el.style[toCamelCase] = value;
 }
 
 function setText(el: Text, text: any): void {
@@ -643,10 +644,17 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
     const [property, ...modifiers] = key.split('.');
 
     const fn = createFunction(source, keys, context);
-    if (key === 'class' && source.startsWith('{')) {
+    const isObject = source.startsWith('{');
+    if (key === 'class' && isObject) {
       effect(fn, (map) => {
         for (const [classNames, value] of Object.entries(map)) {
           setClassName(node, classNames, value);
+        }
+      })
+    } else if (key === 'style' && isObject) {
+      effect(fn, (map) => {
+        for (const [property, value] of Object.entries(map)) {
+          setStyle(node, property, value);
         }
       })
     } else {
@@ -666,7 +674,7 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
   }
 
   if (name.startsWith('style-')) {
-    const key = name.slice(6).replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase());
+    const key = name.slice(6);
     const source = value.trim();
     effect(createFunction(source, keys, context), (value: any) => setStyle(node, key, value));
     node.removeAttribute(name);
