@@ -683,8 +683,11 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
 
   if (node.nodeName === 'TEMPLATE' && name === 'for') {
     const source = value.trim();
-    const [left, expression] = source.split('of').map((s) => s.trim());
     const forNodes: any[] = [];
+    const [left, expression] = source.split('of').map((s) => s.trim());
+    const [key, indexKey] = left.includes('[') ?
+      left.slice(1, -1).split(',').map(s => s.trim()) :
+      [left, 'index'];
 
     effect(createFunction(expression, keys, context), (value: any) => {
       for (const node of forNodes) {
@@ -696,7 +699,6 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
       if (!Array.isArray(value)) return;
 
       const length = value.length;
-      const [key, indexKey] = left.includes('[') ? left.slice(1, -1).split(',') : [left, 'index'];
 
       for (let i = 0; i < length; i++) {
         const dom = (node as HTMLTemplateElement).content.cloneNode(true);
