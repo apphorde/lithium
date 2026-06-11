@@ -788,11 +788,16 @@ function findStyleSheets(template: HTMLTemplateElement): CSSStyleSheet[] {
 
   return styleTags
     .map((tag) => {
-      const sheet = tag.sheet;
+      let sheet = tag.sheet;
+
+      if (!sheet) {
+        sheet = new CSSStyleSheet();
+        sheet.replaceSync(tag.textContent.trim());
+      }
+
       tag.remove();
       return sheet;
-    })
-    .filter(Boolean) as CSSStyleSheet[];
+    });
 }
 
 function tpl(s: string) {
