@@ -17,7 +17,7 @@ export default async function (args: Args) {
   writeFileSync(outputFile, json, "utf-8");
 }
 
-function readFile(inputFile) {
+function readFile(inputFile: string) {
   if (!existsSync(inputFile)) {
     throw new Error("File not found: " + inputFile);
   }
