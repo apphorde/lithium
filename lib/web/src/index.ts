@@ -286,6 +286,8 @@ function ref<T = any>(initial?: T, isShallow = false) {
     },
 
     update(newValue: any) {
+      if (compare(o.internalValue, newValue)) return;
+
       if (!isShallow && canBeObserved(newValue)) {
         newValue = reactive(newValue as object, notifier);
       }
@@ -323,10 +325,10 @@ function computed<T = any>(fn: AnyFunction) {
       throw new Error('Computed value cannot be set');
     },
 
-    update(value = fn()) {
-      let lastValue = o.internalValue;
+    update() {
+      const value = fn();
 
-      if (compare(lastValue, value)) return;
+      if (compare(o.internalValue, value)) return;
 
       o.internalValue = value;
       notifyDependencies(o);
@@ -456,11 +458,12 @@ function notifyDependencies(target: Signal) {
 function memoizedWatcher<T>(watcher: AnyFunction) {
   let lastValue: T | undefined;
 
+  // NOTE: never compare values for watchers!
+  // ref() and computed() already skip watchers if
+  // new and old values are the same
   return function (value: T) {
-    if (!compare(lastValue, value)) {
-      lastValue = value;
-      watcher(value, lastValue);
-    }
+    lastValue = value;
+    watcher(value, lastValue);
   }
 }
 
