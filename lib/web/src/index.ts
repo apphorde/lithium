@@ -206,6 +206,7 @@ function reactive<T extends object>(object: T, effect: AnyFunction): T {
   }
 
   const values = Object.entries(object);
+
   for (const [key, next] of values) {
     if (typeof next === 'object' && next !== null) {
       (object as any)[key] = reactive(next, effect);
@@ -226,16 +227,11 @@ function reactive<T extends object>(object: T, effect: AnyFunction): T {
     },
 
     set(target: any, p, value) {
-      if ((target as any)[p] === value) {
-        return false;
+      if ((target as any)[p] !== value) {
+        target[p] = canBeObserved(value) ? reactive(value, effect) : value;
+        effect();
       }
 
-      if (typeof value === 'object' && value !== null) {
-        value = reactive(value, effect);
-      }
-
-      target[p] = value;
-      effect();
       return true;
     },
     deleteProperty(target: any, p) {
