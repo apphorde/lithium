@@ -269,9 +269,14 @@ function unwrap<T = any>(object: T): T {
 }
 
 function ref<T = any>(initial?: T, isShallow = false) {
+  const notifier = () => {
+    notifyDependencies(o);
+    notifyWatchers(o);
+  };
+
   const o: Signal = {
     [refSymbol]: true,
-    internalValue: initial,
+    internalValue: !isShallow && canBeObserved(initial) ? reactive(initial as object, notifier) : initial,
     dependencies: new Set(),
     watchers: new Set(),
 
@@ -285,18 +290,13 @@ function ref<T = any>(initial?: T, isShallow = false) {
     },
 
     update(newValue: any) {
-      let lastValue = o.internalValue;
       o.internalValue = newValue;
 
-      if (!isShallow && typeof newValue === 'object' && newValue !== null) {
-        newValue = reactive(newValue as object, () => {
-          notifyDependencies(o);
-          notifyWatchers(o, lastValue);
-        });
+      if (!isShallow && canBeObserved(newValue)) {
+        newValue = reactive(newValue as object, notifier);
       }
 
-      notifyDependencies(o);
-      notifyWatchers(o, lastValue);
+      notifier();
     },
   };
 
@@ -334,7 +334,7 @@ function computed<T = any>(fn: AnyFunction) {
 
       o.internalValue = value;
       notifyDependencies(o);
-      notifyWatchers(o, lastValue);
+      notifyWatchers(o);
     },
   };
 
@@ -352,11 +352,12 @@ function computed<T = any>(fn: AnyFunction) {
 }
 
 function watch(target: Signal, fn: AnyFunction) {
-  target.watchers.add(fn);
-  fn(target.value);
+  const memoized = memoizedWatcher(fn);
+  target.watchers.add(memoized);
+  memoized(target.value);
 
   return () => {
-    target.watchers.delete(fn);
+    target.watchers.delete(memoized);
   };
 }
 
@@ -456,13 +457,24 @@ function notifyDependencies(target: Signal) {
   }
 }
 
-function notifyWatchers(target: Signal, lastValue: any) {
-  const value = target.value;
+function memoizedWatcher<T>(watcher: AnyFunction) {
+  let lastValue: T | undefined;
 
-  if (lastValue !== value && target.watchers.size > 0) {
-    for (const watcher of target.watchers) {
+  return function (value: T) {
+    if (!compare(lastValue, value)) {
+      lastValue = value;
       watcher(value, lastValue);
     }
+  }
+}
+
+function notifyWatchers(target: Signal) {
+  if (!target.watchers.size) return;
+
+  const value = target.value;
+
+  for (const watcher of target.watchers) {
+    watcher(value);
   }
 }
 
