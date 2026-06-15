@@ -442,7 +442,7 @@ function defineEvent(name: string) {
 }
 
 function templateRef(name: string | number) {
-  const $ref = ref(null);
+  const $ref = ref(null, true);
   getCurrentNode().refs[name] = $ref;
   return $ref;
 }
