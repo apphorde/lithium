@@ -1,5 +1,3 @@
-import { isA } from '@vitest/expect';
-
 export type AnyFunction = (...args: any[]) => any;
 
 export type PropOptions<T = any> = {
