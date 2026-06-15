@@ -286,11 +286,11 @@ function ref<T = any>(initial?: T, isShallow = false) {
     },
 
     update(newValue: any) {
-      o.internalValue = newValue;
-
       if (!isShallow && canBeObserved(newValue)) {
         newValue = reactive(newValue as object, notifier);
       }
+
+      o.internalValue = newValue;
 
       notifier();
     },
