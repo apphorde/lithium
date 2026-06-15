@@ -1,3 +1,5 @@
+import { isA } from '@vitest/expect';
+
 export type AnyFunction = (...args: any[]) => any;
 
 export type PropOptions<T = any> = {
@@ -694,40 +696,55 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
   }
 
   if (node.nodeName === 'TEMPLATE' && name === 'for') {
+    (node as HTMLTemplateElement).content.normalize();
     const source = value.trim();
-    const forNodes: any[] = [];
+    const forNodes: { nodes: (Node)[], index: Signal<number>, item: Signal }[] = [];
     const [left, expression] = source.split('of').map((s) => s.trim());
     const [key, indexKey] = left.includes('[') ?
       left.slice(1, -1).split(',').map(s => s.trim()) :
       [left, 'index'];
 
     effect(createFunction(expression, keys, context), (value: any) => {
-      for (const node of forNodes) {
-        node.remove();
+      const isArray = Array.isArray(value);
+      const itemsToRemove = forNodes.slice(!isArray ? 0 : value.length);
+
+      for (const next of itemsToRemove) {
+        for (const node of next.nodes) {
+          node.parentNode!.removeChild(node);
+        }
       }
 
-      forNodes.length = 0;
+      forNodes.length = isArray ? value.length : 0;
 
-      if (!Array.isArray(value)) return;
+      if (!isArray) return;
 
+      const lastInsertedNode = forNodes.length ? forNodes.at(-1)!.nodes.at(-1) : node;
       const length = value.length;
+      const nodesToInsert = document.createDocumentFragment();
 
       for (let i = 0; i < length; i++) {
-        const dom = (node as HTMLTemplateElement).content.cloneNode(true);
-        forNodes.push(...Array.from(dom.childNodes));
-
+        const item = ref(value[i]);
+        const index = ref(i);
         const subContext = {
-          [key]: value[i],
-          [indexKey]: i,
+          [key]: item,
+          [indexKey]: index,
         };
 
-        const reader = createReadOnlyContext(Object.assign({}, context, subContext));
-        walkNodes(dom, bindNode, reader);
-
-        setTimeout(() => {
-          (node as any).parentNode.insertBefore(dom, node);
-        });
+        if (forNodes[i]) {
+          forNodes[i].item.value = value[i];
+          forNodes[i].index.value = i;
+        } else {
+          const dom = (node as HTMLTemplateElement).content.cloneNode(true);
+          forNodes[i] = { item, index, nodes: Array.from(dom.childNodes) };
+          nodesToInsert.append(dom);
+          const reader = createReadOnlyContext(Object.assign({}, context, subContext));
+          walkNodes(dom, bindNode, reader);
+        }
       }
+
+      setTimeout(() => {
+        (node as any).parentNode.insertBefore(nodesToInsert, lastInsertedNode);
+      });
     });
     node.removeAttribute(name);
     return;
