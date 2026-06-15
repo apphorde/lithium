@@ -712,7 +712,7 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
 
       if (!isArray) return;
 
-      const lastInsertedNode = forNodes.length ? forNodes.at(-1)!.nodes.at(-1) : node;
+      const lastInsertedNode = forNodes.at(-1)?.nodes.at(-1) ?? node;
       const length = value.length;
       const nodesToInsert = document.createDocumentFragment();
 
