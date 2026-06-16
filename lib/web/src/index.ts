@@ -818,9 +818,9 @@ use({
         } else {
           const dom = (node as HTMLTemplateElement).content.cloneNode(true);
           forNodes[i] = { item, index, nodes: Array.from(dom.childNodes) };
-          nodesToInsert.append(dom);
           const reader = createReadOnlyContext(Object.assign({}, context, subContext));
           linkTreeToContext(dom, reader);
+          nodesToInsert.append(dom);
         }
       }
 
