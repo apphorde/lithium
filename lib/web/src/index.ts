@@ -40,6 +40,7 @@ const refSymbol = Symbol('$');
 const contextRef = Symbol('#');
 const reactiveTag = Symbol('#');
 const unwrapTag = Symbol('#');
+const dirtyTag = Symbol('#');
 const FF: any = {};
 
 export const DEBUG = Symbol('#');
@@ -47,6 +48,10 @@ export const DEBUG = Symbol('#');
 function noop() {}
 
 window.name.split(',').map(k => FF[k.trim()] = true);
+
+function setFeatureFlag(flag: string, v = true) {
+  FF[flag] = v;
+}
 
 function getShadowDomOptions(template: HTMLTemplateElement): ShadowRootInit | undefined {
   const source = template.getAttribute('shadow-dom') || '';
@@ -162,6 +167,10 @@ function compare(a: any, b: any) {
       return a === b;
     }
 
+    if (a[dirtyTag] || b[dirtyTag]) {
+      return false;
+    }
+
     if (Array.isArray(a) && Array.isArray(b)) {
       if (a.length !== b.length) {
         return false;
@@ -219,6 +228,8 @@ function reactive<T extends object>(object: T, effect: AnyFunction): T {
     }
   }
 
+  let dirty = false;
+
   return new Proxy(object, {
     get(target: any, p) {
       if (p === reactiveTag) {
@@ -229,10 +240,18 @@ function reactive<T extends object>(object: T, effect: AnyFunction): T {
         return object;
       }
 
+      if (p === dirtyTag) {
+        return dirty;
+      }
+
       return target[p];
     },
 
     set(target: any, p, value) {
+      if (p === dirtyTag) {
+        return dirty = true;
+      }
+
       if (FF.reactiveEq && target[p] === value) return true;
       if (compare(target[p], value)) return true;
 
@@ -275,14 +294,28 @@ function unwrap<T = any>(object: T): T {
 }
 
 function ref<T = any>(initial?: T, isShallow = false) {
-  const notifier = () => {
+  const notify = () => {
     notifyDependencies(o);
     notifyWatchers(o);
   };
 
+  const reactiveEffect = () => {
+    const isArray = Array.isArray(o.internalValue);
+
+    if (isArray) {
+      o.internalValue[dirtyTag] = true;
+    }
+
+    notify();
+
+    if (isArray) {
+      o.internalValue[dirtyTag] = false;
+    }
+  }
+
   const o: Signal = {
     [refSymbol]: true,
-    internalValue: !isShallow && canBeObserved(initial) ? reactive(initial as object, notifier) : initial,
+    internalValue: !isShallow && canBeObserved(initial) ? reactive(initial as object, reactiveEffect) : initial,
     dependencies: new Set(),
     watchers: new Set(),
 
@@ -300,12 +333,12 @@ function ref<T = any>(initial?: T, isShallow = false) {
       if (compare(o.internalValue, newValue)) return;
 
       if (!isShallow && canBeObserved(newValue)) {
-        newValue = reactive(newValue as object, notifier);
+        newValue = reactive(newValue as object, reactiveEffect);
       }
 
       o.internalValue = newValue;
 
-      notifier();
+      notify();
     },
   };
 
@@ -508,14 +541,14 @@ function getCurrentNode() {
 }
 
 function linkTreeToContext(tree: Node, context: any) {
-  const stack: Node[] = [...tree.childNodes];
+  const stack: Node[] = Array.from(tree.childNodes);
 
   while (stack.length) {
     const node = stack.shift() as Node;
     applyRules(node, context);
 
     if (isElement(node) && !node.hasAttribute('do-not-render')) {
-      stack.push(...node.childNodes);
+      stack.push(...Array.from(node.childNodes));
     }
   }
 }
@@ -1001,6 +1034,7 @@ export {
   mount,
   linkTreeToContext,
   applyRules,
+  createReadOnlyContext,
   compare,
   canBeObserved,
   ref,
@@ -1030,4 +1064,5 @@ export {
   defineFromString,
   defineFromTemplate,
   findApps,
+  setFeatureFlag,
 };
