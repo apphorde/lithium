@@ -542,13 +542,13 @@ function getCurrentNode() {
 }
 
 function linkTreeToContext(tree: Node, context: any) {
-  const stack: Node[] = Array.from(tree.childNodes);
+  const stack: Node[] = [tree].concat(Array.from(tree.childNodes));
+  let node;
 
-  while (stack.length) {
-    const node = stack.shift() as Node;
+  while (node = stack.shift() as Node) {
     applyRules(node, context);
 
-    if (isElement(node) && !node.hasAttribute('do-not-render')) {
+    if (isElement(node) && !node.hasAttribute('do-not-render') && node.childNodes.length) {
       stack.push(...Array.from(node.childNodes));
     }
   }
