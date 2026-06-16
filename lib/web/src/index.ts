@@ -45,6 +45,9 @@ export const DEBUG = Symbol('#');
 
 function noop() {}
 
+const flags: any = {};
+window.name.split(',').map(k => flags[k.trim()] = true);
+
 function getShadowDomOptions(template: HTMLTemplateElement): ShadowRootInit | undefined {
   const source = template.getAttribute('shadow-dom') || '';
 
@@ -114,6 +117,7 @@ function mount(target: Element, options: MountOptions) {
   } finally {
     currentNodeStack.pop();
   }
+
   const mergedContext = Object.assign({}, context, runtime.props, runtime.refs);
   const readOnlyContext = createReadOnlyContext(mergedContext);
   walkNodes(dom, bindNode, readOnlyContext);
@@ -142,6 +146,10 @@ function mount(target: Element, options: MountOptions) {
 }
 
 function compare(a: any, b: any) {
+  if (flags.compareEq) {
+    return a === b;
+  }
+
   const typeA = typeof a;
   const typeB = typeof b;
 
@@ -225,10 +233,11 @@ function reactive<T extends object>(object: T, effect: AnyFunction): T {
     },
 
     set(target: any, p, value) {
-      if ((target as any)[p] !== value) {
-        target[p] = canBeObserved(value) ? reactive(value, effect) : value;
-        effect();
-      }
+      if (flags.reactiveEq && compare(target[p], value)) return true;
+      if (target[p] === value) return true;
+
+      target[p] = canBeObserved(value) ? reactive(value, effect) : value;
+      effect();
 
       return true;
     },
@@ -286,6 +295,7 @@ function ref<T = any>(initial?: T, isShallow = false) {
     },
 
     update(newValue: any) {
+      if (flags.refEq && o.internalValue === newValue) return;
       if (compare(o.internalValue, newValue)) return;
 
       if (!isShallow && canBeObserved(newValue)) {
@@ -328,6 +338,7 @@ function computed<T = any>(fn: AnyFunction) {
     update() {
       const value = fn();
 
+      if (flags.computedEq && o.internalValue === value) return;
       if (compare(o.internalValue, value)) return;
 
       o.internalValue = value;
@@ -748,12 +759,12 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
   }
 
   if (node.nodeName === 'TEMPLATE' && name === 'if') {
-    const source = value.trim();
+    const source = 'Boolean(' + value.trim() + ')';
     const ifNodes: any[] = [];
     let lastValue: any;
 
     effect(createFunction(source, keys, context), (value: any) => {
-      if (compare(value, lastValue)) {
+      if (value === lastValue) {
         return;
       }
 
