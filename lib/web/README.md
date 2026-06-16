@@ -47,4 +47,10 @@
     isRef(x)                                 Check if a value was created with ref()
 ```
 
+**Extensions:**
+
+```txt
+    use(rule)                                Add a new node and attribute matcher. `use({ match(node, attribute, value) {}, exec(node, attribute, value, context) {} })`
+```
+
 Set `window.name` to `debug` in any page to attach component context to components

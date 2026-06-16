@@ -233,14 +233,15 @@ function reactive<T extends object>(object: T, effect: AnyFunction): T {
     },
 
     set(target: any, p, value) {
-      if (flags.reactiveEq && compare(target[p], value)) return true;
-      if (target[p] === value) return true;
+      if (flags.reactiveEq && target[p] === value) return true;
+      if (compare(target[p], value)) return true;
 
       target[p] = canBeObserved(value) ? reactive(value, effect) : value;
       effect();
 
       return true;
     },
+
     deleteProperty(target: any, p) {
       delete target[p];
       effect();
@@ -516,14 +517,8 @@ function walkNodes(tree: { childNodes: any }, fn: AnyFunction, context: any) {
   }
 }
 
-function walkAttributes(node: Element, fn: AnyFunction, context: any) {
-  for (const attr of Array.from(node.attributes)) {
-    fn(node, attr.name, attr.value.trim(), context);
-  }
-}
-
-function createFunction(expression: string, keys: string[], context: any, args: string[] = []) {
-  const k = keys
+function createFunction(expression: string, context: any, args: string[] = []) {
+  const k = Object.keys(context)
     .filter((key: any) => expression.includes(key))
     .join(', ')
     .trim();
@@ -550,6 +545,8 @@ function createReadOnlyContext(context: any) {
   });
 }
 
+const isElement = (x: any): x is Element => x.nodeType === x.ELEMENT_NODE;
+
 function bindNode(node: Text | Element, context: any) {
   if (node.nodeType === node.TEXT_NODE) {
     if (node.textContent.trim()) {
@@ -558,8 +555,18 @@ function bindNode(node: Text | Element, context: any) {
     return;
   }
 
-  if (node.nodeType === node.ELEMENT_NODE) {
-    walkAttributes(node as Element, bindAttribute, context);
+  if (isElement(node)) {
+    for (const attr of Array.from(node.attributes)) {
+      const name = attr.name;
+      const value = attr.value.trim();
+
+      for (const rule of rules) {
+        if (rule.match(node, name, value)) {
+          rule.exec(node, name, value, context);
+          break;
+        }
+      }
+    }
   }
 }
 
@@ -568,10 +575,9 @@ function bindText(node: Text, context: {}) {
 
   if (!template || !template.includes('{{')) return;
 
-  const keys = Object.keys(context);
   const source = '`' + template.replace(/{{(.*?)}}/g, (_: any, exp: string) => '${' + exp.trim() + '}') + '`';
 
-  effect(createFunction(source, keys, context), (v: any) => (node.textContent = v));
+  effect(createFunction(source, context), (v: any) => (node.textContent = v));
 }
 
 const mappedProperties: Record<string, string> = {
@@ -619,17 +625,31 @@ function setAttribute(el: Element, attribute: string, value: boolean): void {
   el.setAttribute(attribute, String(value));
 }
 
-function bindAttribute(node: HTMLElement, name: string, value: string, context: any) {
-  const keys = Object.keys(context);
+export interface Rule {
+  match: (node: Element, name: string, value: string) => boolean;
+  exec: (node: Element, name: string, value: string, context: any) => void;
+}
 
-  if (name === 'ref') {
-    const key = value.trim();
-    context[contextRef][key] ||= ref(null);
-    context[contextRef][key].value = node;
-    return;
+const rules: Rule[] = [];
+function use(rule: Rule) {
+  rules.push(rule);
+}
+
+use({
+  match(_, name) {
+    return name === 'ref'
+  },
+  exec(node: any, _name: string, value: string, context: any) {
+    context[contextRef][value] ||= ref(null);
+    context[contextRef][value].value = node;
   }
+});
 
-  if (name.startsWith('on-')) {
+use({
+  match(_, name) {
+    return name.startsWith('on-')
+  },
+  exec(node, name, value, context) {
     const key = name.slice(3);
     const [event, ...tags] = key.split('.');
     const modifiers: any = {
@@ -641,7 +661,7 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
       modifiers[tag] = true;
     }
 
-    const fn = createFunction(value, keys, context, ['$event']);
+    const fn = createFunction(value, context, ['$event']);
     node.addEventListener(event, (e: Event) => {
       if (modifiers.stop) e.stopPropagation();
       if (modifiers.prevent) e.preventDefault();
@@ -649,23 +669,28 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
       return fn(e);
     });
     node.removeAttribute(name);
-    return;
   }
+});
 
-  if (name.startsWith('attr-')) {
+use({
+  match(_, name) {
+    return name.startsWith('attr-');
+  },
+  exec(node, name, source, context) {
     const key = name.slice(5);
-    const source = value.trim();
-    effect(createFunction(source, keys, context), (v: any) => setAttribute(node, key, v));
+    effect(createFunction(source, context), (v: any) => setAttribute(node, key, v));
     node.removeAttribute(name);
-    return;
   }
+});
 
-  if (name.startsWith('bind-')) {
+use({
+  match(_, name) {
+    return name.startsWith('bind-');
+  },
+  exec(node, name, source, context) {
     const key = name.slice(5);
-    const source = value.trim();
     const [property, ...modifiers] = key.split('.');
-
-    const fn = createFunction(source, keys, context);
+    const fn = createFunction(source, context);
     const isObject = source.startsWith('{');
     if (key === 'class' && isObject) {
       effect(fn, (map) => {
@@ -683,36 +708,45 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
       effect(fn, (value: any) => setProperty(node, property, value, modifiers));
     }
     node.removeAttribute(name);
-    return;
   }
+});
 
-  if (name.startsWith('class-')) {
+use({
+  match(_, name) {
+    return name.startsWith('class-');
+  },
+  exec(node, name, source, context) {
     const key = name.slice(6);
-    const source = value.trim();
 
-    effect(createFunction(source, keys, context), (value: any) => setClassName(node, key, value));
+    effect(createFunction(source, context), (value: any) => setClassName(node, key, value));
     node.removeAttribute(name);
-    return;
   }
+});
 
-  if (name.startsWith('style-')) {
+use({
+  match(_, name) {
+    return name.startsWith('style-');
+  },
+  exec(node, name, source, context) {
     const key = name.slice(6);
-    const source = value.trim();
-    effect(createFunction(source, keys, context), (value: any) => setStyle(node, key, value));
-    node.removeAttribute(name);
-    return;
-  }
 
-  if (node.nodeName === 'TEMPLATE' && name === 'for') {
-    (node as HTMLTemplateElement).content.normalize();
-    const source = value.trim();
+    effect(createFunction(source, context), (value: any) => setStyle(node, key, value));
+    node.removeAttribute(name);
+  }
+});
+
+use({
+  match(node, name) {
+    return node.nodeName === 'TEMPLATE' && name === 'for';
+  },
+  exec(node, name, source, context) {
     const forNodes: { nodes: (Node)[], index: Signal<number>, item: Signal }[] = [];
     const [left, expression] = source.split('of').map((s) => s.trim());
     const [key, indexKey] = left.includes('[') ?
       left.slice(1, -1).split(',').map(s => s.trim()) :
       [left, 'index'];
 
-    effect(createFunction(expression, keys, context), (value: any) => {
+    effect(createFunction(expression, context), (value: any) => {
       const isArray = Array.isArray(value);
       const itemsToRemove = forNodes.slice(!isArray ? 0 : value.length);
 
@@ -755,15 +789,19 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
       });
     });
     node.removeAttribute(name);
-    return;
   }
+});
 
-  if (node.nodeName === 'TEMPLATE' && name === 'if') {
-    const source = 'Boolean(' + value.trim() + ')';
+use({
+  match(node, name) {
+    return node.nodeName === 'TEMPLATE' && name === 'if';
+  },
+  exec(node, name, value, context) {
+    const source = 'Boolean(' + value + ')';
     const ifNodes: any[] = [];
     let lastValue: any;
 
-    effect(createFunction(source, keys, context), (value: any) => {
+    effect(createFunction(source, context), (value: any) => {
       if (value === lastValue) {
         return;
       }
@@ -790,9 +828,8 @@ function bindAttribute(node: HTMLElement, name: string, value: string, context: 
       }
     });
     node.removeAttribute(name);
-    return;
   }
-}
+})
 
 async function importModuleFromSource(code: BlobPart) {
   const blob = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }));
@@ -981,6 +1018,7 @@ export {
   setAttribute,
   tpl,
   load,
+  use,
   defineFromString,
   defineFromTemplate,
   findApps,
