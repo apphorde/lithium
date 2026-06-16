@@ -40,13 +40,13 @@ const refSymbol = Symbol('$');
 const contextRef = Symbol('#');
 const reactiveTag = Symbol('#');
 const unwrapTag = Symbol('#');
+const FF: any = {};
 
 export const DEBUG = Symbol('#');
 
 function noop() {}
 
-const flags: any = {};
-window.name.split(',').map(k => flags[k.trim()] = true);
+window.name.split(',').map(k => FF[k.trim()] = true);
 
 function getShadowDomOptions(template: HTMLTemplateElement): ShadowRootInit | undefined {
   const source = template.getAttribute('shadow-dom') || '';
@@ -120,7 +120,7 @@ function mount(target: Element, options: MountOptions) {
 
   const mergedContext = Object.assign({}, context, runtime.props, runtime.refs);
   const readOnlyContext = createReadOnlyContext(mergedContext);
-  walkNodes(dom, bindNode, readOnlyContext);
+  linkTreeToContext(dom, readOnlyContext);
 
   parentElement.innerHTML = '';
   parentElement.appendChild(dom);
@@ -133,7 +133,7 @@ function mount(target: Element, options: MountOptions) {
     fn();
   }
 
-  if (window.name === 'debug') {
+  if (FF.debug) {
     (parentElement as any)[DEBUG] = { options, context: readOnlyContext };
   }
 
@@ -146,7 +146,7 @@ function mount(target: Element, options: MountOptions) {
 }
 
 function compare(a: any, b: any) {
-  if (flags.compareEq) {
+  if (FF.compareEq) {
     return a === b;
   }
 
@@ -233,7 +233,7 @@ function reactive<T extends object>(object: T, effect: AnyFunction): T {
     },
 
     set(target: any, p, value) {
-      if (flags.reactiveEq && target[p] === value) return true;
+      if (FF.reactiveEq && target[p] === value) return true;
       if (compare(target[p], value)) return true;
 
       target[p] = canBeObserved(value) ? reactive(value, effect) : value;
@@ -296,7 +296,7 @@ function ref<T = any>(initial?: T, isShallow = false) {
     },
 
     update(newValue: any) {
-      if (flags.refEq && o.internalValue === newValue) return;
+      if (FF.refEq && o.internalValue === newValue) return;
       if (compare(o.internalValue, newValue)) return;
 
       if (!isShallow && canBeObserved(newValue)) {
@@ -339,7 +339,7 @@ function computed<T = any>(fn: AnyFunction) {
     update() {
       const value = fn();
 
-      if (flags.computedEq && o.internalValue === value) return;
+      if (FF.computedEq && o.internalValue === value) return;
       if (compare(o.internalValue, value)) return;
 
       o.internalValue = value;
@@ -507,12 +507,15 @@ function getCurrentNode() {
   return t;
 }
 
-function walkNodes(tree: { childNodes: any }, fn: AnyFunction, context: any) {
-  for (const node of tree.childNodes) {
-    fn(node, context);
+function linkTreeToContext(tree: Node, context: any) {
+  const stack: Node[] = [...tree.childNodes];
 
-    if (node.nodeType === Node.ELEMENT_NODE && !node.hasAttribute('do-not-render')) {
-      walkNodes(node, fn, context);
+  while (stack.length) {
+    const node = stack.shift() as Node;
+    applyRules(node, context);
+
+    if (isElement(node) && !node.hasAttribute('do-not-render')) {
+      stack.push(...node.childNodes);
     }
   }
 }
@@ -546,25 +549,28 @@ function createReadOnlyContext(context: any) {
 }
 
 const isElement = (x: any): x is Element => x.nodeType === x.ELEMENT_NODE;
+const isText = (x: any): x is Text => x.nodeType === x.TEXT_NODE;
 
-function bindNode(node: Text | Element, context: any) {
-  if (node.nodeType === node.TEXT_NODE) {
+function applyRules(node: Node, context: any) {
+  if (isText(node)) {
     if (node.textContent.trim()) {
-      bindText(node as Text, context);
+      bindText(node, context);
     }
     return;
   }
 
-  if (isElement(node)) {
-    for (const attr of Array.from(node.attributes)) {
-      const name = attr.name;
-      const value = attr.value.trim();
+  if (!isElement(node)) {
+    return;
+  }
 
-      for (const rule of rules) {
-        if (rule.match(node, name, value)) {
-          rule.exec(node, name, value, context);
-          break;
-        }
+  for (const attr of Array.from(node.attributes)) {
+    const name = attr.name;
+    const value = attr.value.trim();
+
+    for (const rule of rules) {
+      if (rule.match(node, name, value)) {
+        rule.exec(node, name, value, context);
+        break;
       }
     }
   }
@@ -780,7 +786,7 @@ use({
           forNodes[i] = { item, index, nodes: Array.from(dom.childNodes) };
           nodesToInsert.append(dom);
           const reader = createReadOnlyContext(Object.assign({}, context, subContext));
-          walkNodes(dom, bindNode, reader);
+          linkTreeToContext(dom, reader);
         }
       }
 
@@ -812,7 +818,7 @@ use({
         const dom = (node as HTMLTemplateElement).content.cloneNode(true);
         ifNodes.push(...Array.from(dom.childNodes));
 
-        walkNodes(dom, bindNode, context);
+        linkTreeToContext(dom, context);
         setTimeout(() => {
           (node as any).parentNode.insertBefore(dom, node);
         });
@@ -993,6 +999,8 @@ export {
   noop,
   defineComponent,
   mount,
+  linkTreeToContext,
+  applyRules,
   compare,
   canBeObserved,
   ref,
