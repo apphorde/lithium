@@ -26,6 +26,7 @@ export type MountOptions = {
   template: HTMLTemplateElement;
   setup?: Function;
   styles?: CSSStyleSheet[];
+  dependencies?: string[];
   shadowDom?: boolean | string | ShadowRootInit;
 };
 
@@ -914,6 +915,15 @@ function findStyleSheets(template: HTMLTemplateElement): CSSStyleSheet[] {
     });
 }
 
+function loadDependencies(template: HTMLTemplateElement) {
+  const links = Array.from(template.content.querySelectorAll('link[rel=component]')) as HTMLLinkElement[];
+
+  for (const link of links) {
+    load(link.href);
+    link.remove();
+  }
+}
+
 function tpl(s: string) {
   const template = document.createElement('template');
   template.innerHTML = String(s).trim();
@@ -938,6 +948,8 @@ async function defineFromTemplate(template: HTMLTemplateElement | string) {
     setup: await findSetupModule(template),
     styles: findStyleSheets(template),
   };
+
+  loadDependencies(template)
 
   defineComponent(options);
   return options;
