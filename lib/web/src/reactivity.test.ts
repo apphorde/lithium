@@ -81,21 +81,42 @@ describe('reactivity', () => {
       a.value = 10;
       expect(eff.length).toBeGreaterThan(0);
     });
+
+    it('should not recompute if dependencies do not change', () => {
+      const a = ref(1);
+      const fn = vi.fn().mockImplementation(() => a.value * 2);
+      const c = computed(fn);
+
+      expect(c.value).toBe(2);
+      expect(fn.mock.calls.length).toBe(1);
+
+      // Accessing the computed value again should not trigger recomputation
+      expect(c.value).toBe(2);
+      expect(fn.mock.calls.length).toBe(1);
+
+      // Changing the dependency should trigger recomputation
+      a.value = 3;
+      expect(c.value).toBe(6);
+      expect(fn.mock.calls.length).toBe(2);
+    });
   });
 
   describe('effect', () => {
     it('runs effect functions when dependencies change', () => {
-      const value = ref(2);
-      const seen: any[] = [];
+      const object = ref({ number: 2 });
+      const fn = vi.fn();
 
-      effect(
-        () => value.value * 3,
-        (next) => seen.push(next),
-      );
+      effect(() => object.value.number * 3, fn);
 
-      expect(seen[0]).toBe(6);
-      value.value = 3;
-      expect(seen[seen.length - 1]).toBe(9);
+      expect(fn.mock.calls.length).toBe(1);
+      expect(fn.mock.calls[0][0]).toBe(6);
+      object.value.number = 3;
+
+      expect(fn.mock.calls.length).toBe(2);
+      expect(fn.mock.calls[1][0]).toBe(9);
+
+      object.value = { number: 3 };
+      expect(fn.mock.calls.length).toBe(2);
     });
   });
 

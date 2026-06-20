@@ -57,7 +57,6 @@ function reactive<T extends object>(object: T, effect: AnyFunction): T {
 
     set(target: any, p, value) {
       if (p === dirtyTag) {
-        if (FF.debug) console.log('dirtyTag');
         return (dirty = true);
       }
 
