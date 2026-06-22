@@ -28,10 +28,46 @@ export function applyRules(node: Node, context: any) {
     for (const rule of rules) {
       if (rule.match(node, name, value)) {
         rule.exec(node, name, value, context);
+        node.removeAttribute(name);
         break;
       }
     }
   }
+}
+
+export function compileRules(
+  node: Node,
+  compilationContext: any,
+) {
+
+  if (isText(node)) {
+    if (node.textContent.trim()) {
+      compilationContext.rules.push([bindText, node]);
+    }
+    return;
+  }
+
+  if (!isElement(node)) {
+    return;
+  }
+
+  const queue = compilationContext.rules;
+  // const nodeId = compilationContext.rules.length;
+
+  for (const attr of Array.from(node.attributes)) {
+    const name = attr.name;
+    const value = attr.value.trim();
+
+    for (const rule of rules) {
+      if (rule.match(node, name, value)) {
+        queue.push([rule.exec, node, name, value]);
+        node.removeAttribute(name);
+        break;
+      }
+    }
+  }
+
+  // node.setAttribute("data-nodeid", nodeId);
 }
 
 function bindText(node: Text, context: {}) {
@@ -146,7 +182,6 @@ use({
 
       return fn(e);
     });
-    node.removeAttribute(name);
   },
 });
 
@@ -159,7 +194,6 @@ use({
     effect(createFunction(source, context), (v: any) =>
       setAttribute(node, key, v),
     );
-    node.removeAttribute(name);
   },
 });
 
@@ -187,7 +221,6 @@ use({
     } else {
       effect(fn, (value: any) => setProperty(node, property, value, modifiers));
     }
-    node.removeAttribute(name);
   },
 });
 
@@ -201,7 +234,6 @@ use({
     effect(createFunction(source, context), (value: any) =>
       setClassName(node, key, value),
     );
-    node.removeAttribute(name);
   },
 });
 
@@ -215,7 +247,6 @@ use({
     effect(createFunction(source, context), (value: any) =>
       setStyle(node, key, value),
     );
-    node.removeAttribute(name);
   },
 });
 
@@ -223,7 +254,7 @@ use({
   match(node, name) {
     return node.nodeName === "TEMPLATE" && name === "for";
   },
-  exec(node, name, source, context) {
+  exec(node, _name, source, context) {
     const forNodes: { nodes: Node[]; index: number; item: Signal }[] = [];
     const [left, expression] = source.split("of").map((s) => s.trim());
     const [key, indexKey] = left.includes("[")
@@ -274,7 +305,6 @@ use({
         (node as any).parentNode.insertBefore(nodesToInsert, lastInsertedNode);
       });
     });
-    node.removeAttribute(name);
   },
 });
 
@@ -282,7 +312,7 @@ use({
   match(node, name) {
     return node.nodeName === "TEMPLATE" && name === "if";
   },
-  exec(node, name, value, context) {
+  exec(node, _name, value, context) {
     const source = "Boolean(" + value + ")";
     const ifNodes: any[] = [];
     let lastValue: any;
@@ -313,6 +343,5 @@ use({
         ifNodes.length = 0;
       }
     });
-    node.removeAttribute(name);
   },
 });

@@ -1,5 +1,5 @@
 import { FF } from './feature-flags.js';
-import { createContext, createReadOnlyContext, importModuleFromSource, linkTreeToContext } from './internals.js';
+import { createContext, createReadOnlyContext, importModuleFromSource, linkTreeToContext, linkTreeToContextAsync } from './internals.js';
 import type { DefineComponentOptions, MountOptions } from './types';
 
 const DEBUG = Symbol('#');
@@ -77,7 +77,14 @@ export function mount(target: Element, options: MountOptions) {
   const runtime = createContext(target, setup);
   const mergedContext = Object.assign({}, runtime.context, runtime.props, runtime.refs);
   const readOnlyContext = createReadOnlyContext(mergedContext);
-  linkTreeToContext(dom, readOnlyContext);
+
+  if (FF.linker) {
+    (template as any).linker ||= linkTreeToContextAsync(dom);
+    const linker = (template as any).linker;
+    linker(readOnlyContext);
+  } else {
+    linkTreeToContext(dom, readOnlyContext);
+  }
 
   parentElement.innerHTML = '';
   parentElement.appendChild(dom);
