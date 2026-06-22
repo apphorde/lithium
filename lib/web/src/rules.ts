@@ -1,7 +1,7 @@
 import {
   createFunction,
   createReadOnlyContext,
-  linkTreeToContext,
+  walkDomTree,
 } from "./internals.js";
 import { ref, computed, effect } from "./reactivity.js";
 import type { Signal } from "./reactivity";
@@ -9,18 +9,23 @@ import type { Signal } from "./reactivity";
 const isElement = (x: any): x is Element => x.nodeType === x.ELEMENT_NODE;
 const isText = (x: any): x is Text => x.nodeType === x.TEXT_NODE;
 
-export function applyRules(node: Node, context: any) {
-  if (isText(node)) {
-    if (node.textContent.trim()) {
-      bindText(node, context);
-    }
-    return;
-  }
+export function applyTextRules(node: Text, context: any) {
+  const template = node.textContent.trim();
 
-  if (!isElement(node)) {
-    return;
-  }
+  if (!template || !template.includes("{{")) return;
 
+  const source =
+    "`" +
+    template.replace(
+      /{{(.*?)}}/g,
+      (_: any, exp: string) => "${" + exp.trim() + "}",
+    ) +
+    "`";
+
+  effect(createFunction(source, context), (v: any) => setText(node, v));
+}
+
+export function applyElementRules(node: Element, context: any) {
   for (const attr of Array.from(node.attributes)) {
     const name = attr.name;
     const value = attr.value.trim();
@@ -35,24 +40,25 @@ export function applyRules(node: Node, context: any) {
   }
 }
 
-export function compileRules(
-  node: Node,
-  compilationContext: any,
-) {
-
+export function applyRules(node: Node, context: any) {
   if (isText(node)) {
-    if (node.textContent.trim()) {
-      compilationContext.rules.push([bindText, node]);
-    }
+    applyTextRules(node, context);
     return;
   }
 
+  if (isElement(node)) {
+    applyElementRules(node, context);
+    return;
+  }
+}
+
+export function compileRules(node: Node, deferredContext: any) {
   if (!isElement(node)) {
     return;
   }
 
-  const queue = compilationContext.rules;
-  // const nodeId = compilationContext.rules.length;
+  const deferred = [];
+  const nodeId = "n" + ~~(Math.random() * 99999);
 
   for (const attr of Array.from(node.attributes)) {
     const name = attr.name;
@@ -60,30 +66,47 @@ export function compileRules(
 
     for (const rule of rules) {
       if (rule.match(node, name, value)) {
-        queue.push([rule.exec, node, name, value]);
+        deferred.push([rule.exec, name, value]);
         node.removeAttribute(name);
         break;
       }
     }
   }
 
-  // node.setAttribute("data-nodeid", nodeId);
+  node.setAttribute("data-nodeid", nodeId);
+  deferredContext[nodeId] = deferred;
 }
 
-function bindText(node: Text, context: {}) {
-  const template = node.textContent.trim();
+function bind(node: any, context: any, deferredContext: any) {
+  if (isText(node)) {
+    applyTextRules(node, context);
+    return;
+  }
 
-  if (!template || !template.includes("{{")) return;
+  if (isElement(node)) {
+    const id = node.getAttribute("data-nodeid") as string;
+    const rules = deferredContext[id];
 
-  const source =
-    "`" +
-    template.replace(
-      /{{(.*?)}}/g,
-      (_: any, exp: string) => "${" + exp.trim() + "}",
-    ) +
-    "`";
+    if (!rules) return;
 
-  effect(createFunction(source, context), (v: any) => setText(node, v));
+    for (const next of rules) {
+      const [fn, name, value] = next;
+      fn(node, name, value, context);
+    }
+  }
+}
+
+export function linkTreeToContextAsync(tree: Node) {
+  const deferredContext: any = {};
+  walkDomTree(tree, compileRules, deferredContext);
+
+  return function (tree: Node, context: any) {
+    walkDomTree(tree, (n, c) => bind(n, c, deferredContext), context);
+  };
+}
+
+export function linkTreeToContext(tree: Node, context: any) {
+  walkDomTree(tree, applyRules, context);
 }
 
 const mappedProperties: Record<string, string> = {

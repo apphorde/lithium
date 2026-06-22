@@ -1,4 +1,3 @@
-import { applyRules, compileRules } from "./rules.js";
 import { isRef } from "./reactivity.js";
 import type { AnyFunction, RuntimeContext } from "./types";
 
@@ -24,23 +23,7 @@ export function getPropValue<T extends keyof Element>(
   }
 }
 
-export function linkTreeToContextAsync(tree: Node) {
-  const deferredContext = { rules: [] as any[] };
-  link(tree, compileRules, deferredContext);
-
-  return function(context: any) {
-    for (const next of deferredContext.rules) {
-      const [fn, ...args] = next;
-      fn(...args, context);
-    }
-  }
-}
-
-export function linkTreeToContext(tree: Node, context: any) {
-  link(tree, applyRules, context);
-}
-
-function link(tree: Node, fn: AnyFunction, context: any) {
+export function walkDomTree(tree: Node, fn: AnyFunction, context: any) {
   const stack: Node[] = [tree].concat(Array.from(tree.childNodes));
   let node;
 
