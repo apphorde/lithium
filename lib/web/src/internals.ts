@@ -28,7 +28,7 @@ export function linkTreeToContext(tree: Node, context: any) {
     applyRules(node, context);
 
     if (node.nodeType === node.ELEMENT_NODE && !(node as any).hasAttribute('do-not-render') && node.childNodes.length) {
-      stack.push(...Array.from(node.childNodes));
+      stack.push(...Array.from(node.childNodes) as any[]);
     }
   }
 }
