@@ -56,8 +56,8 @@ describe('@li3/web', () => {
       const target = document.createElement('div') as any;
       const unmount = mount(target, { template, setup: () => ({}) });
 
-      expect(target[DEBUG]).toBeDefined();
-      expect(target[DEBUG].context).toBeDefined();
+      expect(getInternals(target)).toBeDefined();
+      expect(getInternals(target).context).toBeDefined();
       unmount();
     });
   });
@@ -209,8 +209,8 @@ describe('@li3/web', () => {
       const el = document.createElement(name);
       document.body.appendChild(el);
 
-      // mount should have attached a shadow root and set DEBUG on it
-      const debug = (el.shadowRoot as any)[DEBUG];
+      // mount should have attached a shadow root with debug data
+      const debug = getInternals(el.shadowRoot);
       expect(debug).toBeTruthy();
 
       document.body.removeChild(el);
@@ -239,23 +239,22 @@ describe('@li3/web', () => {
   describe('load', () => {
     it('loads HTML component templates and returns definitions', async () => {
       const html = '<template component="comp-a"></template><template component="comp-b"></template>';
-      const originalFetch = (global as any).fetch;
-      (global as any).fetch = vi.fn(() => Promise.resolve({ ok: true, text: () => Promise.resolve(html) }));
+      const originalFetch = (window as any).fetch;
+      (window as any).fetch = vi.fn(() => Promise.resolve({ ok: true, text: () => Promise.resolve(html) }));
 
-      const res = await load('http://example/');
-      const options = await Promise.all(res);
+      const options = await load('http://example/');
 
       expect(options[0]?.name).toBe('comp-a');
       expect(options[1]?.name).toBe('comp-b');
-      (global as any).fetch = originalFetch;
+      (window as any).fetch = originalFetch;
     });
 
     it('throws when fetch returns a non-ok response', async () => {
-      const originalFetch = (global as any).fetch;
-      (global as any).fetch = vi.fn(() => Promise.resolve({ ok: false, status: 404, text: () => Promise.resolve('') }));
+      const originalFetch = (window as any).fetch;
+      (window as any).fetch = vi.fn(() => Promise.resolve({ ok: false, status: 404, text: () => Promise.resolve('') }));
 
       await expect(load('http://example/')).rejects.toThrow('Failed to load components from http://example/');
-      (global as any).fetch = originalFetch;
+      (window as any).fetch = originalFetch;
     });
   });
 });

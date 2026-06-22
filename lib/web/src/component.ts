@@ -25,9 +25,11 @@ export async function load(href: string | URL) {
     }
 
     const html = await response.text();
-    return defineFromString(html);
+    const all = await Promise.all(defineFromString(html));
+    return all.filter(Boolean) as DefineComponentOptions[];
   } catch (error) {
     console.error('Error loading component from', href, error);
+    return [];
   }
 }
 
@@ -151,7 +153,7 @@ function tpl(s: string) {
   return template;
 }
 
-export async function defineFromTemplate(template: HTMLTemplateElement | string) {
+export async function defineFromTemplate(template: HTMLTemplateElement | string): Promise<DefineComponentOptions|null> {
   if (typeof template === 'string') {
     template = tpl(template);
   }
@@ -170,16 +172,18 @@ export async function defineFromTemplate(template: HTMLTemplateElement | string)
   };
 
   loadDependencies(template);
-
   defineComponent(options);
+
   return options;
 }
+
 export function defineFromString(html: string) {
   const dom = new DOMParser().parseFromString(html, 'text/html');
-  const nodes = dom.querySelectorAll('template[component]');
+  const nodes = Array.from(dom.querySelectorAll('template[component]')) as HTMLTemplateElement[];
 
-  return (Array.from(nodes) as HTMLTemplateElement[]).map(defineFromTemplate);
+  return nodes.map(defineFromTemplate).filter(Boolean);
 }
+
 export async function findApps() {
   const apps = Array.from(document.querySelectorAll('template[app]')) as HTMLTemplateElement[];
 
