@@ -1,6 +1,10 @@
-import { createFunction, createReadOnlyContext, linkTreeToContext } from './internals.js';
-import { ref, computed, effect } from './reactivity.js';
-import type { Signal } from './reactivity';
+import {
+  createFunction,
+  createReadOnlyContext,
+  linkTreeToContext,
+} from "./internals.js";
+import { ref, computed, effect } from "./reactivity.js";
+import type { Signal } from "./reactivity";
 
 const isElement = (x: any): x is Element => x.nodeType === x.ELEMENT_NODE;
 const isText = (x: any): x is Text => x.nodeType === x.TEXT_NODE;
@@ -33,38 +37,51 @@ export function applyRules(node: Node, context: any) {
 function bindText(node: Text, context: {}) {
   const template = node.textContent.trim();
 
-  if (!template || !template.includes('{{')) return;
+  if (!template || !template.includes("{{")) return;
 
-  const source = '`' + template.replace(/{{(.*?)}}/g, (_: any, exp: string) => '${' + exp.trim() + '}') + '`';
+  const source =
+    "`" +
+    template.replace(
+      /{{(.*?)}}/g,
+      (_: any, exp: string) => "${" + exp.trim() + "}",
+    ) +
+    "`";
 
   effect(createFunction(source, context), (v: any) => setText(node, v));
 }
 
 const mappedProperties: Record<string, string> = {
-  innerhtml: 'innerHTML',
-  baseuri: 'baseURI',
-  class: 'className',
+  innerhtml: "innerHTML",
+  baseuri: "baseURI",
+  class: "className",
 };
 
 function setClassName(el: Element, classNames: string, value: any): void {
-  for (const cls of classNames.split('.').filter(Boolean)) {
+  for (const cls of classNames.split(".").filter(Boolean)) {
     el.classList.toggle(cls, value);
   }
 }
 
 function setStyle(el: any, key: string, value: any): void {
-  const toCamelCase = key.replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase());
+  const toCamelCase = key.replace(/-([a-z])/g, (_: any, letter: string) =>
+    letter.toUpperCase(),
+  );
   el.style[toCamelCase] = value;
 }
 
 function setText(el: Text, text: any): void {
-  el.textContent = String(text !== undefined ? text : '');
+  el.textContent = String(text !== undefined ? text : "");
 }
 
-function setProperty(node: any, key: string, value: any, modifiers: string[]): void {
+function setProperty(
+  node: any,
+  key: string,
+  value: any,
+  modifiers: string[],
+): void {
   const mappedKey = mappedProperties[key] || key;
 
-  if (modifiers.includes('bool')) {
+  if (modifiers.includes("bool")) {
     node.toggleAttribute(mappedKey, Boolean(value));
   } else {
     node[mappedKey] = value;
@@ -77,7 +94,7 @@ function setAttribute(el: Element, attribute: string, value: boolean): void {
     return;
   }
 
-  if (typeof value === 'boolean' && value === false) {
+  if (typeof value === "boolean" && value === false) {
     el.removeAttribute(attribute);
     return;
   }
@@ -98,21 +115,21 @@ export function use(rule: Rule) {
 
 use({
   match(_, name) {
-    return name === 'ref';
+    return name === "ref";
   },
   exec(node: any, _name: string, value: string, context: any) {
-    const $ = (context[value] || (context[value] = ref(null)));
+    const $ = context[value] || (context[value] = ref(null));
     $.value = node;
   },
 });
 
 use({
   match(_, name) {
-    return name.startsWith('on-');
+    return name.startsWith("on-");
   },
   exec(node, name, value, context) {
     const key = name.slice(3);
-    const [event, ...tags] = key.split('.');
+    const [event, ...tags] = key.split(".");
     const modifiers: any = {
       // Safari's default is true
       passive: false,
@@ -122,7 +139,7 @@ use({
       modifiers[tag] = true;
     }
 
-    const fn = createFunction(value, context, ['$event']);
+    const fn = createFunction(value, context, ["$event"]);
     node.addEventListener(event, (e: Event) => {
       if (modifiers.stop) e.stopPropagation();
       if (modifiers.prevent) e.preventDefault();
@@ -135,31 +152,33 @@ use({
 
 use({
   match(_, name) {
-    return name.startsWith('attr-');
+    return name.startsWith("attr-");
   },
   exec(node, name, source, context) {
     const key = name.slice(5);
-    effect(createFunction(source, context), (v: any) => setAttribute(node, key, v));
+    effect(createFunction(source, context), (v: any) =>
+      setAttribute(node, key, v),
+    );
     node.removeAttribute(name);
   },
 });
 
 use({
   match(_, name) {
-    return name.startsWith('bind-');
+    return name.startsWith("bind-");
   },
   exec(node, name, source, context) {
     const key = name.slice(5);
-    const [property, ...modifiers] = key.split('.');
+    const [property, ...modifiers] = key.split(".");
     const fn = createFunction(source, context);
-    const isObject = source.startsWith('{');
-    if (key === 'class' && isObject) {
+    const isObject = source.startsWith("{");
+    if (key === "class" && isObject) {
       effect(fn, (map) => {
         for (const [classNames, value] of Object.entries(map)) {
           setClassName(node, classNames, value);
         }
       });
-    } else if (key === 'style' && isObject) {
+    } else if (key === "style" && isObject) {
       effect(fn, (map) => {
         for (const [property, value] of Object.entries(map)) {
           setStyle(node, property, value);
@@ -174,41 +193,45 @@ use({
 
 use({
   match(_, name) {
-    return name.startsWith('class-');
+    return name.startsWith("class-");
   },
   exec(node, name, source, context) {
     const key = name.slice(6);
 
-    effect(createFunction(source, context), (value: any) => setClassName(node, key, value));
+    effect(createFunction(source, context), (value: any) =>
+      setClassName(node, key, value),
+    );
     node.removeAttribute(name);
   },
 });
 
 use({
   match(_, name) {
-    return name.startsWith('style-');
+    return name.startsWith("style-");
   },
   exec(node, name, source, context) {
     const key = name.slice(6);
 
-    effect(createFunction(source, context), (value: any) => setStyle(node, key, value));
+    effect(createFunction(source, context), (value: any) =>
+      setStyle(node, key, value),
+    );
     node.removeAttribute(name);
   },
 });
 
 use({
   match(node, name) {
-    return node.nodeName === 'TEMPLATE' && name === 'for';
+    return node.nodeName === "TEMPLATE" && name === "for";
   },
   exec(node, name, source, context) {
     const forNodes: { nodes: Node[]; index: number; item: Signal }[] = [];
-    const [left, expression] = source.split('of').map((s) => s.trim());
-    const [key, indexKey] = left.includes('[')
+    const [left, expression] = source.split("of").map((s) => s.trim());
+    const [key, indexKey] = left.includes("[")
       ? left
           .slice(1, -1)
-          .split(',')
+          .split(",")
           .map((s) => s.trim())
-      : [left, 'index'];
+      : [left, "index"];
 
     effect(createFunction(expression, context), (value: any) => {
       const isArray = Array.isArray(value);
@@ -229,6 +252,8 @@ use({
       const nodesToInsert = document.createDocumentFragment();
 
       for (let i = 0; i < length; i++) {
+        if (forNodes[i]) continue;
+
         const index = i;
         const item = computed(() => value[index]);
         const subContext = {
@@ -236,13 +261,13 @@ use({
           [indexKey]: i,
         };
 
-        if (!forNodes[i]) {
-          const dom = (node as HTMLTemplateElement).content.cloneNode(true);
-          forNodes[i] = { item, index, nodes: Array.from(dom.childNodes) };
-          const reader = createReadOnlyContext(Object.assign({}, context, subContext));
-          linkTreeToContext(dom, reader);
-          nodesToInsert.append(dom);
-        }
+        const dom = (node as HTMLTemplateElement).content.cloneNode(true);
+        forNodes[i] = { item, index, nodes: Array.from(dom.childNodes) };
+        const reader = createReadOnlyContext(
+          Object.assign({}, context, subContext),
+        );
+        linkTreeToContext(dom, reader);
+        nodesToInsert.append(dom);
       }
 
       setTimeout(() => {
@@ -255,10 +280,10 @@ use({
 
 use({
   match(node, name) {
-    return node.nodeName === 'TEMPLATE' && name === 'if';
+    return node.nodeName === "TEMPLATE" && name === "if";
   },
   exec(node, name, value, context) {
-    const source = 'Boolean(' + value + ')';
+    const source = "Boolean(" + value + ")";
     const ifNodes: any[] = [];
     let lastValue: any;
 
