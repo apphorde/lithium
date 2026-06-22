@@ -24,7 +24,8 @@ export function getPropValue<T extends keyof Element>(
 }
 
 export function walkDomTree(tree: Node, fn: AnyFunction, context: any) {
-  const stack: Node[] = [tree].concat(tree.childNodes ? Array.from(tree.childNodes) : []);
+  const stack: Node[] = tree.childNodes ? Array.from(tree.childNodes) : [];
+
   let node;
 
   while ((node = stack.shift() as Node)) {

@@ -73,7 +73,7 @@ export function compileRules(node: Node, deferredContext: any) {
     }
   }
 
-  node.setAttribute("data-nodeid", nodeId);
+  node.setAttribute("_id_", nodeId);
   deferredContext[nodeId] = deferred;
 }
 
@@ -84,7 +84,7 @@ function bind(node: any, context: any, deferredContext: any) {
   }
 
   if (isElement(node)) {
-    const id = node.getAttribute("data-nodeid") as string;
+    const id = node.getAttribute("_id_") as string;
     const rules = deferredContext[id];
 
     if (!rules) return;
