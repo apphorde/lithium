@@ -1,8 +1,12 @@
-import { applyRules } from './rules.js';
-import { isRef } from './reactivity.js';
-import type { RuntimeContext } from './types';
+import { applyRules } from "./rules.js";
+import { isRef } from "./reactivity.js";
+import type { RuntimeContext } from "./types";
 
-export function getPropValue<T extends keyof Element>(element: Element, name: T, defaultValue: any) {
+export function getPropValue<T extends keyof Element>(
+  element: Element,
+  name: T,
+  defaultValue: any,
+) {
   const value = element[name];
 
   if (value !== undefined) {
@@ -16,7 +20,7 @@ export function getPropValue<T extends keyof Element>(element: Element, name: T,
   }
 
   if (defaultValue !== undefined) {
-    return typeof defaultValue === 'function' ? defaultValue() : defaultValue;
+    return typeof defaultValue === "function" ? defaultValue() : defaultValue;
   }
 }
 
@@ -27,18 +31,29 @@ export function linkTreeToContext(tree: Node, context: any) {
   while ((node = stack.shift() as Node)) {
     applyRules(node, context);
 
-    if (node.nodeType === node.ELEMENT_NODE && !(node as any).hasAttribute('do-not-render') && node.childNodes.length) {
-      stack.push(...Array.from(node.childNodes) as any[]);
+    if (
+      node.nodeType === node.ELEMENT_NODE &&
+      !(node as any).hasAttribute("do-not-render") &&
+      node.childNodes.length
+    ) {
+      stack.push(...(Array.from(node.childNodes) as any[]));
     }
   }
 }
 
-export function createFunction(expression: string, context: any, args: string[] = []) {
+export function createFunction(
+  expression: string,
+  context: any,
+  args: string[] = [],
+) {
   const k = Object.keys(context)
     .filter((key: any) => expression.includes(key))
-    .join(', ')
+    .join(", ")
     .trim();
-  return Function(...args, (k ? `const { ${k} } = this;` : '') + `return ${expression};`).bind(context);
+  return Function(
+    ...args,
+    (k ? `const { ${k} } = this;` : "") + `return ${expression};`,
+  ).bind(context);
 }
 
 export function createReadOnlyContext(context: any) {
@@ -59,7 +74,7 @@ export function createReadOnlyContext(context: any) {
         return true;
       }
 
-      throw new Error('View contexts are read-only');
+      throw new Error("View contexts are read-only");
     },
   });
 }
@@ -70,7 +85,7 @@ export function getCurrentNode() {
   const t = runtimeStack.at(-1);
 
   if (!t) {
-    throw new Error('Missing context for this component');
+    throw new Error("Missing context for this component");
   }
 
   return t;
@@ -112,7 +127,7 @@ let _importCssModule: any = importModuleFromSource(
 );
 
 export async function importCssModule(href: string) {
-  if (typeof _importCssModule !== 'function') {
+  if (typeof _importCssModule !== "function") {
     _importCssModule = (await _importCssModule).default;
   }
 
@@ -127,7 +142,9 @@ export async function importCssModule(href: string) {
 }
 
 export async function importModuleFromSource(code: BlobPart) {
-  const blob = URL.createObjectURL(new Blob([code], { type: 'text/javascript' }));
+  const blob = URL.createObjectURL(
+    new Blob([code], { type: "text/javascript" }),
+  );
   const module = await import(blob);
   URL.revokeObjectURL(blob);
   return module;

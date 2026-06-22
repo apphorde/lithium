@@ -101,8 +101,8 @@ use({
     return name === 'ref';
   },
   exec(node: any, _name: string, value: string, context: any) {
-    context[value] ||= ref(null);
-    context[value].value = node;
+    const $ = (context[value] || (context[value] = ref(null)));
+    $.value = node;
   },
 });
 
