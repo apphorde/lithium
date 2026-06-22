@@ -82,7 +82,7 @@ export function mount(target: Element, options: MountOptions) {
   if (FF.linker) {
     (template as any).linker ||= linkTreeToContextAsync(dom);
     const linker = (template as any).linker;
-    linker(readOnlyContext);
+    linker(dom, readOnlyContext);
   } else {
     linkTreeToContext(dom, readOnlyContext);
   }
