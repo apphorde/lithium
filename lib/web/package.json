@@ -1,11 +1,12 @@
 {
   "name": "@li3/web",
-  "version": "0.2.19",
+  "version": "0.2.20",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./index.js"
-    }
+    },
+    "./loader": "./loader.js"
   },
   "repository": {
     "url": "https://github.com/apphorde/lithium"

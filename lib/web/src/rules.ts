@@ -1,5 +1,5 @@
 import { createFunction, createReadOnlyContext, linkTreeToContext } from './internals.js';
-import { ref, effect } from './reactivity.js';
+import { ref, computed, effect } from './reactivity.js';
 import type { Signal } from './reactivity';
 
 const isElement = (x: any): x is Element => x.nodeType === x.ELEMENT_NODE;
@@ -201,7 +201,7 @@ use({
     return node.nodeName === 'TEMPLATE' && name === 'for';
   },
   exec(node, name, source, context) {
-    const forNodes: { nodes: Node[]; index: Signal<number>; item: Signal }[] = [];
+    const forNodes: { nodes: Node[]; index: number; item: Signal }[] = [];
     const [left, expression] = source.split('of').map((s) => s.trim());
     const [key, indexKey] = left.includes('[')
       ? left
@@ -229,17 +229,14 @@ use({
       const nodesToInsert = document.createDocumentFragment();
 
       for (let i = 0; i < length; i++) {
-        const item = ref(value[i]);
-        const index = ref(i);
+        const index = i;
+        const item = computed(() => value[index]);
         const subContext = {
           [key]: item,
-          [indexKey]: index,
+          [indexKey]: i,
         };
 
-        if (forNodes[i]) {
-          forNodes[i].item.value = value[i];
-          forNodes[i].index.value = i;
-        } else {
+        if (!forNodes[i]) {
           const dom = (node as HTMLTemplateElement).content.cloneNode(true);
           forNodes[i] = { item, index, nodes: Array.from(dom.childNodes) };
           const reader = createReadOnlyContext(Object.assign({}, context, subContext));
