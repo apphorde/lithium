@@ -1,6 +1,6 @@
-import { createFunction, createReadOnlyContext, linkTreeToContext } from './internals';
-import { ref, effect } from './reactivity';
-import { Signal } from './types';
+import { createFunction, createReadOnlyContext, linkTreeToContext } from './internals.js';
+import { ref, effect } from './reactivity.js';
+import type { Signal } from './reactivity';
 
 const isElement = (x: any): x is Element => x.nodeType === x.ELEMENT_NODE;
 const isText = (x: any): x is Text => x.nodeType === x.TEXT_NODE;
