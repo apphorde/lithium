@@ -73,8 +73,10 @@ export function compileRules(node: Node, deferredContext: any) {
     }
   }
 
-  node.setAttribute("_id_", nodeId);
-  deferredContext[nodeId] = deferred;
+  if (deferred.length) {
+    node.setAttribute("_id_", nodeId);
+    deferredContext[nodeId] = deferred;
+  }
 }
 
 function bind(node: any, context: any, deferredContext: any) {
