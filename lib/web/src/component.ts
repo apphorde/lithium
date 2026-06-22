@@ -1,5 +1,6 @@
 import { FF } from './feature-flags.js';
-import { createContext, createReadOnlyContext, importModuleFromSource, linkTreeToContext, linkTreeToContextAsync } from './internals.js';
+import { createContext, createReadOnlyContext, importModuleFromSource } from './internals.js';
+import { linkTreeToContext, linkTreeToContextAsync } from './rules.js';
 import type { DefineComponentOptions, MountOptions } from './types';
 
 const DEBUG = Symbol('#');
