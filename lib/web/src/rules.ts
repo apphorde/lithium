@@ -58,7 +58,7 @@ export function compileRules(node: Node, deferredContext: any) {
   }
 
   const deferred = [];
-  const nodeId = "n" + ~~(Math.random() * 99999);
+  const nodeId = "n" + deferredContext.id++;
 
   for (const attr of Array.from(node.attributes)) {
     const name = attr.name;
@@ -99,7 +99,7 @@ function bind(node: any, context: any, deferredContext: any) {
 }
 
 export function linkTreeToContextAsync(tree: Node) {
-  const deferredContext: any = {};
+  const deferredContext: any = { id: 0 };
   walkDomTree(tree, compileRules, deferredContext);
 
   return function (tree: Node, context: any) {
