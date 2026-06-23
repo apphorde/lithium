@@ -304,8 +304,8 @@ use({
       if (!isArray) return;
 
       const lastInsertedNode = forNodes.at(-1)?.nodes.at(-1) ?? node;
-      const length = value.length;
       const nodesToInsert = document.createDocumentFragment();
+      const length = value.length;
 
       for (let i = 0; i < length; i++) {
         if (forNodes[i]) continue;
@@ -326,9 +326,14 @@ use({
         nodesToInsert.append(dom);
       }
 
-      setTimeout(() => {
-        (node as any).parentNode.insertBefore(nodesToInsert, lastInsertedNode);
-      });
+      if (nodesToInsert.childNodes.length) {
+        setTimeout(() => {
+          (node as any).parentNode.insertBefore(
+            nodesToInsert,
+            lastInsertedNode,
+          );
+        });
+      }
     });
   },
 });
