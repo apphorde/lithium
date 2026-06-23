@@ -1,5 +1,5 @@
-import { compare } from './compare.js';
-import type { AnyFunction } from './types';
+import { compare } from "./compare.js";
+import type { AnyFunction } from "./types";
 
 export type Signal<T = any> = {
   value: T;
@@ -13,13 +13,19 @@ type SignalInternal<T = any> = Signal<T> & {
   update(value?: T): void;
 };
 const signalsStack: SignalInternal[] = [];
-const reactiveTag = Symbol('!');
-const unwrapTag = Symbol('[]');
-const refSymbol = Symbol('$');
-const dirtyTag = Symbol('%');
+const reactiveTag = Symbol("!");
+const unwrapTag = Symbol("[]");
+const refSymbol = Symbol("$");
+const dirtyTag = Symbol("%");
 
 function canBeObserved(object: any): boolean {
-  return object !== null && object !== undefined && typeof object === 'object' && !object[reactiveTag] && object instanceof Element === false;
+  return (
+    object !== null &&
+    object !== undefined &&
+    typeof object === "object" &&
+    !object[reactiveTag] &&
+    object instanceof Element === false
+  );
 }
 
 function reactive<T extends object>(object: T, effect: AnyFunction): T {
@@ -30,12 +36,12 @@ function reactive<T extends object>(object: T, effect: AnyFunction): T {
   const values = Object.entries(object);
 
   for (const [key, next] of values) {
-    if (typeof next === 'object' && next !== null) {
+    if (typeof next === "object" && next !== null) {
       (object as any)[key] = reactive(next, effect);
     }
   }
 
-  let dirty = false;
+  // let dirty = false;
 
   return new Proxy(object, {
     get(target: any, p) {
@@ -47,22 +53,27 @@ function reactive<T extends object>(object: T, effect: AnyFunction): T {
         return object;
       }
 
-      if (p === dirtyTag) {
-        return dirty;
-      }
+      // if (p === dirtyTag) {
+      //   return dirty;
+      // }
 
       return target[p];
     },
 
-    set(target: any, p, value) {
-      if (p === dirtyTag) {
-        return (dirty = true);
+    set(target: any, p, value, receiver) {
+      // if (p === dirtyTag) {
+      //   return (dirty = true);
+      // }
+
+      if (!compare(target[p], value)) {
+        Reflect.set(
+          target,
+          p,
+          canBeObserved(value) ? reactive(value, effect) : value,
+          receiver
+        );
+        effect();
       }
-
-      if (compare(target[p], value)) return true;
-
-      target[p] = canBeObserved(value) ? reactive(value, effect) : value;
-      effect();
 
       return true;
     },
@@ -94,22 +105,28 @@ function unwrap<T = any>(object: T): T {
 function ref<T>(initial?: T, isShallow?: boolean): Signal<T>;
 function ref<T = any>(initial: T | undefined, isShallow = false) {
   const reactiveEffect = () => {
-    const isArray = Array.isArray(o.internalValue);
-
-    if (isArray) {
-      o.internalValue[dirtyTag] = true;
+    // const isArray = Array.isArray(o.internalValue);
+    if (Array.isArray(o.internalValue)) {
+      o.internalValue = o.internalValue.slice();
     }
 
     notifyDependencies(o);
 
-    if (isArray) {
-      o.internalValue[dirtyTag] = false;
-    }
+    // if (isArray) {
+    //   o.internalValue[dirtyTag] = true;
+    // }
+
+    // if (isArray) {
+    //   o.internalValue[dirtyTag] = false;
+    // }
   };
 
   const o: SignalInternal = {
     [refSymbol]: true,
-    internalValue: !isShallow && canBeObserved(initial) ? reactive(initial as object, reactiveEffect) : initial,
+    internalValue:
+      !isShallow && canBeObserved(initial)
+        ? reactive(initial as object, reactiveEffect)
+        : initial,
     dependencies: new Set(),
     watchers: new Set(),
 
@@ -163,7 +180,7 @@ function computed<T = any>(fn: () => T): Signal<T> {
     },
 
     set value(_) {
-      throw new Error('Computed value cannot be set');
+      throw new Error("Computed value cannot be set");
     },
 
     update() {
@@ -238,4 +255,15 @@ function captureDependency(o: SignalInternal) {
   }
 }
 
-export { ref, computed, effect, watch, reactive, unwrap, isRef, isDirty, shallowRef, canBeObserved };
+export {
+  ref,
+  computed,
+  effect,
+  watch,
+  reactive,
+  unwrap,
+  isRef,
+  isDirty,
+  shallowRef,
+  canBeObserved,
+};

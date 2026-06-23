@@ -1,8 +1,8 @@
 import { FF } from './feature-flags.js';
-import { isDirty } from './reactivity.js';
+// import { isDirty } from './reactivity.js';
 
 export function compare(a: any, b: any) {
-  if (FF.compareEq) {
+  if (!FF.compare) {
     return a === b;
   }
 
@@ -18,9 +18,9 @@ export function compare(a: any, b: any) {
       return a === b;
     }
 
-    if (isDirty(a) || isDirty(b)) {
-      return false;
-    }
+    // if (isDirty(a) || isDirty(b)) {
+    //   return false;
+    // }
 
     if (Array.isArray(a) && Array.isArray(b)) {
       if (a.length !== b.length) {
