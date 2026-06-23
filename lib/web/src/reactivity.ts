@@ -225,8 +225,8 @@ function memoizedWatcher<T>(watcher: AnyFunction) {
   // ref() and computed() already skip watchers if
   // new and old values are the same
   return function (value: T) {
-    lastValue = value;
     watcher(value, lastValue);
+    lastValue = value;
   };
 }
 
