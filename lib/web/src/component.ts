@@ -80,7 +80,7 @@ export function mount(target: Element, options: MountOptions) {
   const readOnlyContext = createReadOnlyContext(mergedContext);
 
   if (FF.linker) {
-    (template as any).linker ||= linkTreeToContextAsync(dom);
+    (template as any).linker ||= linkTreeToContextAsync(template.content);
     const linker = (template as any).linker;
     linker(dom, readOnlyContext);
   } else {
