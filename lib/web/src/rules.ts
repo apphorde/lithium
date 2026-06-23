@@ -3,7 +3,7 @@ import {
   createReadOnlyContext,
   walkDomTree,
 } from "./internals.js";
-import { ref, computed, effect } from "./reactivity.js";
+import { ref, computed, effect, watch } from "./reactivity.js";
 import type { Signal } from "./reactivity";
 
 const isElement = (x: any): x is Element => x.nodeType === x.ELEMENT_NODE;
@@ -289,54 +289,58 @@ use({
           .map((s) => s.trim())
       : [left, "index"];
 
-    effect(createFunction(expression, context), (value: any) => {
-      const isArray = Array.isArray(value);
-      const itemsToRemove = forNodes.slice(!isArray ? 0 : value.length);
-
-      for (const next of itemsToRemove) {
-        for (const node of next.nodes) {
-          node.parentNode!.removeChild(node);
-        }
-      }
-
-      forNodes.length = isArray ? value.length : 0;
-
-      if (!isArray) return;
-
-      const lastInsertedNode = forNodes.at(-1)?.nodes.at(-1) ?? node;
-      const nodesToInsert = document.createDocumentFragment();
-      const length = value.length;
-
-      for (let i = 0; i < length; i++) {
-        if (forNodes[i]) continue;
-
-        const index = i;
-        const item = computed(() => value[index]);
-        const subContext = {
-          [key]: item,
-          [indexKey]: i,
-        };
-
-        const dom = (node as HTMLTemplateElement).content.cloneNode(true);
-        forNodes[i] = { item, index, nodes: Array.from(dom.childNodes) };
-        const reader = createReadOnlyContext(
-          Object.assign({}, context, subContext),
-        );
-        linkTreeToContext(dom, reader);
-        nodesToInsert.append(dom);
-      }
-
-      if (nodesToInsert.childNodes.length) {
-        setTimeout(() => {
-          (node as any).parentNode.insertBefore(
-            nodesToInsert,
-            lastInsertedNode,
-          );
-        });
-      }
-    });
+    const signal = computed(createFunction(expression, context));
+    watch(signal, () => updateForOfList(forNodes, node, key, indexKey, context, signal));
   },
 });
+
+function updateForOfList(forNodes: any[], node: Node, key: string, indexKey: string, context: any, signal: Signal) {
+  const value = signal.value;
+  const isArray = Array.isArray(value);
+  const itemsToRemove = forNodes.slice(!isArray ? 0 : value.length);
+
+  for (const next of itemsToRemove) {
+    for (const node of next.nodes) {
+      node.parentNode!.removeChild(node);
+    }
+  }
+
+  forNodes.length = isArray ? value.length : 0;
+
+  if (!isArray) return;
+
+  const lastInsertedNode = forNodes.at(-1)?.nodes.at(-1) ?? node;
+  const nodesToInsert = document.createDocumentFragment();
+  const length = value.length;
+
+  for (let i = 0; i < length; i++) {
+    if (forNodes[i]) continue;
+
+    const index = i;
+    const item = computed(() => signal.value[index]);
+    const subContext = {
+      [key]: item,
+      [indexKey]: i,
+    };
+
+    const dom = (node as HTMLTemplateElement).content.cloneNode(true);
+    forNodes[i] = { item, index, nodes: Array.from(dom.childNodes) };
+    const reader = createReadOnlyContext(
+      Object.assign({}, context, subContext),
+    );
+    linkTreeToContext(dom, reader);
+    nodesToInsert.append(dom);
+  }
+
+  if (nodesToInsert.childNodes.length) {
+    setTimeout(() => {
+      (node as any).parentNode.insertBefore(
+        nodesToInsert,
+        lastInsertedNode,
+      );
+    });
+  }
+}
 
 use({
   match(node, name) {
