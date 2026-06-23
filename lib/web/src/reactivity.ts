@@ -1,4 +1,3 @@
-import { FF } from './feature-flags.js';
 import { compare } from './compare.js';
 import type { AnyFunction } from './types';
 
@@ -20,7 +19,7 @@ const refSymbol = Symbol('$');
 const dirtyTag = Symbol('%');
 
 function canBeObserved(object: any): boolean {
-  return object !== null && object !== undefined && typeof object === 'object' && !object[reactiveTag];
+  return object !== null && object !== undefined && typeof object === 'object' && !object[reactiveTag] && object instanceof Element === false;
 }
 
 function reactive<T extends object>(object: T, effect: AnyFunction): T {
@@ -60,7 +59,6 @@ function reactive<T extends object>(object: T, effect: AnyFunction): T {
         return (dirty = true);
       }
 
-      if (FF.reactiveEq && target[p] === value) return true;
       if (compare(target[p], value)) return true;
 
       target[p] = canBeObserved(value) ? reactive(value, effect) : value;
@@ -95,10 +93,6 @@ function unwrap<T = any>(object: T): T {
 
 function ref<T>(initial?: T, isShallow?: boolean): Signal<T>;
 function ref<T = any>(initial: T | undefined, isShallow = false) {
-  const notify = () => {
-    notifyDependencies(o);
-  };
-
   const reactiveEffect = () => {
     const isArray = Array.isArray(o.internalValue);
 
@@ -106,7 +100,7 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
       o.internalValue[dirtyTag] = true;
     }
 
-    notify();
+    notifyDependencies(o);
 
     if (isArray) {
       o.internalValue[dirtyTag] = false;
@@ -129,7 +123,6 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
     },
 
     update(newValue?: T) {
-      if (FF.refEq && o.internalValue === newValue) return;
       if (compare(o.internalValue, newValue)) return;
 
       if (!isShallow && canBeObserved(newValue)) {
@@ -138,7 +131,7 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
 
       o.internalValue = newValue;
 
-      notify();
+      notifyDependencies(o);
     },
   };
 
@@ -176,7 +169,6 @@ function computed<T = any>(fn: () => T): Signal<T> {
     update() {
       const value = fn();
 
-      if (FF.computedEq && o.internalValue === value) return;
       if (compare(o.internalValue, value)) return;
 
       o.internalValue = value;
