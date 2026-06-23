@@ -74,15 +74,18 @@ export function defineComponent(options: DefineComponentOptions) {
 export function mount(target: Element, options: MountOptions) {
   const parentElement = target.shadowRoot || target;
   const { template, setup = Function } = options;
+
+  if (FF.linker && !(template as any).linker) {
+    (template as any).linker = linkTreeToContextAsync(template.content);
+  }
+
   const dom = template.content.cloneNode(true);
   const runtime = createContext(target, setup);
   const mergedContext = Object.assign({}, runtime.context, runtime.props, runtime.refs);
   const readOnlyContext = createReadOnlyContext(mergedContext);
 
   if (FF.linker) {
-    (template as any).linker ||= linkTreeToContextAsync(template.content);
-    const linker = (template as any).linker;
-    linker(dom, readOnlyContext);
+    (template as any).linker(dom, readOnlyContext);
   } else {
     linkTreeToContext(dom, readOnlyContext);
   }
