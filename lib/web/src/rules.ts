@@ -294,7 +294,7 @@ use({
   },
 });
 
-function updateForOfList(forNodes: any[], node: Node, key: string, indexKey: string, context: any, signal: Signal) {
+export function updateForOfList(forNodes: any[], node: Node, key: string, indexKey: string, context: any, signal: Signal) {
   const value = signal.value;
   const isArray = Array.isArray(value);
   const itemsToRemove = forNodes.slice(!isArray ? 0 : value.length);
