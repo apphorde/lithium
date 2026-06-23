@@ -16,7 +16,6 @@ const signalsStack: SignalInternal[] = [];
 const reactiveTag = Symbol("!");
 const unwrapTag = Symbol("[]");
 const refSymbol = Symbol("$");
-const dirtyTag = Symbol("%");
 
 function canBeObserved(object: any): boolean {
   return (
@@ -41,8 +40,6 @@ function reactive<T extends object>(object: T, effect: AnyFunction): T {
     }
   }
 
-  // let dirty = false;
-
   return new Proxy(object, {
     get(target: any, p) {
       if (p === reactiveTag) {
@@ -53,24 +50,16 @@ function reactive<T extends object>(object: T, effect: AnyFunction): T {
         return object;
       }
 
-      // if (p === dirtyTag) {
-      //   return dirty;
-      // }
-
       return target[p];
     },
 
     set(target: any, p, value, receiver) {
-      // if (p === dirtyTag) {
-      //   return (dirty = true);
-      // }
-
       if (!compare(target[p], value)) {
         Reflect.set(
           target,
           p,
           canBeObserved(value) ? reactive(value, effect) : value,
-          receiver
+          receiver,
         );
         effect();
       }
@@ -105,20 +94,11 @@ function unwrap<T = any>(object: T): T {
 function ref<T>(initial?: T, isShallow?: boolean): Signal<T>;
 function ref<T = any>(initial: T | undefined, isShallow = false) {
   const reactiveEffect = () => {
-    // const isArray = Array.isArray(o.internalValue);
     if (Array.isArray(o.internalValue)) {
       o.internalValue = o.internalValue.slice();
     }
 
     notifyDependencies(o);
-
-    // if (isArray) {
-    //   o.internalValue[dirtyTag] = true;
-    // }
-
-    // if (isArray) {
-    //   o.internalValue[dirtyTag] = false;
-    // }
   };
 
   const o: SignalInternal = {
@@ -131,7 +111,11 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
     watchers: new Set(),
 
     get value() {
-      captureDependency(o);
+      const d = signalsStack.at(-1);
+      if (d && d !== o) {
+        o.dependencies.add(d);
+      }
+
       return o.internalValue;
     },
 
@@ -155,18 +139,6 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
   return o as Signal<T>;
 }
 
-function isDirty(v: any): boolean {
-  return v && v[dirtyTag];
-}
-
-function shallowRef<T>(value?: T) {
-  return ref<T>(value, true);
-}
-
-function isRef(t: any): t is Signal {
-  return Boolean(t && t[refSymbol]);
-}
-
 function computed<T = any>(fn: () => T): Signal<T> {
   const o: SignalInternal<T> = {
     [refSymbol]: true,
@@ -175,7 +147,11 @@ function computed<T = any>(fn: () => T): Signal<T> {
     watchers: new Set(),
 
     get value() {
-      captureDependency(o);
+      const d = signalsStack.at(-1);
+      if (d && d !== o) {
+        o.dependencies.add(d);
+      }
+
       return o.internalValue;
     },
 
@@ -186,10 +162,10 @@ function computed<T = any>(fn: () => T): Signal<T> {
     update() {
       const value = fn();
 
-      if (compare(o.internalValue, value)) return;
-
-      o.internalValue = value;
-      notifyDependencies(o);
+      if (!compare(o.internalValue, value)) {
+        o.internalValue = value;
+        notifyDependencies(o);
+      }
     },
   };
 
@@ -204,6 +180,14 @@ function computed<T = any>(fn: () => T): Signal<T> {
   }
 
   return o as Signal<T>;
+}
+
+function shallowRef<T>(value?: T) {
+  return ref<T>(value, true);
+}
+
+function isRef(t: any): t is Signal {
+  return Boolean(t && t[refSymbol]);
 }
 
 function watch(target: Signal, fn: AnyFunction) {
@@ -222,13 +206,11 @@ function effect(fn: AnyFunction, effectFn: AnyFunction) {
 }
 
 function notifyDependencies(target: SignalInternal) {
+  const value = target.value;
+
   for (const dep of target.dependencies) {
     dep.update();
   }
-
-  if (!target.watchers.size) return;
-
-  const value = target.value;
 
   for (const watcher of target.watchers) {
     watcher(value);
@@ -247,14 +229,6 @@ function memoizedWatcher<T>(watcher: AnyFunction) {
   };
 }
 
-function captureDependency(o: SignalInternal) {
-  const d = signalsStack.at(-1);
-
-  if (d && d !== o) {
-    o.dependencies.add(d);
-  }
-}
-
 export {
   ref,
   computed,
@@ -263,7 +237,6 @@ export {
   reactive,
   unwrap,
   isRef,
-  isDirty,
   shallowRef,
   canBeObserved,
 };
