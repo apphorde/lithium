@@ -76,6 +76,7 @@ export function compileRules(node: Node, deferredContext: any) {
   if (deferred.length) {
     node.setAttribute("_id_", nodeId);
     deferredContext[nodeId] = deferred;
+    console.log(node, nodeId, deferred);
   }
 }
 
