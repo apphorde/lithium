@@ -206,6 +206,7 @@ export async function findApps() {
     template.parentNode!.insertBefore(app, template);
 
     mount(app, options);
+    template.remove();
   }
 }
 
