@@ -1,5 +1,5 @@
-import { compare } from "./compare.js";
-import type { AnyFunction } from "./types";
+import { compare } from './compare.js';
+import type { AnyFunction } from './types';
 
 export type Signal<T = any> = {
   value: T;
@@ -13,25 +13,21 @@ type SignalInternal<T = any> = Signal<T> & {
   update(value?: T): void;
 };
 const signalsStack: SignalInternal[] = [];
-const reactiveTag = Symbol("!");
-const unwrapTag = Symbol("[]");
-const refSymbol = Symbol("$");
+const reactiveTag = Symbol('!');
+const unwrapTag = Symbol('[]');
+const refSymbol = Symbol('$');
 
 function canBeObserved(object: any): boolean {
   return (
     object !== null &&
     object !== undefined &&
-    typeof object === "object" &&
+    typeof object === 'object' &&
     !object[reactiveTag] &&
     object instanceof Element === false
   );
 }
 
-function reactive<T extends object>(
-  object: T,
-  effect: AnyFunction,
-  notifier?: Signal,
-): T {
+function reactive<T extends object>(object: T, effect: AnyFunction, notifier?: SignalInternal): T {
   if (!canBeObserved(object)) {
     return object;
   }
@@ -39,7 +35,7 @@ function reactive<T extends object>(
   const values = Object.entries(object);
 
   for (const [key, next] of values) {
-    if (typeof next === "object" && next !== null) {
+    if (typeof next === 'object' && next !== null) {
       (object as any)[key] = reactive(next, effect);
     }
   }
@@ -54,19 +50,16 @@ function reactive<T extends object>(
         return object;
       }
 
-      if (notifier) capture(notifier);
+      if (notifier) {
+        capture(notifier);
+      }
 
       return target[p];
     },
 
     set(target: any, p, value, receiver) {
       if (!compare(target[p], value)) {
-        Reflect.set(
-          target,
-          p,
-          canBeObserved(value) ? reactive(value, effect) : value,
-          receiver,
-        );
+        Reflect.set(target, p, canBeObserved(value) ? reactive(value, effect) : value, receiver);
         effect();
       }
 
@@ -109,10 +102,7 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
 
   const o: SignalInternal = {
     [refSymbol]: true,
-    internalValue:
-      !isShallow && canBeObserved(initial)
-        ? reactive(initial as object, reactiveEffect, o)
-        : initial,
+    internalValue: undefined as T,
     dependencies: new Set(),
     watchers: new Set(),
 
@@ -138,6 +128,8 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
     },
   };
 
+  o.internalValue = !isShallow && canBeObserved(initial) ? reactive(initial as object, reactiveEffect, o) : initial;
+
   return o as Signal<T>;
 }
 
@@ -154,7 +146,7 @@ function computed<T = any>(fn: () => T): Signal<T> {
     },
 
     set value(_) {
-      throw new Error("Computed value cannot be set");
+      throw new Error('Computed value cannot be set');
     },
 
     update() {
@@ -215,7 +207,7 @@ function notifyDependencies(target: SignalInternal) {
   }
 }
 
-function capture(o: Signal) {
+function capture(o: SignalInternal) {
   const d = signalsStack.length && signalsStack.at(-1);
   if (d && d !== o) {
     o.dependencies.add(d);
@@ -225,7 +217,7 @@ function capture(o: Signal) {
 function memoizedWatcher<T>(watcher: AnyFunction) {
   let lastValue: T | undefined;
 
-  // NOTE: never compare values for watchers!
+  // NOTE: we never compare values for watchers!
   // ref() and computed() already skip watchers if
   // new and old values are the same
   return function (value: T) {
@@ -234,14 +226,4 @@ function memoizedWatcher<T>(watcher: AnyFunction) {
   };
 }
 
-export {
-  ref,
-  computed,
-  effect,
-  watch,
-  reactive,
-  unwrap,
-  isRef,
-  shallowRef,
-  canBeObserved,
-};
+export { ref, computed, effect, watch, reactive, unwrap, isRef, shallowRef, canBeObserved };
