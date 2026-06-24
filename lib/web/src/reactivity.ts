@@ -6,16 +6,18 @@ export type Signal<T = any> = {
 };
 
 type SignalInternal<T = any> = Signal<T> & {
-  [refSymbol]: true;
+  [refTag]: true;
+  [suspendedTag]: boolean;
   internalValue: T;
   dependencies: Set<WeakRef<SignalInternal>>;
   watchers: Set<AnyFunction>;
   update(value?: T): void;
 };
 const signalsStack: SignalInternal[] = [];
-const reactiveTag = Symbol('!');
+const reactiveTag = Symbol('#');
 const unwrapTag = Symbol('[]');
-const refSymbol = Symbol('$');
+const refTag = Symbol('$');
+const suspendedTag = Symbol('!');
 
 function canBeObserved(object: any): boolean {
   return (
@@ -100,7 +102,8 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
   };
 
   const o: SignalInternal = {
-    [refSymbol]: true,
+    [refTag]: true,
+    [suspendedTag]: false,
     internalValue: undefined as T,
     dependencies: new Set<WeakRef<SignalInternal>>(),
     watchers: new Set(),
@@ -111,6 +114,7 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
     },
 
     set value(newValue) {
+      if (o[suspendedTag]) return;
       o.update(newValue);
     },
 
@@ -134,7 +138,8 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
 
 function computed<T = any>(fn: () => T): Signal<T> {
   const o: SignalInternal<T> = {
-    [refSymbol]: true,
+    [refTag]: true,
+    [suspendedTag]: false,
     internalValue: undefined as T,
     dependencies: new Set<WeakRef<SignalInternal>>(),
     watchers: new Set(),
@@ -149,6 +154,7 @@ function computed<T = any>(fn: () => T): Signal<T> {
     },
 
     update() {
+      if (o[suspendedTag]) return;
       const value = fn();
 
       if (!compare(o.internalValue, value)) {
@@ -177,7 +183,16 @@ function shallowRef<T>(value?: T) {
 }
 
 function isRef(t: any): t is Signal {
-  return Boolean(t && t[refSymbol]);
+  return Boolean(t && t[refTag]);
+}
+
+function suspend(s: Signal) {
+  (s as SignalInternal)[suspendedTag] = true;
+}
+
+function resume(s: Signal) {
+  (s as SignalInternal)[suspendedTag] = false;
+  (s as SignalInternal).update(s.value);
 }
 
 function watch(target: Signal, fn: AnyFunction) {
@@ -231,4 +246,4 @@ function memoizedWatcher<T>(watcher: AnyFunction) {
   };
 }
 
-export { ref, computed, effect, watch, reactive, unwrap, isRef, shallowRef, canBeObserved };
+export { ref, computed, effect, watch, reactive, unwrap, isRef, shallowRef, canBeObserved, suspend, resume };

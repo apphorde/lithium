@@ -3,7 +3,7 @@ import {
   createReadOnlyContext,
   walkDomTree,
 } from "./internals.js";
-import { ref, computed, effect, watch } from "./reactivity.js";
+import { ref, computed, effect, watch, suspend } from "./reactivity.js";
 import type { Signal } from "./reactivity";
 import { FF } from './feature-flags.js';
 
@@ -292,16 +292,16 @@ use({
 
     const signal = computed(createFunction(expression, context));
     (node as any).signal = signal;
-    watch(signal, () => updateForOfList(forNodes, node, key, indexKey, context, signal));
+    watch(signal, (v) => updateForOfList(forNodes, node, key, indexKey, context, v));
   },
 });
 
-export function updateForOfList(forNodes: any[], node: Node, key: string, indexKey: string, context: any, signal: Signal) {
-  const value = signal.value;
+export function updateForOfList(forNodes: any[], node: Node, key: string, indexKey: string, context: any, value: any) {
   const isArray = Array.isArray(value);
   const itemsToRemove = forNodes.slice(!isArray ? 0 : value.length);
 
   for (const next of itemsToRemove) {
+    suspend(next.item);
     for (const node of next.nodes) {
       node.parentNode!.removeChild(node);
     }
@@ -316,10 +316,13 @@ export function updateForOfList(forNodes: any[], node: Node, key: string, indexK
   const length = value.length;
 
   for (let i = 0; i < length; i++) {
-    if (forNodes[i]) continue;
+    if (forNodes[i]) {
+      forNodes[i].item.value = value[i];
+      continue;
+    }
 
     const index = i;
-    const item = computed(() => signal.value[index]);
+    const item = ref(value[index]);
     const subContext = {
       [key]: item,
       [indexKey]: i,
