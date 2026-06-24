@@ -7,6 +7,9 @@
       "default": "./index.js"
     }
   },
+  "repository": {
+    "url": "https://github.com/apphorde/lithium"
+  },
   "dependencies": {
     "@li3/web": "latest"
   }

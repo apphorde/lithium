@@ -92,9 +92,9 @@ function unwrap<T = any>(object: T): T {
 
 function ref<T>(initial?: T, isShallow?: boolean): Signal<T>;
 function ref<T = any>(initial: T | undefined, isShallow = false) {
-  const reactiveEffect = () => {
-    if (Array.isArray(o.internalValue)) {
-      o.internalValue = o.internalValue.slice();
+  function reactiveEffect() {
+    if (!isShallow && Array.isArray(o.internalValue)) {
+      o.internalValue = reactive(o.internalValue, reactiveEffect, o) as T;
     }
 
     notifyDependencies(o);
