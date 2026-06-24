@@ -20,12 +20,7 @@ const refTag = Symbol('$');
 const suspendedTag = Symbol('!');
 
 function canBeObserved(object: any): boolean {
-  return (
-    object !== null &&
-    object !== undefined &&
-    typeof object === 'object' &&
-    !object[reactiveTag]
-  );
+  return object !== null && object !== undefined && typeof object === 'object' && !object[reactiveTag];
 }
 
 function reactive<T extends object>(object: T, effect: AnyFunction, notifier?: SignalInternal): T {
@@ -99,7 +94,7 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
     }
 
     notifyDependencies(o);
-  };
+  }
 
   const o: SignalInternal = {
     [refTag]: true,
@@ -155,7 +150,11 @@ function computed<T = any>(fn: () => T): Signal<T> {
 
     update() {
       if (o[suspendedTag]) return;
-      const value = fn();
+      let value = null as T;
+
+      try {
+        value = fn();
+      } catch {}
 
       if (!compare(o.internalValue, value)) {
         o.internalValue = value;

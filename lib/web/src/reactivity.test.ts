@@ -171,4 +171,33 @@ describe('reactivity', () => {
       unsub();
     });
   });
+
+  describe('reactivity with nested objects', () => {
+    it('should observe changes in nested objects', () => {
+      const context = ref({
+        items: [
+          { name: '', address: { street: '1st Ave' } }
+        ]
+      });
+      const output = { street: '', name: '' };
+      const items = computed(() => context.value.items[0]);
+      effect(() => items.value.name, (next) => output.name = next);
+
+      context.value.items[0].name = 'John';
+      expect(output.name).toBe('John');
+
+      effect(() => items.value.address.street, (next) => output.street = next);
+      context.value.items[0].address.street = '2nd Ave';
+      expect(output.street).toBe('2nd Ave');
+
+      context.value.items = [];
+
+      expect(output.name).toBe(null);
+      expect(output.street).toBe(null);
+
+      context.value.items.push({ name: 'Jane', address: { street: '3rd Ave' } });
+      expect(output.name).toBe('Jane');
+      expect(output.street).toBe('3rd Ave');
+    });
+  });
 });
