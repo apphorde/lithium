@@ -76,12 +76,9 @@ importers:
 
   lib/store:
     dependencies:
-      '@li3/reactive':
+      '@li3/web':
         specifier: latest
-        version: 0.0.23
-      '@li3/runtime':
-        specifier: latest
-        version: 0.0.19
+        version: 0.2.21
 
   lib/use:
     dependencies:
@@ -919,20 +916,17 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@li3/dom@0.0.3':
-    resolution: {integrity: sha512-dRPqKKkQMh4Ohj7Omd+zRwrrpIy0of2Ce1q1ATE9/REth9wQihhgBQcJu2HaGDn0DF7sINofUV3GCAnPDteKkQ==}
-
   '@li3/html-parser@0.0.7':
     resolution: {integrity: sha512-JqHKTdnwO88nEmGKHEjaIcHjA6xIJxQIfLpvYGgclpJbfQUacKwQPRILQKQPNpM3XBfSoUyfyPBBH7NrbE+VCw==}
 
   '@li3/reactive@0.0.23':
     resolution: {integrity: sha512-LXpKjWZ0JcVyDaaAGG8D0biMvIawEjeWCYjpMqfZHEa07N6cfZirVxNepDRAV8u0k6MlfBZKaCcTO2Te4FaKIw==}
 
-  '@li3/runtime@0.0.19':
-    resolution: {integrity: sha512-p7vMI3vvHtTDnfVoBGRn8kRNUNS0fVWSYvjkIG9vnEIFcWwZuihRKN2+AuWZDom/ljYgqvwaKXLQ+4U+Rk5L5A==}
-
   '@li3/sfc@0.0.4':
     resolution: {integrity: sha512-OeHyhEVbpqFgxON3Uk33vD5TeIzm3KWZKI8tOR8aZ/8nAIV1dV704nmNdhyG/EgK/k7wjLX2c/y3v4er4hQq7Q==}
+
+  '@li3/web@0.2.21':
+    resolution: {integrity: sha512-6mdIwVQlIlt31e2X0TXgqBgX6y0LbT6B6qY+WXWtKlJ7amnj48/P2Dq01MQwNdTxtqdL5rQnv56DN6DJpPBXGQ==}
 
   '@napi-rs/wasm-runtime@0.2.4':
     resolution: {integrity: sha512-9zESzOO5aDByvhIAsOy9TbpZ0Ur2AJbUI7UT73kcUTS2mxAMHOBaa1st/jAymNoCtvrit99kkzT1FZuXVcgfIQ==}
@@ -1433,6 +1427,11 @@ packages:
 
   acorn@8.16.0:
     resolution: {integrity: sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
+
+  acorn@8.17.0:
+    resolution: {integrity: sha512-xRQbDb9BnwDafYNn6Vwl839DYVjqXYb1XVGtWAZ1kcDc6iwAL4hg3B1dZlRiuENFeO2H53gFG3in621AdERVAg==}
     engines: {node: '>=0.4.0'}
     hasBin: true
 
@@ -3550,21 +3549,16 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@li3/dom@0.0.3': {}
-
   '@li3/html-parser@0.0.7': {}
 
   '@li3/reactive@0.0.23': {}
 
-  '@li3/runtime@0.0.19':
-    dependencies:
-      '@li3/dom': 0.0.3
-      '@li3/reactive': 0.0.23
-
   '@li3/sfc@0.0.4':
     dependencies:
       '@li3/html-parser': 0.0.7
-      acorn: 8.16.0
+      acorn: 8.17.0
+
+  '@li3/web@0.2.21': {}
 
   '@napi-rs/wasm-runtime@0.2.4':
     dependencies:
@@ -4037,6 +4031,8 @@ snapshots:
       argparse: 2.0.1
 
   acorn@8.16.0: {}
+
+  acorn@8.17.0: {}
 
   address@2.0.3: {}
 
