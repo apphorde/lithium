@@ -22,8 +22,7 @@ function canBeObserved(object: any): boolean {
     object !== null &&
     object !== undefined &&
     typeof object === 'object' &&
-    !object[reactiveTag] &&
-    object instanceof Element === false
+    !object[reactiveTag]
   );
 }
 
@@ -59,7 +58,7 @@ function reactive<T extends object>(object: T, effect: AnyFunction, notifier?: S
 
     set(target: any, p, value, receiver) {
       if (!compare(target[p], value)) {
-        Reflect.set(target, p, canBeObserved(value) ? reactive(value, effect, notifier) : value, receiver);
+        Reflect.set(target, p, reactive(value, effect, notifier), receiver);
         effect();
       }
 
@@ -118,7 +117,7 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
     update(newValue?: T) {
       if (compare(o.internalValue, newValue)) return;
 
-      if (!isShallow && canBeObserved(newValue)) {
+      if (!isShallow) {
         newValue = reactive(newValue as object, reactiveEffect, o) as T;
       }
 
@@ -128,7 +127,7 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
     },
   };
 
-  o.internalValue = !isShallow && canBeObserved(initial) ? reactive(initial as object, reactiveEffect, o) : initial;
+  o.internalValue = !isShallow ? reactive(initial as object, reactiveEffect, o) : initial;
 
   return o as Signal<T>;
 }
