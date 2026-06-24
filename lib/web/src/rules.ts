@@ -288,17 +288,15 @@ use({
           .slice(1, -1)
           .split(",")
           .map((s) => s.trim())
-      : [left, "index"];
+      : [left, ""];
 
-    const signal = computed(createFunction(expression, context));
-    (node as any).signal = signal;
+    const signal = computed(createFunction(`Array.from(${expression} || [])`, context));
     watch(signal, (v) => updateForOfList(forNodes, node, key, indexKey, context, v));
   },
 });
 
-export function updateForOfList(forNodes: any[], node: Node, key: string, indexKey: string, context: any, value: any) {
-  const isArray = Array.isArray(value);
-  const newLength = !isArray ? 0 : value.length;
+function updateForOfList(forNodes: any[], node: Node, key: string, indexKey: string, context: any, value: any) {
+  const newLength = value.length;
   const itemsToRemove = forNodes.slice(newLength);
 
   for (const next of itemsToRemove) {
@@ -310,7 +308,7 @@ export function updateForOfList(forNodes: any[], node: Node, key: string, indexK
 
   forNodes.length = newLength;
 
-  if (!isArray) return;
+  if (!newLength) return;
 
   const lastInsertedNode = forNodes.at(-1)?.nodes.at(-1) ?? node;
   const nodesToInsert = document.createDocumentFragment();
@@ -323,10 +321,11 @@ export function updateForOfList(forNodes: any[], node: Node, key: string, indexK
 
     const index = i;
     const item = ref(value[index]);
-    const subContext = {
-      [key]: item,
-      [indexKey]: i,
-    };
+    const subContext: any = { [key]: item };
+
+    if (indexKey) {
+      subContext[indexKey] = i;
+    }
 
     const dom = (node as HTMLTemplateElement).content.cloneNode(true);
     forNodes[i] = { item, index, nodes: Array.from(dom.childNodes) };
