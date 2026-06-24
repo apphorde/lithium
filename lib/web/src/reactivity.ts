@@ -8,7 +8,7 @@ export type Signal<T = any> = {
 type SignalInternal<T = any> = Signal<T> & {
   [refSymbol]: true;
   internalValue: T;
-  dependencies: Set<SignalInternal>;
+  dependencies: Set<WeakRef<SignalInternal>>;
   watchers: Set<AnyFunction>;
   update(value?: T): void;
 };
@@ -102,7 +102,7 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
   const o: SignalInternal = {
     [refSymbol]: true,
     internalValue: undefined as T,
-    dependencies: new Set(),
+    dependencies: new Set<WeakRef<SignalInternal>>(),
     watchers: new Set(),
 
     get value() {
@@ -136,7 +136,7 @@ function computed<T = any>(fn: () => T): Signal<T> {
   const o: SignalInternal<T> = {
     [refSymbol]: true,
     internalValue: undefined as T,
-    dependencies: new Set(),
+    dependencies: new Set<WeakRef<SignalInternal>>(),
     watchers: new Set(),
 
     get value() {
@@ -199,7 +199,12 @@ function notifyDependencies(target: SignalInternal) {
   const value = target.value;
 
   for (const dep of target.dependencies) {
-    dep.update();
+    const depRef = dep.deref();
+    if (depRef) {
+      depRef.update();
+    } else {
+      target.dependencies.delete(dep);
+    }
   }
 
   for (const watcher of target.watchers) {
@@ -210,7 +215,7 @@ function notifyDependencies(target: SignalInternal) {
 function capture(o: SignalInternal) {
   const d = signalsStack.length && signalsStack.at(-1);
   if (d && d !== o) {
-    o.dependencies.add(d);
+    o.dependencies.add(new WeakRef(d));
   }
 }
 
