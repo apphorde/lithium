@@ -5,6 +5,7 @@ import {
 } from "./internals.js";
 import { ref, computed, effect, watch } from "./reactivity.js";
 import type { Signal } from "./reactivity";
+import { FF } from './feature-flags.js';
 
 const isElement = (x: any): x is Element => x.nodeType === x.ELEMENT_NODE;
 const isText = (x: any): x is Text => x.nodeType === x.TEXT_NODE;
@@ -33,7 +34,7 @@ export function applyElementRules(node: Element, context: any) {
     for (const rule of rules) {
       if (rule.match(node, name, value)) {
         rule.exec(node, name, value, context);
-        node.removeAttribute(name);
+        FF.debug || node.removeAttribute(name);
         break;
       }
     }
