@@ -1,5 +1,5 @@
 import { describe, it, mock } from "node:test";
-import { createStore } from "./index.ns";
+import { createStore } from "./index.js";
 import assert from "node:assert";
 
 describe("store", () => {
