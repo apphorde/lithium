@@ -55,7 +55,8 @@ export function createFunction(
   ).bind(context);
 }
 
-export function createReadOnlyContext(context: any) {
+export function createReadOnlyContext(context: any, keys?: string[]) {
+  keys ||= Object.keys(context);
   return new Proxy(context, {
     get(target, key) {
       if (target[key] !== undefined) {
@@ -74,6 +75,10 @@ export function createReadOnlyContext(context: any) {
       }
 
       throw new Error("View contexts are read-only");
+    },
+
+    ownKeys() {
+      return keys;
     },
   });
 }

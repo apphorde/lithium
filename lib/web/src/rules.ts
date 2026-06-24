@@ -1,10 +1,6 @@
-import {
-  createFunction,
-  createReadOnlyContext,
-  walkDomTree,
-} from "./internals.js";
-import { ref, computed, effect, watch, suspend } from "./reactivity.js";
-import type { Signal } from "./reactivity";
+import { createFunction, createReadOnlyContext, walkDomTree } from './internals.js';
+import { ref, computed, effect, watch, suspend } from './reactivity.js';
+import type { Signal } from './reactivity';
 import { FF } from './feature-flags.js';
 
 const isElement = (x: any): x is Element => x.nodeType === x.ELEMENT_NODE;
@@ -13,15 +9,9 @@ const isText = (x: any): x is Text => x.nodeType === x.TEXT_NODE;
 export function applyTextRules(node: Text, context: any) {
   const template = node.textContent.trim();
 
-  if (!template || !template.includes("{{")) return;
+  if (!template || !template.includes('{{')) return;
 
-  const source =
-    "`" +
-    template.replace(
-      /{{(.*?)}}/g,
-      (_: any, exp: string) => "${" + exp.trim() + "}",
-    ) +
-    "`";
+  const source = '`' + template.replace(/{{(.*?)}}/g, (_: any, exp: string) => '${' + exp.trim() + '}') + '`';
 
   effect(createFunction(source, context), (v: any) => setText(node, v));
 }
@@ -59,7 +49,7 @@ export function compileRules(node: Node, deferredContext: any) {
   }
 
   const deferred = [];
-  const nodeId = "n" + deferredContext.id++;
+  const nodeId = 'n' + deferredContext.id++;
 
   for (const attr of Array.from(node.attributes)) {
     const name = attr.name;
@@ -75,7 +65,7 @@ export function compileRules(node: Node, deferredContext: any) {
   }
 
   if (deferred.length) {
-    node.setAttribute("_", nodeId);
+    node.setAttribute('_', nodeId);
     deferredContext[nodeId] = deferred;
   }
 }
@@ -87,7 +77,7 @@ function bind(node: any, context: any, deferredContext: any) {
   }
 
   if (isElement(node)) {
-    const id = node.getAttribute("_") as string;
+    const id = node.getAttribute('_') as string;
     const rules = deferredContext[id];
 
     if (!rules) return;
@@ -113,37 +103,30 @@ export function linkTreeToContext(tree: Node, context: any) {
 }
 
 const mappedProperties: Record<string, string> = {
-  innerhtml: "innerHTML",
-  baseuri: "baseURI",
-  class: "className",
+  innerhtml: 'innerHTML',
+  baseuri: 'baseURI',
+  class: 'className',
 };
 
 function setClassName(el: Element, classNames: string, value: any): void {
-  for (const cls of classNames.split(".").filter(Boolean)) {
+  for (const cls of classNames.split('.').filter(Boolean)) {
     el.classList.toggle(cls, value);
   }
 }
 
 function setStyle(el: any, key: string, value: any): void {
-  const toCamelCase = key.replace(/-([a-z])/g, (_: any, letter: string) =>
-    letter.toUpperCase(),
-  );
+  const toCamelCase = key.replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase());
   el.style[toCamelCase] = value;
 }
 
 function setText(el: Text, text: any): void {
-  el.textContent = String(text !== undefined ? text : "");
+  el.textContent = String(text !== undefined ? text : '');
 }
 
-function setProperty(
-  node: any,
-  key: string,
-  value: any,
-  modifiers: string[],
-): void {
+function setProperty(node: any, key: string, value: any, modifiers: string[]): void {
   const mappedKey = mappedProperties[key] || key;
 
-  if (modifiers.includes("bool")) {
+  if (modifiers.includes('bool')) {
     node.toggleAttribute(mappedKey, Boolean(value));
   } else {
     node[mappedKey] = value;
@@ -156,7 +139,7 @@ function setAttribute(el: Element, attribute: string, value: boolean): void {
     return;
   }
 
-  if (typeof value === "boolean" && value === false) {
+  if (typeof value === 'boolean' && value === false) {
     el.removeAttribute(attribute);
     return;
   }
@@ -177,7 +160,7 @@ export function use(rule: Rule) {
 
 use({
   match(_, name) {
-    return name === "ref";
+    return name === 'ref';
   },
   exec(node: any, _name: string, value: string, context: any) {
     const $ = context[value] || (context[value] = ref(null));
@@ -187,11 +170,11 @@ use({
 
 use({
   match(_, name) {
-    return name.startsWith("on-");
+    return name.startsWith('on-');
   },
   exec(node, name, value, context) {
     const key = name.slice(3);
-    const [event, ...tags] = key.split(".");
+    const [event, ...tags] = key.split('.');
     const modifiers: any = {
       // Safari's default is true
       passive: false,
@@ -201,7 +184,7 @@ use({
       modifiers[tag] = true;
     }
 
-    const fn = createFunction(value, context, ["$event"]);
+    const fn = createFunction(value, context, ['$event']);
     node.addEventListener(event, (e: Event) => {
       if (modifiers.stop) e.stopPropagation();
       if (modifiers.prevent) e.preventDefault();
@@ -213,32 +196,30 @@ use({
 
 use({
   match(_, name) {
-    return name.startsWith("attr-");
+    return name.startsWith('attr-');
   },
   exec(node, name, source, context) {
     const key = name.slice(5);
-    effect(createFunction(source, context), (v: any) =>
-      setAttribute(node, key, v),
-    );
+    effect(createFunction(source, context), (v: any) => setAttribute(node, key, v));
   },
 });
 
 use({
   match(_, name) {
-    return name.startsWith("bind-");
+    return name.startsWith('bind-');
   },
   exec(node, name, source, context) {
     const key = name.slice(5);
-    const [property, ...modifiers] = key.split(".");
+    const [property, ...modifiers] = key.split('.');
     const fn = createFunction(source, context);
-    const isObject = source.startsWith("{");
-    if (key === "class" && isObject) {
+    const isObject = source.startsWith('{');
+    if (key === 'class' && isObject) {
       effect(fn, (map) => {
         for (const [classNames, value] of Object.entries(map)) {
           setClassName(node, classNames, value);
         }
       });
-    } else if (key === "style" && isObject) {
+    } else if (key === 'style' && isObject) {
       effect(fn, (map) => {
         for (const [property, value] of Object.entries(map)) {
           setStyle(node, property, value);
@@ -252,43 +233,39 @@ use({
 
 use({
   match(_, name) {
-    return name.startsWith("class-");
+    return name.startsWith('class-');
   },
   exec(node, name, source, context) {
     const key = name.slice(6);
 
-    effect(createFunction(source, context), (value: any) =>
-      setClassName(node, key, value),
-    );
+    effect(createFunction(source, context), (value: any) => setClassName(node, key, value));
   },
 });
 
 use({
   match(_, name) {
-    return name.startsWith("style-");
+    return name.startsWith('style-');
   },
   exec(node, name, source, context) {
     const key = name.slice(6);
 
-    effect(createFunction(source, context), (value: any) =>
-      setStyle(node, key, value),
-    );
+    effect(createFunction(source, context), (value: any) => setStyle(node, key, value));
   },
 });
 
 use({
   match(node, name) {
-    return node.nodeName === "TEMPLATE" && name === "for";
+    return node.nodeName === 'TEMPLATE' && name === 'for';
   },
   exec(node, _name, source, context) {
     const forNodes: { nodes: Node[]; index: number; item: Signal }[] = [];
-    const [left, expression] = source.split("of").map((s) => s.trim());
-    const [key, indexKey] = left.includes("[")
+    const [left, expression] = source.split('of').map((s) => s.trim());
+    const [key, indexKey] = left.includes('[')
       ? left
           .slice(1, -1)
-          .split(",")
+          .split(',')
           .map((s) => s.trim())
-      : [left, ""];
+      : [left, ''];
 
     const signal = computed(createFunction(`Array.from(${expression} || [])`, context));
     watch(signal, (v) => updateForOfList(forNodes, node, key, indexKey, context, v));
@@ -321,37 +298,35 @@ function updateForOfList(forNodes: any[], node: Node, key: string, indexKey: str
 
     const index = i;
     const item = ref(value[index]);
-    const subContext: any = { [key]: item };
+    const subContext = Object.create(context);
+    const keys = Object.keys(context).concat(key);
+    subContext[key] = item;
 
     if (indexKey) {
       subContext[indexKey] = i;
+      keys.push(indexKey);
     }
 
     const dom = (node as HTMLTemplateElement).content.cloneNode(true);
     forNodes[i] = { item, index, nodes: Array.from(dom.childNodes) };
-    const reader = createReadOnlyContext(
-      Object.assign({}, context, subContext),
-    );
+    const reader = createReadOnlyContext(subContext, keys);
     linkTreeToContext(dom, reader);
     nodesToInsert.append(dom);
   }
 
   if (nodesToInsert.childNodes.length) {
     setTimeout(() => {
-      (node as any).parentNode.insertBefore(
-        nodesToInsert,
-        lastInsertedNode,
-      );
+      (node as any).parentNode.insertBefore(nodesToInsert, lastInsertedNode);
     });
   }
 }
 
 use({
   match(node, name) {
-    return node.nodeName === "TEMPLATE" && name === "if";
+    return node.nodeName === 'TEMPLATE' && name === 'if';
   },
   exec(node, _name, value, context) {
-    const source = "Boolean(" + value + ")";
+    const source = 'Boolean(' + value + ')';
     const ifNodes: any[] = [];
     let lastValue: any;
 
