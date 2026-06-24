@@ -290,26 +290,22 @@ function updateForOfList(forNodes: any[], node: Node, key: string, indexKey: str
   const lastInsertedNode = forNodes.at(-1)?.nodes.at(-1) ?? node;
   const nodesToInsert = document.createDocumentFragment();
 
-  for (let i = 0; i < newLength; i++) {
-    if (forNodes[i]) {
-      forNodes[i].item.value = value[i];
+  for (let index = 0; index < newLength; index++) {
+    if (forNodes[index]) {
+      forNodes[index].item.value = value[index];
       continue;
     }
 
-    const index = i;
     const item = ref(value[index]);
-    const subContext = Object.create(context);
-    const keys = Object.keys(context).concat(key);
-    subContext[key] = item;
+    const subContext: any = { [key]: item };
 
     if (indexKey) {
-      subContext[indexKey] = i;
-      keys.push(indexKey);
+      subContext[indexKey] = ref(index);
     }
 
     const dom = (node as HTMLTemplateElement).content.cloneNode(true);
-    forNodes[i] = { item, index, nodes: Array.from(dom.childNodes) };
-    const reader = createReadOnlyContext(subContext, keys);
+    forNodes[index] = { item, index: index, nodes: Array.from(dom.childNodes) };
+    const reader = createReadOnlyContext(Object.assign({}, context, subContext));
     linkTreeToContext(dom, reader);
     nodesToInsert.append(dom);
   }
