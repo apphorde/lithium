@@ -298,7 +298,8 @@ use({
 
 export function updateForOfList(forNodes: any[], node: Node, key: string, indexKey: string, context: any, value: any) {
   const isArray = Array.isArray(value);
-  const itemsToRemove = forNodes.slice(!isArray ? 0 : value.length);
+  const newLength = !isArray ? 0 : value.length;
+  const itemsToRemove = forNodes.slice(newLength);
 
   for (const next of itemsToRemove) {
     suspend(next.item);
@@ -307,15 +308,14 @@ export function updateForOfList(forNodes: any[], node: Node, key: string, indexK
     }
   }
 
-  forNodes.length = isArray ? value.length : 0;
+  forNodes.length = newLength;
 
   if (!isArray) return;
 
   const lastInsertedNode = forNodes.at(-1)?.nodes.at(-1) ?? node;
   const nodesToInsert = document.createDocumentFragment();
-  const length = value.length;
 
-  for (let i = 0; i < length; i++) {
+  for (let i = 0; i < newLength; i++) {
     if (forNodes[i]) {
       forNodes[i].item.value = value[i];
       continue;
