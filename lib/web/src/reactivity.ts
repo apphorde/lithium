@@ -36,7 +36,7 @@ function reactive<T extends object>(object: T, effect: AnyFunction, notifier?: S
 
   for (const [key, next] of values) {
     if (typeof next === 'object' && next !== null) {
-      (object as any)[key] = reactive(next, effect);
+      (object as any)[key] = reactive(next, effect, notifier);
     }
   }
 
@@ -59,7 +59,7 @@ function reactive<T extends object>(object: T, effect: AnyFunction, notifier?: S
 
     set(target: any, p, value, receiver) {
       if (!compare(target[p], value)) {
-        Reflect.set(target, p, canBeObserved(value) ? reactive(value, effect) : value, receiver);
+        Reflect.set(target, p, canBeObserved(value) ? reactive(value, effect, notifier) : value, receiver);
         effect();
       }
 
