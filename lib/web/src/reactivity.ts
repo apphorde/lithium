@@ -1,5 +1,9 @@
 import { compare } from './compare.js';
+import { FF } from './feature-flags.js';
 import type { AnyFunction } from './types';
+
+const refList = new Set();
+(window as any)['refList'] = refList;
 
 export type Signal<T = any> = {
   value: T;
@@ -128,6 +132,8 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
 
   o.internalValue = !isShallow ? reactive(initial as object, reactiveEffect, o) : initial;
 
+  if (FF.debug) refList.add(new WeakRef(o));
+
   return o as Signal<T>;
 }
 
@@ -174,6 +180,8 @@ function computed<T = any>(fn: () => T): Signal<T> {
   }
 
   (o as any).fn = fn;
+  if (FF.debug) refList.add(new WeakRef(o));
+
   return o as Signal<T>;
 }
 
