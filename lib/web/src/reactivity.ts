@@ -168,6 +168,7 @@ function computed<T = any>(fn: () => T): Signal<T> {
     signalsStack.pop();
   }
 
+  (o as any).fn = fn;
   return o as Signal<T>;
 }
 

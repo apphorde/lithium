@@ -290,6 +290,7 @@ use({
       : [left, "index"];
 
     const signal = computed(createFunction(expression, context));
+    (node as any).signal = signal;
     watch(signal, () => updateForOfList(forNodes, node, key, indexKey, context, signal));
   },
 });
