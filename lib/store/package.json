@@ -1,14 +1,13 @@
 {
   "name": "@li3/store",
-  "version": "0.1.76",
+  "version": "0.2.0",
   "exports": {
     ".": {
-      "default": "./index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "default": "./index.js"
     }
   },
   "dependencies": {
-    "@li3/reactive": "latest",
-    "@li3/runtime": "latest"
+    "@li3/web": "latest"
   }
 }

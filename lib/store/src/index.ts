@@ -1,110 +1,73 @@
-import { signal, effect, type Effect } from "@li3/reactive";
-import { getCurrentContext } from "@li3/runtime";
+import { computed } from "@li3/web";
 
-type Action<Args, T = any> = (state: T, ...args: Args[]) => void | Promise<void> | Promise<T> | T;
-type ActionParameters<T> = T extends (state: any, ...args: infer P) => any ? P : never;
+const stores = new Map();
+const stateRef = Symbol("#");
 
-export function createStore<State, Payload extends any, Actions extends Record<string, Action<Payload, State>>>(
-  initialState: State,
-  actions: Actions,
-) {
-  let dev;
-  const events = new EventTarget();
-  const state = signal(initialState);
-  const transaction = { active: false, state: null as State | null };
-  const getState = () => (transaction.active ? transaction.state : state.value);
-  const setState = (s: State) => (transaction.active ? (transaction.state = s) : (state.value = s));
+export function defineStore(name: string, factory: CallableFunction) {
+  return function () {
+    if (stores.has(name)) {
+      return stores.get(name);
+    }
 
-  if ((globalThis as any).__REDUX_DEVTOOLS_EXTENSION__) {
-    dev = (globalThis as any).__REDUX_DEVTOOLS_EXTENSION__.connect();
-    dev.init(state.value);
-  }
+    const store = factory();
+    const refs = [];
+    const view = {};
 
-  async function dispatch<K extends keyof Actions>(action: K, ...args: ActionParameters<Actions[K]>): Promise<void> {
-    try {
-      const current = getState();
-      const response = await actions[action](current, ...args);
+    Object.defineProperty(view, "toJSON", {
+      enumerable: false,
+      configurable: false,
+      value: () => Object.fromEntries(refs.map((f) => [f, view[f]])),
+    });
 
-      if (response) {
-        setState({ ...response });
-        dev?.send(action, state.value);
+    Object.defineProperty(view, stateRef, {
+      enumerable: false,
+      configurable: false,
+      get() {
+        return view;
       }
-    } catch (error) {
-      if (!transaction.active) {
-        events.dispatchEvent(new CustomEvent("error", { detail: String(error) }));
+    });
+
+    const error = new Error("Store values are read-only");
+
+    for (const [name, value] of Object.entries(store)) {
+      if (typeof value === "function") {
+        view[name] = value;
+      } else {
+        refs.push(name);
+        Object.defineProperty(view, name, {
+          enumerable: true,
+          get() {
+            return store[name].value;
+          },
+          set() {
+            throw error;
+          },
+        });
       }
-      return;
     }
 
-    if (!transaction.active) {
-      events.dispatchEvent(new CustomEvent("dispatch", { detail: { type: action, payload: args } }));
-    }
-  }
-
-  function select<V>(selector: (state: State) => V): Effect<V> {
-    return effect(() => selector(state.value));
-  }
-
-  function get<V>(selector: (state: State) => V): V {
-    return selector(getState());
-  }
-
-  async function startTransaction(handler: () => any) {
-    try {
-      transaction.active = true;
-      transaction.state = { ...state.value };
-      await handler();
-      transaction.active = false;
-      state.value = transaction.state;
-      events.dispatchEvent(new CustomEvent("commit", { detail: state.value }));
-    } catch (error) {
-      events.dispatchEvent(new CustomEvent("error", { detail: String(error) }));
-    } finally {
-      transaction.active = false;
-      transaction.state = null;
-    }
-  }
-
-  const actionNames = Object.keys(actions);
-  const mappedActions = Object.fromEntries(actionNames.map((key) => [key, dispatch.bind(null, key)])) as {
-    [K in keyof Actions]: (...args: ActionParameters<Actions[K]>) => any;
+    stores.set(name, view);
+    return view;
   };
+}
 
-  function useStore() {
-    const ctx = getCurrentContext();
-    const effects: Effect<any>[] = [];
+export function setState(store, state) {
+  const view = store[stateRef];
+  Object.assign(view, state);
+}
 
-    if (ctx) {
-      ctx.destroy.push(() => {
-        for (const f of effects) {
-          f.dispose();
-        }
+export function storeToRefs(store) {
+  const refs = {};
 
-        effects.length = 0;
+  for (const [name, value] of Object.entries(store)) {
+    if (typeof value !== "function") {
+      Object.defineProperty(refs, name, {
+        get() {
+          return computed(() => store[name]);
+        },
       });
     }
-
-    function select<V>(selector: (state: State) => V): Effect<V> {
-      const $ = effect(() => selector(state.value));
-      effects.push($);
-      return $;
-    }
-
-    return {
-      events,
-      select,
-      get,
-      transaction: startTransaction,
-      store: mappedActions,
-    };
   }
 
-  return {
-    events,
-    select,
-    get,
-    transaction: startTransaction,
-    store: mappedActions,
-    useStore,
-  };
+  return refs;
 }

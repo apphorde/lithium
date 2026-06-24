@@ -27,7 +27,11 @@ function canBeObserved(object: any): boolean {
   );
 }
 
-function reactive<T extends object>(object: T, effect: AnyFunction): T {
+function reactive<T extends object>(
+  object: T,
+  effect: AnyFunction,
+  notifier?: Signal,
+): T {
   if (!canBeObserved(object)) {
     return object;
   }
@@ -49,6 +53,8 @@ function reactive<T extends object>(object: T, effect: AnyFunction): T {
       if (p === unwrapTag) {
         return object;
       }
+
+      if (notifier) capture(notifier);
 
       return target[p];
     },
@@ -105,17 +111,13 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
     [refSymbol]: true,
     internalValue:
       !isShallow && canBeObserved(initial)
-        ? reactive(initial as object, reactiveEffect)
+        ? reactive(initial as object, reactiveEffect, o)
         : initial,
     dependencies: new Set(),
     watchers: new Set(),
 
     get value() {
-      const d = signalsStack.at(-1);
-      if (d && d !== o) {
-        o.dependencies.add(d);
-      }
-
+      capture(o);
       return o.internalValue;
     },
 
@@ -127,7 +129,7 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
       if (compare(o.internalValue, newValue)) return;
 
       if (!isShallow && canBeObserved(newValue)) {
-        newValue = reactive(newValue as object, reactiveEffect) as T;
+        newValue = reactive(newValue as object, reactiveEffect, o) as T;
       }
 
       o.internalValue = newValue;
@@ -147,11 +149,7 @@ function computed<T = any>(fn: () => T): Signal<T> {
     watchers: new Set(),
 
     get value() {
-      const d = signalsStack.at(-1);
-      if (d && d !== o) {
-        o.dependencies.add(d);
-      }
-
+      capture(o);
       return o.internalValue;
     },
 
@@ -214,6 +212,13 @@ function notifyDependencies(target: SignalInternal) {
 
   for (const watcher of target.watchers) {
     watcher(value);
+  }
+}
+
+function capture(o: Signal) {
+  const d = signalsStack.length && signalsStack.at(-1);
+  if (d && d !== o) {
+    o.dependencies.add(d);
   }
 }
 
