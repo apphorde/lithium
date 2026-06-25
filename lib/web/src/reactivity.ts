@@ -11,17 +11,16 @@ export type Signal<T = any> = {
 
 type SignalInternal<T = any> = Signal<T> & {
   [refTag]: true;
-  [suspendedTag]: boolean;
   internalValue: T;
   dependencies: Set<SignalInternal>;
   watchers: Set<AnyFunction>;
+  suspended: boolean;
   update(value?: T): void;
 };
 const signalsStack: SignalInternal[] = [];
 const reactiveTag = Symbol('#');
 const unwrapTag = Symbol('[]');
 const refTag = Symbol('$');
-const suspendedTag = Symbol('!');
 
 function canBeObserved(object: any): boolean {
   return object !== null && object !== undefined && typeof object === 'object' && !object[reactiveTag];
@@ -102,7 +101,7 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
 
   const o: SignalInternal = {
     [refTag]: true,
-    [suspendedTag]: false,
+    suspended: false,
     internalValue: undefined as T,
     dependencies: new Set<SignalInternal>(),
     watchers: new Set(),
@@ -113,7 +112,7 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
     },
 
     set value(newValue) {
-      if (o[suspendedTag]) return;
+      if (o.suspended) return;
       o.update(newValue);
     },
 
@@ -140,7 +139,7 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
 function computed<T = any>(fn: () => T): Signal<T> {
   const o: SignalInternal<T> = {
     [refTag]: true,
-    [suspendedTag]: false,
+    suspended: false,
     internalValue: undefined as T,
     dependencies: new Set<SignalInternal>(),
     watchers: new Set(),
@@ -155,7 +154,7 @@ function computed<T = any>(fn: () => T): Signal<T> {
     },
 
     update() {
-      if (o[suspendedTag]) return;
+      if (o.suspended) return;
       let value = null as T;
 
       try {
@@ -194,11 +193,11 @@ function isRef(t: any): t is Signal {
 }
 
 function suspend(s: Signal) {
-  (s as SignalInternal)[suspendedTag] = true;
+  (s as SignalInternal).suspended = true;
 }
 
 function resume(s: Signal) {
-  (s as SignalInternal)[suspendedTag] = false;
+  (s as SignalInternal).suspended = false;
   (s as SignalInternal).update(s.value);
 }
 
@@ -221,7 +220,7 @@ function notifyDependencies(target: SignalInternal) {
   const value = target.value;
 
   for (const dep of target.dependencies) {
-    if (dep[suspendedTag]) {
+    if (dep.suspended) {
       target.dependencies.delete(dep);
     } else {
       dep.update();

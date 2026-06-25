@@ -268,6 +268,7 @@ use({
       : [left, ''];
 
     const signal = computed(createFunction(`Array.from(${expression} || [])`, context));
+    FF.debug && Object.assign(node, { signal, forNodes });
     watch(signal, (v) => updateForOfList(forNodes, node, key, indexKey, context, v));
   },
 });
