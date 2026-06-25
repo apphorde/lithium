@@ -277,7 +277,7 @@ function updateForOfList(forNodes: any[], node: Node, key: string, indexKey: str
   const itemsToRemove = forNodes.slice(newLength);
 
   for (const next of itemsToRemove) {
-    suspend(next.item);
+    suspend(next.item)x;
     for (const node of next.nodes) {
       node.parentNode!.removeChild(node);
     }
