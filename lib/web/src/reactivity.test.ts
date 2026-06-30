@@ -1,5 +1,5 @@
 import { describe, it, vi, expect, beforeEach } from 'vitest';
-import { ref, computed, watch, effect, reactive, isRef, unwrap, canBeObserved } from './reactivity.js';
+import { ref, computed, watch, hook, effect, reactive, isRef, unwrap, canBeObserved } from './reactivity.js';
 
 beforeEach(() => {
   beforeEach(() => {
@@ -159,6 +159,15 @@ describe('reactivity', () => {
       expect(unwrap(ref(1))).toBe(1);
     });
   });
+
+  describe('hook', () => {
+    it('should create a ref and setter pair', () => {
+      const [$, setter] = hook(123);
+      expect($.value).toBe(123);
+      setter(456);
+      expect($.value).toBe(456);
+    })
+  })
 
   describe('watch', () => {
     it('invokes callback when watched value changes', () => {

@@ -201,19 +201,30 @@ function resume(s: Signal) {
   (s as SignalInternal).update(s.value);
 }
 
-function watch(target: Signal, fn: AnyFunction) {
+export type WatchOptions = { immediate: boolean };
+
+function watch(target: Signal, fn: AnyFunction, o: WatchOptions = { immediate: true } ) {
   const memoized = memoizedWatcher(fn);
   const watchers = (target as SignalInternal).watchers;
   watchers.add(memoized);
-  memoized(target.value);
+
+  if (o?.immediate) {
+    memoized(target.value);
+  }
 
   return () => {
     watchers.delete(memoized);
   };
 }
 
-function effect(fn: AnyFunction, effectFn: AnyFunction) {
-  return watch(computed(fn), effectFn);
+function effect(fn: AnyFunction, effectFn: AnyFunction, o: WatchOptions) {
+  return watch(computed(fn), effectFn, o);
+}
+
+function hook<T>(initial: T, isShallow = false) {
+  const $ = ref(initial, isShallow);
+  const setter = (v: T) => $.value = v;
+  return [$, setter] as const;
 }
 
 function notifyDependencies(target: SignalInternal) {
@@ -251,4 +262,4 @@ function memoizedWatcher<T>(watcher: AnyFunction) {
   };
 }
 
-export { ref, computed, effect, watch, reactive, unwrap, isRef, shallowRef, canBeObserved, suspend, resume };
+export { ref, computed, effect, watch, hook, reactive, unwrap, isRef, shallowRef, canBeObserved, suspend, resume };
