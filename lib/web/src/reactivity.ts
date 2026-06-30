@@ -204,13 +204,15 @@ function resume(s: Signal) {
 
 export type WatchOptions = { immediate: boolean };
 
-function watch(target: Signal, fn: AnyFunction, o: WatchOptions = { immediate: true } ) {
+function watch(target: Signal, fn: AnyFunction, o?: WatchOptions ) {
   const memoized = memoizedWatcher(fn);
   const watchers = (target as SignalInternal).watchers;
   watchers.add(memoized);
 
   if (o?.immediate) {
     memoized(target.value);
+  } else {
+    schedule(() => memoized(target.value));
   }
 
   return () => {
@@ -261,6 +263,21 @@ function memoizedWatcher<T>(watcher: AnyFunction) {
     watcher(value, lastValue);
     lastValue = value;
   };
+}
+
+let timer: any;
+const queue: any[] = [];
+
+function schedule(fn: AnyFunction) {
+  clearTimeout(timer);
+  queue.push(fn);
+
+  timer = setTimeout(() => {
+    let n;
+    while (n = queue.shift()) {
+      n();
+    }
+  }, 5);
 }
 
 export { ref, computed, effect, watch, hook, reactive, unwrap, isRef, shallowRef, canBeObserved, suspend, resume };
