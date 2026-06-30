@@ -60,8 +60,9 @@ function defineEvent(name: string) {
   };
 }
 
-function templateRef(name: string | number) {
-  const $ref = ref(null, true);
+function templateRef(name: string) {
+  const dom = getCurrentNode().dom;
+  const $ref = ref(dom.querySelector(`[ref="${name}"]`), true);
   getCurrentNode().refs[name] = $ref;
   return $ref;
 }

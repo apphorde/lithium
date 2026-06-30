@@ -5,6 +5,7 @@ export type PropOptions<T = any> = {
 };
 
 export type RuntimeContext = {
+  dom: DocumentFragment;
   element: any;
   context: any;
   mount: AnyFunction[];

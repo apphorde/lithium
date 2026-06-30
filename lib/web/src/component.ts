@@ -79,8 +79,10 @@ export function mount(target: Element, options: MountOptions) {
     (template as any).linker = linkTreeToContextAsync(template.content);
   }
 
-  const dom = template.content.cloneNode(true);
-  const runtime = createContext(target, setup);
+  const dom = document.createDocumentFragment();
+  dom.append(template.content.cloneNode(true));
+
+  const runtime = createContext(target, setup, dom);
   const mergedContext = Object.assign({}, runtime.context, runtime.props, runtime.refs);
   const readOnlyContext = createReadOnlyContext(mergedContext);
 

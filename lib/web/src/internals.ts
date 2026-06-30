@@ -90,8 +90,9 @@ export function getCurrentNode() {
   return t;
 }
 
-export function createContext(element: Element, setup: any) {
+export function createContext(element: Element, setup: any, dom: DocumentFragment) {
   const runtime: RuntimeContext = {
+    dom,
     context: null,
     element,
     mount: [],
