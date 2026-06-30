@@ -132,9 +132,8 @@ export async function importCssModule(href: string) {
   }
 
   try {
-    return (await _importCssModule(href)).default;
+    return (await _importCssModule(href)).default as CSSStyleSheet;
   } catch {
-    // fallback for Safari
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(`@import url(${href})`);
     return sheet;

@@ -1,5 +1,5 @@
 import { FF } from './feature-flags.js';
-import { createContext, createReadOnlyContext, importModuleFromSource } from './internals.js';
+import { createContext, createReadOnlyContext, importCssModule, importModuleFromSource, stylesheetCache } from './internals.js';
 import { linkTreeToContext, linkTreeToContextAsync } from './rules.js';
 import type { DefineComponentOptions, MountOptions } from './types';
 
@@ -130,14 +130,15 @@ async function findSetupModule(template: HTMLTemplateElement) {
   return Function;
 }
 
-function findStyleSheets(template: HTMLTemplateElement): CSSStyleSheet[] {
+async function findStyleSheets(template: HTMLTemplateElement): Promise<CSSStyleSheet[]> {
   const styleTags = Array.from(template.content.querySelectorAll('style')) as HTMLStyleElement[];
+  const linkTags = Array.from(template.content.querySelectorAll('link[rel="stylesheet"]')) as HTMLLinkElement[];
 
-  if (!styleTags.length) {
+  if (!(styleTags.length || linkTags.length)) {
     return [];
   }
 
-  return styleTags.map((tag) => {
+  const styles = styleTags.map((tag) => {
     let sheet = tag.sheet;
 
     if (!sheet) {
@@ -148,6 +149,19 @@ function findStyleSheets(template: HTMLTemplateElement): CSSStyleSheet[] {
     tag.remove();
     return sheet;
   });
+
+  const links = linkTags.map(link => {
+    const { href } = link;
+
+    if (!stylesheetCache.has(href)) {
+      stylesheetCache.set(href, importCssModule(href));
+    }
+
+    link.remove();
+    return stylesheetCache.get(href)!;
+  })
+
+  return (await Promise.all(links)).concat(styles);
 }
 
 function loadDependencies(template: HTMLTemplateElement) {
@@ -181,7 +195,7 @@ export async function defineFromTemplate(template: HTMLTemplateElement | string)
     name,
     template,
     setup: await findSetupModule(template),
-    styles: findStyleSheets(template),
+    styles: await findStyleSheets(template),
   };
 
   loadDependencies(template);
