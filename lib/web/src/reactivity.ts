@@ -154,12 +154,20 @@ function computed<T = any>(fn: () => T): Signal<T> {
     },
 
     update() {
-      if (o.suspended) return;
+      if (o.suspended) {
+        return;
+      }
+
       let value = null as T;
+      signalsStack.push(o);
 
       try {
         value = fn();
-      } catch {}
+      } catch (e) {
+        console.error(e);
+      } finally {
+        signalsStack.pop();
+      }
 
       if (!compare(o.internalValue, value)) {
         o.internalValue = value;
@@ -168,19 +176,12 @@ function computed<T = any>(fn: () => T): Signal<T> {
     },
   };
 
-  signalsStack.push(o);
-
-  try {
-    o.update();
-  } catch (e) {
-    console.error(e);
-  } finally {
-    signalsStack.pop();
+  if (FF.debug) {
+    Object.assign(o, { fn });
+    refList.add(new WeakRef(o));
   }
 
-  (o as any).fn = fn;
-  if (FF.debug) refList.add(new WeakRef(o));
-
+  o.update();
   return o as Signal<T>;
 }
 
