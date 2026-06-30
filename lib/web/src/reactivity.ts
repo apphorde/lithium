@@ -218,7 +218,7 @@ function watch(target: Signal, fn: AnyFunction, o: WatchOptions = { immediate: t
   };
 }
 
-function effect(fn: AnyFunction, effectFn: AnyFunction, o: WatchOptions) {
+function effect(fn: AnyFunction, effectFn: AnyFunction, o?: WatchOptions) {
   return watch(computed(fn), effectFn, o);
 }
 
