@@ -246,7 +246,7 @@ function autoInitialize() {
   findApps();
 }
 
-if (document.readyState === 'complete') {
+if (['complete', 'interactive'].includes(document.readyState)) {
   autoInitialize();
 } else {
   window.addEventListener('DOMContentLoaded', autoInitialize);
