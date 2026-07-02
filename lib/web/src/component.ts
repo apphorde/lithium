@@ -9,6 +9,10 @@ export function getInternals(t: any) {
   return t[DEBUG];
 }
 
+function getOrigin(template: HTMLTemplateElement) {
+  return template.getAttribute('origin') || window.location.href;
+}
+
 function getShadowDomOptions(template: HTMLTemplateElement): ShadowRootInit | undefined {
   const source = template.getAttribute('shadow-dom') || '';
 
@@ -17,17 +21,24 @@ function getShadowDomOptions(template: HTMLTemplateElement): ShadowRootInit | un
   }
 }
 
-export async function load(href: string | URL) {
+export async function load(href: string | URL, baseUrl?: string | URL) {
+  const origin = String(baseUrl || window.location.href);
+  const fullUrl = String(new URL(href, origin));
+
   try {
-    const response = await fetch(new URL(href, window.location.href));
+    const response = await fetch(fullUrl);
 
     if (!response.ok) {
       throw new Error('Failed to load components from ' + href);
     }
 
     const html = await response.text();
-    const all = await Promise.all(defineFromString(html));
-    return all.filter(Boolean) as DefineComponentOptions[];
+    const dom = new DOMParser().parseFromString(html, 'text/html');
+    const templates = Array.from(dom.querySelectorAll('template[component]')) as HTMLTemplateElement[];
+    templates.forEach(t => t.setAttribute('origin', fullUrl));
+    const definitions = templates.map(n => defineFromTemplate(n)).filter(Boolean);
+
+    return await Promise.all(definitions) as DefineComponentOptions[];
   } catch (error) {
     console.error('Error loading component from', href, error);
     return [];
@@ -117,11 +128,12 @@ export function mount(target: Element, options: MountOptions) {
 
 async function findSetupModule(template: HTMLTemplateElement) {
   const setupCode = template.content.querySelector('script[setup]');
+  const origin = getOrigin(template);
 
   if (setupCode) {
-    const url = setupCode.getAttribute('src');
+    const src = setupCode.getAttribute('src');
     const code = setupCode.textContent;
-    const mod = url ? import(new URL(url, window.location.href).toString()) : importModuleFromSource(code);
+    const mod = src ? import(String(new URL(src, origin))) : importModuleFromSource(code);
     setupCode.remove();
 
     return (await mod).default;
@@ -150,8 +162,9 @@ async function findStyleSheets(template: HTMLTemplateElement): Promise<CSSStyleS
     return sheet;
   });
 
+  const origin = getOrigin(template);
   const links = linkTags.map(link => {
-    const { href } = link;
+    const href = String(new URL(link.href, origin));
 
     if (!stylesheetCache.has(href)) {
       stylesheetCache.set(href, importCssModule(href));
@@ -164,16 +177,17 @@ async function findStyleSheets(template: HTMLTemplateElement): Promise<CSSStyleS
   return (await Promise.all(links)).concat(styles);
 }
 
-function loadDependencies(template: HTMLTemplateElement) {
+export function loadDependencies(template: HTMLTemplateElement) {
   const links = Array.from(template.content.querySelectorAll('link[rel=component]')) as HTMLLinkElement[];
+  const origin = getOrigin(template);
 
   for (const link of links) {
-    load(link.href);
+    load(link.href, origin);
     link.remove();
   }
 }
 
-function tpl(s: string) {
+export function tpl(s: string) {
   const template = document.createElement('template');
   template.innerHTML = String(s).trim();
 
@@ -204,13 +218,6 @@ export async function defineFromTemplate(template: HTMLTemplateElement | string)
   return options;
 }
 
-export function defineFromString(html: string) {
-  const dom = new DOMParser().parseFromString(html, 'text/html');
-  const nodes = Array.from(dom.querySelectorAll('template[component]')) as HTMLTemplateElement[];
-
-  return nodes.map(defineFromTemplate).filter(Boolean);
-}
-
 export async function findApps() {
   const apps = Array.from(document.querySelectorAll('template[app]')) as HTMLTemplateElement[];
 
@@ -231,10 +238,9 @@ export async function findApps() {
 
 function autoInitialize() {
   const components = Array.from(document.querySelectorAll('template[component]')) as HTMLTemplateElement[];
-
   const links = Array.from(document.querySelectorAll('link[rel="component"]')) as HTMLLinkElement[];
 
-  components.forEach(defineFromTemplate);
+  components.forEach(c => defineFromTemplate(c));
   links.forEach((l) => load(l.href));
 
   findApps();
