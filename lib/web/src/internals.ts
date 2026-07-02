@@ -58,21 +58,17 @@ export function createFunction(
 export function createReadOnlyContext(context: any) {
   return new Proxy(context, {
     get(target, key) {
-      if (target[key] !== undefined) {
-        if (target[key] && isRef(target[key])) {
-          return target[key].value;
+      const t = target[key];
+      if (t !== undefined) {
+        if (t && isRef(t)) {
+          return t.value;
         }
 
-        return target[key];
+        return t;
       }
     },
 
-    set(target, key, value) {
-      if (isRef(value)) {
-        target[key] = value;
-        return true;
-      }
-
+    set() {
       throw new Error("View contexts are read-only");
     },
   });
@@ -90,7 +86,11 @@ export function getCurrentNode() {
   return t;
 }
 
-export function createContext(element: Element, setup: any, dom: DocumentFragment) {
+export function createContext(
+  element: Element,
+  setup: any,
+  dom: DocumentFragment,
+) {
   const runtime: RuntimeContext = {
     dom,
     context: null,

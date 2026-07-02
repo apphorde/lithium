@@ -160,16 +160,6 @@ export function use(rule: Rule) {
 
 use({
   match(_, name) {
-    return name === 'ref';
-  },
-  exec(node: any, _name: string, value: string, context: any) {
-    const $ = context[value] || (context[value] = ref(null));
-    $.value = node;
-  },
-});
-
-use({
-  match(_, name) {
     return name.startsWith('on-');
   },
   exec(node, name, value, context) {
