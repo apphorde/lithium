@@ -78,13 +78,13 @@ importers:
     dependencies:
       '@li3/web':
         specifier: latest
-        version: 0.2.21
+        version: 0.2.30
 
   lib/use:
     dependencies:
-      '@li3/reactive':
+      '@li3/web':
         specifier: latest
-        version: 0.0.23
+        version: 0.2.30
 
   lib/web:
     devDependencies:
@@ -919,14 +919,11 @@ packages:
   '@li3/html-parser@0.0.7':
     resolution: {integrity: sha512-JqHKTdnwO88nEmGKHEjaIcHjA6xIJxQIfLpvYGgclpJbfQUacKwQPRILQKQPNpM3XBfSoUyfyPBBH7NrbE+VCw==}
 
-  '@li3/reactive@0.0.23':
-    resolution: {integrity: sha512-LXpKjWZ0JcVyDaaAGG8D0biMvIawEjeWCYjpMqfZHEa07N6cfZirVxNepDRAV8u0k6MlfBZKaCcTO2Te4FaKIw==}
-
   '@li3/sfc@0.0.4':
     resolution: {integrity: sha512-OeHyhEVbpqFgxON3Uk33vD5TeIzm3KWZKI8tOR8aZ/8nAIV1dV704nmNdhyG/EgK/k7wjLX2c/y3v4er4hQq7Q==}
 
-  '@li3/web@0.2.21':
-    resolution: {integrity: sha512-6mdIwVQlIlt31e2X0TXgqBgX6y0LbT6B6qY+WXWtKlJ7amnj48/P2Dq01MQwNdTxtqdL5rQnv56DN6DJpPBXGQ==}
+  '@li3/web@0.2.30':
+    resolution: {integrity: sha512-1S0qKGUYDgxwwFb9uPzdn4vL0/UuGgXvtjKSXGf4WwG98xWuAeYjibf8pPD+uRbPOGhX+ViFuY+Y0yLK9M+8bg==}
 
   '@napi-rs/wasm-runtime@0.2.4':
     resolution: {integrity: sha512-9zESzOO5aDByvhIAsOy9TbpZ0Ur2AJbUI7UT73kcUTS2mxAMHOBaa1st/jAymNoCtvrit99kkzT1FZuXVcgfIQ==}
@@ -3551,14 +3548,12 @@ snapshots:
 
   '@li3/html-parser@0.0.7': {}
 
-  '@li3/reactive@0.0.23': {}
-
   '@li3/sfc@0.0.4':
     dependencies:
       '@li3/html-parser': 0.0.7
       acorn: 8.17.0
 
-  '@li3/web@0.2.21': {}
+  '@li3/web@0.2.30': {}
 
   '@napi-rs/wasm-runtime@0.2.4':
     dependencies:
