@@ -19,7 +19,6 @@ export type MountOptions = {
   template: HTMLTemplateElement;
   setup?: Function;
   styles?: CSSStyleSheet[];
-  dependencies?: string[];
   shadowDom?: boolean | string | ShadowRootInit;
 };
 

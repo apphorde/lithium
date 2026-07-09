@@ -45,8 +45,12 @@ export async function load(href: string | URL, baseUrl?: string | URL) {
   }
 }
 
-export function defineComponent(options: DefineComponentOptions) {
-  const { name } = options;
+export function defineComponent(name: string, options: MountOptions) {
+  if (customElements.get(name)) {
+    console.error(`Component ${name} is already defined!`);
+    return;
+  }
+
   options.template = typeof options.template === 'string' ? tpl(options.template) : options.template;
   const shadowDom: ShadowRootInit | undefined =
     options.shadowDom === true ? { mode: 'open' } : getShadowDomOptions(options.template);
@@ -194,6 +198,18 @@ export function tpl(s: string) {
   return template;
 }
 
+export async function readOptionsFromTemplate(template: HTMLTemplateElement) {
+  const options: MountOptions = {
+    template,
+    setup: await findSetupModule(template),
+    styles: await findStyleSheets(template),
+  };
+
+  loadDependencies(template);
+
+  return options;
+}
+
 export async function defineFromTemplate(template: HTMLTemplateElement | string): Promise<DefineComponentOptions|null> {
   if (typeof template === 'string') {
     template = tpl(template);
@@ -205,34 +221,25 @@ export async function defineFromTemplate(template: HTMLTemplateElement | string)
     return null;
   }
 
-  const options: DefineComponentOptions = {
-    name,
-    template,
-    setup: await findSetupModule(template),
-    styles: await findStyleSheets(template),
-  };
+  const options = await readOptionsFromTemplate(template);
+  defineComponent(name, options);
 
-  loadDependencies(template);
-  defineComponent(options);
-
-  return options;
+  return { name, ...options };
 }
 
 export async function findApps() {
   const apps = Array.from(document.querySelectorAll('template[app]')) as HTMLTemplateElement[];
 
   for (const template of apps) {
-    const options: MountOptions = {
-      template,
-      setup: await findSetupModule(template),
-    };
+    readOptionsFromTemplate(template).then(options => {
+      const app = document.createElement('div');
+      app.style.display = 'contents';
+      template.parentNode!.insertBefore(app, template);
 
-    const app = document.createElement('div');
-    app.style.display = 'contents';
-    template.parentNode!.insertBefore(app, template);
-
-    mount(app, options);
-    FF.debug || template.remove();
+      mount(app, options);
+      FF.debug || template.remove();
+    })
+    .catch(error => console.error(error));
   }
 }
 

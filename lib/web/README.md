@@ -33,7 +33,7 @@
 **Component definition:**
 
 ```txt
-    defineComponent(options)                 Defines a custom element with the given options (name, template, shadowDom and setup function)
+    defineComponent(name, options)           Defines a custom element with the given name and options (template, shadowDom and setup function)
     mount(targetElement, options)            Mounts a component to a target element with the given options
     unwrap(object)                           Unwraps a reactive reference or computed property to get its underlying value
     load(href)                               Loads one or more components (as HTML) from a source and registers the  as a custom element

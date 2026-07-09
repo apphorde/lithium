@@ -231,9 +231,9 @@ function hook<T>(initial: T, isShallow = false) {
 }
 
 function notifyDependencies(target: SignalInternal) {
-  const value = target.value;
-
   if (!target.dependencies.size || !target.watchers.size) return;
+
+  const value = target.value;
 
   for (const dep of target.dependencies) {
     if (dep.suspended) {
