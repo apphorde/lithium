@@ -231,7 +231,7 @@ function hook<T>(initial: T, isShallow = false) {
 }
 
 function notifyDependencies(target: SignalInternal) {
-  if (!target.dependencies.size || !target.watchers.size) return;
+  if (!target.dependencies.size && !target.watchers.size) return;
 
   const value = target.value;
 
