@@ -196,8 +196,7 @@ describe('@li3/web', () => {
       const tpl = document.createElement('template');
       tpl.innerHTML = '<div></div>';
 
-      defineComponent({
-        name,
+      defineComponent(name, {
         template: tpl,
         shadowDom: true,
         setup: () => {
