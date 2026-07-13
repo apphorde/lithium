@@ -45,7 +45,23 @@ export async function load(href: string | URL, baseUrl?: string | URL) {
   }
 }
 
+//
+const invalidNames = [
+  "annotation-xml",
+  "color-profile",
+  "font-face",
+  "font-face-src",
+  "font-face-uri",
+  "font-face-format",
+  "font-face-name",
+  "missing-glyph",
+]
+
 export function defineComponent(name: string, options: MountOptions) {
+  if (invalidNames.includes(name) ) {
+    throw new Error('Invalid element name. See https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name');
+  }
+
   if (customElements.get(name)) {
     console.error(`Component ${name} is already defined!`);
     return;
@@ -199,13 +215,13 @@ export function tpl(s: string) {
 }
 
 export async function readOptionsFromTemplate(template: HTMLTemplateElement) {
+  loadDependencies(template);
+
   const options: MountOptions = {
     template,
     setup: await findSetupModule(template),
     styles: await findStyleSheets(template),
   };
-
-  loadDependencies(template);
 
   return options;
 }
