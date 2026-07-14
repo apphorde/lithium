@@ -21,9 +21,15 @@ function getShadowDomOptions(template: HTMLTemplateElement): ShadowRootInit | un
   }
 }
 
+const loadCache = new Map();
+
 export async function load(href: string | URL, baseUrl?: string | URL) {
   const origin = String(baseUrl || window.location.href);
   const fullUrl = String(new URL(href, origin));
+
+  if (loadCache.has(fullUrl)) {
+    return loadCache.get(fullUrl);
+  }
 
   try {
     const response = await fetch(fullUrl);
@@ -38,7 +44,10 @@ export async function load(href: string | URL, baseUrl?: string | URL) {
     templates.forEach(t => t.setAttribute('origin', fullUrl));
     const definitions = templates.map(n => defineFromTemplate(n)).filter(Boolean);
 
-    return await Promise.all(definitions) as DefineComponentOptions[];
+
+    const def = await Promise.all(definitions) as DefineComponentOptions[];
+    loadCache.set(fullUrl, def);
+    return def;
   } catch (error) {
     console.error('Error loading component from', href, error);
     return [];

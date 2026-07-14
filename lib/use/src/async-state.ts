@@ -1,12 +1,19 @@
 import { ref } from "@li3/web";
 
+/**
+ * @example
+ *    import { useAsyncState } from '@li3/use/async-state';
+ *
+ *    const { data, error, loading, empty, update } = useAsyncState();
+ *    update();
+ */
 export function useAsyncState<T>(effect: (...args: any[]) => Promise<T> = fetch as any) {
   const error = ref("");
   const loading = ref(false);
   const empty = ref(false);
   const data = ref(null);
 
-  const fetch = async (...args: any[]) => {
+  const update = async (...args: any[]) => {
     loading.value = true;
     empty.value = false;
 
@@ -22,5 +29,5 @@ export function useAsyncState<T>(effect: (...args: any[]) => Promise<T> = fetch 
     }
   };
 
-  return { data, error, loading, empty, fetch };
+  return { data, error, loading, empty, update };
 }

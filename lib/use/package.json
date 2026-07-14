@@ -2,12 +2,16 @@
   "name": "@li3/use",
   "version": "0.1.6",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./index.js"
+    ".": "./dist/index.js",
+    "./*": {
+      "types": "./dist/*",
+      "default": "./dist/*.js"
     }
   },
-  "dependencies": {
+  "repository": {
+    "url": "https://github.com/apphorde/lithium"
+  },
+  "peerDependencies": {
     "@li3/web": "latest"
   }
 }

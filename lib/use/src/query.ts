@@ -1,5 +1,15 @@
-import { getElement } from '@li3/web';
+import { getElement } from "@li3/web";
 
+/**
+ * @example
+ *    import { useQuery } from '@li3/use/async-state';
+ *
+ *    const listItems = useQuery('li');
+ *
+ *    for (const li of listItems.all) {
+ *      // ...
+ *    }
+ */
 export function useQuery(selector: string) {
   const element = getElement();
 
@@ -10,6 +20,6 @@ export function useQuery(selector: string) {
 
     get all() {
       return element.querySelectorAll(selector);
-    }
-  }
+    },
+  };
 }
