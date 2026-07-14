@@ -162,7 +162,7 @@ async function findSetupModule(template: HTMLTemplateElement) {
   if (setupCode) {
     const src = setupCode.getAttribute('src');
     const code = setupCode.textContent;
-    const mod = src ? import(String(new URL(src, origin))) : importModuleFromSource(code);
+    const mod = src ? import(String(new URL(src, origin))) : importModuleFromSource(code, origin);
     setupCode.remove();
 
     return (await mod).default;

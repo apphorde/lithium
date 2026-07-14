@@ -140,11 +140,41 @@ export async function importCssModule(href: string) {
   }
 }
 
-export async function importModuleFromSource(code: BlobPart) {
-  const blob = URL.createObjectURL(
-    new Blob([code], { type: "text/javascript" }),
-  );
-  const module = await import(blob);
-  URL.revokeObjectURL(blob);
-  return module;
+export async function importModuleFromSource(
+  sourceText: string,
+  origin: string,
+) {
+  const url = new URL(origin);
+  url.pathname = url.pathname.replace(".html", ".mjs");
+  const fileName = String(url);
+  const lineCount = sourceText.split(/\r?\n/).length;
+  const mappings = new Array(lineCount).fill("AACA");
+  mappings[0] = "AAAA";
+
+  const sourceMap = {
+    version: 3,
+    file: fileName,
+    sourcesContent: [sourceText],
+    sources: [fileName],
+    mappings: mappings.join(";"),
+  };
+
+  const jsonString = JSON.stringify(sourceMap);
+  const base64Map = btoa(unescape(encodeURIComponent(jsonString)));
+  const mapUrl = `data:application/json;charset=utf-8;base64,${base64Map}`;
+  const instrumentedCode = `${sourceText}\n//# sourceMappingURL=${mapUrl}\n//# sourceURL=${fileName}`;
+  const blob = new Blob([instrumentedCode], { type: "application/javascript" });
+  const objectUrl = URL.createObjectURL(blob);
+
+  try {
+    return await import(objectUrl);
+  } catch (error) {
+    if (error instanceof Error && error.stack) {
+      const blobUrlPattern = new RegExp(objectUrl, "g");
+      error.stack = error.stack.replace(blobUrlPattern, fileName);
+    }
+    throw error;
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
 }
