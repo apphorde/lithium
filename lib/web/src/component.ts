@@ -10,7 +10,16 @@ export function getInternals(t: any) {
 }
 
 function getOrigin(template: HTMLTemplateElement) {
-  return template.getAttribute('origin') || window.location.href;
+  let url =  template.getAttribute('origin');
+
+  if (!url) {
+    const origin = new URL(window.location.href);
+    origin.pathname += template.getAttribute('component') + '.html';
+    url = String(origin);
+    template.setAttribute('origin', url);
+  }
+
+  return url;
 }
 
 function getShadowDomOptions(template: HTMLTemplateElement): ShadowRootInit | undefined {
