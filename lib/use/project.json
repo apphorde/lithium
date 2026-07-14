@@ -1,6 +1,7 @@
 {
   "name": "@li3/use",
   "targets": {
-    "tsc": {}
+    "tsc": {},
+    "build": {}
   }
 }
