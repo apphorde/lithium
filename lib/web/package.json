@@ -1,9 +1,9 @@
 {
   "name": "@li3/web",
-  "version": "0.2.31",
+  "version": "0.2.32",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
       "default": "./index.js"
     },
     "./loader": "./loader.js"

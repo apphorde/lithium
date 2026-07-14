@@ -1,6 +1,6 @@
-src/
 project.json
 rollup.config.js
+vitest.config.*
 tsconfig.json
 typedoc.json
 .git/
