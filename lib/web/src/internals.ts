@@ -124,7 +124,7 @@ export const debounce = (fn: any) => {
 export const stylesheetCache = new Map<string, Promise<CSSStyleSheet>>();
 let _importCssModule: any = importModuleFromSource(
   'export default function(href) { return import(href, { with: { type: "css" } }) }',
-  'import-css-module.mjs'
+  'https://li3.dev/modules#import-css-module.mjs'
 );
 
 export async function importCssModule(href: string) {
