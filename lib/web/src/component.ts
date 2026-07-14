@@ -1,5 +1,5 @@
 import { FF } from './feature-flags.js';
-import { createContext, createReadOnlyContext, importCssModule, importModuleFromSource, stylesheetCache } from './internals.js';
+import { createContext, createReadOnlyContext, importCssModule, importModuleFromSource } from './internals.js';
 import { linkTreeToContext, linkTreeToContextAsync } from './rules.js';
 import type { DefineComponentOptions, MountOptions } from './types';
 
@@ -194,13 +194,9 @@ async function findStyleSheets(template: HTMLTemplateElement): Promise<CSSStyleS
   const origin = getOrigin(template);
   const links = linkTags.map(link => {
     const href = String(new URL(link.href, origin));
-
-    if (!stylesheetCache.has(href)) {
-      stylesheetCache.set(href, importCssModule(href));
-    }
-
+    const sheet = importCssModule(href);
     link.remove();
-    return stylesheetCache.get(href)!;
+    return sheet;
   })
 
   return (await Promise.all(links)).concat(styles);

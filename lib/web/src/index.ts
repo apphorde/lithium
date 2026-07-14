@@ -1,6 +1,6 @@
 import type { PropOptions } from './types';
 import { ref, watch } from './reactivity.js';
-import { debounce, getCurrentNode, getPropValue, importCssModule, stylesheetCache } from './internals.js';
+import { debounce, getCurrentNode, getPropValue, importCssModule } from './internals.js';
 
 function getElement() {
   return getCurrentNode().element;
@@ -68,17 +68,9 @@ function templateRef(name: string) {
 }
 
 function loadCss(href: string | URL) {
-  href = String(href);
   const element = getElement();
-
-  if (!stylesheetCache.has(href)) {
-    stylesheetCache.set(href, importCssModule(href));
-  }
-
-  const stylesheet = stylesheetCache.get(href);
-  stylesheetCache.get(href)?.then((s) => (element.shadowRoot || document).adoptedStyleSheets.push(s));
-
-  return stylesheet;
+  const stylesheet = importCssModule(String(href));
+  stylesheet.then((s) => (element.shadowRoot || document).adoptedStyleSheets.push(s));
 }
 
 export { getElement, onInit, onUpdate, onDestroy, defineProp, defineEvent, templateRef, loadCss };

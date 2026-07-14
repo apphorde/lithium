@@ -121,13 +121,22 @@ export const debounce = (fn: any) => {
   };
 };
 
-export const stylesheetCache = new Map<string, Promise<CSSStyleSheet>>();
+const stylesheetCache = new Map<string, Promise<CSSStyleSheet>>();
+
+export function importCssModule(href: string) {
+  if (!stylesheetCache.has(href)) {
+    stylesheetCache.set(href, importCssModuleInternal(href));
+  }
+
+  return stylesheetCache.get(href);
+}
+
 let _importCssModule: any = importModuleFromSource(
   'export default function(href) { return import(href, { with: { type: "css" } }) }',
-  'https://li3.dev/modules#import-css-module.mjs'
+  "import-css-module.mjs",
 );
 
-export async function importCssModule(href: string) {
+async function importCssModuleInternal(href: string) {
   if (typeof _importCssModule !== "function") {
     _importCssModule = (await _importCssModule).default;
   }
@@ -145,9 +154,9 @@ export async function importModuleFromSource(
   sourceText: string,
   origin: string,
 ) {
-  const url = new URL(origin);
-  url.pathname = url.pathname.replace(".html", ".mjs");
-  const fileName = String(url);
+  const fileName = String(origin).replace(".html", ".mjs");
+  const originalFile = new URL(fileName, 'https://li3.dev');
+  originalFile.pathname = originalFile.pathname.replace('.mjs', '.src.mjs');
   const lineCount = sourceText.split(/\r?\n/).length;
   const mappings = new Array(lineCount).fill("AACA");
   mappings[0] = "AAAA";
@@ -156,7 +165,7 @@ export async function importModuleFromSource(
     version: 3,
     file: fileName,
     sourcesContent: [sourceText],
-    sources: [fileName],
+    sources: [String(originalFile)],
     mappings: mappings.join(";"),
   };
 
