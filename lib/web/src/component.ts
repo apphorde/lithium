@@ -14,9 +14,15 @@ function getOrigin(template: HTMLTemplateElement) {
 
   if (!url) {
     const origin = new URL(window.location.href);
-    origin.pathname += template.getAttribute('component') + '.html';
-    url = String(origin);
-    template.setAttribute('origin', url);
+    const c = template.getAttribute('component');
+
+    if (c) {
+      origin.pathname += '/' + template.getAttribute('component') + '.html';
+      url = String(origin);
+      template.setAttribute('origin', url);
+    } else {
+      url = origin.pathname;
+    }
   }
 
   return url;
