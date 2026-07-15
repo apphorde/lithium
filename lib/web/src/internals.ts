@@ -106,6 +106,8 @@ export function createContext(
 
   try {
     runtime.context = setup() ?? {};
+  } catch (e) {
+    console.error(e);
   } finally {
     runtimeStack.pop();
   }
