@@ -1,59 +1,64 @@
-import { computed } from "@li3/web";
+import { computed, watch, isRef, unwrap } from "@li3/web";
 
 const stores = new Map();
-const stateRef = Symbol("#");
+const error = new Error("Store values are read-only");
 
-export function defineStore(name: string, factory: CallableFunction) {
+export function defineStore(storeName: string, factory: CallableFunction) {
   return function () {
-    if (stores.has(name)) {
-      return stores.get(name);
+    if (stores.has(storeName)) {
+      return stores.get(storeName);
     }
 
     const store = factory();
+    const readOnlyProperties = {};
     const refs = [];
-    const view = {};
-
-    Object.defineProperty(view, "toJSON", {
-      enumerable: false,
-      configurable: false,
-      value: () => Object.fromEntries(refs.map((f) => [f, view[f]])),
-    });
-
-    Object.defineProperty(view, stateRef, {
-      enumerable: false,
-      configurable: false,
-      get() {
-        return view;
-      }
-    });
-
-    const error = new Error("Store values are read-only");
 
     for (const [name, value] of Object.entries(store)) {
-      if (typeof value === "function") {
-        view[name] = value;
-      } else {
-        refs.push(name);
-        Object.defineProperty(view, name, {
-          enumerable: true,
-          get() {
-            return store[name].value;
-          },
-          set() {
-            throw error;
-          },
-        });
+      if (isRef(value)) {
+        refs.push(value);
       }
+
+      Object.defineProperty(readOnlyProperties, name, {
+        enumerable: true,
+        get() {
+          return unwrap(value);
+        },
+        set() {
+          throw error;
+        },
+      });
     }
 
-    stores.set(name, view);
-    return view;
-  };
-}
+    const c = computed(() => refs.map((x) => x.value));
+    refs.length = 0;
+    let timer;
 
-export function setState(store, state) {
-  const view = store[stateRef];
-  Object.assign(view, state);
+    watch(c, () => {
+      clearTimeout(timer);
+      timer = setTimeout(
+        () =>
+          localStorage.setItem(storeName, JSON.stringify(readOnlyProperties)),
+        10,
+      );
+    });
+
+    const cached = localStorage.getItem(storeName);
+    if (cached) {
+      try {
+        const values = JSON.parse(cached);
+        const entries = Object.entries(values);
+
+        for (const [key, value] of entries) {
+          if (isRef(store[key])) {
+            store[key].value = value;
+          }
+        }
+      } catch {}
+    }
+
+    stores.set(storeName, readOnlyProperties);
+    return readOnlyProperties;
+  };
 }
 
 export function storeToRefs(store) {
