@@ -5,6 +5,7 @@ import { FF } from './feature-flags.js';
 
 const isElement = (x: any): x is Element => x.nodeType === x.ELEMENT_NODE;
 const isText = (x: any): x is Text => x.nodeType === x.TEXT_NODE;
+const toCamelCase = s => s.replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase());
 
 export function applyTextRules(node: Text, context: any) {
   const template = node.textContent.trim();
@@ -115,7 +116,6 @@ function setClassName(el: Element, classNames: string, value: any): void {
 }
 
 function setStyle(el: any, key: string, value: any): void {
-  const toCamelCase = key.replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase());
   el.style[toCamelCase] = value;
 }
 
@@ -200,7 +200,6 @@ use({
   },
   exec(node, name, source, context) {
     const key = name.slice(5);
-    const [property, ...modifiers] = key.split('.');
     const fn = createFunction(source, context);
     const isObject = source.startsWith('{');
     if (key === 'class' && isObject) {
@@ -216,6 +215,8 @@ use({
         }
       });
     } else {
+      const [propertyText, ...modifiers] = key.split('.');
+      const property = toCamelCase(propertyText);
       effect(fn, (value: any) => setProperty(node, property, value, modifiers));
     }
   },
