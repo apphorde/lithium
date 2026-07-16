@@ -116,7 +116,7 @@ function setClassName(el: Element, classNames: string, value: any): void {
 }
 
 function setStyle(el: any, key: string, value: any): void {
-  el.style[toCamelCase] = value;
+  el.style[toCamelCase(key)] = value;
 }
 
 function setText(el: Text, text: any): void {
