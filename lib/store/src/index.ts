@@ -2,6 +2,7 @@ import { computed, watch, isRef, unwrap } from "@li3/web";
 
 const stores = new Map();
 const error = new Error("Store values are read-only");
+const storeKey = (name) => `$store${name}`;
 
 export function defineStore(storeName: string, factory: CallableFunction) {
   return function () {
@@ -10,6 +11,7 @@ export function defineStore(storeName: string, factory: CallableFunction) {
     }
 
     const store = factory();
+    const storageKey = storeKey(storeName);
     const readOnlyProperties = {};
     const refs = [];
 
@@ -37,12 +39,12 @@ export function defineStore(storeName: string, factory: CallableFunction) {
       clearTimeout(timer);
       timer = setTimeout(
         () =>
-          localStorage.setItem(storeName, JSON.stringify(readOnlyProperties)),
+          localStorage.setItem(storageKey, JSON.stringify(readOnlyProperties)),
         10,
       );
     });
 
-    const cached = localStorage.getItem(storeName);
+    const cached = localStorage.getItem(storageKey);
     if (cached) {
       try {
         const values = JSON.parse(cached);
