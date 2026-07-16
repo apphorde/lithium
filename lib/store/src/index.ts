@@ -18,17 +18,23 @@ export function defineStore(storeName: string, factory: CallableFunction) {
     for (const [name, value] of Object.entries(store)) {
       if (isRef(value)) {
         refs.push(value);
+        Object.defineProperty(readOnlyProperties, name, {
+          enumerable: true,
+          get() {
+            return unwrap(value);
+          },
+          set() {
+            throw error;
+          },
+        });
+      } else {
+        Object.defineProperty(readOnlyProperties, name, {
+          configurable: false,
+          enumerable: false,
+          writable: false,
+          value,
+        });
       }
-
-      Object.defineProperty(readOnlyProperties, name, {
-        enumerable: true,
-        get() {
-          return unwrap(value);
-        },
-        set() {
-          throw error;
-        },
-      });
     }
 
     const c = computed(() => refs.map((x) => x.value));
