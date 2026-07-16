@@ -51,8 +51,9 @@ export function defineStore(storeName: string, factory: CallableFunction) {
         const entries = Object.entries(values);
 
         for (const [key, value] of entries) {
-          if (isRef(store[key] && !isReadOnlyRef(store[key]))) {
-            store[key].value = value;
+          const k = store[key];
+          if (isRef(k) && !isReadOnlyRef(k)) {
+            k.value = value;
           }
         }
       } catch {}
