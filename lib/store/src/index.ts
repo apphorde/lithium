@@ -1,4 +1,4 @@
-import { computed, watch, isRef, unwrap } from "@li3/web";
+import { computed, watch, isRef, isReadOnlyRef, unwrap } from "@li3/web";
 
 const stores = new Map();
 const error = new Error("Store values are read-only");
@@ -51,7 +51,7 @@ export function defineStore(storeName: string, factory: CallableFunction) {
         const entries = Object.entries(values);
 
         for (const [key, value] of entries) {
-          if (isRef(store[key])) {
+          if (isRef(store[key] && !isReadOnlyRef(store[key]))) {
             store[key].value = value;
           }
         }

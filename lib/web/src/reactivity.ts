@@ -11,6 +11,7 @@ export type Signal<T = any> = {
 
 type SignalInternal<T = any> = Signal<T> & {
   [refTag]: true;
+  [readonly]: boolean;
   internalValue: T;
   dependencies: Set<SignalInternal>;
   watchers: Set<AnyFunction>;
@@ -21,6 +22,7 @@ const signalsStack: SignalInternal[] = [];
 const reactiveTag = Symbol('#');
 const unwrapTag = Symbol('[]');
 const refTag = Symbol('$');
+const readonly = Symbol('~');
 
 function canBeObserved(object: any): boolean {
   return object !== null && object !== undefined && typeof object === 'object' && !object[reactiveTag];
@@ -89,6 +91,10 @@ function unwrap<T = any>(object: T): T {
   return object;
 }
 
+function isReadOnlyRef(ref: Signal): boolean {
+  return (ref as SignalInternal)[readonly];
+}
+
 function ref<T>(initial?: T, isShallow?: boolean): Signal<T>;
 function ref<T = any>(initial: T | undefined, isShallow = false) {
   function reactiveEffect() {
@@ -101,6 +107,7 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
 
   const o: SignalInternal = {
     [refTag]: true,
+    [readonly]: false,
     suspended: false,
     internalValue: undefined as T,
     dependencies: new Set<SignalInternal>(),
@@ -139,6 +146,7 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
 function computed<T = any>(fn: () => T): Signal<T> {
   const o: SignalInternal<T> = {
     [refTag]: true,
+    [readonly]: true,
     suspended: false,
     internalValue: undefined as T,
     dependencies: new Set<SignalInternal>(),
@@ -282,4 +290,4 @@ function schedule(fn: AnyFunction) {
   }, 5);
 }
 
-export { ref, computed, effect, watch, hook, reactive, unwrap, isRef, shallowRef, canBeObserved, suspend, resume };
+export { ref, computed, effect, watch, hook, reactive, unwrap, isRef, isReadOnlyRef, shallowRef, canBeObserved, suspend, resume };
