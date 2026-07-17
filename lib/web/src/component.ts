@@ -279,7 +279,7 @@ export async function findApps() {
   }
 }
 
-function autoInitialize() {
+export function autoInitialize() {
   const components = Array.from(document.querySelectorAll('template[component]')) as HTMLTemplateElement[];
   const links = Array.from(document.querySelectorAll('link[rel="component"]')) as HTMLLinkElement[];
 
@@ -289,8 +289,10 @@ function autoInitialize() {
   findApps();
 }
 
-if (['complete', 'interactive'].includes(document.readyState)) {
-  autoInitialize();
-} else {
-  window.addEventListener('DOMContentLoaded', autoInitialize);
+if (!FF.skipAutoInitialize) {
+  if (['complete', 'interactive'].includes(document.readyState)) {
+    autoInitialize();
+  } else {
+    window.addEventListener('DOMContentLoaded', autoInitialize);
+  }
 }
