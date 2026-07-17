@@ -12,6 +12,7 @@ export type Signal<T = any> = {
 type SignalInternal<T = any> = Signal<T> & {
   [refTag]: true;
   [readonly]: boolean;
+  [Symbol.toPrimitive]: any;
   internalValue: T;
   dependencies: Set<SignalInternal>;
   watchers: Set<AnyFunction>;
@@ -23,6 +24,17 @@ const reactiveTag = Symbol('#');
 const unwrapTag = Symbol('[]');
 const refTag = Symbol('$');
 const readonly = Symbol('~');
+
+function toPrimitive(v: Signal, hint: string) {
+  if (hint === 'number') {
+    return Number(v.value);
+  }
+  if (hint === 'string') {
+    return String(v.value);
+  }
+
+  return v.value;
+}
 
 function canBeObserved(object: any): boolean {
   return object !== null && object !== undefined && typeof object === 'object' && !object[reactiveTag];
@@ -106,6 +118,9 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
   }
 
   const o: SignalInternal = {
+    [Symbol.toPrimitive](hint: string) {
+      return toPrimitive(o, hint);
+    },
     [refTag]: true,
     [readonly]: false,
     suspended: false,
@@ -145,6 +160,9 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
 
 function computed<T = any>(fn: () => T): Signal<T> {
   const o: SignalInternal<T> = {
+    [Symbol.toPrimitive](hint: string) {
+      return toPrimitive(o, hint);
+    },
     [refTag]: true,
     [readonly]: true,
     suspended: false,
