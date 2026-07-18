@@ -133,58 +133,49 @@ export function importCssModule(href: string) {
   return stylesheetCache.get(href);
 }
 
-let _importCssModule: any = importModuleFromSource(
-  'export default function(href) { return import(href, { with: { type: "css" } }) }',
-  "import-css-module.mjs",
-);
-
 async function importCssModuleInternal(href: string) {
-  if (typeof _importCssModule !== "function") {
-    _importCssModule = (await _importCssModule).default;
-  }
-
-  try {
-    return (await _importCssModule(href)).default as CSSStyleSheet;
-  } catch {
-    const sheet = new CSSStyleSheet();
-    sheet.replaceSync(`@import url(${href})`);
-    return sheet;
-  }
+  const sheet = new CSSStyleSheet();
+  sheet.replaceSync(`@import url(${href})`);
+  return sheet;
 }
 
 export async function importModuleFromSource(
   sourceText: string,
   origin: string,
 ) {
-  const fileName = String(origin).replace(".html", ".mjs");
-  const originalFile = new URL(fileName, 'https://li3.dev');
-  originalFile.pathname = originalFile.pathname.replace('.mjs', '.src.mjs');
-  const lineCount = sourceText.split(/\r?\n/).length;
-  const mappings = new Array(lineCount).fill("AACA");
-  mappings[0] = "AAAA";
+  if (origin) {
+    const fileName = String(origin).replace(".html", ".mjs");
+    const originalFile = new URL(fileName, 'https://li3.dev');
+    originalFile.pathname = originalFile.pathname.replace('.mjs', '.src.mjs');
+    const lineCount = sourceText.split(/\r?\n/).length;
+    const mappings = new Array(lineCount).fill("AACA");
+    mappings[0] = "AAAA";
 
-  const sourceMap = {
-    version: 3,
-    file: fileName,
-    sourcesContent: [sourceText],
-    sources: [String(originalFile)],
-    mappings: mappings.join(";"),
-  };
+    const sourceMap = {
+      version: 3,
+      file: fileName,
+      sourcesContent: [sourceText],
+      sources: [String(originalFile)],
+      mappings: mappings.join(";"),
+    };
 
-  const jsonString = JSON.stringify(sourceMap);
-  const base64Map = btoa(unescape(encodeURIComponent(jsonString)));
-  const mapUrl = `data:application/json;charset=utf-8;base64,${base64Map}`;
-  const instrumentedCode = `${sourceText}\n//# sourceMappingURL=${mapUrl}\n//# sourceURL=${fileName}`;
-  const blob = new Blob([instrumentedCode], { type: "application/javascript" });
+    const jsonString = JSON.stringify(sourceMap);
+    const base64Map = btoa(unescape(encodeURIComponent(jsonString)));
+    const mapUrl = `data:application/json;charset=utf-8;base64,${base64Map}`;
+    sourceText += `\n//# sourceMappingURL=${mapUrl}\n//# sourceURL=${fileName}`;
+  }
+
+  const blob = new Blob([sourceText], { type: "application/javascript" });
   const objectUrl = URL.createObjectURL(blob);
 
   try {
     return await import(objectUrl);
   } catch (error) {
-    if (error instanceof Error && error.stack) {
+    if (origin && error instanceof Error && error.stack) {
       const blobUrlPattern = new RegExp(objectUrl, "g");
       error.stack = error.stack.replace(blobUrlPattern, fileName);
     }
+    
     throw error;
   } finally {
     URL.revokeObjectURL(objectUrl);

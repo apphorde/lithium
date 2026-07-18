@@ -1,6 +1,7 @@
 import { FF } from './feature-flags.js';
 import { createContext, createReadOnlyContext, importCssModule, importModuleFromSource } from './internals.js';
 import { linkTreeToContext, linkTreeToContextAsync } from './rules.js';
+import { isRef, isReadOnlyRef } from './reactivity.js';
 import type { DefineComponentOptions, MountOptions } from './types';
 
 const DEBUG = Symbol('#');
@@ -178,10 +179,8 @@ async function findSetupModule(template: HTMLTemplateElement) {
   let stateFunction;
 
   if (stateCode) {
-    const code = stateCode.textContent;
-    const stateModule = importModuleFromSource(code, origin)
-    const stateDefault = (await stateModule).default;
-    stateFunction = typeof stateDefault !== 'function' ? () => stateDefault : stateDefault;
+    const code = stateCode.textContent.trim();
+    stateFunction = () => JSON.parse(code);
     stateCode.remove();
   }
 
@@ -194,10 +193,23 @@ async function findSetupModule(template: HTMLTemplateElement) {
   }
 
   if (setupFunction && stateFunction) {
-    return function() {
-      const state = await stateFunction() || {};
+    return async function() {
+      const state = stateFunction();
       const bindings = setupFunction() || {};
-      return {...state, ...bindings}
+
+      for (const [key, value] of Object.entries(state)) {
+        const $ = bindings[key];
+        
+        if (isRef($)) {
+          if (!isReadOnlyRef($)) {
+            $.value = value;
+          } 
+        } else {
+          bindings[key] = value;
+        }
+      }
+      
+      return bindings;
     }
   };
 
