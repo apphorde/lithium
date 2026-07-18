@@ -172,39 +172,39 @@
         <script state type="application/json">{
           "concepts": [
             { 
-              "t": "<template for=\"x of y\">",
+              "t": "\u003Ctemplate for=\"x of y\">",
               "s": "Render lists with natural iteration syntax",
-              "c": "<template for=\"item of items\">\n<li>{{ item }}</li>\n</template>",
+              "c": "\u003Ctemplate for=\"item of items\">\n<li>{{ item }}</li>\n\u003C/template>",
               "l": "html"
             },
             { 
-              "t": "<template if=\"xyz\">",
+              "t": "\u003Ctemplate if=\"xyz\">",
               "s": "Conditionally render DOM elements",
-              "c": "<template if=\"isVisible\"><div>Hidden until true</div></template>",
+              "c": "\u003Ctemplate if=\"isVisible\">\u003Cdiv>Hidden until true\u003C/div>\u003C/template>",
               "l": "html"
             },
             { 
-              "t": "<div bind-property=\"expression\">",
+              "t": "\u003Cdiv bind-property=\"expression\">",
               "s": "Bind properties to reactive expressions",
-              "c": "<button bind-disabled=\"isNotValid\">click me</button>",
+              "c": "\u003Cbutton bind-disabled=\"isNotValid\">click me\u003C/button>",
               "l": "html"
             },
             { 
-              "t": "<button on-event=\"handler($event)\">",
+              "t": "\u003Cbutton on-event=\"handler($event)\">",
               "s": "Listen to events and trigger handlers",
-              "c": "<button on-click=\"onBtnClick()\">click me</button>",
+              "c": "\u003Cbutton on-click=\"onBtnClick()\">click me\u003C/button>",
               "l": "html"
             },
             { 
               "t": "<script setup>",
               "s": "Define component behavior and state",
-              "c": "<script setup>\nimport { ref } from '@li3/web';\n\nexport default function() {\n  const count = ref(0);\n  return { count };}\u003C/script>",
+              "c": "\u003Cscript setup>\nimport { ref } from '@li3/web';\n\nexport default function() {\n  const count = ref(0);\n  return { count };}\u003C/script>",
               "l": "html"
             },
             { 
               "t": "ref(), computed(), hook()",
               "s": "Create reactive values and computed state",
-              "c": "<script setup>\nimport { ref, computed, watch, hook } from '@li3/web';\n\nexport default function() {\n  const count = ref(0);\n  const add2 = computed(() => count + 2);\n  const [n, setNumber] = hook(123); return { count, add2, n, setNumber };}\u003C/script>",
+              "c": "\u003Cscript setup>\nimport { ref, computed, watch, hook } from '@li3/web';\n\nexport default function() {\n  const count = ref(0);\n  const add2 = computed(() => count + 2);\n  const [n, setNumber] = hook(123); return { count, add2, n, setNumber };}\u003C/script>",
               "l": "javascript"
             }
           ]}</script>
@@ -218,61 +218,6 @@
             <code-block class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto" bind-src="c.c" bind-language="c.l">{{c.c}}</code-block>
           </div>
         </template>
-
-        <div
-          class="bg-gradient-to-br from-blue-50 to-transparent p-8 rounded-2xl border border-blue-200 hover:shadow-xl transition-shadow">
-          <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;div bind-xyz="expr"&gt;</h3>
-          <p class="text-gray-700 mb-4">Bind properties to reactive expressions</p>
-          <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
-              <span class="text-cyan-400">&lt;button</span>
-              <span class="text-yellow-400">bind-disabled="isActive"</span><span class="text-cyan-400">&gt;</span
-              ><br />click me<br /><span class="text-cyan-400">&lt;/button&gt;</span>
-            </code>
-        </div>
-
-        <div
-          class="bg-gradient-to-br from-green-50 to-transparent p-8 rounded-2xl border border-green-200 hover:shadow-xl transition-shadow">
-          <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;button on-xyz="handler()"&gt;</h3>
-          <p class="text-gray-700 mb-4">Listen to events and trigger handlers</p>
-          <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
-              <span class="text-cyan-400">&lt;button </span>
-              <div class="ml-4">
-                on-click="<span class="text-yellow-400">deleteItem(id)</span>"<span class="text-cyan-400">&gt;</span>
-                Delete
-              </div>
-              <span class="text-cyan-400">&lt;/button&gt;</span>
-            </code>
-        </div>
-
-        <div
-          class="bg-gradient-to-br from-indigo-50 to-transparent p-8 rounded-2xl border border-indigo-200 hover:shadow-xl transition-shadow">
-          <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;script setup&gt;</h3>
-          <p class="text-gray-700 mb-4">Define component behavior and state</p>
-          <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
-              <span class="text-cyan-400">&lt;script setup&gt; <br /></span>
-              <span class="text-red-400">export default </span>
-              <span class="text-yellow-400">function() {</span>
-              <div class="ml-4">
-                const count = ref(0);<br />
-                return { count };
-                <br />
-              </div>
-              <span class="text-yellow-400">}</span><br />
-              <span class="text-cyan-400">&lt;/script&gt;</span>
-            </code>
-        </div>
-
-        <div
-          class="bg-gradient-to-br from-yellow-50 to-transparent p-8 rounded-2xl border border-yellow-200 hover:shadow-xl transition-shadow">
-          <h3 class="text-xl font-bold text-gray-900 mb-3">ref(), computed(), watch()</h3>
-          <p class="text-gray-700 mb-4">Create reactive values and derived state</p>
-          <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
-              const count = <span class="text-yellow-400">ref(0);</span><br />
-              const double =
-              <span class="text-yellow-400">computed(() => count.value * 2)</span><br />
-              <span class="text-yellow-400">watch(count, () => ...)</span>
-            </code>
-        </div>
       </div>
     </div>
   </section>
