@@ -208,17 +208,18 @@
               "l": "javascript"
             }
           ]}</script>
-      </template>
+      
 
-      <div class="flex flex-col space-y-8">
-        <template for="c of concepts">
-          <div class="bg-gradient-to-br from-purple-50 to-transparent p-8 rounded-2xl border border-purple-200 hover:shadow-xl transition-shadow">
-            <h3 class="text-xl font-bold text-gray-900 mb-3">{{ c.t }}</h3>
-            <p class="text-gray-700 mb-4">{{ c.s }}</p>
-            <code-block class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto" bind-src="c.c" bind-language="c.l">{{c.c}}</code-block>
-          </div>
-        </template>
-      </div>
+        <div class="flex flex-col space-y-8">
+          <template for="c of concepts">
+            <div class="bg-gradient-to-br from-purple-50 to-transparent p-8 rounded-2xl border border-purple-200 hover:shadow-xl transition-shadow">
+              <h3 class="text-xl font-bold text-gray-900 mb-3">{{ c.t }}</h3>
+              <p class="text-gray-700 mb-4">{{ c.s }}</p>
+              <code-block class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto" bind-src="c.c" bind-language="c.l">{{c.c}}</code-block>
+            </div>
+          </template>
+        </div>
+      </template>
     </div>
   </section>
 
