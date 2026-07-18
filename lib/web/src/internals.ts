@@ -133,15 +133,27 @@ export function importCssModule(href: string) {
   return stylesheetCache.get(href);
 }
 
+let _importCssModule: any = importModuleFromSource(
+  'export default function(href) { return import(href, { with: { type: "css" } }) }'
+);
+
 async function importCssModuleInternal(href: string) {
-  const sheet = new CSSStyleSheet();
-  sheet.replaceSync(`@import url(${href})`);
-  return sheet;
+  if (typeof _importCssModule !== "function") {
+    _importCssModule = (await _importCssModule).default;
+  }
+
+  try {
+    return (await _importCssModule(href)).default as CSSStyleSheet;
+  } catch {
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync(`@import url(${href})`);
+    return sheet;
+  }
 }
 
 export async function importModuleFromSource(
   sourceText: string,
-  origin: string,
+  origin?: string,
 ) {
   let fileName;
   if (origin) {
