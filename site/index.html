@@ -159,7 +159,6 @@
     </div>
   </section>
 
-  <!-- Concepts Section -->
   <section id="concepts" class="py-24 px-8 bg-white">
     <div class="max-w-7xl mx-auto">
       <div class="text-center mb-16">
@@ -167,8 +166,9 @@
         <p class="text-xl text-gray-700">Simple rules that make everything powerful</p>
       </div>
 
+      <link rel="component" href="https://sodium.static.apphor.de/code-block.html" />
+
       <template app>
-        <link rel="component" href="https://sodium.static.apphor.de/code-block.html" />
         <script state type="application/json">{
           "concepts": [
             { 
@@ -206,7 +206,7 @@
               "s": "Create reactive values and computed state",
               "c": "<script setup>\nimport { ref, computed, watch, hook } from '@li3/web';\n\nexport default function() {\n  const count = ref(0);\n  const add2 = computed(() => count + 2);\n  const [n, setNumber] = hook(123); return { count, add2, n, setNumber };}\u003C/script>",
               "l": "javascript"
-            },
+            }
           ]}</script>
       </template>
 
@@ -215,7 +215,7 @@
           <div class="bg-gradient-to-br from-purple-50 to-transparent p-8 rounded-2xl border border-purple-200 hover:shadow-xl transition-shadow">
             <h3 class="text-xl font-bold text-gray-900 mb-3">{{ c.t }}</h3>
             <p class="text-gray-700 mb-4">{{ c.s }}</p>
-            <code-block class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto" bind-src="c.c" bind-language="c.l"></code-block>
+            <code-block class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto" bind-src="c.c" bind-language="c.l">{{c.c}}</code-block>
           </div>
         </template>
 
