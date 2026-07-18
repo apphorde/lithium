@@ -143,8 +143,9 @@ export async function importModuleFromSource(
   sourceText: string,
   origin: string,
 ) {
+  let fileName;
   if (origin) {
-    const fileName = String(origin).replace(".html", ".mjs");
+    fileName = String(origin).replace(".html", ".mjs");
     const originalFile = new URL(fileName, 'https://li3.dev');
     originalFile.pathname = originalFile.pathname.replace('.mjs', '.src.mjs');
     const lineCount = sourceText.split(/\r?\n/).length;
