@@ -1,269 +1,231 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="component" href="/code-block.html" />
-    <title>Lithium - Pure Web UI library</title>
-    <script type="importmap">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="component" href="/code-block.html" />
+  <title>Lithium - Pure Web UI library</title>
+  <script type="importmap">
       {
         "imports": {
           "@li3/": "https://at-li3.static.apphor.de/"
         }
       }
     </script>
-    <script type="module">
-      import '@li3/web';
-    </script>
-  </head>
-  <body class="font-sans text-gray-900 antialiased bg-white">
-    <!-- Navigation -->
-    <nav class="flex justify-between items-center px-8 py-4 bg-white border-b border-gray-100">
-      <a href="#" class="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">Li³</a>
-      <div class="hidden md:flex gap-8">
-        <a href="#philosophy" class="text-gray-600 hover:text-lithium transition-colors font-medium">Philosophy</a>
-        <a href="#concepts" class="text-gray-600 hover:text-lithium transition-colors font-medium">Concepts</a>
-        <a href="#examples" class="text-gray-600 hover:text-lithium transition-colors font-medium">Examples</a>
-        <a
-          href="https://github.com/apphorde/lithium"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-gray-600 hover:text-lithium transition-colors font-medium"
-          >GitHub</a
-        >
-      </div>
-    </nav>
+  <script type="module">
+    import '@li3/web';
+  </script>
+</head>
 
-    <!-- Hero Section -->
-    <section class="relative min-h-screen bg-gradient-to-br from-white via-purple-50 to-white overflow-hidden">
-      <div
-        class="absolute top-0 right-0 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
-      ></div>
-      <div
-        class="absolute bottom-0 left-0 w-96 h-96 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
-        style="animation-delay: 2s"
-      ></div>
+<body class="font-sans text-gray-900 antialiased bg-white">
+  <!-- Navigation -->
+  <nav class="flex justify-between items-center px-8 py-4 bg-white border-b border-gray-100">
+    <a href="#" class="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">Li³</a>
+    <div class="hidden md:flex gap-8">
+      <a href="#philosophy" class="text-gray-600 hover:text-lithium transition-colors font-medium">Philosophy</a>
+      <a href="#concepts" class="text-gray-600 hover:text-lithium transition-colors font-medium">Concepts</a>
+      <a href="#examples" class="text-gray-600 hover:text-lithium transition-colors font-medium">Examples</a>
+      <a href="https://github.com/apphorde/lithium" target="_blank" rel="noopener noreferrer"
+        class="text-gray-600 hover:text-lithium transition-colors font-medium">GitHub</a>
+    </div>
+  </nav>
 
-      <div
-        class="relative max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between px-8 py-20 md:py-32 gap-12"
-      >
-        <div class="flex-1 max-w-3xl">
-          <div class="inline-block mb-4">
-            <span class="px-4 py-2 bg-purple-100 text-lithium rounded-full text-sm font-semibold">Pure Web APIs</span>
-          </div>
-          <h1 class="text-6xl md:text-7xl font-bold mb-6 leading-tight">
-            <span class="bg-gradient-primary bg-clip-text text-transparent">Lithium</span>
-          </h1>
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-8">
-            The UI runtime that speaks your language: HTML
-          </h2>
-          <p class="text-xl text-gray-700 mb-8 leading-relaxed">
-            Stop learning new syntax. Lithium harnesses the power of standard Web APIs and extends them naturally with a
-            few simple markup rules. Write less, do more.
-          </p>
-          <div class="flex flex-wrap gap-4">
-            <a
-              href="#concepts"
-              class="px-8 py-4 bg-gradient-primary text-white rounded-xl font-semibold hover:shadow-lg transform hover:-translate-y-1 transition-all"
-            >
-              Learn the Concepts
-            </a>
-            <a
-              href="https://github.com/apphorde/lithium"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="px-8 py-4 bg-white text-lithium border-2 border-lithium rounded-xl font-semibold hover:bg-purple-50 transform hover:-translate-y-1 transition-all"
-            >
-              View on GitHub →
-            </a>
-          </div>
+  <!-- Hero Section -->
+  <section class="relative min-h-screen bg-gradient-to-br from-white via-purple-50 to-white overflow-hidden">
+    <div
+      class="absolute top-0 right-0 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse">
+    </div>
+    <div
+      class="absolute bottom-0 left-0 w-96 h-96 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
+      style="animation-delay: 2s"></div>
+
+    <div
+      class="relative max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between px-8 py-20 md:py-32 gap-12">
+      <div class="flex-1 max-w-3xl">
+        <div class="inline-block mb-4">
+          <span class="px-4 py-2 bg-purple-100 text-lithium rounded-full text-sm font-semibold">Pure Web APIs</span>
         </div>
+        <h1 class="text-6xl md:text-7xl font-bold mb-6 leading-tight">
+          <span class="bg-gradient-primary bg-clip-text text-transparent">Lithium</span>
+        </h1>
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-8">
+          The UI runtime that speaks your language: HTML
+        </h2>
+        <p class="text-xl text-gray-700 mb-8 leading-relaxed">
+          Stop learning new syntax. Lithium harnesses the power of standard Web APIs and extends them naturally with a
+          few simple markup rules. Write less, do more.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="#concepts"
+            class="px-8 py-4 bg-gradient-primary text-white rounded-xl font-semibold hover:shadow-lg transform hover:-translate-y-1 transition-all">
+            Learn the Concepts
+          </a>
+          <a href="https://github.com/apphorde/lithium" target="_blank" rel="noopener noreferrer"
+            class="px-8 py-4 bg-white text-lithium border-2 border-lithium rounded-xl font-semibold hover:bg-purple-50 transform hover:-translate-y-1 transition-all">
+            View on GitHub →
+          </a>
+        </div>
+      </div>
 
-        <div class="flex-1 relative">
-          <div class="bg-gray-900 rounded-2xl p-8 shadow-2xl">
-            <div class="text-green-400 font-mono text-sm md:text-base space-y-2">
-              <div>
-                &lt;button
-                <div class="ml-4">
-                  <div>
-                    <span class="text-yellow-400">class-font-bold</span>=<span class="text-yellow-400"
-                      >"counter > 2"</span
-                    >
-                  </div>
-                  <div>
-                    <span class="text-yellow-400">bind-disabled</span>=<span class="text-yellow-400"
-                      >"counter > 5"</span
-                    >
-                  </div>
-                  <div>
-                    <span class="text-yellow-400">attr-aria-disabled</span>=<span class="text-yellow-400"
-                      >"counter > 5"</span
-                    >
-                  </div>
-                  <div>
-                    <span class="text-pink-400">on-click</span>=<span class="text-yellow-400">"increment()"</span>
-                  </div>
+      <div class="flex-1 relative">
+        <div class="bg-gray-900 rounded-2xl p-8 shadow-2xl">
+          <div class="text-green-400 font-mono text-sm md:text-base space-y-2">
+            <div>
+              &lt;button
+              <div class="ml-4">
+                <div>
+                  <span class="text-yellow-400">class-font-bold</span>=<span class="text-yellow-400">"counter >
+                    2"</span>
                 </div>
-                &gt;
+                <div>
+                  <span class="text-yellow-400">bind-disabled</span>=<span class="text-yellow-400">"counter > 5"</span>
+                </div>
+                <div>
+                  <span class="text-yellow-400">attr-aria-disabled</span>=<span class="text-yellow-400">"counter >
+                    5"</span>
+                </div>
+                <div>
+                  <span class="text-pink-400">on-click</span>=<span class="text-yellow-400">"increment()"</span>
+                </div>
+              </div>
+              &gt;
+            </div>
+            <div class="ml-4">
+              &lt;p&gt;<span class="text-yellow-400">Count: {{ <span class="text-purple-300">count</span>
+                }}</span>&lt;/p&gt;
+            </div>
+
+            <div>&lt;/div&gt;</div>
+            <div class="mt-4 text-blue-300">
+              <div>&lt;script <span class="text-pink-400">setup</span>&gt;</div>
+              <div class="ml-4 mb-4">
+                <span class="text-pink-400">import</span> { <span class="text-yellow-300">ref</span> }
+                <span class="text-pink-400">from</span>
+                <span class="text-green-400">"@li3/web"</span>
               </div>
               <div class="ml-4">
-                &lt;p&gt;<span class="text-yellow-400">Count: {{ <span class="text-purple-300">count</span> }}</span
-                >&lt;/p&gt;
+                <span class="text-pink-400">export default</span>
+                <span class="text-yellow-400">function</span>() {
+
+                <div class="ml-4">const count = <span class="text-yellow-400">ref(0)</span></div>
+                <div class="ml-4">const <span class="text-yellow-300">increment</span> = () =&gt; count.value++</div>
+                <div class="ml-4"><span class="text-pink-400">return</span> { count, increment };</div>
+                <div>}</div>
               </div>
-
-              <div>&lt;/div&gt;</div>
-              <div class="mt-4 text-blue-300">
-                <div>&lt;script <span class="text-pink-400">setup</span>&gt;</div>
-                <div class="ml-4 mb-4">
-                  <span class="text-pink-400">import</span> { <span class="text-yellow-300">ref</span> }
-                  <span class="text-pink-400">from</span>
-                  <span class="text-green-400">"@li3/web"</span>
-                </div>
-                <div class="ml-4">
-                  <span class="text-pink-400">export default</span>
-                  <span class="text-yellow-400">function</span>() {
-
-                  <div class="ml-4">const count = <span class="text-yellow-400">ref(0)</span></div>
-                  <div class="ml-4">const <span class="text-yellow-300">increment</span> = () =&gt; count.value++</div>
-                  <div class="ml-4"><span class="text-pink-400">return</span> { count, increment };</div>
-                  <div>}</div>
-                </div>
-                <div>&lt;/script&gt;</div>
-              </div>
+              <div>&lt;/script&gt;</div>
             </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Snippet Section -->
-    <section id="philosophy" class="py-24 px-8 bg-gray-50 border-t border-gray-200">
-      <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-16">
-          <h2 class="text-5xl font-bold text-gray-900 mb-4">Drop in by design</h2>
-          <p class="text-xl text-gray-700 max-w-3xl mx-auto">
-            Add an import map entry.<br />
-            Load the library.<br />
-            That's it!<br />
-          </p>
-        </div>
+  <!-- Snippet Section -->
+  <section id="philosophy" class="py-24 px-8 bg-gray-50 border-t border-gray-200">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-5xl font-bold text-gray-900 mb-4">Drop in by design</h2>
+        <p class="text-xl text-gray-700 max-w-3xl mx-auto">
+          Add an import map entry.<br />
+          Load the library.<br />
+          That's it!<br />
+        </p>
+      </div>
 
-        <!-- snippet -->
-        <div class="max-w-3xl mx-auto my-8">
-          <div class="bg-gray-900 rounded-2xl p-8 shadow-2xl text-green-400 font-mono text-sm md:text-base space-y-2">
-            &lt;script <span class="text-yellow-400">type="importmap"</span>&gt;
-            <span class="text-pink-400">{"imports": { "@li3/": "https://cdn.li3.dev/@li3/" }}</span>
-            <div>&lt;/script&gt;</div>
-            <div>
-              &lt;script <span class="text-yellow-400">type="</span><span class="text-cyan-400">module</span>"&gt;<span class="text-purple-400">import </span><span class="text-yellow-400">"@li3/web"</span>&lt;/script&gt;
-            </div>
+      <!-- snippet -->
+      <div class="max-w-3xl mx-auto my-8">
+        <div class="bg-gray-900 rounded-2xl p-8 shadow-2xl text-green-400 font-mono text-sm md:text-base space-y-2">
+          &lt;script <span class="text-yellow-400">type="importmap"</span>&gt;
+          <span class="text-pink-400">{"imports": { "@li3/": "https://cdn.li3.dev/@li3/" }}</span>
+          <div>&lt;/script&gt;</div>
+          <div>
+            &lt;script <span class="text-yellow-400">type="</span><span class="text-cyan-400">module</span>"&gt;<span
+              class="text-purple-400">import </span><span class="text-yellow-400">"@li3/web"</span>&lt;/script&gt;
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section id="philosophy" class="py-24 px-8 bg-gray-50 border-t border-gray-200">
-      <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-16">
-          <h2 class="text-5xl font-bold text-gray-900 mb-4">Built on Web Fundamentals</h2>
-          <p class="text-xl text-gray-700 max-w-3xl mx-auto">
-            Lithium doesn't invent a new language. It embraces HTML, CSS, and JavaScript as they are, adding minimal,
-            intuitive extensions.
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div class="bg-white p-8 rounded-2xl shadow-lg border-l-4 border-lithium">
-            <div class="text-4xl mb-4">📥</div>
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">All Props Down, All Changes Up via Events</h3>
-            <p class="text-gray-700 mb-4">
-              Data flows down through properties, changes flow up through events. This creates a clear, predictable data
-              pattern that mirrors how the web has always worked.
-            </p>
-          </div>
-
-          <div class="bg-white p-8 rounded-2xl shadow-lg border-l-4 border-pink-500">
-            <div class="text-4xl mb-4">🔐</div>
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">Read-Only Templates</h3>
-            <p class="text-gray-700 mb-4">
-              Templates are declarative and read-only. State changes don't come from the template—they flow through your
-              component logic via events and ref updates.
-            </p>
-          </div>
-        </div>
+  <section id="philosophy" class="py-24 px-8 bg-gray-50 border-t border-gray-200">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-5xl font-bold text-gray-900 mb-4">Built on Web Fundamentals</h2>
+        <p class="text-xl text-gray-700 max-w-3xl mx-auto">
+          Lithium doesn't invent a new language. It embraces HTML, CSS, and JavaScript as they are, adding minimal,
+          intuitive extensions.
+        </p>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Concepts Section -->
-    <section id="concepts" class="py-24 px-8 bg-white">
-      <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-16">
-          <h2 class="text-5xl font-bold text-gray-900 mb-4">Core Concepts</h2>
-          <p class="text-xl text-gray-700">Simple rules that make everything powerful</p>
-        </div>
+  <!-- Concepts Section -->
+  <section id="concepts" class="py-24 px-8 bg-white">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-5xl font-bold text-gray-900 mb-4">Core Concepts</h2>
+        <p class="text-xl text-gray-700">Simple rules that make everything powerful</p>
+      </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <!-- Concept 1 -->
-          <div
-            class="bg-gradient-to-br from-purple-50 to-transparent p-8 rounded-2xl border border-purple-200 hover:shadow-xl transition-shadow"
-          >
-            <div class="inline-block mb-4 p-3 bg-gradient-primary rounded-lg">
-              <span class="text-2xl">🔁</span>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;template for="x of y"&gt;</h3>
-            <p class="text-gray-700 mb-4">Render lists with natural iteration syntax</p>
-            <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Concept 1 -->
+        <div
+          class="bg-gradient-to-br from-purple-50 to-transparent p-8 rounded-2xl border border-purple-200 hover:shadow-xl transition-shadow">
+          <div class="inline-block mb-4 p-3 bg-gradient-primary rounded-lg">
+            <span class="text-2xl">🔁</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;template for="x of y"&gt;</h3>
+          <p class="text-gray-700 mb-4">Render lists with natural iteration syntax</p>
+          <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
               <span class="text-cyan-400">&lt;template</span>
               <span class="text-yellow-400">for="item of items"</span>&gt;<br />
               <div class="ml-4">&lt;li&gt;{{item}}&lt;/li&gt;<br /></div>
               <span class="text-cyan-400">&lt;/template&gt;</span>
             </code>
-          </div>
+        </div>
 
-          <!-- Concept 2 -->
-          <div
-            class="bg-gradient-to-br from-pink-50 to-transparent p-8 rounded-2xl border border-pink-200 hover:shadow-xl transition-shadow"
-          >
-            <div class="inline-block mb-4 p-3 bg-gradient-accent rounded-lg">
-              <span class="text-2xl">❓</span>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;template if="xyz"&gt;</h3>
-            <p class="text-gray-700 mb-4">Conditionally render DOM elements</p>
-            <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
+        <!-- Concept 2 -->
+        <div
+          class="bg-gradient-to-br from-pink-50 to-transparent p-8 rounded-2xl border border-pink-200 hover:shadow-xl transition-shadow">
+          <div class="inline-block mb-4 p-3 bg-gradient-accent rounded-lg">
+            <span class="text-2xl">❓</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;template if="xyz"&gt;</h3>
+          <p class="text-gray-700 mb-4">Conditionally render DOM elements</p>
+          <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
               <span class="text-cyan-400">&lt;template</span>
               <span class="text-yellow-400">if="isVisible"</span>&gt;
               <div class="ml-4">&lt;div&gt;Hidden until true&lt;/div&gt;</div>
 
               <span class="text-cyan-400">&lt;/template&gt;</span>
             </code>
-          </div>
+        </div>
 
-          <!-- Concept 3 -->
-          <div
-            class="bg-gradient-to-br from-blue-50 to-transparent p-8 rounded-2xl border border-blue-200 hover:shadow-xl transition-shadow"
-          >
-            <div class="inline-block mb-4 p-3 bg-blue-400 rounded-lg">
-              <span class="text-2xl">🎯</span>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;div bind-xyz="expr"&gt;</h3>
-            <p class="text-gray-700 mb-4">Bind properties to reactive expressions</p>
-            <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
+        <!-- Concept 3 -->
+        <div
+          class="bg-gradient-to-br from-blue-50 to-transparent p-8 rounded-2xl border border-blue-200 hover:shadow-xl transition-shadow">
+          <div class="inline-block mb-4 p-3 bg-blue-400 rounded-lg">
+            <span class="text-2xl">🎯</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;div bind-xyz="expr"&gt;</h3>
+          <p class="text-gray-700 mb-4">Bind properties to reactive expressions</p>
+          <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
               <span class="text-cyan-400">&lt;button</span>
               <span class="text-yellow-400">bind-disabled="isActive"</span><span class="text-cyan-400">&gt;</span
               ><br />click me<br /><span class="text-cyan-400">&lt;/button&gt;</span>
             </code>
-          </div>
+        </div>
 
-          <!-- Concept 4 -->
-          <div
-            class="bg-gradient-to-br from-green-50 to-transparent p-8 rounded-2xl border border-green-200 hover:shadow-xl transition-shadow"
-          >
-            <div class="inline-block mb-4 p-3 bg-green-400 rounded-lg">
-              <span class="text-2xl">🔊</span>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;button on-xyz="handler()"&gt;</h3>
-            <p class="text-gray-700 mb-4">Listen to events and trigger handlers</p>
-            <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
+        <!-- Concept 4 -->
+        <div
+          class="bg-gradient-to-br from-green-50 to-transparent p-8 rounded-2xl border border-green-200 hover:shadow-xl transition-shadow">
+          <div class="inline-block mb-4 p-3 bg-green-400 rounded-lg">
+            <span class="text-2xl">🔊</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;button on-xyz="handler()"&gt;</h3>
+          <p class="text-gray-700 mb-4">Listen to events and trigger handlers</p>
+          <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
               <span class="text-cyan-400">&lt;button </span>
               <div class="ml-4">
                 on-click="<span class="text-yellow-400">deleteItem(id)</span>"<span class="text-cyan-400">&gt;</span>
@@ -271,18 +233,17 @@
               </div>
               <span class="text-cyan-400">&lt;/button&gt;</span>
             </code>
-          </div>
+        </div>
 
-          <!-- Concept 5 -->
-          <div
-            class="bg-gradient-to-br from-indigo-50 to-transparent p-8 rounded-2xl border border-indigo-200 hover:shadow-xl transition-shadow"
-          >
-            <div class="inline-block mb-4 p-3 bg-indigo-400 rounded-lg">
-              <span class="text-2xl">⚙️</span>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;script setup&gt;</h3>
-            <p class="text-gray-700 mb-4">Define component behavior and state</p>
-            <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
+        <!-- Concept 5 -->
+        <div
+          class="bg-gradient-to-br from-indigo-50 to-transparent p-8 rounded-2xl border border-indigo-200 hover:shadow-xl transition-shadow">
+          <div class="inline-block mb-4 p-3 bg-indigo-400 rounded-lg">
+            <span class="text-2xl">⚙️</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;script setup&gt;</h3>
+          <p class="text-gray-700 mb-4">Define component behavior and state</p>
+          <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
               <span class="text-cyan-400">&lt;script setup&gt; <br /></span>
               <span class="text-red-400">export default </span>
               <span class="text-yellow-400">function() {</span>
@@ -294,139 +255,172 @@
               <span class="text-yellow-400">}</span><br />
               <span class="text-cyan-400">&lt;/script&gt;</span>
             </code>
-          </div>
+        </div>
 
-          <!-- Concept 6 -->
-          <div
-            class="bg-gradient-to-br from-yellow-50 to-transparent p-8 rounded-2xl border border-yellow-200 hover:shadow-xl transition-shadow"
-          >
-            <div class="inline-block mb-4 p-3 bg-yellow-400 rounded-lg">
-              <span class="text-2xl">💡</span>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-3">ref(), computed(), watch()</h3>
-            <p class="text-gray-700 mb-4">Create reactive values and derived state</p>
-            <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
+        <!-- Concept 6 -->
+        <div
+          class="bg-gradient-to-br from-yellow-50 to-transparent p-8 rounded-2xl border border-yellow-200 hover:shadow-xl transition-shadow">
+          <div class="inline-block mb-4 p-3 bg-yellow-400 rounded-lg">
+            <span class="text-2xl">💡</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">ref(), computed(), watch()</h3>
+          <p class="text-gray-700 mb-4">Create reactive values and derived state</p>
+          <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
               const count = <span class="text-yellow-400">ref(0);</span><br />
               const double =
               <span class="text-yellow-400">computed(() => count.value * 2)</span><br />
               <span class="text-yellow-400">watch(count, () => ...)</span>
             </code>
-          </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Examples Section -->
-    <section id="examples" class="py-24 px-8 bg-gray-50 border-t border-gray-200">
+  <!-- Examples Section -->
+  <section id="examples" class="py-24 px-8 bg-gray-50 border-t border-gray-200">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-5xl font-bold text-gray-900 mb-4">One-File Applications</h2>
+        <p class="text-xl text-gray-700">Entire apps in a single file with inline components and a declarative API</p>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
+        <div class="bg-gray-900 p-8 text-green-400 font-mono text-sm overflow-x-auto">
+          <div class="text-blue-300">&lt;!-- Counter App --&gt;</div>
+          <div>&lt;template app&gt;</div>
+          <div class="ml-4">&lt;h1&gt;{{title}}&lt;/h1&gt;</div>
+          <div class="ml-4">&lt;div class-warning="count &gt; 10"&gt;</div>
+          <div class="ml-8">&lt;p&gt;Count: &lt;strong&gt;{{count}}&lt;/strong&gt;&lt;/p&gt;</div>
+          <div class="ml-8">&lt;template if="count &gt; 0"&gt;</div>
+          <div class="ml-12">&lt;p class="text-sm text-gray-500"&gt;You've clicked {{count}} times&lt;/p&gt;</div>
+          <div class="ml-8">&lt;/template&gt;</div>
+          <div class="ml-4">&lt;/div&gt;</div>
+          <div class="ml-4">&lt;div class="button-group"&gt;</div>
+          <div class="ml-8">&lt;button on-click="increment()"&gt;Increment&lt;/button&gt;</div>
+          <div class="ml-8">&lt;button on-click="reset()"&gt;Reset&lt;/button&gt;</div>
+          <div class="ml-4">&lt;/div&gt;</div>
+
+          <div class="mt-4 ml-4">
+            <div class="text-blue-300">&lt;script setup&gt;</div>
+            <div class="ml-4"><span class="text-pink-400">export default </span><span
+                class="text-yellow-400">function</span>() {
+              <div class="ml-4">const title = <span class="text-yellow-400">ref(</span>'Counter App'<span
+                  class="text-yellow-400">)</span></div>
+              <div class="ml-4">const <span class="text-cyan-400">count</span> = <span
+                  class="text-yellow-400">ref</span>(0)</div>
+              <div class="ml-4">const <span class="text-cyan-400">increment</span> = () =&gt; count.value++</div>
+              <div class="ml-4">const <span class="text-cyan-400">reset</span> = () =&gt; count.value = 0</div>
+              }
+            </div>
+            <div class="text-blue-300">&lt;/script&gt;</div>
+          </div>
+          <div>&lt;/template&gt;</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+        <div class="bg-white p-8 rounded-2xl border border-gray-200">
+          <h3 class="text-lg font-bold text-gray-900 mb-2">Minimal Syntax</h3>
+          <p class="text-gray-700">Only learn the extensions you need. HTML stays HTML.</p>
+        </div>
+        <div class="bg-white p-8 rounded-2xl border border-gray-200">
+          <h3 class="text-lg font-bold text-gray-900 mb-2">No Build Required</h3>
+          <p class="text-gray-700">Works instantly in the browser with no compilation step.</p>
+        </div>
+        <div class="bg-white p-8 rounded-2xl border border-gray-200">
+          <h3 class="text-lg font-bold text-gray-900 mb-2">Progressive Enhancement</h3>
+          <p class="text-gray-700">Add reactivity to existing HTML incrementally.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="facts" class="py-24 px-8 bg-gray-50 border-t border-gray-200">
+    <template app>
+      <script state>
+        export default {
+          facts: [{
+            title: 'All Props Down, All Changes Up via Events',
+            content: `Data flows down through properties, changes flow up through events. This creates a clear, predictable data
+              pattern that mirrors how the web has always worked.`,
+          },
+          {
+            title: 'Read-Only Templates',
+            content: `Templates are declarative and read-only. State changes don't come from the template -- they flow through your
+              component logic via events and ref updates.`
+          },
+          {
+            title: 'Event names are always lowercase',
+            content: `events defined within a component should always use a lowercase format, and never contain dashes. The same rules applies to native
+            events, like click or mouseover.`
+          }],
+        }
+      </script>
+
       <div class="max-w-7xl mx-auto">
         <div class="text-center mb-16">
-          <h2 class="text-5xl font-bold text-gray-900 mb-4">One-File Applications</h2>
-          <p class="text-xl text-gray-700">Entire apps in a single file with inline components and a declarative API</p>
+          <h2 class="text-5xl font-bold text-gray-900 mb-4">Things you should know</h2>
+          <p class="text-xl text-gray-700">Small facts that you should keep in mind</p>
         </div>
-
-        <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
-          <div class="bg-gray-900 p-8 text-green-400 font-mono text-sm overflow-x-auto">
-            <div class="text-blue-300">&lt;!-- Counter App --&gt;</div>
-            <div>&lt;template app&gt;</div>
-            <div class="ml-4">&lt;h1&gt;{{title}}&lt;/h1&gt;</div>
-            <div class="ml-4">&lt;div class-warning="count &gt; 10"&gt;</div>
-            <div class="ml-8">&lt;p&gt;Count: &lt;strong&gt;{{count}}&lt;/strong&gt;&lt;/p&gt;</div>
-            <div class="ml-8">&lt;template if="count &gt; 0"&gt;</div>
-            <div class="ml-12">&lt;p class="text-sm text-gray-500"&gt;You've clicked {{count}} times&lt;/p&gt;</div>
-            <div class="ml-8">&lt;/template&gt;</div>
-            <div class="ml-4">&lt;/div&gt;</div>
-            <div class="ml-4">&lt;div class="button-group"&gt;</div>
-            <div class="ml-8">&lt;button on-click="increment()"&gt;Increment&lt;/button&gt;</div>
-            <div class="ml-8">&lt;button on-click="reset()"&gt;Reset&lt;/button&gt;</div>
-            <div class="ml-4">&lt;/div&gt;</div>
-
-            <div class="mt-4 ml-4">
-              <div class="text-blue-300">&lt;script setup&gt;</div>
-              <div class="ml-4"><span class="text-pink-400">export default </span><span class="text-yellow-400">function</span>() {
-                <div class="ml-4">const title = <span class="text-yellow-400">ref(</span>'Counter App'<span class="text-yellow-400">)</span></div>
-                <div class="ml-4">const <span class="text-cyan-400">count</span> = <span class="text-yellow-400">ref</span>(0)</div>
-                <div class="ml-4">const <span class="text-cyan-400">increment</span> = () =&gt; count.value++</div>
-                <div class="ml-4">const <span class="text-cyan-400">reset</span> = () =&gt; count.value = 0</div>
-              }
-              </div>
-              <div class="text-blue-300">&lt;/script&gt;</div>
-            </div>
-            <div>&lt;/template&gt;</div>
-          </div>
-        </div>
-
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-          <div class="bg-white p-8 rounded-2xl border border-gray-200">
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Minimal Syntax</h3>
-            <p class="text-gray-700">Only learn the extensions you need. HTML stays HTML.</p>
-          </div>
-          <div class="bg-white p-8 rounded-2xl border border-gray-200">
-            <h3 class="text-lg font-bold text-gray-900 mb-2">No Build Required</h3>
-            <p class="text-gray-700">Works instantly in the browser with no compilation step.</p>
-          </div>
-          <div class="bg-white p-8 rounded-2xl border border-gray-200">
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Progressive Enhancement</h3>
-            <p class="text-gray-700">Add reactivity to existing HTML incrementally.</p>
-          </div>
+          <template for="fact of facts">
+            <div class="bg-white p-8 rounded-2xl border border-gray-200">
+              <h3 class="text-lg font-bold text-gray-900 mb-2">{{ fact.title }}</h3>
+              <p class="text-gray-700">{{ fact.content }}</p>
+            </div>
+          </template>
         </div>
       </div>
-    </section>
+    </template>
+  </section>
 
-    <!-- CTA Section -->
-    <section class="py-24 px-8 bg-gradient-primary text-white">
-      <div class="max-w-4xl mx-auto text-center">
-        <h2 class="text-5xl font-bold mb-6">Ready to simplify your frontend?</h2>
-        <p class="text-xl mb-8 opacity-90">
-          Start building with Lithium today. It takes just minutes to get up and running.
-        </p>
-        <a
-          href="https://github.com/apphorde/lithium"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-block px-8 py-4 bg-white text-lithium rounded-xl font-bold hover:shadow-lg transform hover:-translate-y-1 transition-all"
-        >
-          Star on GitHub →
-        </a>
-      </div>
-    </section>
+  <!-- CTA Section -->
+  <section class="py-24 px-8 bg-gradient-primary text-white">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-5xl font-bold mb-6">Ready to simplify your frontend?</h2>
+      <p class="text-xl mb-8 opacity-90">
+        Start building with Lithium today. It takes just minutes to get up and running.
+      </p>
+      <a href="https://github.com/apphorde/lithium" target="_blank" rel="noopener noreferrer"
+        class="inline-block px-8 py-4 bg-white text-lithium rounded-xl font-bold hover:shadow-lg transform hover:-translate-y-1 transition-all">
+        Star on GitHub →
+      </a>
+    </div>
+  </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-gray-400 py-12 px-8">
-      <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-        <div>
-          <h3 class="text-white font-bold text-xl mb-2">Lithium</h3>
-          <p>Pure Web APIs, Beautifully Extended</p>
-        </div>
-        <div class="flex gap-8 text-sm">
-          <a
-            href="https://github.com/apphorde/lithium"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="hover:text-white transition-colors"
-            >GitHub</a
-          >
-          <a href="#philosophy" class="hover:text-white transition-colors">Docs</a>
-          <a href="#concepts" class="hover:text-white transition-colors">API</a>
-        </div>
-        <p class="text-sm">Released under the MIT License</p>
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-400 py-12 px-8">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+      <div>
+        <h3 class="text-white font-bold text-xl mb-2">Lithium</h3>
+        <p>Pure Web APIs, Beautifully Extended</p>
       </div>
-    </footer>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            backgroundImage: {
-              'gradient-primary': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              'gradient-accent': 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-            },
-            colors: {
-              lithium: '#667eea',
-              'lithium-dark': '#764ba2',
-            },
+      <div class="flex gap-8 text-sm">
+        <a href="https://github.com/apphorde/lithium" target="_blank" rel="noopener noreferrer"
+          class="hover:text-white transition-colors">GitHub</a>
+        <a href="#philosophy" class="hover:text-white transition-colors">Docs</a>
+        <a href="#concepts" class="hover:text-white transition-colors">API</a>
+      </div>
+      <p class="text-sm">Released under the MIT License</p>
+    </div>
+  </footer>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          backgroundImage: {
+            'gradient-primary': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            'gradient-accent': 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+          },
+          colors: {
+            lithium: '#667eea',
+            'lithium-dark': '#764ba2',
           },
         },
-      };
-    </script>
-  </body>
+      },
+    };
+  </script>
+</body>
+
 </html>

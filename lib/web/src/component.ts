@@ -171,19 +171,37 @@ export function mount(target: Element, options: MountOptions) {
 }
 
 async function findSetupModule(template: HTMLTemplateElement) {
+  const stateCode = template.content.querySelector('script[state]');
   const setupCode = template.content.querySelector('script[setup]');
   const origin = getOrigin(template);
+  let setupFunction;
+  let stateFunction;
+
+  if (stateCode) {
+    const code = stateCode.textContent;
+    const stateModule = importModuleFromSource(code, origin)
+    const stateDefault = (await stateModule).default;
+    stateFunction = typeof stateDefault !== 'function' ? () => stateDefault : stateDefault;
+    stateCode.remove();
+  }
 
   if (setupCode) {
     const src = setupCode.getAttribute('src');
     const code = setupCode.textContent;
     const mod = src ? import(String(new URL(src, origin))) : importModuleFromSource(code, origin);
+    setupFunction = (await mod).default;
     setupCode.remove();
-
-    return (await mod).default;
   }
 
-  return Function;
+  if (setupFunction && stateFunction) {
+    return function() {
+      const state = await stateFunction() || {};
+      const bindings = setupFunction() || {};
+      return {...state, ...bindings}
+    }
+  };
+
+  return setupFunction || stateFunction || Function;
 }
 
 async function findStyleSheets(template: HTMLTemplateElement): Promise<CSSStyleSheet[]> {
