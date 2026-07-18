@@ -167,46 +167,60 @@
         <p class="text-xl text-gray-700">Simple rules that make everything powerful</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <!-- Concept 1 -->
-        <div
-          class="bg-gradient-to-br from-purple-50 to-transparent p-8 rounded-2xl border border-purple-200 hover:shadow-xl transition-shadow">
-          <div class="inline-block mb-4 p-3 bg-gradient-primary rounded-lg">
-            <span class="text-2xl">🔁</span>
+      <template app>
+        <link rel="component" href="https://sodium.static.apphor.de/code-block.html" />
+        <script state type="application/json">{
+          "concepts": [
+            { 
+              "t": "<template for=\"x of y\">",
+              "s": "Render lists with natural iteration syntax",
+              "c": "<template for=\"item of items\">\n<li>{{ item }}</li>\n</template>",
+              "l": "html"
+            },
+            { 
+              "t": "<template if=\"xyz\">",
+              "s": "Conditionally render DOM elements",
+              "c": "<template if=\"isVisible\"><div>Hidden until true</div></template>",
+              "l": "html"
+            },
+            { 
+              "t": "<div bind-property=\"expression\">",
+              "s": "Bind properties to reactive expressions",
+              "c": "<button bind-disabled=\"isNotValid\">click me</button>",
+              "l": "html"
+            },
+            { 
+              "t": "<button on-event=\"handler($event)\">",
+              "s": "Listen to events and trigger handlers",
+              "c": "<button on-click=\"onBtnClick()\">click me</button>",
+              "l": "html"
+            },
+            { 
+              "t": "<script setup>",
+              "s": "Define component behavior and state",
+              "c": "<script setup>\nimport { ref } from '@li3/web';\n\nexport default function() {\n  const count = ref(0);\n  return { count };}\u003C/script>",
+              "l": "html"
+            },
+            { 
+              "t": "ref(), computed(), hook()",
+              "s": "Create reactive values and computed state",
+              "c": "<script setup>\nimport { ref, computed, watch, hook } from '@li3/web';\n\nexport default function() {\n  const count = ref(0);\n  const add2 = computed(() => count + 2);\n  const [n, setNumber] = hook(123); return { count, add2, n, setNumber };}\u003C/script>",
+              "l": "javascript"
+            },
+          ]}</script>
+      </template>
+
+      <div class="flex flex-col space-y-8">
+        <template for="c of concepts">
+          <div class="bg-gradient-to-br from-purple-50 to-transparent p-8 rounded-2xl border border-purple-200 hover:shadow-xl transition-shadow">
+            <h3 class="text-xl font-bold text-gray-900 mb-3">{{ c.t }}</h3>
+            <p class="text-gray-700 mb-4">{{ c.s }}</p>
+            <code-block class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto" bind-src="c.c" bind-language="c.l"></code-block>
           </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;template for="x of y"&gt;</h3>
-          <p class="text-gray-700 mb-4">Render lists with natural iteration syntax</p>
-          <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
-              <span class="text-cyan-400">&lt;template</span>
-              <span class="text-yellow-400">for="item of items"</span>&gt;<br />
-              <div class="ml-4">&lt;li&gt;{{item}}&lt;/li&gt;<br /></div>
-              <span class="text-cyan-400">&lt;/template&gt;</span>
-            </code>
-        </div>
+        </template>
 
-        <!-- Concept 2 -->
-        <div
-          class="bg-gradient-to-br from-pink-50 to-transparent p-8 rounded-2xl border border-pink-200 hover:shadow-xl transition-shadow">
-          <div class="inline-block mb-4 p-3 bg-gradient-accent rounded-lg">
-            <span class="text-2xl">❓</span>
-          </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;template if="xyz"&gt;</h3>
-          <p class="text-gray-700 mb-4">Conditionally render DOM elements</p>
-          <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
-              <span class="text-cyan-400">&lt;template</span>
-              <span class="text-yellow-400">if="isVisible"</span>&gt;
-              <div class="ml-4">&lt;div&gt;Hidden until true&lt;/div&gt;</div>
-
-              <span class="text-cyan-400">&lt;/template&gt;</span>
-            </code>
-        </div>
-
-        <!-- Concept 3 -->
         <div
           class="bg-gradient-to-br from-blue-50 to-transparent p-8 rounded-2xl border border-blue-200 hover:shadow-xl transition-shadow">
-          <div class="inline-block mb-4 p-3 bg-blue-400 rounded-lg">
-            <span class="text-2xl">🎯</span>
-          </div>
           <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;div bind-xyz="expr"&gt;</h3>
           <p class="text-gray-700 mb-4">Bind properties to reactive expressions</p>
           <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
@@ -216,12 +230,8 @@
             </code>
         </div>
 
-        <!-- Concept 4 -->
         <div
           class="bg-gradient-to-br from-green-50 to-transparent p-8 rounded-2xl border border-green-200 hover:shadow-xl transition-shadow">
-          <div class="inline-block mb-4 p-3 bg-green-400 rounded-lg">
-            <span class="text-2xl">🔊</span>
-          </div>
           <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;button on-xyz="handler()"&gt;</h3>
           <p class="text-gray-700 mb-4">Listen to events and trigger handlers</p>
           <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
@@ -234,12 +244,8 @@
             </code>
         </div>
 
-        <!-- Concept 5 -->
         <div
           class="bg-gradient-to-br from-indigo-50 to-transparent p-8 rounded-2xl border border-indigo-200 hover:shadow-xl transition-shadow">
-          <div class="inline-block mb-4 p-3 bg-indigo-400 rounded-lg">
-            <span class="text-2xl">⚙️</span>
-          </div>
           <h3 class="text-xl font-bold text-gray-900 mb-3">&lt;script setup&gt;</h3>
           <p class="text-gray-700 mb-4">Define component behavior and state</p>
           <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
@@ -256,12 +262,8 @@
             </code>
         </div>
 
-        <!-- Concept 6 -->
         <div
           class="bg-gradient-to-br from-yellow-50 to-transparent p-8 rounded-2xl border border-yellow-200 hover:shadow-xl transition-shadow">
-          <div class="inline-block mb-4 p-3 bg-yellow-400 rounded-lg">
-            <span class="text-2xl">💡</span>
-          </div>
           <h3 class="text-xl font-bold text-gray-900 mb-3">ref(), computed(), watch()</h3>
           <p class="text-gray-700 mb-4">Create reactive values and derived state</p>
           <code class="bg-gray-900 text-green-400 p-3 rounded-lg block font-mono text-xs overflow-x-auto">
