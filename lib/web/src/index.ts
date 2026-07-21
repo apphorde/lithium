@@ -52,11 +52,15 @@ function defineEvent(name: string) {
 
   return function emitter(value: any) {
     const event = new CustomEvent(name, { detail: value });
-    element.dispatchEvent(event);
+
     const handler = element['on' + name];
     if (typeof handler === 'function') {
       handler(event);
     }
+
+    element.dispatchEvent(event);
+
+    return event;
   };
 }
 
