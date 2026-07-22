@@ -116,7 +116,7 @@ function setClassName(el: Element, classNames: string, value: any): void {
 }
 
 function setStyle(el: any, key: string, value: any): void {
-  el.style[toCamelCase(key)] = value;
+  el.style[key] = value;
 }
 
 function setText(el: Text, text: any): void {
@@ -178,6 +178,7 @@ use({
     node.addEventListener(event, (e: Event) => {
       if (modifiers.stop) e.stopPropagation();
       if (modifiers.prevent) e.preventDefault();
+      if (modifiers.self && e.target !== node) return;
 
       return fn(e);
     });
@@ -211,7 +212,7 @@ use({
     } else if (key === 'style' && isObject) {
       effect(fn, (map) => {
         for (const [property, value] of Object.entries(map)) {
-          setStyle(node, property, value);
+          setStyle(node, toCamelCase(property), value);
         }
       });
     } else {
@@ -238,7 +239,7 @@ use({
     return name.startsWith('style-');
   },
   exec(node, name, source, context) {
-    const key = name.slice(6);
+    const key = toCamelCase(name.slice(6));
 
     effect(createFunction(source, context), (value: any) => setStyle(node, key, value));
   },
