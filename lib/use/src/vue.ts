@@ -2,7 +2,7 @@ import { TemplateFor, use } from "@li3/web";
 
 export function useVue() {
   class VueTemplateFor extends TemplateFor {
-    match(node, name) {
+    match(_node, name) {
       return name === "v-for";
     }
 

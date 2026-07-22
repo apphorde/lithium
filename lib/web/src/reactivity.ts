@@ -190,7 +190,7 @@ function computed<T = any>(fn: () => T): Signal<T> {
       try {
         value = fn();
       } catch (e) {
-        console.error(e);
+        FF.debug && console.error(e);
       } finally {
         signalsStack.pop();
       }
