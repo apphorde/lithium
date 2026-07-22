@@ -78,7 +78,7 @@ function loadCss(href: string | URL) {
 }
 
 export { getElement, onInit, onUpdate, onDestroy, defineProp, defineEvent, templateRef, loadCss };
-export { use } from './rules.js';
+export { use, SetAttribute, SetClassName, SetProperty, SetStyle, AddEventHandler, TemplateFor, TemplateIf, type Rule } from './rules.js';
 export * from './reactivity.js';
 export { mount, load, autoInitialize } from './component.js';
 export { setFeatureFlag } from './feature-flags.js';

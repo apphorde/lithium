@@ -1,18 +1,29 @@
-import { createFunction, createReadOnlyContext, walkDomTree } from './internals.js';
-import { ref, computed, effect, watch, suspend } from './reactivity.js';
-import type { Signal } from './reactivity';
-import { FF } from './feature-flags.js';
+import {
+  createFunction,
+  createReadOnlyContext,
+  walkDomTree,
+} from "./internals.js";
+import { ref, computed, effect, watch, suspend } from "./reactivity.js";
+import type { Signal } from "./reactivity";
+import { FF } from "./feature-flags.js";
 
 const isElement = (x: any): x is Element => x.nodeType === x.ELEMENT_NODE;
 const isText = (x: any): x is Text => x.nodeType === x.TEXT_NODE;
-const toCamelCase = s => s.replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase());
+const toCamelCase = (s) =>
+  s.replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase());
 
 export function applyTextRules(node: Text, context: any) {
   const template = node.textContent.trim();
 
-  if (!template || !template.includes('{{')) return;
+  if (!template || !template.includes("{{")) return;
 
-  const source = '`' + template.replace(/{{(.*?)}}/g, (_: any, exp: string) => '${' + exp.trim() + '}') + '`';
+  const source =
+    "`" +
+    template.replace(
+      /{{(.*?)}}/g,
+      (_: any, exp: string) => "${" + exp.trim() + "}",
+    ) +
+    "`";
 
   effect(createFunction(source, context), (v: any) => setText(node, v));
 }
@@ -50,7 +61,7 @@ export function compileRules(node: Node, deferredContext: any) {
   }
 
   const deferred = [];
-  const nodeId = 'n' + deferredContext.id++;
+  const nodeId = "n" + deferredContext.id++;
 
   for (const attr of Array.from(node.attributes)) {
     const name = attr.name;
@@ -66,7 +77,7 @@ export function compileRules(node: Node, deferredContext: any) {
   }
 
   if (deferred.length) {
-    node.setAttribute('_', nodeId);
+    node.setAttribute("_", nodeId);
     deferredContext[nodeId] = deferred;
   }
 }
@@ -78,7 +89,7 @@ function bind(node: any, context: any, deferredContext: any) {
   }
 
   if (isElement(node)) {
-    const id = node.getAttribute('_') as string;
+    const id = node.getAttribute("_") as string;
     const rules = deferredContext[id];
 
     if (!rules) return;
@@ -104,13 +115,13 @@ export function linkTreeToContext(tree: Node, context: any) {
 }
 
 const mappedProperties: Record<string, string> = {
-  innerhtml: 'innerHTML',
-  baseuri: 'baseURI',
-  class: 'className',
+  innerhtml: "innerHTML",
+  baseuri: "baseURI",
+  class: "className",
 };
 
 function setClassName(el: Element, classNames: string, value: any): void {
-  for (const cls of classNames.split('.').filter(Boolean)) {
+  for (const cls of classNames.split(".").filter(Boolean)) {
     el.classList.toggle(cls, value);
   }
 }
@@ -120,13 +131,18 @@ function setStyle(el: any, key: string, value: any): void {
 }
 
 function setText(el: Text, text: any): void {
-  el.textContent = String(text !== undefined ? text : '');
+  el.textContent = String(text !== undefined ? text : "");
 }
 
-function setProperty(node: any, key: string, value: any, modifiers: string[]): void {
+function setProperty(
+  node: any,
+  key: string,
+  value: any,
+  modifiers: string[],
+): void {
   const mappedKey = mappedProperties[key] || key;
 
-  if (modifiers.includes('bool')) {
+  if (modifiers.includes("bool")) {
     node.toggleAttribute(mappedKey, Boolean(value));
   } else {
     node[mappedKey] = value;
@@ -134,138 +150,27 @@ function setProperty(node: any, key: string, value: any, modifiers: string[]): v
 }
 
 const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
-function setAttribute(el: Element, attribute: string, value: boolean): void {
+function setAttribute(el: Element, attribute: string, value: boolean, modifiers: string[]): void {
   if (!validAttribute.test(attribute)) {
     return;
   }
 
-  if (typeof value === 'boolean' && value === false) {
-    el.removeAttribute(attribute);
+  if (modifiers.includes('bool')) {
+    el.toggleAttribute(attribute, !!value);
     return;
   }
 
   el.setAttribute(attribute, String(value));
 }
 
-export interface Rule {
-  match: (node: Element, name: string, value: string) => boolean;
-  exec: (node: Element, name: string, value: string, context: any) => void;
-}
-
-const rules: Rule[] = [];
-
-export function use(rule: Rule) {
-  rules.push(rule);
-}
-
-use({
-  match(_, name) {
-    return name.startsWith('on-');
-  },
-  exec(node, name, value, context) {
-    const key = name.slice(3);
-    const [event, ...tags] = key.split('.');
-    const modifiers: any = {
-      // Safari's default is true
-      passive: false,
-    };
-
-    for (const tag of tags) {
-      modifiers[tag] = true;
-    }
-
-    const fn = createFunction(value, context, ['$event']);
-    node.addEventListener(event, (e: Event) => {
-      if (modifiers.stop) e.stopPropagation();
-      if (modifiers.prevent) e.preventDefault();
-      if (modifiers.self && e.target !== node) return;
-
-      return fn(e);
-    });
-  },
-});
-
-use({
-  match(_, name) {
-    return name.startsWith('attr-');
-  },
-  exec(node, name, source, context) {
-    const key = name.slice(5);
-    effect(createFunction(source, context), (v: any) => setAttribute(node, key, v));
-  },
-});
-
-use({
-  match(_, name) {
-    return name.startsWith('bind-');
-  },
-  exec(node, name, source, context) {
-    const key = name.slice(5);
-    const fn = createFunction(source, context);
-    const isObject = source.startsWith('{');
-    if (key === 'class' && isObject) {
-      effect(fn, (map) => {
-        for (const [classNames, value] of Object.entries(map)) {
-          setClassName(node, classNames, value);
-        }
-      });
-    } else if (key === 'style' && isObject) {
-      effect(fn, (map) => {
-        for (const [property, value] of Object.entries(map)) {
-          setStyle(node, toCamelCase(property), value);
-        }
-      });
-    } else {
-      const [propertyText, ...modifiers] = key.split('.');
-      const property = toCamelCase(propertyText);
-      effect(fn, (value: any) => setProperty(node, property, value, modifiers));
-    }
-  },
-});
-
-use({
-  match(_, name) {
-    return name.startsWith('class-');
-  },
-  exec(node, name, source, context) {
-    const key = name.slice(6);
-
-    effect(createFunction(source, context), (value: any) => setClassName(node, key, value));
-  },
-});
-
-use({
-  match(_, name) {
-    return name.startsWith('style-');
-  },
-  exec(node, name, source, context) {
-    const key = toCamelCase(name.slice(6));
-
-    effect(createFunction(source, context), (value: any) => setStyle(node, key, value));
-  },
-});
-
-use({
-  match(node, name) {
-    return node.nodeName === 'TEMPLATE' && name === 'for';
-  },
-  exec(node, _name, source, context) {
-    const forNodes: { nodes: Node[]; index: number; item: Signal }[] = [];
-    const [left, expression] = source.split('of').map((s) => s.trim());
-    const [key, indexKey] = left.includes('[')
-      ? left
-          .slice(1, -1)
-          .split(',')
-          .map((s) => s.trim())
-      : [left, ''];
-
-    const signal = computed(createFunction(`Array.from(${expression} || [])`, context));
-    FF.debug && Object.assign(node, { signal, forNodes });
-    watch(signal, (v) => updateForOfList(forNodes, node, key, indexKey, context, v));
-  },
-});
-
-function updateForOfList(forNodes: any[], node: Node, key: string, indexKey: string, context: any, value: any) {
+function updateForOfList(
+  forNodes: any[],
+  node: Node,
+  key: string,
+  indexKey: string,
+  context: any,
+  value: any,
+) {
   const newLength = value.length;
   const itemsToRemove = forNodes.slice(newLength);
 
@@ -298,7 +203,9 @@ function updateForOfList(forNodes: any[], node: Node, key: string, indexKey: str
 
     const dom = (node as HTMLTemplateElement).content.cloneNode(true);
     forNodes[index] = { item, index: index, nodes: Array.from(dom.childNodes) };
-    const reader = createReadOnlyContext(Object.assign({}, context, subContext));
+    const reader = createReadOnlyContext(
+      Object.assign({}, context, subContext),
+    );
     linkTreeToContext(dom, reader);
     nodesToInsert.append(dom);
   }
@@ -310,12 +217,148 @@ function updateForOfList(forNodes: any[], node: Node, key: string, indexKey: str
   }
 }
 
-use({
+export interface Rule {
+  match: (node: Element, name: string, value: string) => boolean;
+  exec: (node: Element, name: string, value: string, context: any) => void;
+}
+
+const rules: Rule[] = [];
+
+export function use(rule: Rule) {
+  rules.push(rule);
+}
+
+export class AddEventHandler implements Rule {
+  match(_, name) {
+    return name.startsWith("on-");
+  }
+
+  exec(node, name, value, context) {
+    const key = name.slice(3);
+    const [event, ...tags] = key.split(".");
+    const modifiers: any = {
+      // Safari's default is true
+      passive: false,
+    };
+
+    for (const tag of tags) {
+      modifiers[tag] = true;
+    }
+
+    const fn = createFunction(value, context, ["$event"]);
+    node.addEventListener(event, (e: Event) => {
+      if (modifiers.stop) e.stopPropagation();
+      if (modifiers.prevent) e.preventDefault();
+      if (modifiers.self && e.target !== node) return;
+
+      return fn(e);
+    });
+  }
+}
+
+export class SetAttribute implements Rule {
+  match(_, name) {
+    return name.startsWith("attr-");
+  }
+
+  exec(node, name, source, context) {
+    const [key, ...modifiers] = name.slice(5).split('.');
+
+    effect(createFunction(source, context), (v: any) =>
+      setAttribute(node, key, v, modifiers),
+    );
+  }
+}
+
+export class SetProperty implements Rule {
+  match(_, name) {
+    return name.startsWith("bind-");
+  }
+
+  exec(node, name, source, context) {
+    const key = name.slice(5);
+    const fn = createFunction(source, context);
+    const isObject = source.startsWith("{");
+    if (key === "class" && isObject) {
+      effect(fn, (map) => {
+        for (const [classNames, value] of Object.entries(map)) {
+          setClassName(node, classNames, value);
+        }
+      });
+    } else if (key === "style" && isObject) {
+      effect(fn, (map) => {
+        for (const [property, value] of Object.entries(map)) {
+          setStyle(node, toCamelCase(property), value);
+        }
+      });
+    } else {
+      const [propertyText, ...modifiers] = key.split(".");
+      const property = toCamelCase(propertyText);
+      effect(fn, (value: any) => setProperty(node, property, value, modifiers));
+    }
+  }
+}
+
+export class SetClassName implements Rule {
+  match(_, name) {
+    return name.startsWith("class-");
+  }
+
+  exec(node, name, source, context) {
+    const key = name.slice(6);
+
+    effect(createFunction(source, context), (value: any) =>
+      setClassName(node, key, value),
+    );
+  }
+}
+
+export class SetStyle implements Rule {
+  match(_, name) {
+    return name.startsWith("style-");
+  }
+
+  exec(node, name, source, context) {
+    const key = toCamelCase(name.slice(6));
+
+    effect(createFunction(source, context), (value: any) =>
+      setStyle(node, key, value),
+    );
+  }
+}
+
+export class TemplateFor implements Rule {
   match(node, name) {
-    return node.nodeName === 'TEMPLATE' && name === 'if';
-  },
+    return node.nodeName === "TEMPLATE" && name === "for";
+  }
+
+  exec(node, _name, source, context) {
+    const forNodes: { nodes: Node[]; index: number; item: Signal }[] = [];
+    const [left, expression] = source.split("of").map((s) => s.trim());
+    const [key, indexKey] = left.includes("[")
+      ? left
+          .slice(1, -1)
+          .split(",")
+          .map((s) => s.trim())
+      : [left, ""];
+
+    const signal = computed(
+      createFunction(`Array.from(${expression} || [])`, context),
+    );
+    FF.debug && Object.assign(node, { signal, forNodes });
+    watch(signal, (v) =>
+      updateForOfList(forNodes, node, key, indexKey, context, v),
+    );
+  }
+}
+
+export class TemplateIf implements Rule {
+  match(node, name) {
+    return node.nodeName === "TEMPLATE" && name === "if";
+  }
+
   exec(node, _name, value, context) {
-    const source = 'Boolean(' + value + ')';
+    const source = "Boolean(" + value + ")";
     const ifNodes: any[] = [];
     let lastValue: any;
 
@@ -345,5 +388,13 @@ use({
         ifNodes.length = 0;
       }
     });
-  },
-});
+  }
+}
+
+use(new TemplateIf());
+use(new TemplateFor());
+use(new AddEventHandler());
+use(new SetProperty());
+use(new SetAttribute());
+use(new SetClassName());
+use(new SetStyle());
