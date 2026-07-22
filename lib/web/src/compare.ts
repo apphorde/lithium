@@ -1,6 +1,6 @@
 import { FF } from './feature-flags.js';
 export function compare(a: any, b: any) {
-  if (!FF.strictCompare) {
+  if (FF.strictCompare) {
     return a === b;
   }
 
