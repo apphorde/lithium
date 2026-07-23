@@ -11,6 +11,7 @@ export type RuntimeContext = {
   mount: AnyFunction[];
   update: AnyFunction[];
   unmount: AnyFunction[];
+  props: Record<PropertyKey, any>;
   refs: Record<PropertyKey, any>;
 };
 
@@ -19,7 +20,7 @@ export type MountOptions = {
   setup?: Function;
   styles?: CSSStyleSheet[];
   shadowDom?: boolean | string | ShadowRootInit;
-  refs?: Array<[string, any, string]>;
+  refs?: any[];
 };
 
 export type DefineComponentOptions = MountOptions & {
