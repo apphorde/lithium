@@ -1,6 +1,6 @@
 import type { PropOptions } from './types';
 import { ref, watch } from './reactivity.js';
-import { debounce, getCurrentNode, getPropValue, importCssModule } from './internals.js';
+import { debounce, getCurrentNode, getPropValue } from './internals.js';
 
 function getElement() {
   return getCurrentNode().element;
@@ -19,7 +19,7 @@ function onDestroy(fn: any) {
 }
 
 function defineProp(name: string, options: PropOptions = {}) {
-  const { element, update } = getCurrentNode();
+  const { element, update, props } = getCurrentNode();
   const current = getPropValue(element, name as keyof Element, options.default);
   const prop = ref(current);
 
@@ -42,7 +42,7 @@ function defineProp(name: string, options: PropOptions = {}) {
     },
   });
 
-  getCurrentNode().props[name] = prop;
+  props[name] = prop;
 
   return prop;
 }
@@ -71,15 +71,19 @@ function templateRef(name: string) {
   return $ref;
 }
 
-function loadCss(href: string | URL) {
-  const element = getElement();
-  const stylesheet = importCssModule(String(href));
-  stylesheet.then((s) => (element.shadowRoot || document).adoptedStyleSheets.push(s));
-}
-
-export { getElement, onInit, onUpdate, onDestroy, defineProp, defineEvent, templateRef, loadCss };
-export { use, SetAttribute, SetClassName, SetProperty, SetStyle, AddEventHandler, TemplateFor, TemplateIf, type Rule } from './rules.js';
+export { getElement, onInit, onUpdate, onDestroy, defineProp, defineEvent, templateRef };
+export {
+  use,
+  SetAttribute,
+  SetClassName,
+  SetProperty,
+  SetStyle,
+  AddEventListener,
+  TemplateFor,
+  TemplateIf,
+  type Rule,
+} from './rules.js';
 export * from './reactivity.js';
-export { mount, load, autoInitialize } from './component.js';
+export {  mount, load, loadCss, autoInitialize } from './component.js';
 export { setFeatureFlag } from './feature-flags.js';
 export { getInternals } from './component.js';

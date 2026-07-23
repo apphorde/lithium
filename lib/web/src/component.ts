@@ -1,7 +1,13 @@
 import { FF } from './feature-flags.js';
-import { createContext, createReadOnlyContext, importCssModule, importModuleFromSource } from './internals.js';
+import {
+  createContext,
+  createReadOnlyContext,
+  guessValue,
+  importCssModule,
+  importModuleFromSource,
+} from './internals.js';
 import { linkTreeToContext, linkTreeToContextAsync } from './rules.js';
-import { isRef, isReadOnlyRef } from './reactivity.js';
+import { isRef, isReadOnlyRef, ref } from './reactivity.js';
 import type { DefineComponentOptions, MountOptions } from './types';
 
 const DEBUG = Symbol('#');
@@ -11,7 +17,7 @@ export function getInternals(t: any) {
 }
 
 function getOrigin(template: HTMLTemplateElement) {
-  let url =  template.getAttribute('origin');
+  let url = template.getAttribute('origin');
 
   if (!url) {
     const origin = new URL(window.location.href);
@@ -57,11 +63,9 @@ export async function load(href: string | URL, baseUrl?: string | URL) {
     const html = await response.text();
     const dom = new DOMParser().parseFromString(html, 'text/html');
     const templates = Array.from(dom.querySelectorAll('template[component]')) as HTMLTemplateElement[];
-    templates.forEach(t => t.setAttribute('origin', fullUrl));
-    const definitions = templates.map(n => defineFromTemplate(n)).filter(Boolean);
-
-
-    const def = await Promise.all(definitions) as DefineComponentOptions[];
+    templates.forEach((t) => t.setAttribute('origin', fullUrl));
+    const definitions = templates.map((n) => defineFromTemplate(n)).filter(Boolean);
+    const def = (await Promise.all(definitions)) as DefineComponentOptions[];
     loadCache.set(fullUrl, def);
     return def;
   } catch (error) {
@@ -70,25 +74,37 @@ export async function load(href: string | URL, baseUrl?: string | URL) {
   }
 }
 
-//
+export function loadCss(href: string | URL) {
+  const { element } = getCurrentNode();
+  const stylesheet = importCssModule(String(href));
+  stylesheet.then((s) => (element.shadowRoot || document).adoptedStyleSheets.push(s));
+}
+
 const invalidNames = [
-  "annotation-xml",
-  "color-profile",
-  "font-face",
-  "font-face-src",
-  "font-face-uri",
-  "font-face-format",
-  "font-face-name",
-  "missing-glyph",
-]
+  'annotation-xml',
+  'color-profile',
+  'font-face',
+  'font-face-src',
+  'font-face-uri',
+  'font-face-format',
+  'font-face-name',
+  'missing-glyph',
+];
 
 export function defineComponent(name: string, options: MountOptions) {
-  if (invalidNames.includes(name) ) {
-    throw new Error('Invalid element name. See https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name');
+  if (invalidNames.includes(name)) {
+    throw new Error(
+      'Invalid element name. See https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name',
+    );
   }
 
-  if (customElements.get(name)) {
-    console.error(`Component ${name} is already defined!`);
+  const registered = customElements.get(name);
+  if (registered) {
+    if (!FF.debug) {
+      console.error(`Component ${name} is already defined. Options only apply to new instances of ${name}`);
+    }
+
+    registered.options = options;
     return;
   }
 
@@ -99,6 +115,7 @@ export function defineComponent(name: string, options: MountOptions) {
   options.shadowDom = shadowDom;
 
   class Component extends HTMLElement {
+    static options = options;
     unmount: Function | null = null;
 
     constructor() {
@@ -111,7 +128,7 @@ export function defineComponent(name: string, options: MountOptions) {
 
     connectedCallback() {
       if (this.isConnected) {
-        this.unmount = mount(this, options);
+        this.unmount = mount(this, Component.options);
       } else {
         this.unmount?.();
       }
@@ -139,6 +156,13 @@ export function mount(target: Element, options: MountOptions) {
   dom.append(template.content.cloneNode(true));
 
   const runtime = createContext(target, setup, dom);
+
+  if (options.refs) {
+    for (const [name, value] of Object.entries(options.refs)) {
+      runtime.refs[name] = ref(guessValue(value));
+    }
+  }
+
   const mergedContext = Object.assign({}, runtime.context, runtime.props, runtime.refs);
   const readOnlyContext = createReadOnlyContext(mergedContext);
 
@@ -160,7 +184,7 @@ export function mount(target: Element, options: MountOptions) {
   }
 
   if (FF.debug) {
-    (parentElement as any)[DEBUG] = { options, context: readOnlyContext };
+    (parentElement as any)[DEBUG] = mergedContext;
   }
 
   const unmountHooks = runtime.unmount;
@@ -193,25 +217,25 @@ async function findSetupModule(template: HTMLTemplateElement) {
   }
 
   if (setupFunction && stateFunction) {
-    return async function() {
+    return async function () {
       const state = stateFunction();
       const bindings = setupFunction() || {};
 
       for (const [key, value] of Object.entries(state)) {
         const $ = bindings[key];
-        
+
         if (isRef($)) {
           if (!isReadOnlyRef($)) {
             $.value = value;
-          } 
+          }
         } else {
           bindings[key] = value;
         }
       }
-      
+
       return bindings;
-    }
-  };
+    };
+  }
 
   return setupFunction || stateFunction || Function;
 }
@@ -237,14 +261,29 @@ async function findStyleSheets(template: HTMLTemplateElement): Promise<CSSStyleS
   });
 
   const origin = getOrigin(template);
-  const links = linkTags.map(link => {
+  const links = linkTags.map((link) => {
     const href = String(new URL(link.href, origin));
     const sheet = importCssModule(href);
     link.remove();
     return sheet;
-  })
+  });
 
   return (await Promise.all(links)).concat(styles);
+}
+
+function findRefs(template: HTMLTemplateElement) {
+  const list = [...template.content.querySelectorAll('ref')];
+
+  if (list.length) {
+    return Object.fromEntries(
+      list.map((r) => {
+        r.remove();
+        return [r.getAttribute('name'), guessValue(r.getAttribute('value'))];
+      }),
+    );
+  }
+
+  return null;
 }
 
 export function loadDependencies(template: HTMLTemplateElement) {
@@ -271,12 +310,15 @@ export async function readOptionsFromTemplate(template: HTMLTemplateElement) {
     template,
     setup: await findSetupModule(template),
     styles: await findStyleSheets(template),
+    refs: await findRefs(template),
   };
 
   return options;
 }
 
-export async function defineFromTemplate(template: HTMLTemplateElement | string): Promise<DefineComponentOptions|null> {
+export async function defineFromTemplate(
+  template: HTMLTemplateElement | string,
+): Promise<DefineComponentOptions | null> {
   if (typeof template === 'string') {
     template = tpl(template);
   }
@@ -297,15 +339,16 @@ export async function findApps() {
   const apps = Array.from(document.querySelectorAll('template[app]')) as HTMLTemplateElement[];
 
   for (const template of apps) {
-    readOptionsFromTemplate(template).then(options => {
-      const app = document.createElement('div');
-      app.style.display = 'contents';
-      template.parentNode!.insertBefore(app, template);
+    readOptionsFromTemplate(template)
+      .then((options) => {
+        const app = document.createElement('div');
+        app.style.display = 'contents';
+        template.parentNode!.insertBefore(app, template);
 
-      mount(app, options);
-      FF.debug || template.remove();
-    })
-    .catch(error => console.error(error));
+        mount(app, options);
+        FF.debug || template.remove();
+      })
+      .catch((error) => console.error(error));
   }
 }
 
@@ -313,16 +356,19 @@ export function autoInitialize() {
   const components = Array.from(document.querySelectorAll('template[component]')) as HTMLTemplateElement[];
   const links = Array.from(document.querySelectorAll('link[rel="component"]')) as HTMLLinkElement[];
 
-  components.forEach(c => defineFromTemplate(c));
+  components.forEach((c) => defineFromTemplate(c));
   links.forEach((l) => load(l.href));
 
   findApps();
 }
 
-if (!FF.skipAutoInitialize) {
-  if (['complete', 'interactive'].includes(document.readyState)) {
-    autoInitialize();
-  } else {
+// give time to import the module and set feature flags
+setTimeout(() => {
+  if (!FF.skipAutoInitialize) {
+    if (['complete', 'interactive'].includes(document.readyState)) {
+      return autoInitialize();
+    }
+
     window.addEventListener('DOMContentLoaded', autoInitialize);
   }
-}
+}, 10);

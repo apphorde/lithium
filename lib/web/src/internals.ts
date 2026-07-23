@@ -1,6 +1,24 @@
 import { isRef } from "./reactivity.js";
 import type { AnyFunction, RuntimeContext } from "./types";
 
+export function guessValue(s: string) {
+  s = s.trim();
+
+  if (s === 'true') {
+    return true;
+  }
+
+  if (s === 'false') {
+    return false;
+  }
+
+  try {
+    return Function('return ' + s)();
+  } catch {
+    return s;
+  }
+}
+
 export function getPropValue<T extends keyof Element>(
   element: Element,
   name: T,
@@ -15,7 +33,7 @@ export function getPropValue<T extends keyof Element>(
   const attr = element.getAttribute(name);
 
   if (attr !== null) {
-    return attr;
+    return guessValue(attr);
   }
 
   if (defaultValue !== undefined) {
@@ -188,7 +206,7 @@ export async function importModuleFromSource(
       const blobUrlPattern = new RegExp(objectUrl, "g");
       error.stack = error.stack.replace(blobUrlPattern, fileName);
     }
-    
+
     throw error;
   } finally {
     URL.revokeObjectURL(objectUrl);

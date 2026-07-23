@@ -150,12 +150,17 @@ function setProperty(
 }
 
 const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
-function setAttribute(el: Element, attribute: string, value: boolean, modifiers: string[]): void {
+function setAttribute(
+  el: Element,
+  attribute: string,
+  value: boolean,
+  modifiers: string[],
+): void {
   if (!validAttribute.test(attribute)) {
     return;
   }
 
-  if (modifiers.includes('bool')) {
+  if (modifiers.includes("bool")) {
     el.toggleAttribute(attribute, !!value);
     return;
   }
@@ -228,7 +233,11 @@ export function use(rule: Rule) {
   rules.push(rule);
 }
 
-export class AddEventHandler implements Rule {
+export function resetRules() {
+  rules.length = 0;
+}
+
+export class AddEventListener implements Rule {
   match(_, name) {
     return name.startsWith("on-");
   }
@@ -262,7 +271,7 @@ export class SetAttribute implements Rule {
   }
 
   exec(node, name, source, context) {
-    const [key, ...modifiers] = name.slice(5).split('.');
+    const [key, ...modifiers] = name.slice(5).split(".");
 
     effect(createFunction(source, context), (v: any) =>
       setAttribute(node, key, v, modifiers),
@@ -279,6 +288,7 @@ export class SetProperty implements Rule {
     const key = name.slice(5);
     const fn = createFunction(source, context);
     const isObject = source.startsWith("{");
+
     if (key === "class" && isObject) {
       effect(fn, (map) => {
         for (const [classNames, value] of Object.entries(map)) {
@@ -360,6 +370,11 @@ export class TemplateIf implements Rule {
   exec(node, _name, value, context) {
     const source = "Boolean(" + value + ")";
     const ifNodes: any[] = [];
+    const anchor: any = document.createComment("if: " + value);
+    (node as any).parentNode.insertBefore(anchor, node);
+
+    if (!FF.debug) node.remove();
+
     let lastValue: any;
 
     effect(createFunction(source, context), (value: any) => {
@@ -374,8 +389,8 @@ export class TemplateIf implements Rule {
         ifNodes.push(...Array.from(dom.childNodes));
 
         linkTreeToContext(dom, context);
-        setTimeout(() => {
-          (node as any).parentNode.insertBefore(dom, node);
+        requestIdleCallback(() => {
+          anchor.parentNode.insertBefore(dom, anchor);
         });
         return;
       }
@@ -393,7 +408,7 @@ export class TemplateIf implements Rule {
 
 use(new TemplateIf());
 use(new TemplateFor());
-use(new AddEventHandler());
+use(new AddEventListener());
 use(new SetProperty());
 use(new SetAttribute());
 use(new SetClassName());
