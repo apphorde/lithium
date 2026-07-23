@@ -1,11 +1,10 @@
-import { createFunction, createReadOnlyContext, walkDomTree } from './internals.js';
+import { createFunction, createReadOnlyContext, walkDomTree, toCamelCase } from './internals.js';
 import { ref, computed, effect, watch, suspend } from './reactivity.js';
 import type { Signal } from './reactivity';
 import { FF } from './feature-flags.js';
 
 const isElement = (x: any): x is Element => x.nodeType === x.ELEMENT_NODE;
 const isText = (x: any): x is Text => x.nodeType === x.TEXT_NODE;
-const toCamelCase = (s) => s.replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase());
 
 export function applyTextRules(node: Text, context: any) {
   const template = node.textContent.trim();

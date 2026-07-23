@@ -212,3 +212,5 @@ export async function importModuleFromSource(
     URL.revokeObjectURL(objectUrl);
   }
 }
+
+export const toCamelCase = (s) => s.replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase());

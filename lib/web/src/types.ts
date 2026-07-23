@@ -20,7 +20,7 @@ export type MountOptions = {
   setup?: Function;
   styles?: CSSStyleSheet[];
   shadowDom?: boolean | string | ShadowRootInit;
-  refs?: Record<string, any>;
+  refs?: Array<[string, any, string]>;
 };
 
 export type DefineComponentOptions = MountOptions & {

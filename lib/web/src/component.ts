@@ -159,8 +159,13 @@ export function mount(target: Element, options: MountOptions) {
   const runtime = createContext(target, setup, dom);
 
   if (options.refs) {
-    for (const [name, value] of Object.entries(options.refs)) {
-      runtime.refs[name] = ref(guessValue(value));
+    for (const [name, value, setter] of options.refs) {
+      const $ = ref(guessValue(value));
+      runtime.context[name] = $;
+
+      if (setter) {
+        runtime.context[setter] = (v: any) => $.value = v;
+      }
     }
   }
 
@@ -274,17 +279,12 @@ async function findStyleSheets(template: HTMLTemplateElement): Promise<CSSStyleS
 
 function findRefs(template: HTMLTemplateElement) {
   const list = Array.from(template.content.querySelectorAll('ref'));
-
-  if (list.length) {
-    return Object.fromEntries(
-      list.map((r) => {
-        r.remove();
-        return [r.getAttribute('name'), guessValue(r.getAttribute('value'))];
-      }),
-    );
-  }
-
-  return null;
+  return list.map((r) => {
+    r.remove();
+    const name = r.getAttribute('name');
+    const setterName = r.getAttribute('setter');
+    return [name, r.getAttribute('value'), setterName];
+  });
 }
 
 export function loadDependencies(template: HTMLTemplateElement) {
@@ -311,7 +311,7 @@ export async function readOptionsFromTemplate(template: HTMLTemplateElement) {
     template,
     setup: await findSetupModule(template),
     styles: await findStyleSheets(template),
-    refs: await findRefs(template),
+    refs: findRefs(template),
   };
 
   return options;
