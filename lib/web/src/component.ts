@@ -5,6 +5,7 @@ import {
   guessValue,
   importCssModule,
   importModuleFromSource,
+  getCurrentNode,
 } from './internals.js';
 import { linkTreeToContext, linkTreeToContextAsync } from './rules.js';
 import { isRef, isReadOnlyRef, ref } from './reactivity.js';
@@ -98,7 +99,7 @@ export function defineComponent(name: string, options: MountOptions) {
     );
   }
 
-  const registered = customElements.get(name);
+  const registered: any = customElements.get(name);
   if (registered) {
     if (!FF.debug) {
       console.error(`Component ${name} is already defined. Options only apply to new instances of ${name}`);
@@ -272,7 +273,7 @@ async function findStyleSheets(template: HTMLTemplateElement): Promise<CSSStyleS
 }
 
 function findRefs(template: HTMLTemplateElement) {
-  const list = [...template.content.querySelectorAll('ref')];
+  const list = Array.from(template.content.querySelectorAll('ref'));
 
   if (list.length) {
     return Object.fromEntries(
