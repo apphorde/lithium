@@ -1,7 +1,7 @@
-import { computed, watch, isRef, isReadOnlyRef, unwrap } from "@li3/web";
+import { computed, effect, isRef, isReadOnlyRef, unwrap } from '@li3/web';
 
 const stores = new Map();
-const error = new Error("Store values are read-only");
+const error = new Error('Store values are read-only');
 const storeKey = (name) => `$store${name}`;
 
 export function defineStore(storeName: string, factory: CallableFunction) {
@@ -37,18 +37,23 @@ export function defineStore(storeName: string, factory: CallableFunction) {
       }
     }
 
-    const c = computed(() => refs.map((x) => x.value));
-    refs.length = 0;
     let timer;
 
-    watch(c, () => {
-      clearTimeout(timer);
-      timer = setTimeout(
-        () =>
-          localStorage.setItem(storageKey, JSON.stringify(readOnlyProperties)),
-        10,
-      );
-    });
+    effect(
+      () => {
+        if (refs.length) {
+          refs.map((x) => x.value);
+          refs.length = 0;
+        }
+
+        return Math.random();
+      },
+
+      () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => localStorage.setItem(storageKey, JSON.stringify(readOnlyProperties)), 10);
+      },
+    );
 
     const cached = localStorage.getItem(storageKey);
     if (cached) {
@@ -74,7 +79,7 @@ export function storeToRefs(store) {
   const refs = {};
 
   for (const [name, value] of Object.entries(store)) {
-    if (typeof value !== "function") {
+    if (typeof value !== 'function') {
       Object.defineProperty(refs, name, {
         get() {
           return computed(() => store[name]);
