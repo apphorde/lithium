@@ -27,7 +27,7 @@ export function useVue() {
     exec(node, _name, value, context) {
       const t = document.createElement('template');
       node.replaceWith(t);
-      node.removeAttribute(vFor);
+      node.removeAttribute(vIf);
       t.content.append(node);
 
       super.exec(t, 'if', value, context);
