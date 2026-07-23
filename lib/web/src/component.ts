@@ -6,6 +6,7 @@ import {
   importCssModule,
   importModuleFromSource,
   getCurrentNode,
+  eventEmitter,
 } from './internals.js';
 import { linkTreeToContext, linkTreeToContextAsync } from './rules.js';
 import { isRef, isReadOnlyRef, ref } from './reactivity.js';
@@ -164,11 +165,12 @@ export function mount(target: Element, options: MountOptions) {
       runtime.context[name] = $;
 
       if (setter) {
-        runtime.context[setter] = (v: any) => $.value = v;
+        runtime.context[setter] = (v: any) => ($.value = v);
       }
     }
   }
 
+  runtime.context.$$emit = eventEmitter.bind(null, target);
   const mergedContext = Object.assign({}, runtime.context, runtime.props, runtime.refs);
   const readOnlyContext = createReadOnlyContext(mergedContext);
 
@@ -336,7 +338,7 @@ export async function defineFromTemplate(
   return { name, ...options };
 }
 
-export async function findApps() {
+export function findApps() {
   const apps = Array.from(document.querySelectorAll('template[app]')) as HTMLTemplateElement[];
 
   for (const template of apps) {

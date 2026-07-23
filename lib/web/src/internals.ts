@@ -1,5 +1,5 @@
-import { isRef } from "./reactivity.js";
-import type { AnyFunction, RuntimeContext } from "./types";
+import { isRef, ref, watch } from "./reactivity.js";
+import type { AnyFunction, RuntimeContext, PropOptions } from "./types";
 
 export function guessValue(s: string) {
   s = s.trim();
@@ -19,7 +19,7 @@ export function guessValue(s: string) {
   }
 }
 
-export function getPropValue<T extends keyof Element>(
+function getPropValue<T extends keyof Element>(
   element: Element,
   name: T,
   defaultValue: any,
@@ -214,3 +214,45 @@ export async function importModuleFromSource(
 }
 
 export const toCamelCase = (s) => s.replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase());
+
+export function eventEmitter(element, name, value) {
+  const event = new CustomEvent(name, { detail: value });
+  const handler = element['on' + name];
+
+  if (typeof handler === 'function') {
+    handler(event);
+  }
+
+  element.dispatchEvent(event);
+
+  return event;
+}
+
+export function definePropInternal(name: string, options: PropOptions = {}) {
+  const { element, update, props } = getCurrentNode();
+  const current = getPropValue(element, name as any, options.default);
+  const prop = ref(current);
+
+  watch(prop, (value: any) => {
+    if (element[name] !== value) {
+      element[name] = value;
+    }
+  });
+
+  Object.defineProperty(element, name, {
+    get() {
+      return prop.value;
+    },
+    set(value) {
+      prop.value = value;
+
+      for (const fn of update) {
+        fn();
+      }
+    },
+  });
+
+  props[name] = prop;
+
+  return prop;
+}
