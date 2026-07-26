@@ -5,7 +5,7 @@ const error = new Error('Store values are read-only');
 const storeKey = (name) => `_store_${name}`;
 
 export function defineStore(storeName: string, factory: CallableFunction) {
-  return function () {
+  return async function () {
     if (stores.has(storeName)) {
       return stores.get(storeName);
     }
@@ -39,17 +39,14 @@ export function defineStore(storeName: string, factory: CallableFunction) {
   };
 }
 
-export function definePersistentStore(
-  storeName: string,
-  factory: CallableFunction,
-  o: { parse?: (s: string) => any; serialize?: (v: any) => string; skip?: string[] },
-) {
-  return function () {
-    const { parse = JSON.parse, serialize = JSON.stringify, skip = [] } = o;
-    const store = defineStore(storeName, factory);
-    const storageKey = storeKey(storeName);
-    const refs = Object.entries(store).filter(([k, v]) => isRef(v) && !isReadOnlyRef(v) && skip.includes(k) === false);
+export function definePersistentStore(storeName: string, factory: CallableFunction) {
+  const storeFactory = defineStore(storeName, factory);
 
+  return async function () {
+    const store = await storeFactory();
+    const storageKey = storeKey(storeName);
+    const storage = useIndexedDbStorage(storeName);
+    const refs = Object.values(store).filter((v) => isRef(v) && !isReadOnlyRef(v));
     let timer: any;
 
     effect(
@@ -61,28 +58,25 @@ export function definePersistentStore(
 
         return Math.random();
       },
-
       () => {
         clearTimeout(timer);
-        timer = setTimeout(() => localStorage.setItem(storageKey, serialize(store)), 10);
+        timer = setTimeout(() => storage.setItem(storageKey, serialize(store)), 10);
       },
     );
 
-    const cached = localStorage.getItem(storageKey);
+    try {
+      const cached = await storage.getItem(storageKey);
+      const entries = Object.entries(cached || {});
 
-    if (cached) {
-      try {
-        const values = parse(cached);
-        const entries = Object.entries(values);
-
-        for (const [key, value] of entries) {
-          const k = store[key];
-          if (isRef(k) && !isReadOnlyRef(k)) {
-            k.value = value;
-          }
+      for (const [key, value] of entries) {
+        const k = store[key];
+        if (isRef(k) && !isReadOnlyRef(k)) {
+          k.value = value;
         }
-      } catch {}
-    }
+      }
+    } catch {}
+
+    return store;
   };
 }
 
@@ -97,4 +91,61 @@ export function storeToRefs(store) {
       return v;
     },
   });
+}
+
+export function useIndexedDbStorage(name: string) {
+  const dbName = 'li3Store_' + name;
+  const storeName = 'kv_' + name;
+
+  function getDB() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(dbName, 1);
+
+      request.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(storeName)) {
+          db.createObjectStore(storeName);
+        }
+      };
+
+      request.onsuccess = (e) => resolve(e.target.result);
+      request.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  async function getStore(mode) {
+    const db = await getDB();
+    const transaction = db.transaction(storeName, mode);
+    return transaction.objectStore(storeName);
+  }
+
+  function wrap(f) {
+    return new Promise((resolve, reject) => {
+      const request = f();
+      request.onsuccess = (e) => resolve(e.target?.result ?? null);
+      request.onerror = (e) => reject(e.target.error);
+    });
+  }
+
+  return {
+    async setItem(key, value) {
+      const store = await getStore('readwrite');
+      return wrap(() => store.put(value, key));
+    },
+
+    async getItem(key) {
+      const store = await getStore('readonly');
+      return wrap(() => store.get(key));
+    },
+
+    async removeItem(key) {
+      const store = await getStore('readwrite');
+      return wrap(() => store.delete(key));
+    },
+
+    async clear() {
+      const store = await getStore('readwrite');
+      return wrap(() => store.clear());
+    },
+  };
 }
