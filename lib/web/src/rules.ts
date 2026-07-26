@@ -288,7 +288,7 @@ export class TemplateFor implements Rule {
     }
 
     if (nodesToRemove.length) {
-      requestIdleCallback(() => {
+      setTimeout(() => {
         for (const node of nodesToRemove) {
           node.parentNode!.removeChild(node);
         }
@@ -323,7 +323,7 @@ export class TemplateFor implements Rule {
     }
 
     if (nodesToInsert.childNodes.length) {
-      requestIdleCallback(() => {
+      setTimeout(() => {
         anchor.parentNode.insertBefore(nodesToInsert, lastInsertedNode);
       });
     }
@@ -351,7 +351,7 @@ export class TemplateIf implements Rule {
         ifNodes.push(...Array.from(dom.childNodes));
 
         linkTreeToContext(dom, context);
-        requestIdleCallback(() => {
+        setTimeout(() => {
           anchor.parentNode.insertBefore(dom, anchor);
         });
         return;
