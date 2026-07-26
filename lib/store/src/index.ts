@@ -46,7 +46,7 @@ export function definePersistentStore(storeName: string, factory: CallableFuncti
 
   return function () {
     const store = storeFactory();
-    const refs = Object.values(store).filter((v) => isRef(v) && !isReadOnlyRef(v));
+    const refs: any[] = Object.values(store).filter((v) => isRef(v) && !isReadOnlyRef(v));
     let timer: any;
 
     effect(
@@ -100,20 +100,20 @@ export function useIndexedDbStorage(name: string) {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(dbName, 1);
 
-      request.onupgradeneeded = (e) => {
+      request.onupgradeneeded = (e: any) => {
         const db = e.target.result;
         if (!db.objectStoreNames.contains(storeName)) {
           db.createObjectStore(storeName);
         }
       };
 
-      request.onsuccess = (e) => resolve(e.target.result);
-      request.onerror = (e) => reject(e.target.error);
+      request.onsuccess = (e: any) => resolve(e.target.result);
+      request.onerror = (e: any) => reject(e.target.error);
     });
   }
 
   async function getStore(mode) {
-    const db = await getDB();
+    const db: any = await getDB();
     const transaction = db.transaction(storeName, mode);
     return transaction.objectStore(storeName);
   }
@@ -121,8 +121,8 @@ export function useIndexedDbStorage(name: string) {
   function wrap(f) {
     return new Promise((resolve, reject) => {
       const request = f();
-      request.onsuccess = (e) => resolve(e.target?.result ?? null);
-      request.onerror = (e) => reject(e.target.error);
+      request.onsuccess = (e: any) => resolve(e.target?.result ?? null);
+      request.onerror = (e: any) => reject(e.target.error);
     });
   }
 
