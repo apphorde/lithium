@@ -40,11 +40,11 @@ export function defineStore(storeName: string, factory: CallableFunction) {
 }
 
 export function definePersistentStore(storeName: string, factory: CallableFunction) {
-  const storeFactory = defineStore(storeName, factory);
   const storage = useIndexedDbStorage(storeName);
   const storageKey = storeKey(storeName);
 
   return function () {
+    const storeFactory = defineStore(storeName, factory);
     const store = storeFactory();
     const refs: any[] = Object.values(store).filter((v) => isRef(v) && !isReadOnlyRef(v));
     let timer: any;
