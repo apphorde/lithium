@@ -39,8 +39,7 @@ export function defineStore(storeName: string, factory: CallableFunction) {
   };
 }
 
-export function definePersistentStore(storeName: string, factory: CallableFunction) {
-  const storage = useIndexedDbStorage(storeName);
+export function definePersistentStore(storeName: string, storage: any, factory: CallableFunction) {
   const storageKey = storeKey(storeName);
 
   return function () {
@@ -64,7 +63,8 @@ export function definePersistentStore(storeName: string, factory: CallableFuncti
       },
     );
 
-    storage.getItem(storageKey).then((cached) => {
+    (async () => {
+      const cached = await storage.getItem(storageKey);
       const entries = Object.entries(cached || {});
 
       for (const [key, value] of entries) {
@@ -73,7 +73,7 @@ export function definePersistentStore(storeName: string, factory: CallableFuncti
           k.value = value;
         }
       }
-    });
+    })();
 
     return store;
   };

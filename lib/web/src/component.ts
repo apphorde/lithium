@@ -23,14 +23,14 @@ function getOrigin(template: HTMLTemplateElement) {
 
   if (!url) {
     const origin = new URL(window.location.href);
-    const c = template.getAttribute('component');
+    const isComponent = template.getAttribute('component');
 
-    if (c) {
+    url = String(origin);
+
+    if (isComponent) {
+      // add origin to template to correctly load any relative imports within the source
       origin.pathname += '/' + template.getAttribute('component') + '.html';
-      url = String(origin);
       template.setAttribute('origin', url);
-    } else {
-      url = origin.pathname;
     }
   }
 
