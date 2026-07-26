@@ -2,7 +2,7 @@ import { computed, effect, isRef, isReadOnlyRef, unwrap } from '@li3/web';
 
 const stores = new Map();
 const error = new Error('Store values are read-only');
-const storeKey = (name) => `$store${name}`;
+const storeKey = (name) => `_store_${name}`;
 
 export function defineStore(storeName: string, factory: CallableFunction) {
   return function () {
@@ -11,13 +11,10 @@ export function defineStore(storeName: string, factory: CallableFunction) {
     }
 
     const store = factory();
-    const storageKey = storeKey(storeName);
     const readOnlyProperties = {};
-    const refs = [];
 
     for (const [name, value] of Object.entries(store)) {
       if (isRef(value)) {
-        refs.push(value);
         Object.defineProperty(readOnlyProperties, name, {
           enumerable: true,
           get() {
@@ -37,7 +34,23 @@ export function defineStore(storeName: string, factory: CallableFunction) {
       }
     }
 
-    let timer;
+    stores.set(storeName, readOnlyProperties);
+    return readOnlyProperties;
+  };
+}
+
+export function definePersistentStore(
+  storeName: string,
+  factory: CallableFunction,
+  o: { parse?: (s: string) => any; serialize?: (v: any) => string; skip?: string[] },
+) {
+  return function () {
+    const { parse = JSON.parse, serialize = JSON.stringify, skip = [] } = o;
+    const store = defineStore(storeName, factory);
+    const storageKey = storeKey(storeName);
+    const refs = Object.entries(store).filter(([k, v]) => isRef(v) && !isReadOnlyRef(v) && skip.includes(k) === false);
+
+    let timer: any;
 
     effect(
       () => {
@@ -51,14 +64,15 @@ export function defineStore(storeName: string, factory: CallableFunction) {
 
       () => {
         clearTimeout(timer);
-        timer = setTimeout(() => localStorage.setItem(storageKey, JSON.stringify(readOnlyProperties)), 10);
+        timer = setTimeout(() => localStorage.setItem(storageKey, serialize(store)), 10);
       },
     );
 
     const cached = localStorage.getItem(storageKey);
+
     if (cached) {
       try {
-        const values = JSON.parse(cached);
+        const values = parse(cached);
         const entries = Object.entries(values);
 
         for (const [key, value] of entries) {
@@ -69,24 +83,18 @@ export function defineStore(storeName: string, factory: CallableFunction) {
         }
       } catch {}
     }
-
-    stores.set(storeName, readOnlyProperties);
-    return readOnlyProperties;
   };
 }
 
 export function storeToRefs(store) {
-  const refs = {};
+  return new Proxy(store, {
+    get(_t, p) {
+      const v = store[p];
+      if (typeof v !== 'function') {
+        return computed(() => store[v]);
+      }
 
-  for (const [name, value] of Object.entries(store)) {
-    if (typeof value !== 'function') {
-      Object.defineProperty(refs, name, {
-        get() {
-          return computed(() => store[name]);
-        },
-      });
-    }
-  }
-
-  return refs;
+      return v;
+    },
+  });
 }
