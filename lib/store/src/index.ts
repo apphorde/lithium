@@ -5,7 +5,7 @@ const error = new Error('Store values are read-only');
 const storeKey = (name) => `_store_${name}`;
 
 export function defineStore(storeName: string, factory: CallableFunction) {
-  return async function () {
+  return function () {
     if (stores.has(storeName)) {
       return stores.get(storeName);
     }
@@ -41,11 +41,11 @@ export function defineStore(storeName: string, factory: CallableFunction) {
 
 export function definePersistentStore(storeName: string, factory: CallableFunction) {
   const storeFactory = defineStore(storeName, factory);
+  const storage = useIndexedDbStorage(storeName);
+  const storageKey = storeKey(storeName);
 
-  return async function () {
-    const store = await storeFactory();
-    const storageKey = storeKey(storeName);
-    const storage = useIndexedDbStorage(storeName);
+  return function () {
+    const store = storeFactory();
     const refs = Object.values(store).filter((v) => isRef(v) && !isReadOnlyRef(v));
     let timer: any;
 
@@ -60,12 +60,11 @@ export function definePersistentStore(storeName: string, factory: CallableFuncti
       },
       () => {
         clearTimeout(timer);
-        timer = setTimeout(() => storage.setItem(storageKey, serialize(store)), 10);
+        timer = setTimeout(() => storage.setItem(storageKey, store), 10);
       },
     );
 
-    try {
-      const cached = await storage.getItem(storageKey);
+    storage.getItem(storageKey).then((cached) => {
       const entries = Object.entries(cached || {});
 
       for (const [key, value] of entries) {
@@ -74,7 +73,7 @@ export function definePersistentStore(storeName: string, factory: CallableFuncti
           k.value = value;
         }
       }
-    } catch {}
+    });
 
     return store;
   };
