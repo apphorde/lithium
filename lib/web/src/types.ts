@@ -2,6 +2,7 @@ export type AnyFunction = (...args: any[]) => any;
 
 export type PropOptions<T = any> = {
   default?: T | (() => T);
+  attribute?: boolean
 };
 
 export type RuntimeContext = {

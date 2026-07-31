@@ -1,5 +1,5 @@
-import { isRef, ref, watch } from "./reactivity.js";
-import type { AnyFunction, RuntimeContext, PropOptions } from "./types";
+import { isRef, ref, watch } from './reactivity.js';
+import type { AnyFunction, RuntimeContext, PropOptions } from './types';
 
 export function guessValue(s: string) {
   s = s.trim();
@@ -19,11 +19,10 @@ export function guessValue(s: string) {
   }
 }
 
-function getPropValue<T extends keyof Element>(
-  element: Element,
-  name: T,
-  defaultValue: any,
-) {
+const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
+export const isValidAttribute = (s) => validAttribute.test(s);
+
+function getPropValue<T extends keyof Element>(element: Element, name: T, defaultValue: any) {
   const value = element[name];
 
   if (value !== undefined) {
@@ -37,7 +36,7 @@ function getPropValue<T extends keyof Element>(
   }
 
   if (defaultValue !== undefined) {
-    return typeof defaultValue === "function" ? defaultValue() : defaultValue;
+    return typeof defaultValue === 'function' ? defaultValue() : defaultValue;
   }
 }
 
@@ -48,29 +47,18 @@ export function walkDomTree(tree: Node, fn: AnyFunction, context: any) {
   while ((node = stack.shift() as Node)) {
     fn(node, context);
 
-    if (
-      node.nodeType === node.ELEMENT_NODE &&
-      !(node as any).hasAttribute("do-not-render") &&
-      node.childNodes.length
-    ) {
+    if (node.nodeType === node.ELEMENT_NODE && !(node as any).hasAttribute('do-not-render') && node.childNodes.length) {
       stack.push(...(Array.from(node.childNodes) as any[]));
     }
   }
 }
 
-export function createFunction(
-  expression: string,
-  context: any,
-  args: string[] = [],
-) {
+export function createFunction(expression: string, context: any, args: string[] = []) {
   const k = Object.keys(context)
     .filter((key: any) => expression.includes(key))
-    .join(", ")
+    .join(', ')
     .trim();
-  return Function(
-    ...args,
-    (k ? `const { ${k} } = this;` : "") + `return ${expression};`,
-  ).bind(context);
+  return Function(...args, (k ? `const { ${k} } = this;` : '') + `return ${expression};`).bind(context);
 }
 
 export function createReadOnlyContext(context: any) {
@@ -87,7 +75,7 @@ export function createReadOnlyContext(context: any) {
     },
 
     set() {
-      throw new Error("View contexts are read-only");
+      throw new Error('View contexts are read-only');
     },
   });
 }
@@ -98,17 +86,13 @@ export function getCurrentNode() {
   const t = runtimeStack.at(-1);
 
   if (!t) {
-    throw new Error("Missing context for this component");
+    throw new Error('Missing context for this component');
   }
 
   return t;
 }
 
-export function createContext(
-  element: Element,
-  setup: any,
-  dom: DocumentFragment,
-) {
+export function createContext(element: Element, setup: any, dom: DocumentFragment) {
   const runtime: RuntimeContext = {
     dom,
     context: null,
@@ -152,11 +136,11 @@ export function importCssModule(href: string): Promise<CSSStyleSheet> {
 }
 
 let _importCssModule: any = importModuleFromSource(
-  'export default function(href) { return import(href, { with: { type: "css" } }) }'
+  'export default function(href) { return import(href, { with: { type: "css" } }) }',
 );
 
 async function importCssModuleInternal(href: string) {
-  if (typeof _importCssModule !== "function") {
+  if (typeof _importCssModule !== 'function') {
     _importCssModule = (await _importCssModule).default;
   }
 
@@ -169,25 +153,22 @@ async function importCssModuleInternal(href: string) {
   }
 }
 
-export async function importModuleFromSource(
-  sourceText: string,
-  origin?: string,
-) {
+export async function importModuleFromSource(sourceText: string, origin?: string) {
   let fileName;
   if (origin) {
-    fileName = String(origin).replace(".html", ".mjs");
+    fileName = String(origin).replace('.html', '.mjs');
     const originalFile = new URL(fileName, 'https://li3.dev');
     originalFile.pathname = originalFile.pathname.replace('.mjs', '.src.mjs');
     const lineCount = sourceText.split(/\r?\n/).length;
-    const mappings = new Array(lineCount).fill("AACA");
-    mappings[0] = "AAAA";
+    const mappings = new Array(lineCount).fill('AACA');
+    mappings[0] = 'AAAA';
 
     const sourceMap = {
       version: 3,
       file: fileName,
       sourcesContent: [sourceText],
       sources: [String(originalFile)],
-      mappings: mappings.join(";"),
+      mappings: mappings.join(';'),
     };
 
     const jsonString = JSON.stringify(sourceMap);
@@ -196,14 +177,14 @@ export async function importModuleFromSource(
     sourceText += `\n//# sourceMappingURL=${mapUrl}\n//# sourceURL=${fileName}`;
   }
 
-  const blob = new Blob([sourceText], { type: "application/javascript" });
+  const blob = new Blob([sourceText], { type: 'application/javascript' });
   const objectUrl = URL.createObjectURL(blob);
 
   try {
     return await import(objectUrl);
   } catch (error) {
     if (origin && error instanceof Error && error.stack) {
-      const blobUrlPattern = new RegExp(objectUrl, "g");
+      const blobUrlPattern = new RegExp(objectUrl, 'g');
       error.stack = error.stack.replace(blobUrlPattern, fileName);
     }
 
@@ -232,6 +213,7 @@ export function definePropInternal(name: string, options: PropOptions = {}) {
   const { element, update, props } = getCurrentNode();
   const current = getPropValue(element, name as any, options.default);
   const prop = ref(current);
+  const attribute = options.attribute && isValidAttribute(name);
 
   watch(prop, (value: any) => {
     if (element[name] !== value) {
@@ -248,6 +230,10 @@ export function definePropInternal(name: string, options: PropOptions = {}) {
 
       for (const fn of update) {
         fn();
+      }
+
+      if (attribute) {
+        element.setAttribute(name, String(value));
       }
     },
   });

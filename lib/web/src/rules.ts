@@ -1,4 +1,4 @@
-import { createFunction, createReadOnlyContext, walkDomTree, toCamelCase } from './internals.js';
+import { createFunction, createReadOnlyContext, walkDomTree, toCamelCase, isValidAttribute } from './internals.js';
 import { ref, computed, effect, watch, suspend } from './reactivity.js';
 import type { Signal } from './reactivity';
 import { FF } from './feature-flags.js';
@@ -132,9 +132,8 @@ function setProperty(node: any, key: string, value: any, modifiers: string[]): v
   }
 }
 
-const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
 function setAttribute(el: Element, attribute: string, value: boolean, modifiers: string[]): void {
-  if (!validAttribute.test(attribute)) {
+  if (!isValidAttribute(attribute)) {
     return;
   }
 
