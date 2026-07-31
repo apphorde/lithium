@@ -77,10 +77,10 @@ export async function load(href: string | URL, baseUrl?: string | URL) {
 }
 
 export function loadCss(href: string | URL, options: { adopt: boolean } = {}) {
-  const { element } = getCurrentNode();
   const stylesheet = importCssModule(String(href));
 
   if (options?.adopt !== false) {
+    const { element } = getCurrentNode();
     stylesheet.then((s) => (element.shadowRoot || document).adoptedStyleSheets.push(s));
   }
 
