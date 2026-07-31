@@ -76,7 +76,7 @@ export async function load(href: string | URL, baseUrl?: string | URL) {
   }
 }
 
-export function loadCss(href: string | URL, options: { adopt: boolean } = {}) {
+export function loadCss(href: string | URL, options?: { adopt: boolean }) {
   const stylesheet = importCssModule(String(href));
 
   if (options?.adopt !== false) {
