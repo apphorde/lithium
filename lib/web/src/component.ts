@@ -80,6 +80,7 @@ export function loadCss(href: string | URL) {
   const { element } = getCurrentNode();
   const stylesheet = importCssModule(String(href));
   stylesheet.then((s) => (element.shadowRoot || document).adoptedStyleSheets.push(s));
+  return stylesheet;
 }
 
 const invalidNames = [
