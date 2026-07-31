@@ -143,12 +143,12 @@ export const debounce = (fn: any) => {
 
 const stylesheetCache = new Map<string, Promise<CSSStyleSheet>>();
 
-export function importCssModule(href: string) {
+export function importCssModule(href: string): Promise<CSSStyleSheet> {
   if (!stylesheetCache.has(href)) {
     stylesheetCache.set(href, importCssModuleInternal(href));
   }
 
-  return stylesheetCache.get(href);
+  return stylesheetCache.get(href)!;
 }
 
 let _importCssModule: any = importModuleFromSource(
