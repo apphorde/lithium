@@ -1,6 +1,6 @@
 {
   "name": "@li3/web",
-  "version": "0.2.34",
+  "version": "0.2.35",
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -16,8 +16,5 @@
     "@vitest/browser-playwright": "^4.1.7",
     "jsdom": "^29.1.1",
     "vitest": "^4.1.7"
-  },
-  "scripts": {
-    "test:browser": "vitest"
   }
 }
