@@ -107,10 +107,11 @@ export function createContext(element: Element, setup: any, dom: DocumentFragmen
   runtimeStack.push(runtime);
 
   try {
-    runtime.context = setup() ?? {};
+    runtime.context = setup();
   } catch (e) {
     console.error(e);
   } finally {
+    runtime.context ||= {};
     runtimeStack.pop();
   }
 

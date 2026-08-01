@@ -22,13 +22,11 @@ function getOrigin(template: HTMLTemplateElement) {
   let url = template.getAttribute('origin');
 
   if (!url) {
-    const origin = new URL(window.location.href);
-    const isComponent = template.getAttribute('component');
+    url = window.location.href;
 
-    url = String(origin);
-
-    if (isComponent) {
-      // add origin to template to correctly load any relative imports within the source
+    if (template.getAttribute('component')) {
+      // add origin to template to correctly load any relative imports within the template's source
+      const origin = new URL(url);
       origin.pathname += '/' + template.getAttribute('component') + '.html';
       template.setAttribute('origin', url);
     }
