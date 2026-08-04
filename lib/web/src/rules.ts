@@ -212,13 +212,13 @@ export class SetProperty implements Rule {
 
     if (key === 'class' && isObject) {
       effect(fn, (map) => {
-        for (const [classNames, value] of Object.entries(map)) {
+        for (const [classNames, value] of Object.entries(map || {})) {
           setClassName(node, classNames, value);
         }
       });
     } else if (key === 'style' && isObject) {
       effect(fn, (map) => {
-        for (const [property, value] of Object.entries(map)) {
+        for (const [property, value] of Object.entries(map || {})) {
           setStyle(node, toCamelCase(property), value);
         }
       });
