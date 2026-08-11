@@ -191,7 +191,7 @@ function computed<T = any>(fn: () => T): Signal<T> {
       signalsStack.push(o);
 
       try {
-        value = xfn();
+        value = fn();
       } catch (e) {
         FF.debug && console.error(e);
       } finally {
