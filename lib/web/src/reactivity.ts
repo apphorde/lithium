@@ -11,19 +11,18 @@ export type Signal<T = any> = {
 
 type SignalInternal<T = any> = Signal<T> & {
   [refTag]: true;
-  [readonly]: boolean;
   [Symbol.toPrimitive]: any;
   internalValue: T;
   dependencies: Set<SignalInternal>;
   watchers: Set<AnyFunction>;
   suspended: boolean;
+  readonly: boolean;
   update(value?: T): void;
 };
 const signalsStack: SignalInternal[] = [];
-const reactiveTag = Symbol('#');
-const unwrapTag = Symbol('[]');
-const refTag = Symbol('$');
-const readonly = Symbol('~');
+const reactiveTag = Symbol('reactive');
+const unwrapTag = Symbol('unwrap');
+const refTag = Symbol('ref');
 
 function toPrimitive(v: Signal, hint: string) {
   if (hint === 'number') {
@@ -104,7 +103,11 @@ function unwrap<T = any>(object: T): T {
 }
 
 function isReadOnlyRef(ref: Signal): boolean {
-  return (ref as SignalInternal)[readonly];
+  return isRef(ref) && (ref as SignalInternal).readonly;
+}
+
+function isWritableRef(ref: Signal): boolean {
+  return isRef(ref) && !(ref as SignalInternal).readonly;
 }
 
 function ref<T>(initial?: T, isShallow?: boolean): Signal<T>;
@@ -122,7 +125,7 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
       return toPrimitive(o, hint);
     },
     [refTag]: true,
-    [readonly]: false,
+    readonly: false,
     suspended: false,
     internalValue: undefined as T,
     dependencies: new Set<SignalInternal>(),
@@ -164,7 +167,7 @@ function computed<T = any>(fn: () => T): Signal<T> {
       return toPrimitive(o, hint);
     },
     [refTag]: true,
-    [readonly]: true,
+    readonly: true,
     suspended: false,
     internalValue: undefined as T,
     dependencies: new Set<SignalInternal>(),
@@ -188,7 +191,7 @@ function computed<T = any>(fn: () => T): Signal<T> {
       signalsStack.push(o);
 
       try {
-        value = fn();
+        value = xfn();
       } catch (e) {
         FF.debug && console.error(e);
       } finally {
@@ -230,7 +233,7 @@ function resume(s: Signal) {
 
 export type WatchOptions = { immediate: boolean };
 
-function watch(target: Signal, fn: AnyFunction, o?: WatchOptions ) {
+function watch(target: Signal, fn: AnyFunction, o?: WatchOptions) {
   const memoized = memoizedWatcher(fn);
   const watchers = (target as SignalInternal).watchers;
   watchers.add(memoized);
@@ -252,7 +255,7 @@ function effect(fn: AnyFunction, effectFn: AnyFunction, o?: WatchOptions) {
 
 function hook<T>(initial: T, isShallow = false) {
   const $ = ref(initial, isShallow);
-  const setter = (v: T) => $.value = v;
+  const setter = (v: T) => ($.value = v);
   return [$, setter] as const;
 }
 
@@ -302,10 +305,25 @@ function schedule(fn: AnyFunction) {
 
   timer = setTimeout(() => {
     let n;
-    while (n = queue.shift()) {
+    while ((n = queue.shift())) {
       n();
     }
   }, 5);
 }
 
-export { ref, computed, effect, watch, hook, reactive, unwrap, isRef, isReadOnlyRef, shallowRef, canBeObserved, suspend, resume };
+export {
+  ref,
+  computed,
+  effect,
+  watch,
+  hook,
+  reactive,
+  unwrap,
+  isRef,
+  isReadOnlyRef,
+  isWritableRef,
+  shallowRef,
+  canBeObserved,
+  suspend,
+  resume,
+};

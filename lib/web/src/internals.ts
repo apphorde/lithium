@@ -1,44 +1,8 @@
-import { isRef, ref, watch } from './reactivity.js';
-import type { AnyFunction, RuntimeContext, PropOptions } from './types';
-
-export function guessValue(s: string) {
-  s = s.trim();
-
-  if (s === 'true') {
-    return true;
-  }
-
-  if (s === 'false') {
-    return false;
-  }
-
-  try {
-    return Function('return ' + s)();
-  } catch {
-    return s;
-  }
-}
+import { isRef } from './reactivity.js';
+import type { AnyFunction } from './types';
 
 const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
 export const isValidAttribute = (s) => validAttribute.test(s);
-
-function getPropValue<T extends keyof Element>(element: Element, name: T, defaultValue: any) {
-  const value = element[name];
-
-  if (value !== undefined) {
-    return value;
-  }
-
-  const attr = element.getAttribute(name);
-
-  if (attr !== null) {
-    return guessValue(attr);
-  }
-
-  if (defaultValue !== undefined) {
-    return typeof defaultValue === 'function' ? defaultValue() : defaultValue;
-  }
-}
 
 export function walkDomTree(tree: Node, fn: AnyFunction, context: any) {
   const stack: Node[] = tree.childNodes ? Array.from(tree.childNodes) : [];
@@ -78,44 +42,6 @@ export function createReadOnlyContext(context: any) {
       throw new Error('View contexts are read-only');
     },
   });
-}
-
-const runtimeStack: RuntimeContext[] = [];
-
-export function getCurrentNode() {
-  const t = runtimeStack.at(-1);
-
-  if (!t) {
-    throw new Error('Missing context for this component');
-  }
-
-  return t;
-}
-
-export function createContext(element: Element, setup: any, dom: DocumentFragment) {
-  const runtime: RuntimeContext = {
-    dom,
-    context: null,
-    element,
-    mount: [],
-    update: [],
-    unmount: [],
-    props: {},
-    refs: {},
-  };
-
-  runtimeStack.push(runtime);
-
-  try {
-    runtime.context = setup();
-  } catch (e) {
-    console.error(e);
-  } finally {
-    runtime.context ||= {};
-    runtimeStack.pop();
-  }
-
-  return runtime;
 }
 
 export const debounce = (fn: any) => {
@@ -210,36 +136,3 @@ export function eventEmitter(element, name, value) {
   return event;
 }
 
-export function definePropInternal(name: string, options: PropOptions = {}) {
-  const { element, update, props } = getCurrentNode();
-  const current = getPropValue(element, name as any, options.default);
-  const prop = ref(current);
-  const attribute = options.attribute && isValidAttribute(name);
-
-  watch(prop, (value: any) => {
-    if (element[name] !== value) {
-      element[name] = value;
-    }
-  });
-
-  Object.defineProperty(element, name, {
-    get() {
-      return prop.value;
-    },
-    set(value) {
-      prop.value = value;
-
-      for (const fn of update) {
-        fn();
-      }
-
-      if (attribute) {
-        element.setAttribute(name, String(value));
-      }
-    },
-  });
-
-  props[name] = prop;
-
-  return prop;
-}

@@ -277,7 +277,8 @@ export class TemplateFor implements Rule {
   }
 
   updateForOfList(forNodes: any[], anchor: any, node: Node, key: string, indexKey: string, context: any, value: any) {
-    const newLength = value.length;
+    value ||= [];
+    const newLength = value?.length | 0;
     const itemsToRemove = forNodes.slice(newLength);
     const nodesToRemove = [];
 

@@ -1,16 +1,14 @@
 import { FF } from './feature-flags.js';
 import {
-  createContext,
   createReadOnlyContext,
-  guessValue,
+  eventEmitter,
   importCssModule,
   importModuleFromSource,
-  getCurrentNode,
-  eventEmitter,
+  isValidAttribute,
 } from './internals.js';
+import { isReadOnlyRef, isRef, ref, watch } from './reactivity.js';
 import { linkTreeToContext, linkTreeToContextAsync } from './rules.js';
-import { isRef, isReadOnlyRef, ref } from './reactivity.js';
-import type { DefineComponentOptions, MountOptions } from './types';
+import type { DefineComponentOptions, MountOptions, PropOptions, RuntimeContext } from './types';
 
 const DEBUG = Symbol('#');
 
@@ -105,7 +103,7 @@ export function defineComponent(name: string, options: MountOptions) {
 
   const registered: any = customElements.get(name);
   if (registered) {
-    if (!FF.debug) {
+    if (FF.debug) {
       console.error(`Component ${name} is already defined. Options only apply to new instances of ${name}`);
     }
 
@@ -131,7 +129,7 @@ export function defineComponent(name: string, options: MountOptions) {
       }
     }
 
-    connectedCallback() {
+    async connectedCallback() {
       if (this.isConnected) {
         this.unmount = mount(this, Component.options);
       } else {
@@ -204,6 +202,114 @@ export function mount(target: Element, options: MountOptions) {
       fn();
     }
   };
+}
+
+const runtimeStack: RuntimeContext[] = [];
+
+export function getCurrentNode() {
+  const t = runtimeStack.at(-1);
+
+  if (!t) {
+    throw new Error('Missing context for this component');
+  }
+
+  return t;
+}
+
+function createContext(element: Element, setup: any, dom: DocumentFragment) {
+  const runtime: RuntimeContext = {
+    dom,
+    context: null,
+    element,
+    mount: [],
+    update: [],
+    unmount: [],
+    props: {},
+    refs: {},
+  };
+
+  runtimeStack.push(runtime);
+
+  try {
+    runtime.context = setup();
+  } catch (e) {
+    console.error(e);
+  } finally {
+    runtime.context ||= {};
+    runtimeStack.pop();
+  }
+
+  return runtime;
+}
+
+function guessValue(s: string) {
+  s = String(s).trim();
+
+  if (s === 'true') {
+    return true;
+  }
+
+  if (s === 'false') {
+    return false;
+  }
+
+  try {
+    return Function('return ' + s)();
+  } catch {
+    return s;
+  }
+}
+
+function getPropValue<T extends keyof Element>(element: Element, name: T, defaultValue: any) {
+  const value = element[name];
+
+  if (value !== undefined) {
+    return value;
+  }
+
+  const attr = element.getAttribute(name);
+
+  if (attr !== null) {
+    return guessValue(attr);
+  }
+
+  if (defaultValue !== undefined) {
+    return typeof defaultValue === 'function' ? defaultValue() : defaultValue;
+  }
+}
+
+export function definePropInternal(name: string, options: PropOptions = {}) {
+  const { element, update, props } = getCurrentNode();
+  const current = getPropValue(element, name as any, options.default);
+  const prop = ref(current);
+  const attribute = options.attribute && isValidAttribute(name);
+
+  watch(prop, (value: any) => {
+    if (element[name] !== value) {
+      element[name] = value;
+    }
+  });
+
+  Object.defineProperty(element, name, {
+    get() {
+      return prop.value;
+    },
+    set(value) {
+      prop.value = value;
+
+      for (const fn of update) {
+        fn();
+      }
+
+      if (attribute) {
+        element.setAttribute(name, String(value));
+      }
+    },
+  });
+
+  props[name] = prop;
+
+  return prop;
 }
 
 async function findSetupModule(template: HTMLTemplateElement) {

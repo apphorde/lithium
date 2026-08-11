@@ -1,6 +1,7 @@
 import type { PropOptions } from './types';
 import { ref } from './reactivity.js';
-import { debounce, getCurrentNode, definePropInternal, eventEmitter } from './internals.js';
+import { debounce, eventEmitter } from './internals.js';
+import { definePropInternal, getCurrentNode } from './component.js';
 
 function getElement() {
   return getCurrentNode().element;
