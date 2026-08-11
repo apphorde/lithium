@@ -6,7 +6,7 @@ import {
   importModuleFromSource,
   isValidAttribute,
 } from './internals.js';
-import { isReadOnlyRef, isRef, ref, watch } from './reactivity.js';
+import { isWritableRef, ref, watch } from './reactivity.js';
 import { linkTreeToContext, linkTreeToContextAsync } from './rules.js';
 import type { DefineComponentOptions, MountOptions, PropOptions, RuntimeContext } from './types';
 
@@ -321,7 +321,11 @@ async function findSetupModule(template: HTMLTemplateElement) {
 
   if (stateCode) {
     const code = stateCode.textContent.trim();
-    stateFunction = () => JSON.parse(code);
+    stateFunction = () => {
+      try {
+        return JSON.parse(code);
+      } catch {}
+    };
     stateCode.remove();
   }
 
@@ -334,17 +338,14 @@ async function findSetupModule(template: HTMLTemplateElement) {
   }
 
   if (setupFunction && stateFunction) {
-    return async function () {
+    return function () {
       const state = stateFunction();
       const bindings = setupFunction() || {};
 
       for (const [key, value] of Object.entries(state)) {
         const $ = bindings[key];
-
-        if (isRef($)) {
-          if (!isReadOnlyRef($)) {
-            $.value = value;
-          }
+        if (isWritableRef($)) {
+          $.value = value;
         } else {
           bindings[key] = value;
         }

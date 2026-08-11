@@ -1,4 +1,4 @@
-import { computed, effect, isRef, isReadOnlyRef, unwrap } from '@li3/web';
+import { computed, effect, isRef, isWritableRef, unwrap } from '@li3/web';
 
 const stores = new Map();
 const error = new Error('Store values are read-only');
@@ -45,7 +45,7 @@ export function definePersistentStore(storeName: string, storage: any, factory: 
   return function () {
     const storeFactory = defineStore(storeName, factory);
     const store = storeFactory();
-    const refs: any[] = Object.values(store).filter((v) => isRef(v) && !isReadOnlyRef(v));
+    const refs: any[] = Object.values(store).filter(isWritableRef);
     let timer: any;
 
     effect(
@@ -69,7 +69,7 @@ export function definePersistentStore(storeName: string, storage: any, factory: 
 
       for (const [key, value] of entries) {
         const k = store[key];
-        if (isRef(k) && !isReadOnlyRef(k)) {
+        if (isWritableRef(k)) {
           k.value = value;
         }
       }
