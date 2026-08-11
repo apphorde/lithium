@@ -1,6 +1,7 @@
 {
   "name": "@li3/monorepo",
   "license": "MIT",
+  "private": true,
   "devDependencies": {
     "@cloud-cli/prettier-config": "^1.0.0",
     "@nx/vite": "22.7.4",
