@@ -50,4 +50,3 @@ export {
 export * from './reactivity.js';
 export { mount, load, loadCss, autoInitialize } from './component.js';
 export { setFeatureFlag } from './feature-flags.js';
-export { getInternals } from './component.js';
