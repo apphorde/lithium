@@ -273,7 +273,7 @@ export class TemplateFor implements Rule {
     FF.debug && Object.assign(node, { signal, forNodes });
     const anchor = document.createComment('for: ' + source);
     node.replaceWith(anchor);
-    watch(signal, (value) => this.updateForOfList(forNodes, anchor, node, key, indexKey, context, value));
+    watch(signal, (value) => this.updateForOfList(forNodes, anchor, node, key, indexKey, context, value || []));
   }
 
   updateForOfList(forNodes: any[], anchor: any, node: Node, key: string, indexKey: string, context: any, value: any) {
