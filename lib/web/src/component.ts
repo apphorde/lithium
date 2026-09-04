@@ -12,10 +12,6 @@ import type { DefineComponentOptions, MountOptions, PropOptions, RuntimeContext 
 
 const DEBUG = Symbol('#');
 
-export function getInternals(t: any) {
-  return t[DEBUG];
-}
-
 function getOrigin(template: HTMLTemplateElement) {
   let url = template.getAttribute('origin');
 
@@ -192,9 +188,7 @@ export function mount(target: Element, options: MountOptions) {
     fn();
   }
 
-  if (FF.debug) {
-    (parentElement as any)[DEBUG] = mergedContext;
-  }
+  (parentElement as any)[DEBUG] = mergedContext;
 
   const unmountHooks = runtime.unmount;
   return function () {
