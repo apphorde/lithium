@@ -212,13 +212,13 @@ export class SetProperty implements Rule {
 
     if (key === 'class') {
       const currentValue = node.className;
-      effect(fn, (map) => {
+      effect(fn, (mapOrString) => {
         if (isObject) {
-          for (const [classNames, value] of Object.entries(map || {})) {
+          for (const [classNames, value] of Object.entries(mapOrString || {})) {
             setClassName(node, classNames, value);
           }
         } else {
-          node.className = currentValue + ' ' + value;
+          node.className = currentValue + ' ' + mapOrString;
         }
       });
       return;
