@@ -210,23 +210,32 @@ export class SetProperty implements Rule {
     const fn = createFunction(source, context);
     const isObject = source.startsWith('{');
 
-    if (key === 'class' && isObject) {
+    if (key === 'class') {
+      const currentValue = node.className;
       effect(fn, (map) => {
-        for (const [classNames, value] of Object.entries(map || {})) {
-          setClassName(node, classNames, value);
+        if (isObject) {
+          for (const [classNames, value] of Object.entries(map || {})) {
+            setClassName(node, classNames, value);
+          }
+        } else {
+          node.className = currentValue + ' ' + value;
         }
       });
-    } else if (key === 'style' && isObject) {
+      return;
+    } 
+    
+    if (key === 'style' && isObject) {
       effect(fn, (map) => {
         for (const [property, value] of Object.entries(map || {})) {
           setStyle(node, toCamelCase(property), value);
         }
       });
-    } else {
-      const [propertyText, ...modifiers] = key.split('.');
-      const property = toCamelCase(propertyText);
-      effect(fn, (value: any) => setProperty(node, property, value, modifiers));
-    }
+      return;
+    } 
+    
+    const [propertyText, ...modifiers] = key.split('.');
+    const property = toCamelCase(propertyText);
+    effect(fn, (value: any) => setProperty(node, property, value, modifiers));
   }
 }
 
