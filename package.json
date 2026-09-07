@@ -26,6 +26,7 @@
   "scripts": {
     "docs": "pnpm typedoc --footerLastModified",
     "build-all": "pnpm nx run-many -t build,tsc",
+    "build:site": "tsx site/build-docs.ts",
     "publish-all": "pnpm publish --no-git-checks --access public -r"
   }
 }
