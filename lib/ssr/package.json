@@ -1,0 +1,21 @@
+{
+  "name": "@li3/ssr",
+  "version": "0.1.0",
+  "description": "Server-side rendering for @li3/web applications using a virtual server DOM",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./index.js"
+    }
+  },
+  "repository": {
+    "url": "https://github.com/apphorde/lithium"
+  },
+  "dependencies": {
+    "@li3/web": "workspace:*",
+    "jsdom": "^29.1.1"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.7"
+  }
+}

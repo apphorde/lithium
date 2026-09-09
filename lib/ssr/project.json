@@ -1,0 +1,8 @@
+{
+  "name": "@li3/ssr",
+  "targets": {
+    "build": {},
+    "tsc": {},
+    "unit": {}
+  }
+}

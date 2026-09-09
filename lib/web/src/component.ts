@@ -12,6 +12,11 @@ import type { DefineComponentOptions, MountOptions, PropOptions, RuntimeContext 
 
 const DEBUG = Symbol('#');
 
+// adoptedStyleSheets is not implemented by jsdom / SSR virtual DOMs; guard it.
+function adoptStyleSheet(root: any, sheet: CSSStyleSheet) {
+  root.adoptedStyleSheets?.push?.(sheet);
+}
+
 function getOrigin(template: HTMLTemplateElement) {
   let url = template.getAttribute('origin');
 
@@ -73,7 +78,7 @@ export function loadCss(href: string | URL, options?: { adopt: boolean }) {
 
   if (options?.adopt !== false) {
     const { element } = getCurrentNode();
-    stylesheet.then((s) => (element.shadowRoot || document).adoptedStyleSheets.push(s));
+    stylesheet.then((s) => adoptStyleSheet(element.shadowRoot || document, s));
   }
 
   return stylesheet;
@@ -181,7 +186,9 @@ export function mount(target: Element, options: MountOptions) {
   parentElement.appendChild(dom);
 
   if (options.styles?.length) {
-    (target.shadowRoot || document).adoptedStyleSheets.push(...options.styles);
+    for (const sheet of options.styles) {
+      adoptStyleSheet(target.shadowRoot || document, sheet);
+    }
   }
 
   for (const fn of runtime.mount) {
@@ -451,12 +458,24 @@ export function findApps() {
   for (const template of apps) {
     readOptionsFromTemplate(template)
       .then((options) => {
-        const app = document.createElement('div');
+        // SSR hydration: reuse the projection div the server rendered (marked
+        // with data-li3-root) instead of creating a duplicate app root.
+        // Contents are still fully re-rendered by mount() (innerHTML = '').
+        const prev = template.previousElementSibling as HTMLElement | null;
+        const app =
+          FF.ssr && prev?.hasAttribute?.('data-li3-root')
+            ? prev
+            : Object.assign(document.createElement('div'), { style: 'display: contents' });
+
+        if (FF.ssr) {
+          app.setAttribute('data-li3-root', '');
+        }
         app.style.display = 'contents';
         template.parentNode!.insertBefore(app, template);
 
         mount(app, options);
-        FF.debug || template.remove();
+        // SSR keeps the source template as the client re-rendering blueprint.
+        FF.debug || FF.ssr || template.remove();
       })
       .catch((error) => console.error(error));
   }

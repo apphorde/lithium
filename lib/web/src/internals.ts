@@ -54,6 +54,13 @@ export const debounce = (fn: any) => {
 
 const stylesheetCache = new Map<string, Promise<CSSStyleSheet>>();
 
+// True when there's no real browser CSS engine (SSR / jsdom). Detected lazily
+// via adoptedStyleSheets, which jsdom does not implement. Lazy because the
+// document may be swapped in after this module is first imported (SSR).
+function isServer(): boolean {
+  return typeof document === 'undefined' || !('adoptedStyleSheets' in document);
+}
+
 export function importCssModule(href: string): Promise<CSSStyleSheet> {
   if (!stylesheetCache.has(href)) {
     stylesheetCache.set(href, importCssModuleInternal(href));
@@ -62,11 +69,21 @@ export function importCssModule(href: string): Promise<CSSStyleSheet> {
   return stylesheetCache.get(href)!;
 }
 
-let _importCssModule: any = importModuleFromSource(
-  'export default function(href) { return import(href, { with: { type: "css" } }) }',
-);
+let _importCssModule: any = null;
 
-async function importCssModuleInternal(href: string) {
+async function importCssModuleInternal(href: string): Promise<CSSStyleSheet> {
+  // On the server we never fetch stylesheets, and the dynamic
+  // import(href, { with: { type: 'css' } }) would fail against the page URL.
+  if (isServer()) {
+    return new CSSStyleSheet();
+  }
+
+  if (!_importCssModule) {
+    _importCssModule = importModuleFromSource(
+      'export default function(href) { return import(href, { with: { type: "css" } }) }',
+    );
+  }
+
   if (typeof _importCssModule !== 'function') {
     _importCssModule = (await _importCssModule).default;
   }
@@ -80,7 +97,22 @@ async function importCssModuleInternal(href: string) {
   }
 }
 
+// Pluggable loader for importing setup/state modules from source text.
+// Browsers use the Blob + object-URL default below; SSR installs a file-based
+// loader (blob: URLs are not importable in Node).
+export type ModuleLoader = (sourceText: string, origin?: string) => Promise<any>;
+
+let moduleLoader: ModuleLoader | null = null;
+
+export function setModuleLoader(loader: ModuleLoader | null) {
+  moduleLoader = loader;
+}
+
 export async function importModuleFromSource(sourceText: string, origin?: string) {
+  if (moduleLoader) {
+    return moduleLoader(sourceText, origin);
+  }
+
   let fileName;
   if (origin) {
     fileName = String(origin).replace('.html', '.mjs');

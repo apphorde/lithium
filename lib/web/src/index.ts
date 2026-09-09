@@ -1,6 +1,6 @@
 import type { PropOptions } from './types';
 import { ref } from './reactivity.js';
-import { debounce, eventEmitter } from './internals.js';
+import { debounce, eventEmitter, setModuleLoader } from './internals.js';
 import { definePropInternal, getCurrentNode } from './component.js';
 
 function getElement() {
@@ -35,7 +35,7 @@ function templateRef(name: string) {
   return $ref;
 }
 
-export { getElement, onInit, onUpdate, onDestroy, defineProp, defineEvent, templateRef };
+export { getElement, onInit, onUpdate, onDestroy, defineProp, defineEvent, templateRef, setModuleLoader };
 export {
   use,
   SetAttribute,
