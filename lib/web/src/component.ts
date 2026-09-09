@@ -254,11 +254,16 @@ function guessValue(s: string) {
   }
 }
 
-function getPropValue<T extends keyof Element>(element: Element, name: T, defaultValue: any) {
+function getPropValue<T extends keyof Element>(element: Element, name: T, options: PropOptions = {}) {
+  const defaultValue = typeof options.default === 'function' ? options.default() : options.default;
   const value = element[name];
 
   if (value !== undefined) {
-    return value;
+    return options.bool ? !!value : value;
+  }
+
+  if (options.bool) {
+    return element.hasAttribute(name) || defaultValue;
   }
 
   const attr = element.getAttribute(name);
@@ -267,16 +272,14 @@ function getPropValue<T extends keyof Element>(element: Element, name: T, defaul
     return guessValue(attr);
   }
 
-  if (defaultValue !== undefined) {
-    return typeof defaultValue === 'function' ? defaultValue() : defaultValue;
-  }
+  return defaultValue;
 }
 
 export function definePropInternal(name: string, options: PropOptions = {}) {
   const { element, update, props } = getCurrentNode();
-  const current = getPropValue(element, name as any, options.default);
+  const current = getPropValue(element, name as any, options);
   const prop = ref(current);
-  const attribute = options.attribute && isValidAttribute(name);
+  const setAttribute = (options.attribute || options.bool) && isValidAttribute(name);
 
   watch(prop, (value: any) => {
     if (element[name] !== value) {
@@ -295,7 +298,7 @@ export function definePropInternal(name: string, options: PropOptions = {}) {
         fn();
       }
 
-      if (attribute) {
+      if (setAttribute) {
         element.setAttribute(name, String(value));
       }
     },
