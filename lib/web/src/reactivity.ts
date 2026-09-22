@@ -14,12 +14,14 @@ type SignalInternal<T = any> = Signal<T> & {
   [Symbol.toPrimitive]: any;
   internalValue: T;
   dependencies: Set<SignalInternal>;
+  sources: Set<SignalInternal>;
   watchers: Set<AnyFunction>;
   suspended: boolean;
   readonly: boolean;
   update(value?: T): void;
 };
 const signalsStack: SignalInternal[] = [];
+const scopes: Set<AnyFunction>[] = [];
 const reactiveTag = Symbol('reactive');
 const unwrapTag = Symbol('unwrap');
 const refTag = Symbol('ref');
@@ -37,6 +39,25 @@ function toPrimitive(v: Signal, hint: string) {
 
 function canBeObserved(object: any): boolean {
   return object !== null && object !== undefined && typeof object === 'object' && !object[reactiveTag];
+}
+
+function runInScope<T>(scope: Set<AnyFunction>, fn: () => T): T {
+  scopes.push(scope);
+  try {
+    return fn();
+  } finally {
+    scopes.pop();
+  }
+}
+
+function onCleanup(fn: AnyFunction) {
+  scopes.at(-1)?.add(fn);
+  return fn;
+}
+
+function disposeScope(scope: Set<AnyFunction>) {
+  for (const fn of scope) fn();
+  scope.clear();
 }
 
 function reactive<T extends object>(object: T, effect: AnyFunction, notifier?: SignalInternal): T {
@@ -129,6 +150,7 @@ function ref<T = any>(initial: T | undefined, isShallow = false) {
     suspended: false,
     internalValue: undefined as T,
     dependencies: new Set<SignalInternal>(),
+    sources: new Set<SignalInternal>(),
     watchers: new Set(),
 
     get value() {
@@ -171,6 +193,7 @@ function computed<T = any>(fn: () => T): Signal<T> {
     suspended: false,
     internalValue: undefined as T,
     dependencies: new Set<SignalInternal>(),
+    sources: new Set<SignalInternal>(),
     watchers: new Set(),
 
     get value() {
@@ -186,6 +209,11 @@ function computed<T = any>(fn: () => T): Signal<T> {
       if (o.suspended) {
         return;
       }
+
+      for (const source of o.sources) {
+        source.dependencies.delete(o);
+      }
+      o.sources.clear();
 
       let value = null as T;
       signalsStack.push(o);
@@ -236,21 +264,40 @@ export type WatchOptions = { immediate: boolean };
 function watch(target: Signal, fn: AnyFunction, o?: WatchOptions) {
   const memoized = memoizedWatcher(fn);
   const watchers = (target as SignalInternal).watchers;
+  const scope = scopes.at(-1);
   watchers.add(memoized);
 
+  const invoke = (value: any) => (scope ? runInScope(scope, () => memoized(value)) : memoized(value));
+
   if (o?.immediate) {
-    memoized(target.value);
+    invoke(target.value);
   } else {
-    schedule(() => memoized(target.value));
+    schedule(() => invoke(target.value));
   }
 
-  return () => {
+  const unsubscribe = () => {
     watchers.delete(memoized);
   };
+
+  if (scope) onCleanup(unsubscribe);
+  return unsubscribe;
 }
 
 function effect(fn: AnyFunction, effectFn: AnyFunction, o?: WatchOptions) {
-  return watch(computed(fn), effectFn, o);
+  const target = computed(fn) as SignalInternal;
+  const unsubscribe = watch(target, effectFn, o);
+  let disposed = false;
+  const dispose = () => {
+    if (disposed) return;
+    disposed = true;
+    unsubscribe();
+    for (const source of target.sources) source.dependencies.delete(target);
+    target.sources.clear();
+    target.watchers.clear();
+  };
+
+  if (scopes.at(-1)) onCleanup(dispose);
+  return dispose;
 }
 
 function hook<T>(initial: T, isShallow = false) {
@@ -264,7 +311,7 @@ function notifyDependencies(target: SignalInternal) {
 
   const value = target.value;
 
-  for (const dep of target.dependencies) {
+  for (const dep of [...target.dependencies]) {
     if (dep.suspended) {
       target.dependencies.delete(dep);
     } else {
@@ -272,7 +319,7 @@ function notifyDependencies(target: SignalInternal) {
     }
   }
 
-  for (const watcher of target.watchers) {
+  for (const watcher of [...target.watchers]) {
     watcher(value);
   }
 }
@@ -281,6 +328,7 @@ function capture(o: SignalInternal) {
   const d = signalsStack.length && signalsStack.at(-1);
   if (d && d !== o) {
     o.dependencies.add(d);
+    d.sources.add(o);
   }
 }
 
@@ -311,6 +359,10 @@ function schedule(fn: AnyFunction) {
   }, 5);
 }
 
+function nextTick() {
+  return new Promise<void>((resolve) => schedule(resolve));
+}
+
 export {
   ref,
   computed,
@@ -326,4 +378,8 @@ export {
   canBeObserved,
   suspend,
   resume,
+  runInScope,
+  onCleanup,
+  disposeScope,
+  nextTick,
 };

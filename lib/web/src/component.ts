@@ -6,8 +6,8 @@ import {
   importModuleFromSource,
   isValidAttribute,
 } from './internals.js';
-import { isWritableRef, ref, watch } from './reactivity.js';
-import { linkTreeToContext, linkTreeToContextAsync } from './rules.js';
+import { disposeScope, isWritableRef, ref, runInScope, watch } from './reactivity.js';
+import { linkTreeToContext } from './rules.js';
 import type { DefineComponentOptions, MountOptions, PropOptions, RuntimeContext } from './types';
 
 const DEBUG = Symbol('#');
@@ -152,10 +152,6 @@ export function mount(target: Element, options: MountOptions) {
   const parentElement = target.shadowRoot || target;
   const { template, setup = Function } = options;
 
-  if (FF.linker && !(template as any).linker) {
-    (template as any).linker = linkTreeToContextAsync(template.content);
-  }
-
   const dom = document.createDocumentFragment();
   dom.append(template.content.cloneNode(true));
 
@@ -176,11 +172,7 @@ export function mount(target: Element, options: MountOptions) {
   const mergedContext = Object.assign({}, runtime.context, runtime.props, runtime.refs);
   const readOnlyContext = createReadOnlyContext(mergedContext);
 
-  if (FF.linker) {
-    (template as any).linker(dom, readOnlyContext);
-  } else {
-    linkTreeToContext(dom, readOnlyContext);
-  }
+  runInScope(runtime.cleanup, () => linkTreeToContext(dom, readOnlyContext));
 
   parentElement.innerHTML = '';
   parentElement.appendChild(dom);
@@ -198,10 +190,14 @@ export function mount(target: Element, options: MountOptions) {
   (parentElement as any)[DEBUG] = mergedContext;
 
   const unmountHooks = runtime.unmount;
+  let unmounted = false;
   return function () {
+    if (unmounted) return;
+    unmounted = true;
     for (const fn of unmountHooks) {
       fn();
     }
+    disposeScope(runtime.cleanup);
   };
 }
 
@@ -227,12 +223,13 @@ function createContext(element: Element, setup: any, dom: DocumentFragment) {
     unmount: [],
     props: {},
     refs: {},
+    cleanup: new Set(),
   };
 
   runtimeStack.push(runtime);
 
   try {
-    runtime.context = setup();
+    runtime.context = runInScope(runtime.cleanup, setup);
   } catch (e) {
     console.error(e);
   } finally {

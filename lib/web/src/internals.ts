@@ -22,8 +22,18 @@ export function createFunction(expression: string, context: any, args: string[] 
     .filter((key: any) => expression.includes(key))
     .join(', ')
     .trim();
-  return Function(...args, (k ? `const { ${k} } = this;` : '') + `return ${expression};`).bind(context);
+  const cacheKey = `${args.join(',')}|${k}|${expression}`;
+  let fn = functionCache.get(cacheKey);
+
+  if (!fn) {
+    fn = Function(...args, (k ? `const { ${k} } = this;` : '') + `return ${expression};`);
+    functionCache.set(cacheKey, fn);
+  }
+
+  return fn.bind(context);
 }
+
+const functionCache = new Map<string, Function>();
 
 export function createReadOnlyContext(context: any) {
   return new Proxy(context, {
@@ -167,4 +177,3 @@ export function eventEmitter(element, name, value) {
 
   return event;
 }
-

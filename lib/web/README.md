@@ -16,6 +16,7 @@ programming interface.
     watch(ref, callback)                     Watches a reactive source and calls the callback when it changes
     effect(fn, effectFn)                     Runs a function and tracks its dependencies, re-running the effectFn when they change (wraps fn in computed)
     reactive(object, effect)                 Creates a reactive version of an object that triggers an effect when it changes
+    nextTick()                               Resolves after the pending reactive update queue flushes
 ```
 
 **Lifecycle Hooks:**
@@ -24,6 +25,7 @@ programming interface.
     onInit(fn)                               Called just before the component is initialized
     onDestroy(fn)                            Called just before the component is destroyed
     onUpdate(fn)                             Called just before the component inputs have changed (i.e. one or more props have changed)
+    onCleanup(fn)                            Registers per-instance cleanup for resources created during setup
 
 ```
 
@@ -955,6 +957,29 @@ True for plain objects that are not already reactive proxies. Internal use.
   notifications run synchronously. All DOM updates from bindings flow through this, so DOM reflects
   state changes asynchronously — don't assert on the DOM synchronously after a state change.
 
+Use `await nextTick()` when code needs to wait for the scheduled reactive work:
+
+```js
+import { nextTick } from '@li3/web';
+
+count.value++;
+await nextTick();
+// DOM bindings have now processed the queued update.
+```
+
+Resources created during setup and template linking are disposed when the component is unmounted.
+Application code can register its own cleanup:
+
+```js
+import { onCleanup } from '@li3/web';
+
+export default function () {
+  const timer = setInterval(refresh, 1000);
+  onCleanup(() => clearInterval(timer));
+  return { refresh };
+}
+```
+
 ## 8. Props
 
 `defineProp(name, options?)` declares an input. Call it in setup; it returns a writable ref and also
@@ -1244,13 +1269,11 @@ This enables `:value="x"`, `@click="fn()"`, `v-if="cond"`, `v-for="item of items
 ## 14. Feature flags and debugging
 
 Set flags via `setFeatureFlag(name, value?)` (must run before components initialize) or by listing them
-comma-separated in `window.name` (e.g. `window.name = 'debug,linker'` — note this replaces the window
-name).
+comma-separated in `window.name` (e.g. `window.name = 'debug'` — note this replaces the window name).
 
 | Flag | Effect |
 |---|---|
 | `debug` | Keeps processed binding attributes on elements; keeps `<template app>` elements in the DOM; attaches every signal to `window.refList` (a `Set` of `WeakRef`s); logs component redefinition and computed errors. |
-| `linker` | Pre-compiles template rule matches once per template and replays them per mount (faster mounts for repeated components). |
 | `strictCompare` | Uses `===` instead of the deep-ish `compare` for change detection. |
 | `skipAutoInitialize` | Disables the automatic startup pass; call `autoInitialize()` yourself. |
 

@@ -15,6 +15,7 @@ export type RuntimeContext = {
   unmount: AnyFunction[];
   props: Record<PropertyKey, any>;
   refs: Record<PropertyKey, any>;
+  cleanup: Set<AnyFunction>;
 };
 
 export type MountOptions = {

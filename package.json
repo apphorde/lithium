@@ -27,6 +27,7 @@
     "docs": "pnpm typedoc --footerLastModified",
     "build-all": "pnpm nx run-many -t build,tsc",
     "build:site": "tsx site/build-docs.ts",
+    "test:browser": "pnpm nx run @li3/web:build && node lib/web/browser.e2e.mjs",
     "publish-all": "pnpm publish --no-git-checks --access public -r"
   }
 }

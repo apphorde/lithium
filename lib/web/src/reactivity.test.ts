@@ -1,5 +1,5 @@
 import { describe, it, vi, expect, beforeEach } from 'vitest';
-import { ref, computed, watch, hook, effect, reactive, isRef, unwrap, canBeObserved } from './reactivity.js';
+import { ref, computed, watch, hook, effect, reactive, isRef, unwrap, canBeObserved, nextTick } from './reactivity.js';
 
 beforeEach(() => {
   beforeEach(() => {
@@ -65,18 +65,19 @@ describe('reactivity', () => {
       expect(() => ((c as any).value = 0)).toThrow();
 
       const seen: any[] = [];
-      const unsub = watch(a, (v: any) => seen.push(v));
+      const unsub = watch(a, (v: any) => seen.push(v), { immediate: true });
 
       a.value = 4;
       unsub();
 
       a.value = 5;
-      expect(seen.length).toBeGreaterThanOrEqual(2);
+      expect(seen).toEqual([3, 4]);
 
       const eff: any[] = [];
       effect(
         () => a.value * 2,
         (v: any) => eff.push(v),
+        { immediate: true },
       );
       a.value = 10;
       expect(eff.length).toBeGreaterThan(0);
@@ -106,7 +107,7 @@ describe('reactivity', () => {
       const object = ref({ number: 2 });
       const fn = vi.fn();
 
-      effect(() => object.value.number * 3, fn);
+      effect(() => object.value.number * 3, fn, { immediate: true });
 
       expect(fn.mock.calls.length).toBe(1);
       expect(fn.mock.calls[0][0]).toBe(6);
@@ -173,12 +174,22 @@ describe('reactivity', () => {
     it('invokes callback when watched value changes', () => {
       const r = ref(1);
       const seen: any[] = [];
-      const unsub = watch(r, (next) => seen.push(next));
+      const unsub = watch(r, (next) => seen.push(next), { immediate: true });
       expect(seen[0]).toBe(1);
       r.value = 2;
       expect(seen[seen.length - 1]).toBe(2);
       unsub();
     });
+  });
+
+  it('flushes scheduled watchers with nextTick', async () => {
+    const r = ref(1);
+    const seen: any[] = [];
+    watch(r, (value) => seen.push(value));
+
+    expect(seen).toEqual([]);
+    await nextTick();
+    expect(seen).toEqual([1]);
   });
 
   describe('reactivity with nested objects', () => {
