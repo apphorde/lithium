@@ -1,6 +1,6 @@
 {
   "name": "@li3/web",
-  "version": "0.2.38",
+  "version": "0.2.39",
   "exports": {
     ".": {
       "types": "./src/index.ts",
