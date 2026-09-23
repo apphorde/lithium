@@ -165,8 +165,8 @@ export async function importModuleFromSource(sourceText: string, origin?: string
 
 export const toCamelCase = (s) => s.replace(/-([a-z])/g, (_: any, letter: string) => letter.toUpperCase());
 
-export function eventEmitter(element, name, value) {
-  const event = new CustomEvent(name, { detail: value });
+export function eventEmitter(element, name, value, flags: any = {}) {
+  const event = new CustomEvent(name, { detail: value, ...flags });
   const handler = element['on' + name];
 
   if (typeof handler === 'function') {
