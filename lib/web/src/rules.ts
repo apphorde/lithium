@@ -246,7 +246,7 @@ export class TemplateFor implements Rule {
         key,
         indexKey,
         context,
-        value || [],
+        value ?? [],
         timers,
         () => disposed,
         initial,
@@ -263,13 +263,13 @@ export class TemplateFor implements Rule {
     key: string,
     indexKey: string,
     context: any,
-    value: any,
+    value: any = [],
     timers: Set<ReturnType<typeof setTimeout>>,
     isDisposed: () => boolean,
     synchronous = false,
   ) {
-    value ||= [];
-    const newLength = value?.length | 0;
+    const list = value == null ? [] : value;
+    const newLength = list.length | 0;
     const itemsToRemove = forNodes.slice(newLength);
     const nodesToRemove = [];
 
@@ -299,11 +299,11 @@ export class TemplateFor implements Rule {
 
     for (let index = 0; index < newLength; index++) {
       if (forNodes[index]) {
-        forNodes[index].item.value = value[index];
+        forNodes[index].item.value = list[index];
         continue;
       }
 
-      const item = ref(value[index]);
+      const item = ref(list[index]);
       const scope = new Set<AnyFunction>();
       const subContext: any = { [key]: item };
 

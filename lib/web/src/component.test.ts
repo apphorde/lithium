@@ -153,4 +153,25 @@ describe('nested template structures', () => {
     expect(target.querySelectorAll('li')).toHaveLength(1);
     expect(target.textContent).toContain('one');
   });
+
+  it('treats null and undefined for values as empty lists', async () => {
+    const target = document.createElement('div');
+    const items = ref<string[] | null | undefined>(undefined);
+
+    mount(target, {
+      template: template('<ul><template for="item of items"><li>{{ item }}</li></template></ul>'),
+      setup: () => ({ items }),
+    });
+
+    await waitForDom();
+    expect(target.querySelectorAll('li')).toHaveLength(0);
+
+    items.value = ['loaded'];
+    await waitForDom();
+    expect(target.querySelectorAll('li')).toHaveLength(1);
+
+    items.value = null;
+    await waitForDom();
+    expect(target.querySelectorAll('li')).toHaveLength(0);
+  });
 });
