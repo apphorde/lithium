@@ -312,7 +312,7 @@ export class TemplateFor implements Rule {
       }
 
       const dom = (node as HTMLTemplateElement).content.cloneNode(true);
-      forNodes[index] = { item, index: index, nodes: Array.from(dom.childNodes) };
+      forNodes[index] = { item, index: index, nodes: Array.from(dom.childNodes), scope };
       const reader = createReadOnlyContext(Object.assign({}, context, subContext));
       runInScope(scope, () => linkTreeToContext(dom, reader));
       onCleanup(() => disposeScope(scope));

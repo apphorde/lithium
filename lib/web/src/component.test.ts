@@ -135,4 +135,22 @@ describe('nested template structures', () => {
     await waitForDom();
     expect(target.textContent).toContain('onetwo');
   });
+
+  it('disposes removed for rows without throwing', async () => {
+    const target = document.createElement('div');
+    const items = ref(['one', 'two', 'three']);
+
+    mount(target, {
+      template: template('<ul><template for="item of items"><li>{{ item }}</li></template></ul>'),
+      setup: () => ({ items }),
+    });
+
+    await waitForDom();
+    expect(target.querySelectorAll('li')).toHaveLength(3);
+
+    items.value = ['one'];
+    await waitForDom();
+    expect(target.querySelectorAll('li')).toHaveLength(1);
+    expect(target.textContent).toContain('one');
+  });
 });
