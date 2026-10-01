@@ -1,18 +1,21 @@
-import { isRef } from './reactivity.js';
-import type { AnyFunction } from './types';
+import { isRef } from "./reactivity.js";
+import type { AnyFunction } from "./types";
 
 const validAttribute = /^[a-zA-Z_][a-zA-Z0-9\-_:.]*$/;
 export const isValidAttribute = (s) => validAttribute.test(s);
 
 export function walkDomTree(tree: Node, fn: AnyFunction, context: any) {
   const stack: Node[] = tree.childNodes ? Array.from(tree.childNodes) : [];
-  let node;
+  let cursor = 0;
 
-  while ((node = stack.shift() as Node)) {
+  while (cursor < stack.length) {
+    const node = stack[cursor++];
     fn(node, context);
 
-    if (node.nodeType === node.ELEMENT_NODE && !(node as any).hasAttribute('do-not-render') && node.childNodes.length) {
-      stack.push(...(Array.from(node.childNodes) as any[]));
+    if (node.nodeType === node.ELEMENT_NODE && !(node as any).hasAttribute("do-not-render") && node.childNodes.length) {
+      for (let index = 0; index < node.childNodes.length; index++) {
+        stack.push(node.childNodes[index]);
+      }
     }
   }
 }
@@ -20,13 +23,13 @@ export function walkDomTree(tree: Node, fn: AnyFunction, context: any) {
 export function createFunction(expression: string, context: any, args: string[] = []) {
   const k = Object.keys(context)
     .filter((key: any) => expression.includes(key))
-    .join(', ')
+    .join(", ")
     .trim();
-  const cacheKey = `${args.join(',')}|${k}|${expression}`;
+  const cacheKey = `${args.join(",")}|${k}|${expression}`;
   let fn = functionCache.get(cacheKey);
 
   if (!fn) {
-    fn = Function(...args, (k ? `const { ${k} } = this;` : '') + `return ${expression};`);
+    fn = Function(...args, (k ? `const { ${k} } = this;` : "") + `return ${expression};`);
     functionCache.set(cacheKey, fn);
   }
 
@@ -49,7 +52,7 @@ export function createReadOnlyContext(context: any) {
     },
 
     set() {
-      throw new Error('View contexts are read-only');
+      throw new Error("View contexts are read-only");
     },
   });
 }
@@ -68,7 +71,7 @@ const stylesheetCache = new Map<string, Promise<CSSStyleSheet>>();
 // via adoptedStyleSheets, which jsdom does not implement. Lazy because the
 // document may be swapped in after this module is first imported (SSR).
 function isServer(): boolean {
-  return typeof document === 'undefined' || !('adoptedStyleSheets' in document);
+  return typeof document === "undefined" || !("adoptedStyleSheets" in document);
 }
 
 export function importCssModule(href: string): Promise<CSSStyleSheet> {
@@ -94,7 +97,7 @@ async function importCssModuleInternal(href: string): Promise<CSSStyleSheet> {
     );
   }
 
-  if (typeof _importCssModule !== 'function') {
+  if (typeof _importCssModule !== "function") {
     _importCssModule = (await _importCssModule).default;
   }
 
@@ -125,19 +128,19 @@ export async function importModuleFromSource(sourceText: string, origin?: string
 
   let fileName;
   if (origin) {
-    fileName = String(origin).replace('.html', '.mjs');
-    const originalFile = new URL(fileName, 'https://li3.dev');
-    originalFile.pathname = originalFile.pathname.replace('.mjs', '.src.mjs');
+    fileName = String(origin).replace(".html", ".mjs");
+    const originalFile = new URL(fileName, "https://li3.dev");
+    originalFile.pathname = originalFile.pathname.replace(".mjs", ".src.mjs");
     const lineCount = sourceText.split(/\r?\n/).length;
-    const mappings = new Array(lineCount).fill('AACA');
-    mappings[0] = 'AAAA';
+    const mappings = new Array(lineCount).fill("AACA");
+    mappings[0] = "AAAA";
 
     const sourceMap = {
       version: 3,
       file: fileName,
       sourcesContent: [sourceText],
       sources: [String(originalFile)],
-      mappings: mappings.join(';'),
+      mappings: mappings.join(";"),
     };
 
     const jsonString = JSON.stringify(sourceMap);
@@ -146,14 +149,14 @@ export async function importModuleFromSource(sourceText: string, origin?: string
     sourceText += `\n//# sourceMappingURL=${mapUrl}\n//# sourceURL=${fileName}`;
   }
 
-  const blob = new Blob([sourceText], { type: 'application/javascript' });
+  const blob = new Blob([sourceText], { type: "application/javascript" });
   const objectUrl = URL.createObjectURL(blob);
 
   try {
     return await import(objectUrl);
   } catch (error) {
     if (origin && error instanceof Error && error.stack) {
-      const blobUrlPattern = new RegExp(objectUrl, 'g');
+      const blobUrlPattern = new RegExp(objectUrl, "g");
       error.stack = error.stack.replace(blobUrlPattern, fileName);
     }
 
@@ -167,9 +170,9 @@ export const toCamelCase = (s) => s.replace(/-([a-z])/g, (_: any, letter: string
 
 export function eventEmitter(element, name, value, flags: any = {}) {
   const event = new CustomEvent(name, { detail: value, ...flags });
-  const handler = element['on' + name];
+  const handler = element["on" + name];
 
-  if (typeof handler === 'function') {
+  if (typeof handler === "function") {
     handler(event);
   }
 

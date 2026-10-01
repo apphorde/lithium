@@ -141,7 +141,7 @@ Import the module in a page. Auto-initialization runs shortly after module evalu
   { "imports": { "@li3/": "https://cdn.li3.dev/@li3/" } }
 </script>
 <script type="module">
-  import '@li3/web';
+  import "@li3/web";
 </script>
 
 <template app>
@@ -149,15 +149,15 @@ Import the module in a page. Auto-initialization runs shortly after module evalu
   <button on-click="increment()">Count: {{ count }}</button>
 
   <script setup>
-    import { ref } from '@li3/web';
+    import { ref } from "@li3/web";
 
     export default function () {
-      const title = ref('Hello Lithium');
+      const title = ref("Hello Lithium");
       const count = ref(0);
       const increment = () => count.value++;
 
       return { title, count, increment };
-    };
+    }
   </script>
 </template>
 ```
@@ -232,14 +232,14 @@ Sets a DOM **property** (not an attribute). Re-evaluated whenever the expression
 - The property name is **camelCased**: `bind-scroll-top` → `el.scrollTop`.
 - Name mappings: `bind-innerhtml` → `el.innerHTML`, `bind-baseuri` → `el.baseURI`,
   `bind-class` → `el.className`.
-- **`.bool` modifier** — toggles a boolean *attribute* instead of setting a property:
+- **`.bool` modifier** — toggles a boolean _attribute_ instead of setting a property:
 
   ```html
   <button bind-disabled.bool="isSaving">Save</button>
   <section bind-hidden.bool="!isVisible">...</section>
   ```
 
-- **Object syntax for `class`** — when the expression *source text* starts with `{`, each key is
+- **Object syntax for `class`** — when the expression _source text_ starts with `{`, each key is
   toggled as a class name by the truthiness of its value:
 
   ```html
@@ -387,17 +387,19 @@ Mark any element with a plain `ref` attribute, then grab it in setup with `templ
   <button on-click="input.focus()">Focus</button>
 
   <script setup>
-    import { templateRef, onInit } from '@li3/web';
+    import { templateRef, onInit } from "@li3/web";
 
     export default function () {
-      const input = templateRef('input');
+      const input = templateRef("input");
 
       onInit(() => input.value.focus());
 
-      function onInput(e) { /* ... */ }
+      function onInput(e) {
+        /* ... */
+      }
 
       return { input, onInput };
-    };
+    }
   </script>
 </template>
 ```
@@ -446,7 +448,7 @@ follow the same rules:
 4. **The context is read-only.** Assigning to a top-level context variable in a template
    (`on-click="count = count + 1"`) **throws** `"View contexts are read-only"`. Call setup methods
    instead: `on-click="increment()"`. Two exceptions:
-   - Mutating *inside* an object works via deep reactivity: `on-input="user.name = $event.target.value"`
+   - Mutating _inside_ an object works via deep reactivity: `on-input="user.name = $event.target.value"`
      mutates the reactive object held by the `user` ref.
    - Host element props can be mutated through `$event.target` or element refs:
      `on-click="$event.target.trigger++"`.
@@ -466,11 +468,11 @@ follow the same rules:
 
   <!-- optional behavior -->
   <script setup>
-    import { ref } from '@li3/web';
+    import { ref } from "@li3/web";
     export default function () {
-      const message = ref('hi');
+      const message = ref("hi");
       return { message };
-    };
+    }
   </script>
 </template>
 ```
@@ -497,10 +499,10 @@ the application root — or several independent apps on one page.
 <template app>
   <h1>{{ title }}</h1>
   <script setup>
-    import { ref } from '@li3/web';
+    import { ref } from "@li3/web";
     export default function () {
-      return { title: ref('My App') };
-    };
+      return { title: ref("My App") };
+    }
   </script>
 </template>
 ```
@@ -513,22 +515,22 @@ component instance. Everything the template needs must be **returned** as an obj
 
 ```html
 <script setup>
-  import { ref, computed, defineProp, defineEvent, onInit, templateRef } from '@li3/web';
+  import { ref, computed, defineProp, defineEvent, onInit, templateRef } from "@li3/web";
 
   export default function () {
-    const initial = defineProp('initial', { default: 0 });
+    const initial = defineProp("initial", { default: 0 });
     const count = ref(initial.value);
     const doubled = computed(() => count.value * 2);
-    const onSave = defineEvent('save');
-    const input = templateRef('input');
+    const onSave = defineEvent("save");
+    const input = templateRef("input");
 
     const increment = () => count.value++;
     const save = () => onSave(count.value);
 
-    onInit(() => console.log('mounted'));
+    onInit(() => console.log("mounted"));
 
     return { count, doubled, increment, save, input };
-  };
+  }
 </script>
 ```
 
@@ -570,12 +572,14 @@ a scripted component:
 
 ```html
 <template app>
-  <script state type="application/json">{ "title": "Overridden" }</script>
+  <script state type="application/json">
+    { "title": "Overridden" }
+  </script>
   <script setup>
-    import { ref } from '@li3/web';
+    import { ref } from "@li3/web";
     export default function () {
-      return { title: ref('Default title') };
-    };
+      return { title: ref("Default title") };
+    }
   </script>
   <h1>{{ title }}</h1>
 </template>
@@ -611,7 +615,11 @@ to `adoptedStyleSheets` of the shadow root (or the document, when no shadow DOM)
   <div class="card"><slot></slot></div>
 
   <style>
-    .card { padding: 1rem; border: 1px solid #ccc; border-radius: 0.5rem; }
+    .card {
+      padding: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+    }
   </style>
   <link rel="stylesheet" href="./card.css" />
 </template>
@@ -652,7 +660,11 @@ With `shadow-dom`, the template renders into the element's shadow root and nativ
     <slot></slot>
     <slot name="footer"></slot>
   </div>
-  <style>.card { padding: 1rem; }</style>
+  <style>
+    .card {
+      padding: 1rem;
+    }
+  </style>
 </template>
 
 <ui-card title="Hello">
@@ -669,8 +681,12 @@ slot implementation).
 ### 6.1 Counter (single file app)
 
 ```html
-<script type="importmap">{ "imports": { "@li3/": "https://cdn.li3.dev/@li3/" } }</script>
-<script type="module">import '@li3/web';</script>
+<script type="importmap">
+  { "imports": { "@li3/": "https://cdn.li3.dev/@li3/" } }
+</script>
+<script type="module">
+  import "@li3/web";
+</script>
 
 <template app>
   <h1>{{ title }}</h1>
@@ -684,17 +700,17 @@ slot implementation).
   <button on-click="reset()">Reset</button>
 
   <script setup>
-    import { ref, computed } from '@li3/web';
+    import { ref, computed } from "@li3/web";
 
     export default function () {
-      const title = ref('Counter App');
+      const title = ref("Counter App");
       const count = ref(0);
       const doubled = computed(() => count.value * 2);
       const increment = () => count.value++;
       const reset = () => (count.value = 0);
 
       return { title, count, doubled, increment, reset };
-    };
+    }
   </script>
 </template>
 ```
@@ -710,21 +726,30 @@ slot implementation).
   </div>
 
   <script setup>
-    import { defineProp, defineEvent } from '@li3/web';
+    import { defineProp, defineEvent } from "@li3/web";
 
     export default function () {
-      const title = defineProp('title', { default: '' });
-      const onSelect = defineEvent('select');
+      const title = defineProp("title", { default: "" });
+      const onSelect = defineEvent("select");
 
       const select = () => onSelect(title.value);
 
       return { title, select };
-    };
+    }
   </script>
 
   <style>
-    .card { padding: 1rem; margin: 1rem auto; border-radius: 0.5rem; border: 1px solid #ccc; }
-    .card-title { color: #999; text-transform: uppercase; font-size: 0.75rem; }
+    .card {
+      padding: 1rem;
+      margin: 1rem auto;
+      border-radius: 0.5rem;
+      border: 1px solid #ccc;
+    }
+    .card-title {
+      color: #999;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+    }
   </style>
 </template>
 
@@ -743,10 +768,10 @@ slot implementation).
   </div>
 
   <script setup>
-    import { onInit, onUpdate, ref, defineProp } from '@li3/web';
+    import { onInit, onUpdate, ref, defineProp } from "@li3/web";
 
     export default function () {
-      const trigger = defineProp('trigger');
+      const trigger = defineProp("trigger");
       const ready = ref(false);
       const count = ref(0);
 
@@ -754,7 +779,7 @@ slot implementation).
       onUpdate(() => count.value++);
 
       return { trigger, ready, count };
-    };
+    }
   </script>
 </template>
 
@@ -786,25 +811,25 @@ slot implementation).
   </template>
 
   <script setup>
-    import { ref, computed, templateRef } from '@li3/web';
+    import { ref, computed, templateRef } from "@li3/web";
 
     export default function () {
-      const draft = templateRef('draft');
+      const draft = templateRef("draft");
       const todos = ref([
-        { title: 'Learn Lithium', done: true },
-        { title: 'Build an app', done: false },
+        { title: "Learn Lithium", done: true },
+        { title: "Build an app", done: false },
       ]);
       const remaining = computed(() => todos.value.filter((t) => !t.done).length);
 
       function add() {
         todos.value.push({ title: draft.value.value.trim(), done: false });
-        draft.value.value = '';
+        draft.value.value = "";
       }
       const toggle = (todo) => (todo.done = !todo.done);
       const remove = (todo) => (todos.value = todos.value.filter((t) => t !== todo));
 
       return { draft, todos, remaining, add, toggle, remove };
-    };
+    }
   </script>
 </template>
 ```
@@ -839,10 +864,10 @@ All reactive primitives are **signals**: objects with a `.value` property (`type
 Creates a writable signal.
 
 ```js
-import { ref } from '@li3/web';
+import { ref } from "@li3/web";
 
 const count = ref(0);
-count.value++;            // triggers updates
+count.value++; // triggers updates
 console.log(count.value); // 1
 ```
 
@@ -863,15 +888,15 @@ which is what you want).
 A read-only derived signal. Re-evaluates lazily when any signal read inside `fn` notifies.
 
 ```js
-import { ref, computed } from '@li3/web';
+import { ref, computed } from "@li3/web";
 
 const a = ref(1);
 const b = ref(2);
 const sum = computed(() => a.value + b.value);
 
-sum.value;   // 3
+sum.value; // 3
 a.value = 5;
-sum.value;   // 7
+sum.value; // 7
 sum.value = 9; // throws: "Computed value cannot be set"
 ```
 
@@ -882,7 +907,7 @@ Errors thrown inside `fn` are swallowed and yield `null` (logged when `debug` is
 Calls `callback(newValue, lastValue)` whenever the signal changes. Returns an unsubscribe function.
 
 ```js
-import { ref, watch } from '@li3/web';
+import { ref, watch } from "@li3/web";
 
 const count = ref(0);
 const unwatch = watch(count, (value, lastValue) => {
@@ -890,7 +915,7 @@ const unwatch = watch(count, (value, lastValue) => {
 });
 
 count.value = 1; // logs "0 -> 1"
-unwatch();       // stop watching
+unwatch(); // stop watching
 ```
 
 - The **first invocation is scheduled asynchronously** (~5ms queue) unless `{ immediate: true }` is
@@ -902,14 +927,14 @@ unwatch();       // stop watching
 changes, `effectFn(newValue, lastValue)` runs. All DOM bindings are built on this.
 
 ```js
-import { ref, effect } from '@li3/web';
+import { ref, effect } from "@li3/web";
 
-const user = ref({ name: 'Ada' });
+const user = ref({ name: "Ada" });
 effect(
   () => user.value.name.toUpperCase(),
-  (name) => console.log('name changed:', name),
+  (name) => console.log("name changed:", name),
 );
-user.value.name = 'Grace'; // logs "name changed: GRACE"
+user.value.name = "Grace"; // logs "name changed: GRACE"
 ```
 
 ### `hook(initialValue, isShallow?)`
@@ -917,7 +942,7 @@ user.value.name = 'Grace'; // logs "name changed: GRACE"
 React-style tuple:
 
 ```js
-import { hook } from '@li3/web';
+import { hook } from "@li3/web";
 
 const [count, setCount] = hook(0);
 setCount(42);
@@ -930,11 +955,11 @@ Creates a deep reactive proxy of `object` that calls `effectFn` on any change (s
 depth). Non-objects and already-reactive objects pass through unchanged.
 
 ```js
-import { reactive } from '@li3/web';
+import { reactive } from "@li3/web";
 
-const state = reactive({ user: { name: 'Ada' }, items: [] }, () => console.log('changed'));
-state.user.name = 'Grace'; // logs "changed"
-state.items.push(1);       // logs "changed"
+const state = reactive({ user: { name: "Ada" }, items: [] }, () => console.log("changed"));
+state.user.name = "Grace"; // logs "changed"
+state.items.push(1); // logs "changed"
 ```
 
 ### `unwrap(object)`
@@ -965,7 +990,7 @@ True for plain objects that are not already reactive proxies. Internal use.
 Use `await nextTick()` when code needs to wait for the scheduled reactive work:
 
 ```js
-import { nextTick } from '@li3/web';
+import { nextTick } from "@li3/web";
 
 count.value++;
 await nextTick();
@@ -976,7 +1001,7 @@ Resources created during setup and template linking are disposed when the compon
 Application code can register its own cleanup:
 
 ```js
-import { onCleanup } from '@li3/web';
+import { onCleanup } from "@li3/web";
 
 export default function () {
   const timer = setInterval(refresh, 1000);
@@ -991,12 +1016,12 @@ export default function () {
 exposes the prop in the template context by name.
 
 ```js
-import { defineProp } from '@li3/web';
+import { defineProp } from "@li3/web";
 
 export default function () {
-  const title = defineProp('title', { default: 'Untitled' });
-  const items = defineProp('items', { default: () => [] });
-  const active = defineProp('active', { default: false, attribute: true });
+  const title = defineProp("title", { default: "Untitled" });
+  const items = defineProp("items", { default: () => [] });
+  const active = defineProp("active", { default: false, attribute: true });
 
   return { title, items, active };
 }
@@ -1034,11 +1059,11 @@ Options (`PropOptions`):
 `defineEvent(name)` declares an output and returns an emitter function. Call it with a payload:
 
 ```js
-import { defineEvent, ref } from '@li3/web';
+import { defineEvent, ref } from "@li3/web";
 
 export default function () {
-  const onSave = defineEvent('save');
-  const draft = ref('');
+  const onSave = defineEvent("save");
+  const draft = ref("");
 
   const save = () => onSave(draft.value); // emits CustomEvent('save', { detail: draft.value })
 
@@ -1054,7 +1079,7 @@ Parent listens with the standard event binding; the payload is in `$event.detail
 
 ```js
 function handleSave(e) {
-  console.log('saved:', e.detail);
+  console.log("saved:", e.detail);
 }
 ```
 
@@ -1071,12 +1096,12 @@ All lifecycle functions must be called **during setup** (they need the current c
 throw `"Missing context for this component"` otherwise).
 
 ```js
-import { onInit, onUpdate, onDestroy, getElement } from '@li3/web';
+import { onInit, onUpdate, onDestroy, getElement } from "@li3/web";
 
 export default function () {
   onInit(() => {
     // DOM is in place; good for focus(), measurements, starting timers
-    getElement().querySelector('input')?.focus();
+    getElement().querySelector("input")?.focus();
   });
 
   onUpdate(() => {
@@ -1101,9 +1126,9 @@ resolves to the list of definitions. Relative URLs inside the file (setup `src`,
 log to the console and resolve to `[]`.
 
 ```js
-import { load } from '@li3/web';
+import { load } from "@li3/web";
 
-await load('./components/ui-kit.html');
+await load("./components/ui-kit.html");
 // <ui-card> etc. are now defined and upgrade automatically
 ```
 
@@ -1117,9 +1142,16 @@ await load('./components/ui-kit.html');
     <slot></slot>
   </span>
   <style>
-    .badge { padding: 0.25rem 0.5rem; border-radius: 1rem; }
-    .info { background: #def; }
-    .warn { background: #fed; }
+    .badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 1rem;
+    }
+    .info {
+      background: #def;
+    }
+    .warn {
+      background: #fed;
+    }
   </style>
 </template>
 
@@ -1134,13 +1166,13 @@ await load('./components/ui-kit.html');
   </div>
 
   <script setup>
-    import { defineProp, defineEvent } from '@li3/web';
+    import { defineProp, defineEvent } from "@li3/web";
     export default function () {
-      defineProp('title', { default: '' });
-      defineProp('author', { default: null });
-      const onOpen = defineEvent('open');
+      defineProp("title", { default: "" });
+      defineProp("author", { default: null });
+      const onOpen = defineEvent("open");
       return { onOpen };
-    };
+    }
   </script>
 </template>
 ```
@@ -1161,12 +1193,12 @@ function. Options (`MountOptions`):
 ```
 
 ```js
-import { mount, ref } from '@li3/web';
+import { mount, ref } from "@li3/web";
 
-const unmount = mount(document.getElementById('app'), {
+const unmount = mount(document.getElementById("app"), {
   template: `<p>{{ message }}</p><button on-click="increment()">{{ count }}</button>`,
   setup() {
-    const message = ref('Hello');
+    const message = ref("Hello");
     const count = ref(0);
     const increment = () => count.value++;
     return { message, count, increment };
@@ -1205,14 +1237,14 @@ use({
 Example — a custom tooltip directive:
 
 ```js
-import { use, effect } from '@li3/web';
+import { use, effect } from "@li3/web";
 
 use({
-  match: (node, name) => name === 'tooltip',
+  match: (node, name) => name === "tooltip",
   exec: (node, name, value, context) => {
     // naive implementation: evaluate `value` against context and keep title in sync
     const fn = new Function(`with(this) { return ${value}; }`).bind(context);
-    effect(fn, (v) => node.setAttribute('title', v ?? ''));
+    effect(fn, (v) => node.setAttribute("title", v ?? ""));
   },
 });
 ```
@@ -1225,41 +1257,49 @@ Example — Vue-style syntax (this is how the sibling `@li3/use` package impleme
 subclass the built-ins and remap attribute names:
 
 ```js
-import { use, TemplateForeach, TemplateIf, SetProperty, AddEventListener } from '@li3/web';
+import { use, TemplateForeach, TemplateIf, SetProperty, AddEventListener } from "@li3/web";
 
 class VueSetProperty extends SetProperty {
-  match(node, name) { return name.startsWith(':'); }
+  match(node, name) {
+    return name.startsWith(":");
+  }
   exec(node, name, value, context) {
-    return super.exec(node, 'bind-' + name.slice(1), value, context);
+    return super.exec(node, "bind-" + name.slice(1), value, context);
   }
 }
 
 class VueEventListener extends AddEventListener {
-  match(node, name) { return name.startsWith('@'); }
+  match(node, name) {
+    return name.startsWith("@");
+  }
   exec(node, name, value, context) {
-    return super.exec(node, 'on-' + name.slice(1), value, context);
+    return super.exec(node, "on-" + name.slice(1), value, context);
   }
 }
 
 class VueTemplateIf extends TemplateIf {
-  match(node, name) { return name === 'v-if'; }
+  match(node, name) {
+    return name === "v-if";
+  }
   exec(node, name, value, context) {
-    const t = document.createElement('template');
+    const t = document.createElement("template");
     node.replaceWith(t);
-    node.removeAttribute('v-if');
+    node.removeAttribute("v-if");
     t.content.append(node);
-    super.exec(t, 'if', value, context);
+    super.exec(t, "if", value, context);
   }
 }
 
 class VueTemplateFor extends TemplateForeach {
-  match(node, name) { return name === 'v-for'; }
+  match(node, name) {
+    return name === "v-for";
+  }
   exec(node, name, value, context) {
-    const t = document.createElement('template');
+    const t = document.createElement("template");
     node.replaceWith(t);
-    node.removeAttribute('v-for');
+    node.removeAttribute("v-for");
     t.content.append(node);
-    super.exec(t, 'foreach', value, context);
+    super.exec(t, "foreach", value, context);
   }
 }
 
@@ -1276,11 +1316,12 @@ This enables `:value="x"`, `@click="fn()"`, `v-if="cond"`, `v-for="item of items
 Set flags via `setFeatureFlag(name, value?)` (must run before components initialize) or by listing them
 comma-separated in `window.name` (e.g. `window.name = 'debug'` — note this replaces the window name).
 
-| Flag | Effect |
-|---|---|
-| `debug` | Keeps processed binding attributes on elements; keeps `<template app>` elements in the DOM; attaches every signal to `window.refList` (a `Set` of `WeakRef`s); logs component redefinition and computed errors. |
-| `strictCompare` | Uses `===` instead of the deep-ish `compare` for change detection. |
-| `skipAutoInitialize` | Disables the automatic startup pass; call `autoInitialize()` yourself. |
+| Flag                 | Effect                                                                                                                                                                                                          |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `debug`              | Keeps processed binding attributes on elements; keeps `<template app>` elements in the DOM; attaches every signal to `window.refList` (a `Set` of `WeakRef`s); logs component redefinition and computed errors. |
+| `strictCompare`      | Uses `===` instead of the deep-ish `compare` for change detection.                                                                                                                                              |
+| `skipAutoInitialize` | Disables the automatic startup pass; call `autoInitialize()` yourself.                                                                                                                                          |
+| `codePlan`           | Experimental generated binding plan. Disabled by default; opt in with `window.name = 'codePlan'` before importing Li3.                                                                                          |
 
 Debugging aids:
 
@@ -1292,35 +1333,35 @@ Debugging aids:
 
 ## 15. Complete syntax cheat sheet
 
-| Feature | Syntax | Example |
-|---|---|---|
-| Interpolation | `{{ expr }}` in text nodes | `<p>{{ user.name }}</p>` |
-| Event | `on-<event>="expr"` | `<button on-click="save()">` |
-| Event modifiers | `.stop` `.prevent` `.self` | `<form on-submit.prevent="save()">` |
-| Event payload | `$event` (`$event.detail` for custom events) | `on-input="onInput($event)"` |
-| Property binding | `bind-<prop>="expr"` (camelCased) | `<input bind-value="name">` |
-| Boolean property | `bind-<prop>.bool="expr"` | `<button bind-disabled.bool="busy">` |
-| Class map | `bind-class="{ cls: cond }"` | `<div bind-class="{ active: isOn }">` |
-| Style map | `bind-style="{ prop: value }"` | `<div bind-style="{ color: c }">` |
-| Attribute binding | `attr-<name>="expr"` | `<div attr-data-id="id">` |
-| Boolean attribute | `attr-<name>.bool="expr"` | `<input attr-readonly.bool="locked">` |
-| Class toggle | `class-<name>[.<name2>]="expr"` | `<li class-done="t.done">` |
-| Style property | `style-<prop>="expr"` (camelCased) | `<div style-color="c">` |
-| Conditional | `<template if="expr">` | `<template if="user">...</template>` |
-| List | `<template foreach="item of items">` | `<template foreach="u of users">...</template>` |
-| List + index | `<template foreach="[item, i] of items">` | `<template foreach="[u, i] of users">...</template>` |
-| Element ref | `ref="name"` + `templateRef('name')` | `<input ref="box">` |
-| Declarative state | `<ref name value setter>` inside template | `<ref name="n" value="0" setter="setN">` |
-| JSON state | `<script state type="application/json">` | `{ "title": "Hi" }` |
-| Setup module | `<script setup>` (or `src=`) | `export default function () { ... }` |
-| Component | `<template component="my-el" shadow-dom="open">` | custom element definition |
-| App root | `<template app>` | auto-mounted |
-| Styles | `<style>` / `<link rel="stylesheet">` inside template | adopted stylesheets |
-| Dependencies | `<link rel="component" href="...">` | page or template level |
-| Emit from template | `$$emit('name', value)` | `on-click="$$emit('close')"` |
-| Skip subtree | `do-not-render` attribute | `<pre do-not-render>` |
-| Custom rule | `use({ match, exec })` | see [§13](#13-the-extension-system-use) |
-| Feature flags | `setFeatureFlag('debug')` / `window.name` | see [§14](#14-feature-flags-and-debugging) |
+| Feature            | Syntax                                                | Example                                              |
+| ------------------ | ----------------------------------------------------- | ---------------------------------------------------- |
+| Interpolation      | `{{ expr }}` in text nodes                            | `<p>{{ user.name }}</p>`                             |
+| Event              | `on-<event>="expr"`                                   | `<button on-click="save()">`                         |
+| Event modifiers    | `.stop` `.prevent` `.self`                            | `<form on-submit.prevent="save()">`                  |
+| Event payload      | `$event` (`$event.detail` for custom events)          | `on-input="onInput($event)"`                         |
+| Property binding   | `bind-<prop>="expr"` (camelCased)                     | `<input bind-value="name">`                          |
+| Boolean property   | `bind-<prop>.bool="expr"`                             | `<button bind-disabled.bool="busy">`                 |
+| Class map          | `bind-class="{ cls: cond }"`                          | `<div bind-class="{ active: isOn }">`                |
+| Style map          | `bind-style="{ prop: value }"`                        | `<div bind-style="{ color: c }">`                    |
+| Attribute binding  | `attr-<name>="expr"`                                  | `<div attr-data-id="id">`                            |
+| Boolean attribute  | `attr-<name>.bool="expr"`                             | `<input attr-readonly.bool="locked">`                |
+| Class toggle       | `class-<name>[.<name2>]="expr"`                       | `<li class-done="t.done">`                           |
+| Style property     | `style-<prop>="expr"` (camelCased)                    | `<div style-color="c">`                              |
+| Conditional        | `<template if="expr">`                                | `<template if="user">...</template>`                 |
+| List               | `<template foreach="item of items">`                  | `<template foreach="u of users">...</template>`      |
+| List + index       | `<template foreach="[item, i] of items">`             | `<template foreach="[u, i] of users">...</template>` |
+| Element ref        | `ref="name"` + `templateRef('name')`                  | `<input ref="box">`                                  |
+| Declarative state  | `<ref name value setter>` inside template             | `<ref name="n" value="0" setter="setN">`             |
+| JSON state         | `<script state type="application/json">`              | `{ "title": "Hi" }`                                  |
+| Setup module       | `<script setup>` (or `src=`)                          | `export default function () { ... }`                 |
+| Component          | `<template component="my-el" shadow-dom="open">`      | custom element definition                            |
+| App root           | `<template app>`                                      | auto-mounted                                         |
+| Styles             | `<style>` / `<link rel="stylesheet">` inside template | adopted stylesheets                                  |
+| Dependencies       | `<link rel="component" href="...">`                   | page or template level                               |
+| Emit from template | `$$emit('name', value)`                               | `on-click="$$emit('close')"`                         |
+| Skip subtree       | `do-not-render` attribute                             | `<pre do-not-render>`                                |
+| Custom rule        | `use({ match, exec })`                                | see [§13](#13-the-extension-system-use)              |
+| Feature flags      | `setFeatureFlag('debug')` / `window.name`             | see [§14](#14-feature-flags-and-debugging)           |
 
 ## 16. Gotchas and rules of thumb
 

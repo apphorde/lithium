@@ -9,13 +9,13 @@ export function useVue() {
       return name === vFor;
     }
 
-    exec(node, _name, value, context) {
+    exec(node, _name, value, context, applyChildren?) {
       const t = document.createElement("template");
       node.replaceWith(t);
       node.removeAttribute(vFor);
       t.content.append(node);
 
-      super.exec(t, "foreach", value, context);
+      super.exec(t, "foreach", value, context, applyChildren);
     }
   }
 
@@ -24,13 +24,13 @@ export function useVue() {
       return name === vIf;
     }
 
-    exec(node, _name, value, context) {
+    exec(node, _name, value, context, applyChildren?) {
       const t = document.createElement("template");
       node.replaceWith(t);
       node.removeAttribute(vIf);
       t.content.append(node);
 
-      super.exec(t, "if", value, context);
+      super.exec(t, "if", value, context, applyChildren);
     }
   }
 

@@ -1,16 +1,16 @@
-import { FF } from './feature-flags.js';
+import { FF } from "./feature-flags.js";
 import {
   createReadOnlyContext,
   eventEmitter,
   importCssModule,
   importModuleFromSource,
   isValidAttribute,
-} from './internals.js';
-import { disposeScope, isWritableRef, ref, runInScope, watch } from './reactivity.js';
-import { linkTreeToContext } from './rules.js';
-import type { DefineComponentOptions, MountOptions, PropOptions, RuntimeContext } from './types';
+} from "./internals.js";
+import { disposeScope, isWritableRef, ref, runInScope, watch } from "./reactivity.js";
+import { applyCodePlan, linkTreeToContext } from "./rules.js";
+import type { DefineComponentOptions, MountOptions, PropOptions, RuntimeContext } from "./types";
 
-const DEBUG = Symbol('#');
+const DEBUG = Symbol("#");
 
 // adoptedStyleSheets is not implemented by jsdom / SSR virtual DOMs; guard it.
 function adoptStyleSheet(root: any, sheet: CSSStyleSheet) {
@@ -18,16 +18,16 @@ function adoptStyleSheet(root: any, sheet: CSSStyleSheet) {
 }
 
 function getOrigin(template: HTMLTemplateElement) {
-  let url = template.getAttribute('origin');
+  let url = template.getAttribute("origin");
 
   if (!url) {
     url = window.location.href;
 
-    if (template.getAttribute('component')) {
+    if (template.getAttribute("component")) {
       // add origin to template to correctly load any relative imports within the template's source
       const origin = new URL(url);
-      origin.pathname += '/' + template.getAttribute('component') + '.html';
-      template.setAttribute('origin', url);
+      origin.pathname += "/" + template.getAttribute("component") + ".html";
+      template.setAttribute("origin", url);
     }
   }
 
@@ -35,10 +35,10 @@ function getOrigin(template: HTMLTemplateElement) {
 }
 
 function getShadowDomOptions(template: HTMLTemplateElement): ShadowRootInit | undefined {
-  const source = template.getAttribute('shadow-dom') || '';
+  const source = template.getAttribute("shadow-dom") || "";
 
   if (source) {
-    return source.startsWith('{') ? JSON.parse(source) : { mode: source as ShadowRootMode };
+    return source.startsWith("{") ? JSON.parse(source) : { mode: source as ShadowRootMode };
   }
 }
 
@@ -56,19 +56,19 @@ export async function load(href: string | URL, baseUrl?: string | URL) {
     const response = await fetch(fullUrl);
 
     if (!response.ok) {
-      throw new Error('Failed to load components from ' + href);
+      throw new Error("Failed to load components from " + href);
     }
 
     const html = await response.text();
-    const dom = new DOMParser().parseFromString(html, 'text/html');
-    const templates = Array.from(dom.querySelectorAll('template[component]')) as HTMLTemplateElement[];
-    templates.forEach((t) => t.setAttribute('origin', fullUrl));
+    const dom = new DOMParser().parseFromString(html, "text/html");
+    const templates = Array.from(dom.querySelectorAll("template[component]")) as HTMLTemplateElement[];
+    templates.forEach((t) => t.setAttribute("origin", fullUrl));
     const definitions = templates.map((n) => defineFromTemplate(n)).filter(Boolean);
     const def = (await Promise.all(definitions)) as DefineComponentOptions[];
     loadCache.set(fullUrl, def);
     return def;
   } catch (error) {
-    console.error('Error loading component from', href, error);
+    console.error("Error loading component from", href, error);
     return [];
   }
 }
@@ -85,20 +85,20 @@ export function loadCss(href: string | URL, options?: { adopt: boolean }) {
 }
 
 const invalidNames = [
-  'annotation-xml',
-  'color-profile',
-  'font-face',
-  'font-face-src',
-  'font-face-uri',
-  'font-face-format',
-  'font-face-name',
-  'missing-glyph',
+  "annotation-xml",
+  "color-profile",
+  "font-face",
+  "font-face-src",
+  "font-face-uri",
+  "font-face-format",
+  "font-face-name",
+  "missing-glyph",
 ];
 
 export function defineComponent(name: string, options: MountOptions) {
   if (invalidNames.includes(name)) {
     throw new Error(
-      'Invalid element name. See https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name',
+      "Invalid element name. See https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name",
     );
   }
 
@@ -112,9 +112,9 @@ export function defineComponent(name: string, options: MountOptions) {
     return;
   }
 
-  options.template = typeof options.template === 'string' ? tpl(options.template) : options.template;
+  options.template = typeof options.template === "string" ? tpl(options.template) : options.template;
   const shadowDom: ShadowRootInit | undefined =
-    options.shadowDom === true ? { mode: 'open' } : getShadowDomOptions(options.template);
+    options.shadowDom === true ? { mode: "open" } : getShadowDomOptions(options.template);
 
   options.shadowDom = shadowDom;
 
@@ -172,9 +172,15 @@ export function mount(target: Element, options: MountOptions) {
   const mergedContext = Object.assign({}, runtime.context, runtime.props, runtime.refs);
   const readOnlyContext = createReadOnlyContext(mergedContext);
 
-  runInScope(runtime.cleanup, () => linkTreeToContext(dom, readOnlyContext));
+  runInScope(runtime.cleanup, () => {
+    if (FF.codePlan) {
+      applyCodePlan(template, dom, readOnlyContext);
+    } else {
+      linkTreeToContext(dom, readOnlyContext);
+    }
+  });
 
-  parentElement.innerHTML = '';
+  parentElement.innerHTML = "";
   parentElement.appendChild(dom);
 
   if (options.styles?.length) {
@@ -207,7 +213,7 @@ export function getCurrentNode() {
   const t = runtimeStack.at(-1);
 
   if (!t) {
-    throw new Error('Missing context for this component');
+    throw new Error("Missing context for this component");
   }
 
   return t;
@@ -243,23 +249,23 @@ function createContext(element: Element, setup: any, dom: DocumentFragment) {
 function guessValue(s: string) {
   s = String(s).trim();
 
-  if (s === 'true') {
+  if (s === "true") {
     return true;
   }
 
-  if (s === 'false') {
+  if (s === "false") {
     return false;
   }
 
   try {
-    return Function('return ' + s)();
+    return Function("return " + s)();
   } catch {
     return s;
   }
 }
 
 function getPropValue<T extends keyof Element>(element: Element, name: T, options: PropOptions = {}) {
-  const defaultValue = typeof options.default === 'function' ? options.default() : options.default;
+  const defaultValue = typeof options.default === "function" ? options.default() : options.default;
   const value = element[name];
 
   if (value !== undefined) {
@@ -314,8 +320,8 @@ export function definePropInternal(name: string, options: PropOptions = {}) {
 }
 
 async function findSetupModule(template: HTMLTemplateElement) {
-  const stateCode = template.content.querySelector('script[state]');
-  const setupCode = template.content.querySelector('script[setup]');
+  const stateCode = template.content.querySelector("script[state]");
+  const setupCode = template.content.querySelector("script[setup]");
   const origin = getOrigin(template);
   let setupFunction;
   let stateFunction;
@@ -331,7 +337,7 @@ async function findSetupModule(template: HTMLTemplateElement) {
   }
 
   if (setupCode) {
-    const src = setupCode.getAttribute('src');
+    const src = setupCode.getAttribute("src");
     const code = setupCode.textContent;
     const mod = src ? import(String(new URL(src, origin))) : importModuleFromSource(code, origin);
     setupFunction = (await mod).default;
@@ -360,7 +366,7 @@ async function findSetupModule(template: HTMLTemplateElement) {
 }
 
 async function findStyleSheets(template: HTMLTemplateElement): Promise<CSSStyleSheet[]> {
-  const styleTags = Array.from(template.content.querySelectorAll('style')) as HTMLStyleElement[];
+  const styleTags = Array.from(template.content.querySelectorAll("style")) as HTMLStyleElement[];
   const linkTags = Array.from(template.content.querySelectorAll('link[rel="stylesheet"]')) as HTMLLinkElement[];
 
   if (!(styleTags.length || linkTags.length)) {
@@ -391,17 +397,17 @@ async function findStyleSheets(template: HTMLTemplateElement): Promise<CSSStyleS
 }
 
 function findRefs(template: HTMLTemplateElement) {
-  const list = Array.from(template.content.querySelectorAll('ref'));
+  const list = Array.from(template.content.querySelectorAll("ref"));
   return list.map((r) => {
     r.remove();
-    const name = r.getAttribute('name');
-    const setterName = r.getAttribute('setter');
-    return [name, r.getAttribute('value'), setterName];
+    const name = r.getAttribute("name");
+    const setterName = r.getAttribute("setter");
+    return [name, r.getAttribute("value"), setterName];
   });
 }
 
 export function loadDependencies(template: HTMLTemplateElement) {
-  const links = Array.from(template.content.querySelectorAll('link[rel=component]')) as HTMLLinkElement[];
+  const links = Array.from(template.content.querySelectorAll("link[rel=component]")) as HTMLLinkElement[];
   const origin = getOrigin(template);
 
   for (const link of links) {
@@ -411,7 +417,7 @@ export function loadDependencies(template: HTMLTemplateElement) {
 }
 
 export function tpl(s: string) {
-  const template = document.createElement('template');
+  const template = document.createElement("template");
   template.innerHTML = String(s).trim();
 
   return template;
@@ -433,11 +439,11 @@ export async function readOptionsFromTemplate(template: HTMLTemplateElement) {
 export async function defineFromTemplate(
   template: HTMLTemplateElement | string,
 ): Promise<DefineComponentOptions | null> {
-  if (typeof template === 'string') {
+  if (typeof template === "string") {
     template = tpl(template);
   }
 
-  const name = template.getAttribute('component') as string;
+  const name = template.getAttribute("component") as string;
 
   if (!name) {
     return null;
@@ -450,7 +456,7 @@ export async function defineFromTemplate(
 }
 
 export function findApps() {
-  const apps = Array.from(document.querySelectorAll('template[app]')) as HTMLTemplateElement[];
+  const apps = Array.from(document.querySelectorAll("template[app]")) as HTMLTemplateElement[];
 
   for (const template of apps) {
     readOptionsFromTemplate(template)
@@ -460,14 +466,14 @@ export function findApps() {
         // Contents are still fully re-rendered by mount() (innerHTML = '').
         const prev = template.previousElementSibling as HTMLElement | null;
         const app =
-          FF.ssr && prev?.hasAttribute?.('data-li3-root')
+          FF.ssr && prev?.hasAttribute?.("data-li3-root")
             ? prev
-            : Object.assign(document.createElement('div'), { style: 'display: contents' });
+            : Object.assign(document.createElement("div"), { style: "display: contents" });
 
         if (FF.ssr) {
-          app.setAttribute('data-li3-root', '');
+          app.setAttribute("data-li3-root", "");
         }
-        app.style.display = 'contents';
+        app.style.display = "contents";
         template.parentNode!.insertBefore(app, template);
 
         mount(app, options);
@@ -479,7 +485,7 @@ export function findApps() {
 }
 
 export function autoInitialize() {
-  const components = Array.from(document.querySelectorAll('template[component]')) as HTMLTemplateElement[];
+  const components = Array.from(document.querySelectorAll("template[component]")) as HTMLTemplateElement[];
   const links = Array.from(document.querySelectorAll('link[rel="component"]')) as HTMLLinkElement[];
 
   components.forEach((c) => defineFromTemplate(c));
@@ -491,10 +497,10 @@ export function autoInitialize() {
 // give time to import the module and set feature flags
 setTimeout(() => {
   if (!FF.skipAutoInitialize) {
-    if (['complete', 'interactive'].includes(document.readyState)) {
+    if (["complete", "interactive"].includes(document.readyState)) {
       return autoInitialize();
     }
 
-    window.addEventListener('DOMContentLoaded', autoInitialize);
+    window.addEventListener("DOMContentLoaded", autoInitialize);
   }
 }, 10);

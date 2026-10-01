@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { mount, nextTick, onCleanup, ref } from "./index.js";
+import { mount, nextTick, onCleanup, ref, setFeatureFlag } from "./index.js";
 import { computed, effect } from "./reactivity.js";
 import { TemplateForeach } from "./rules.js";
+import { walkDomTree } from "./internals.js";
 
 function template(source: string) {
   const element = document.createElement("template");
@@ -65,6 +66,37 @@ describe("component cleanup", () => {
     unmount();
     unmount();
     expect(cleanup).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("DOM traversal", () => {
+  it("visits text and element nodes in the existing breadth-first order", () => {
+    const fragment = document.createDocumentFragment();
+    const section = document.createElement("section");
+    const paragraph = document.createElement("p");
+    const text = document.createTextNode("text");
+    paragraph.append(text);
+    section.append(paragraph);
+    fragment.append(section, document.createTextNode("tail"));
+
+    const visited: Node[] = [];
+    walkDomTree(fragment, (node) => visited.push(node), undefined);
+
+    expect(visited).toEqual([section, fragment.childNodes[1], paragraph, text]);
+  });
+
+  it("walks wide subtrees without queue-shift or argument-spread limits", () => {
+    const fragment = document.createDocumentFragment();
+    const wide = document.createElement("div");
+    for (let index = 0; index < 20_000; index++) {
+      wide.append(document.createElement("i"));
+    }
+    fragment.append(wide);
+
+    let visited = 0;
+    walkDomTree(fragment, () => visited++, undefined);
+
+    expect(visited).toBe(20_001);
   });
 });
 
@@ -186,5 +218,53 @@ describe("nested template structures", () => {
     items.value = null;
     await waitForDom();
     expect(target.querySelectorAll("li")).toHaveLength(0);
+  });
+
+  it("runs the experimental code plan across bindings and nested structures", async () => {
+    setFeatureFlag("codePlan", true);
+    try {
+      const target = document.createElement("div");
+      const selected = vi.fn();
+      const clicked = vi.fn();
+      const visible = ref(true);
+      const items = ref(["one", "two"]);
+      mount(target, {
+        template: template(`
+          <button bind-title="title" on-click="clicked()" class-active="active">{{ title }}</button>
+          <template if="visible">
+            <ul><template for="item of items"><li on-click="select(item)">{{ item }}</li></template></ul>
+          </template>
+        `),
+        setup: () => ({
+          title: "Plan",
+          clicked,
+          active: true,
+          visible,
+          items,
+          select: selected,
+        }),
+      });
+
+      await waitForDom();
+      const button = target.querySelector("button")!;
+      expect(button.title).toBe("Plan");
+      expect(button.textContent).toBe("Plan");
+      expect(button.classList.contains("active")).toBe(true);
+      expect(target.querySelectorAll("li")).toHaveLength(2);
+      button.click();
+      expect(clicked).toHaveBeenCalledTimes(1);
+      target.querySelector("li")!.click();
+      expect(selected).toHaveBeenCalledWith("one");
+
+      visible.value = false;
+      await waitForDom();
+      expect(target.querySelectorAll("li")).toHaveLength(0);
+      visible.value = true;
+      items.value = ["three"];
+      await waitForDom();
+      expect(Array.from(target.querySelectorAll("li"), (li) => li.textContent)).toEqual(["three"]);
+    } finally {
+      setFeatureFlag("codePlan", false);
+    }
   });
 });
