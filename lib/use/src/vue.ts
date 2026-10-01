@@ -39,8 +39,8 @@ export function useVue() {
       return name.at(0) === ":";
     }
 
-    exec(node, name, value, context) {
-      return super.exec(node, "bind-" + name.slice(1), value, context);
+    exec(node, name, value, context, applyChildren?, evaluate?) {
+      return super.exec(node, "bind-" + name.slice(1), value, context, applyChildren, evaluate);
     }
   }
 
@@ -49,8 +49,8 @@ export function useVue() {
       return name.at(0) === "@";
     }
 
-    exec(node, name, value, context) {
-      return super.exec(node, "on-" + name.slice(1), value, context);
+    exec(node, name, value, context, applyChildren?, evaluate?) {
+      return super.exec(node, "on-" + name.slice(1), value, context, applyChildren, evaluate);
     }
   }
 

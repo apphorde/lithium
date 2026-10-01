@@ -59,4 +59,5 @@ export {
 } from "./rules.js";
 export * from "./reactivity.js";
 export { mount, load, loadCss, autoInitialize } from "./component.js";
+export type { MountDisposer } from "./component.js";
 export { setFeatureFlag } from "./feature-flags.js";

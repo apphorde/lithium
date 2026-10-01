@@ -1,4 +1,11 @@
-import { createFunction, createReadOnlyContext, walkDomTree, toCamelCase, isValidAttribute } from "./internals.js";
+import {
+  createFunction,
+  createReadOnlyContext,
+  importModuleFromSource,
+  walkDomTree,
+  toCamelCase,
+  isValidAttribute,
+} from "./internals.js";
 import { ref, computed, disposeScope, effect, onCleanup, runInScope, watch, suspend } from "./reactivity.js";
 import type { Signal } from "./reactivity";
 import type { AnyFunction } from "./types";
@@ -7,14 +14,18 @@ import { FF } from "./feature-flags.js";
 const isElement = (x: any): x is Element => x.nodeType === x.ELEMENT_NODE;
 const isText = (x: any): x is Text => x.nodeType === x.TEXT_NODE;
 
-export function applyTextRules(node: Text, context: any) {
+export function applyTextRules(node: Text, context: any, evaluate?: AnyFunction) {
   const template = node.textContent.trim();
 
   if (!template || !template.includes("{{")) return;
 
-  const source = "`" + template.replace(/{{(.*?)}}/g, (_: any, exp: string) => "${" + exp.trim() + "}") + "`";
+  const source = textExpression(template);
 
-  effect(createFunction(source, context), (v: any) => setText(node, v));
+  effect(evaluate || createFunction(source, context), (v: any) => setText(node, v));
+}
+
+function textExpression(template: string) {
+  return "`" + template.replace(/{{(.*?)}}/g, (_: any, exp: string) => "${" + exp.trim() + "}") + "`";
 }
 
 export function applyElementRules(node: Element, context: any) {
@@ -93,12 +104,19 @@ function setAttribute(el: Element, attribute: string, value: boolean, modifiers:
 
 export interface Rule {
   match: (node: Element, name: string, value: string) => boolean;
-  exec: (node: Element, name: string, value: string, context: any, applyChildren?: TreeLinker) => void;
+  exec: (
+    node: Element,
+    name: string,
+    value: string,
+    context: any,
+    applyChildren?: TreeLinker,
+    evaluate?: AnyFunction,
+  ) => void;
 }
 
 const rules: Rule[] = [];
 let rulesVersion = 0;
-const codePlans = new WeakMap<HTMLTemplateElement, { version: number; apply: TreeLinker }>();
+const codePlans = new WeakMap<HTMLTemplateElement, { version: number; plans: Map<string, Promise<TreeLinker>> }>();
 
 type TreeLinker = (tree: Node, context: any) => void;
 
@@ -117,7 +135,7 @@ export class AddEventListener implements Rule {
     return name.startsWith("on-");
   }
 
-  exec(node, name, value, context) {
+  exec(node, name, value, context, _applyChildren?: TreeLinker, evaluate?: AnyFunction) {
     const key = name.slice(3);
     const [event, ...tags] = key.split(".");
     const modifiers: any = {
@@ -129,7 +147,7 @@ export class AddEventListener implements Rule {
       modifiers[tag] = true;
     }
 
-    const fn = createFunction(value, context, ["$event"]);
+    const fn = evaluate || createFunction(value, context, ["$event"]);
     const listener = (e: Event) => {
       if (modifiers.stop) e.stopPropagation();
       if (modifiers.prevent) e.preventDefault();
@@ -147,10 +165,10 @@ export class SetAttribute implements Rule {
     return name.startsWith("attr-");
   }
 
-  exec(node, name, source, context) {
+  exec(node, name, source, context, _applyChildren?: TreeLinker, evaluate?: AnyFunction) {
     const [key, ...modifiers] = name.slice(5).split(".");
 
-    effect(createFunction(source, context), (v: any) => setAttribute(node, key, v, modifiers));
+    effect(evaluate || createFunction(source, context), (v: any) => setAttribute(node, key, v, modifiers));
   }
 }
 
@@ -159,9 +177,9 @@ export class SetProperty implements Rule {
     return name.startsWith("bind-");
   }
 
-  exec(node, name, source, context) {
+  exec(node, name, source, context, _applyChildren?: TreeLinker, evaluate?: AnyFunction) {
     const key = name.slice(5);
-    const fn = createFunction(source, context);
+    const fn = evaluate || createFunction(source, context);
     const isObject = source.startsWith("{");
 
     if (key === "class") {
@@ -198,10 +216,10 @@ export class SetClassName implements Rule {
     return name.startsWith("class-");
   }
 
-  exec(node, name, source, context) {
+  exec(node, name, source, context, _applyChildren?: TreeLinker, evaluate?: AnyFunction) {
     const key = name.slice(6);
 
-    effect(createFunction(source, context), (value: any) => setClassName(node, key, value));
+    effect(evaluate || createFunction(source, context), (value: any) => setClassName(node, key, value));
   }
 }
 
@@ -210,10 +228,10 @@ export class SetStyle implements Rule {
     return name.startsWith("style-");
   }
 
-  exec(node, name, source, context) {
+  exec(node, name, source, context, _applyChildren?: TreeLinker, evaluate?: AnyFunction) {
     const key = toCamelCase(name.slice(6));
 
-    effect(createFunction(source, context), (value: any) => setStyle(node, key, value));
+    effect(evaluate || createFunction(source, context), (value: any) => setStyle(node, key, value));
   }
 }
 
@@ -222,7 +240,7 @@ export class TemplateForeach implements Rule {
     return node.nodeName === "TEMPLATE" && (name === "foreach" || name === "for");
   }
 
-  exec(node, _name, source, context, applyChildren?: TreeLinker) {
+  exec(node, _name, source, context, applyChildren?: TreeLinker, evaluate?: AnyFunction) {
     const rows: { nodes: Node[]; index: number; item: Signal; scope: Set<AnyFunction> }[] = [];
     const timers = new Set<ReturnType<typeof setTimeout>>();
     let disposed = false;
@@ -231,15 +249,11 @@ export class TemplateForeach implements Rule {
       for (const timer of timers) clearTimeout(timer);
       timers.clear();
     });
-    const [left, expression] = source.split("of").map((s) => s.trim());
-    const [key, indexKey] = left.includes("[")
-      ? left
-          .slice(1, -1)
-          .split(",")
-          .map((s) => s.trim())
-      : [left, ""];
+    const { key, indexKey, expression } = parseForeachSource(source);
 
-    const signal = computed(createFunction(`Array.from(${expression} || [])`, context));
+    const signal = computed(
+      evaluate ? () => Array.from(evaluate() || []) : createFunction(`Array.from(${expression} || [])`, context),
+    );
     FF.debug && Object.assign(node, { signal, rows });
     const anchor = document.createComment("foreach: " + source);
     node.replaceWith(anchor);
@@ -351,7 +365,7 @@ export class TemplateIf implements Rule {
     return node.nodeName === "TEMPLATE" && name === "if";
   }
 
-  exec(node, _name, value, context, applyChildren?: TreeLinker) {
+  exec(node, _name, value, context, applyChildren?: TreeLinker, evaluate?: AnyFunction) {
     const source = "Boolean(" + value + ")";
     const ifNodes: any[] = [];
     let branchScope: Set<AnyFunction> | null = null;
@@ -367,7 +381,7 @@ export class TemplateIf implements Rule {
     let initial = true;
 
     effect(
-      createFunction(source, context),
+      evaluate ? () => Boolean(evaluate()) : createFunction(source, context),
       (value: any, lastValue: any) => {
         if (value === lastValue) {
           return;
@@ -410,19 +424,66 @@ export class TemplateIf implements Rule {
   }
 }
 
-/** Applies a template's cached, path-based rule plan to a cloned tree. */
-export function applyCodePlan(template: HTMLTemplateElement, tree: Node, context: any) {
+/** Prepares a cached path-based binding function for a template/context shape. */
+export function prepareCodePlan(template: HTMLTemplateElement, context: any): Promise<TreeLinker> {
   let cached = codePlans.get(template);
   if (!cached || cached.version !== rulesVersion) {
-    cached = { version: rulesVersion, apply: compileCodePlan(template.content) };
+    cached = { version: rulesVersion, plans: new Map() };
     codePlans.set(template, cached);
   }
 
-  cached.apply(tree, context);
+  const contextKeys = Object.keys(context);
+  const key = JSON.stringify(contextKeys);
+  let plan = cached.plans.get(key);
+  if (!plan) {
+    plan = compileCodePlan(template.content, contextKeys);
+    cached.plans.set(key, plan);
+  }
+
+  return plan.catch((error) => {
+    cached!.plans.delete(key);
+    throw error;
+  });
 }
 
-function compileCodePlan(tree: Node): TreeLinker {
-  const operations: Array<{ path: string; run: (node: Node, context: any) => void }> = [];
+type CodeOperation = {
+  path: string;
+  run: (node: Node, context: any, evaluate?: AnyFunction) => void;
+  expression?: string;
+  args?: string[];
+};
+
+function supportsExpressionCompilation(rule: Rule) {
+  return (
+    rule instanceof AddEventListener ||
+    rule instanceof SetAttribute ||
+    rule instanceof SetProperty ||
+    rule instanceof SetClassName ||
+    rule instanceof SetStyle ||
+    rule instanceof TemplateIf ||
+    rule instanceof TemplateForeach
+  );
+}
+
+function parseForeachSource(source: string) {
+  const [left, expression] = source.split("of").map((s) => s.trim());
+  const [key, indexKey] = left.includes("[")
+    ? left
+        .slice(1, -1)
+        .split(",")
+        .map((s) => s.trim())
+    : [left, ""];
+  return { key, indexKey, expression };
+}
+
+function evaluatorSource(expression: string, contextKeys: string[], args: string[] = []) {
+  const names = contextKeys.filter((key) => !args.includes(key) && expression.includes(key));
+  const destructure = names.length ? `const { ${names.join(", ")} } = ctx;` : "";
+  return `function(${args.join(", ")}) { ${destructure} return (${expression}); }.bind(ctx)`;
+}
+
+async function compileCodePlan(tree: Node, contextKeys: string[]): Promise<TreeLinker> {
+  const operations: CodeOperation[] = [];
   const targets = new Map<string, { path: number[]; variable: string }>();
   const queue: Array<{ node: Node; path: number[] }> = Array.from(tree.childNodes).map((node, index) => ({
     node,
@@ -434,13 +495,15 @@ function compileCodePlan(tree: Node): TreeLinker {
     const pathKey = path.join(".");
 
     if (node.nodeType === node.TEXT_NODE) {
-      if ((node.textContent || "").includes("{{")) {
+      const template = node.textContent?.trim() || "";
+      if (template.includes("{{")) {
         if (!targets.has(pathKey)) {
           targets.set(pathKey, { path, variable: `n${targets.size}` });
         }
         operations.push({
           path: pathKey,
-          run: (target, context) => applyTextRules(target as Text, context),
+          expression: textExpression(template),
+          run: (target, context, evaluate) => applyTextRules(target as Text, context, evaluate),
         });
       }
       continue;
@@ -462,12 +525,28 @@ function compileCodePlan(tree: Node): TreeLinker {
         element.nodeName === "TEMPLATE" &&
         ((rule instanceof TemplateIf && name === "if") ||
           (rule instanceof TemplateForeach && (name === "foreach" || name === "for")));
-      const childPlan = structural ? compileCodePlan((element as HTMLTemplateElement).content) : undefined;
+      let expression = value;
+      let childKeys = contextKeys;
+      if (rule instanceof TemplateForeach) {
+        const parsed = parseForeachSource(value);
+        expression = parsed.expression;
+        childKeys = [...new Set([...contextKeys, parsed.key, parsed.indexKey].filter(Boolean))];
+      }
+      const childPlan = structural
+        ? await compileCodePlan((element as HTMLTemplateElement).content, childKeys)
+        : undefined;
+      const hasCompiledExpression = supportsExpressionCompilation(rule);
 
       operations.push({
         path: pathKey,
-        run: (target, context) => {
-          (rule.exec as any).call(rule, target, name, value, context, childPlan);
+        expression: hasCompiledExpression ? expression : undefined,
+        args: rule instanceof AddEventListener ? ["$event"] : [],
+        run: (target, context, evaluate) => {
+          if (hasCompiledExpression) {
+            (rule.exec as any).call(rule, target, name, value, context, childPlan, evaluate);
+          } else {
+            (rule.exec as any).call(rule, target, name, value, context, childPlan);
+          }
           if (!FF.debug && target.nodeType === target.ELEMENT_NODE) {
             (target as Element).removeAttribute(name);
           }
@@ -499,10 +578,14 @@ function compileCodePlan(tree: Node): TreeLinker {
     }
   }
 
-  const calls = operations.map(({ path }, index) => `ops[${index}](${targets.get(path)!.variable}, context);`);
-  const source = `return function(root, context) { ${locals.join(" ")} ${calls.join(" ")} };`;
-  const run = Function("ops", source)(operations.map((operation) => operation.run)) as TreeLinker;
-  return run;
+  const calls = operations.map(({ path, expression, args = [] }, index) => {
+    const variable = targets.get(path)!.variable;
+    const evaluate = expression === undefined ? "" : `, ${evaluatorSource(expression, contextKeys, args)}`;
+    return `ops[${index}](${variable}, ctx${evaluate});`;
+  });
+  const source = `export default function makePlan(ops) { return function apply(root, ctx) { ${locals.join(" ")} ${calls.join(" ")} }; }`;
+  const module = await importModuleFromSource(source);
+  return module.default(operations.map((operation) => operation.run)) as TreeLinker;
 }
 
 use(new TemplateIf());

@@ -364,7 +364,7 @@ its children are processed. Useful for raw content that may contain <code>{{ ...
 <h2 id="4-template-expressions-rules-and-semantics"><a href="#4-template-expressions-rules-and-semantics" class="anchor">4. Template expressions: rules and semantics</a></h2>
 <p>All binding expressions (<code>{{ }}</code>, <code>on-*</code>, <code>bind-*</code>, <code>attr-*</code>, <code>class-*</code>, <code>style-*</code>, <code>if</code>, <code>for</code>)<br />
 follow the same rules:</p>
-<p>1. <strong>Plain JavaScript.</strong> Expressions are compiled with <code>new Function</code>. <code>if</code> is wrapped in<br />
+<p>1. <strong>Plain JavaScript.</strong> By default, expressions are compiled with <code>new Function</code>. <code>if</code> is wrapped in<br />
 <code>Boolean(...)</code>; <code>for</code> sources in <code>Array.from(... || [])</code>; text interpolations become template<br />
 literals.<br />
 2. <strong>The context is the setup's return value</strong> merged with props (<code>defineProp</code>) and template refs<br />
@@ -1111,6 +1111,10 @@ comma-separated in <code>window.name</code> (e.g. <code>window.name = 'debug'</c
 <tr><td><code>codePlan</code></td><td>Experimental generated binding plan. Disabled by default; opt in with <code>window.name = 'codePlan'</code> before importing Li3.</td></tr>
 </tbody>
 </table>
+<p><code>codePlan</code> asynchronously imports generated binding modules from Blob URLs. It avoids <code>new Function</code><br />
+for built-in rules, but requires CSP to allow <code>blob:</code> in <code>script-src</code>. Custom rules may still use dynamic<br />
+code generation. While the flag is enabled, <code>mount()</code> returns its unmount function immediately and exposes<br />
+a <code>ready</code> promise; calling the unmount function before <code>ready</code> settles cancels the pending mount.</p>
 <p>Debugging aids:</p>
 <ul>
 <li>Every mounted root element carries its merged context under a symbol key; with <code>debug</code> on, processed</li>

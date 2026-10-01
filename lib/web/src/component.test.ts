@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { mount, nextTick, onCleanup, ref, setFeatureFlag } from "./index.js";
+import { mount, nextTick, onCleanup, ref, setFeatureFlag, setModuleLoader } from "./index.js";
 import { computed, effect } from "./reactivity.js";
 import { TemplateForeach } from "./rules.js";
 import { walkDomTree } from "./internals.js";
@@ -12,6 +12,12 @@ function template(source: string) {
 
 function waitForDom() {
   return new Promise((resolve) => setTimeout(resolve, 20));
+}
+
+function createTestModuleLoader() {
+  return async (source: string) => ({
+    default: new Function(source.replace("export default ", "return "))(),
+  });
 }
 
 describe("component cleanup", () => {
@@ -222,13 +228,14 @@ describe("nested template structures", () => {
 
   it("runs the experimental code plan across bindings and nested structures", async () => {
     setFeatureFlag("codePlan", true);
+    setModuleLoader(createTestModuleLoader());
     try {
       const target = document.createElement("div");
       const selected = vi.fn();
       const clicked = vi.fn();
       const visible = ref(true);
       const items = ref(["one", "two"]);
-      mount(target, {
+      const mountHandle = mount(target, {
         template: template(`
           <button bind-title="title" on-click="clicked()" class-active="active">{{ title }}</button>
           <template if="visible">
@@ -245,7 +252,8 @@ describe("nested template structures", () => {
         }),
       });
 
-      await waitForDom();
+      await mountHandle.ready;
+      await nextTick();
       const button = target.querySelector("button")!;
       expect(button.title).toBe("Plan");
       expect(button.textContent).toBe("Plan");
@@ -264,6 +272,39 @@ describe("nested template structures", () => {
       await waitForDom();
       expect(Array.from(target.querySelectorAll("li"), (li) => li.textContent)).toEqual(["three"]);
     } finally {
+      setModuleLoader(null);
+      setFeatureFlag("codePlan", false);
+    }
+  });
+
+  it("cancels a pending code-plan mount when unmounted before compilation resolves", async () => {
+    setFeatureFlag("codePlan", true);
+    let resolveModule!: (module: any) => void;
+    const cleanup = vi.fn();
+    setModuleLoader(() => new Promise((resolve) => (resolveModule = resolve)));
+
+    try {
+      const target = document.createElement("div");
+      const unmount = mount(target, {
+        template: template('<p bind-title="title"></p>'),
+        setup: () => {
+          onCleanup(cleanup);
+          return { title: "late" };
+        },
+      });
+
+      unmount();
+      resolveModule({
+        default: (operations: any[]) => (root: ParentNode, context: any) => {
+          operations[0](root.childNodes[0], context, () => "late");
+        },
+      });
+      await unmount.ready;
+
+      expect(target.innerHTML).toBe("");
+      expect(cleanup).toHaveBeenCalledTimes(1);
+    } finally {
+      setModuleLoader(null);
       setFeatureFlag("codePlan", false);
     }
   });

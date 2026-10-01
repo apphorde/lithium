@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { renderPage } from './render.js';
-import { readState } from './state.js';
+import { describe, it, expect } from "vitest";
+import { renderPage } from "./render.js";
+import { readState } from "./state.js";
 
 const counterApp = `<!doctype html>
 <html><body>
@@ -25,34 +25,34 @@ const counterApp = `<!doctype html>
 </template>
 </body></html>`;
 
-describe('renderPage', () => {
-  it('mounts <template app> and renders initial state', async () => {
+describe("renderPage", () => {
+  it("mounts <template app> and renders initial state", async () => {
     const { html, state } = await renderPage({ html: counterApp });
 
-    expect(html).toContain('<h1>Counter App</h1>');
-    expect(html).toContain('<strong>3</strong>');
+    expect(html).toContain("<h1>Counter App</h1>");
+    expect(html).toContain("<strong>3</strong>");
     expect(html).toContain("You've clicked 3 times");
-    expect(state).toEqual([{ title: 'Counter App', count: 3, doubled: 6 }]);
+    expect(state).toEqual([{ title: "Counter App", count: 3, doubled: 6 }]);
   });
 
-  it('keeps <template app> for hydration by default, with state + bootstrap script', async () => {
+  it("keeps <template app> for hydration by default, with state + bootstrap script", async () => {
     const { html } = await renderPage({ html: counterApp });
 
     expect(html).toContain('<template app="">');
-    expect(html).toContain('data-li3-hydrate');
-    expect(html).toContain('data-li3-ssr');
+    expect(html).toContain("data-li3-hydrate");
+    expect(html).toContain("data-li3-ssr");
   });
 
-  it('strips templates in static mode', async () => {
-    const { html } = await renderPage({ html: counterApp, hydrate: 'static' });
+  it("strips templates in static mode", async () => {
+    const { html } = await renderPage({ html: counterApp, hydrate: "static" });
 
-    expect(html).not.toContain('<template app>');
-    expect(html).not.toContain('data-li3-hydrate');
-    expect(html).not.toContain('data-li3-root');
-    expect(html).toContain('<h1>Counter App</h1>');
+    expect(html).not.toContain("<template app>");
+    expect(html).not.toContain("data-li3-hydrate");
+    expect(html).not.toContain("data-li3-root");
+    expect(html).toContain("<h1>Counter App</h1>");
   });
 
-  it('renders for-loops with per-row context', async () => {
+  it("renders for-loops with per-row context", async () => {
     const app = `<!doctype html><html><body>
       <template app>
         <ul><template foreach="[t, i] of todos"><li>{{ i }}: {{ t.title }}</li></template></ul>
@@ -66,11 +66,36 @@ describe('renderPage', () => {
     </body></html>`;
 
     const { html } = await renderPage({ html: app });
-    expect(html).toContain('<li>0: a</li>');
-    expect(html).toContain('<li>1: b</li>');
+    expect(html).toContain("<li>0: a</li>");
+    expect(html).toContain("<li>1: b</li>");
   });
 
-  it('defines in-document components and renders them with props', async () => {
+  it("renders nested foreach and if using the experimental code plan", async () => {
+    const web = await import("@li3/web");
+    web.setFeatureFlag("codePlan", true);
+    try {
+      const app = `<!doctype html><html><body>
+        <template app>
+          <template foreach="item of items">
+            <template if="item.visible"><p>{{ item.name }}</p></template>
+          </template>
+          <script setup>
+            import { ref } from '@li3/web';
+            export default function () {
+              return { items: ref([{ name: 'SSR plan', visible: true }]) };
+            }
+          </script>
+        </template>
+      </body></html>`;
+
+      const { html } = await renderPage({ html: app });
+      expect(html).toContain("<p>SSR plan</p>");
+    } finally {
+      web.setFeatureFlag("codePlan", false);
+    }
+  });
+
+  it("defines in-document components and renders them with props", async () => {
     const app = `<!doctype html><html><body>
       <template component="ui-badge">
         <span class="badge">{{ label }}</span>
@@ -91,7 +116,7 @@ describe('renderPage', () => {
     expect(html).toContain('<span class="badge">New</span>');
   });
 
-  it('renders declarative <ref> and <script state> apps without setup code', async () => {
+  it("renders declarative <ref> and <script state> apps without setup code", async () => {
     const app = `<!doctype html><html><body>
       <template app>
         <ref name="count" value="7"></ref>
@@ -101,24 +126,24 @@ describe('renderPage', () => {
     </body></html>`;
 
     const { html } = await renderPage({ html: app });
-    expect(html).toContain('<p>Ada: 7</p>');
+    expect(html).toContain("<p>Ada: 7</p>");
   });
 
-  it('state snapshots can be read back from the rendered HTML', async () => {
+  it("state snapshots can be read back from the rendered HTML", async () => {
     const { html } = await renderPage({ html: counterApp });
 
     // re-parse the output in a fresh DOM and read embedded state
-    const { createDom } = await import('./dom.js');
+    const { createDom } = await import("./dom.js");
     const dom = createDom(html);
     try {
-      expect(readState(dom.document)).toEqual([{ title: 'Counter App', count: 3, doubled: 6 }]);
+      expect(readState(dom.document)).toEqual([{ title: "Counter App", count: 3, doubled: 6 }]);
     } finally {
       dom.restore();
     }
   });
 
-  it('escapes </script> in embedded state', async () => {
-    const { serializeState } = await import('./state.js');
-    expect(serializeState({ html: '</script><b>x</b>' })).toBe('{"html":"<\\/script><b>x<\\/b>"}');
+  it("escapes </script> in embedded state", async () => {
+    const { serializeState } = await import("./state.js");
+    expect(serializeState({ html: "</script><b>x</b>" })).toBe('{"html":"<\\/script><b>x<\\/b>"}');
   });
 });

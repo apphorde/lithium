@@ -435,7 +435,7 @@ its children are processed. Useful for raw content that may contain `{{ ... }}` 
 All binding expressions (`{{ }}`, `on-*`, `bind-*`, `attr-*`, `class-*`, `style-*`, `if`, `for`)
 follow the same rules:
 
-1. **Plain JavaScript.** Expressions are compiled with `new Function`. `if` is wrapped in
+1. **Plain JavaScript.** By default, expressions are compiled with `new Function`. `if` is wrapped in
    `Boolean(...)`; `for` sources in `Array.from(... || [])`; text interpolations become template
    literals.
 2. **The context is the setup's return value** merged with props (`defineProp`) and template refs
@@ -1180,7 +1180,10 @@ await load("./components/ui-kit.html");
 ## 12. Programmatic mounting: `mount`
 
 `mount(targetElement, options)` mounts a component onto an existing element and returns an unmount
-function. Options (`MountOptions`):
+function. The function has a `ready: Promise<void>` property; it resolves once initial linking and mount
+hooks complete. With `codePlan`, generated module loading makes this asynchronous. Calling the returned
+function before `ready` settles cancels the pending mount and disposes its setup resources. Options
+(`MountOptions`):
 
 ```ts
 {
@@ -1212,7 +1215,7 @@ const unmount = mount(document.getElementById("app"), {
 part of the component module but **not re-exported from the package entry point** — prefer
 `<template component>` / `load()` for HTML-driven apps, and `mount()` for programmatic ones.
 
-`autoInitialize()` runs the startup pass manually (define in-document `template[component]`, load
+`autoInitialize()` returns a promise for the startup pass (define in-document `template[component]`, load
 `link[rel=component]`, mount `template[app]`). It runs automatically unless the `skipAutoInitialize`
 flag is set.
 
@@ -1322,6 +1325,12 @@ comma-separated in `window.name` (e.g. `window.name = 'debug'` — note this rep
 | `strictCompare`      | Uses `===` instead of the deep-ish `compare` for change detection.                                                                                                                                              |
 | `skipAutoInitialize` | Disables the automatic startup pass; call `autoInitialize()` yourself.                                                                                                                                          |
 | `codePlan`           | Experimental generated binding plan. Disabled by default; opt in with `window.name = 'codePlan'` before importing Li3.                                                                                          |
+
+`codePlan` asynchronously imports generated binding modules from Blob URLs. It inlines expressions for
+built-in rules and avoids `new Function` in that path, but requires CSP to allow `blob:` in `script-src`.
+Custom rules may still use dynamic code generation. It compiles nested `if`/`foreach` content recursively
+and resolves planned node paths before executing operations. Keep it opt-in until benchmarked against
+representative applications.
 
 Debugging aids:
 

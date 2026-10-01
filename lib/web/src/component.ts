@@ -7,10 +7,27 @@ import {
   isValidAttribute,
 } from "./internals.js";
 import { disposeScope, isWritableRef, ref, runInScope, watch } from "./reactivity.js";
-import { applyCodePlan, linkTreeToContext } from "./rules.js";
+import { linkTreeToContext, prepareCodePlan } from "./rules.js";
 import type { DefineComponentOptions, MountOptions, PropOptions, RuntimeContext } from "./types";
 
 const DEBUG = Symbol("#");
+
+export type MountDisposer = (() => void) & { ready: Promise<void> };
+
+const pendingCodePlanMounts = new Set<Promise<void>>();
+
+function trackCodePlanMount(promise: Promise<void>) {
+  let tracked: Promise<void>;
+  tracked = promise.finally(() => pendingCodePlanMounts.delete(tracked));
+  pendingCodePlanMounts.add(tracked);
+  return tracked;
+}
+
+async function waitForCodePlanMounts() {
+  while (pendingCodePlanMounts.size) {
+    await Promise.all([...pendingCodePlanMounts]);
+  }
+}
 
 // adoptedStyleSheets is not implemented by jsdom / SSR virtual DOMs; guard it.
 function adoptStyleSheet(root: any, sheet: CSSStyleSheet) {
@@ -133,6 +150,7 @@ export function defineComponent(name: string, options: MountOptions) {
     async connectedCallback() {
       if (this.isConnected) {
         this.unmount = mount(this, Component.options);
+        await (this.unmount as MountDisposer).ready;
       } else {
         this.unmount?.();
       }
@@ -148,7 +166,7 @@ export function defineComponent(name: string, options: MountOptions) {
   customElements.define(name, Component);
 }
 
-export function mount(target: Element, options: MountOptions) {
+export function mount(target: Element, options: MountOptions): MountDisposer {
   const parentElement = target.shadowRoot || target;
   const { template, setup = Function } = options;
 
@@ -172,39 +190,55 @@ export function mount(target: Element, options: MountOptions) {
   const mergedContext = Object.assign({}, runtime.context, runtime.props, runtime.refs);
   const readOnlyContext = createReadOnlyContext(mergedContext);
 
-  runInScope(runtime.cleanup, () => {
-    if (FF.codePlan) {
-      applyCodePlan(template, dom, readOnlyContext);
-    } else {
-      linkTreeToContext(dom, readOnlyContext);
-    }
-  });
-
-  parentElement.innerHTML = "";
-  parentElement.appendChild(dom);
-
-  if (options.styles?.length) {
-    for (const sheet of options.styles) {
-      adoptStyleSheet(target.shadowRoot || document, sheet);
-    }
-  }
-
-  for (const fn of runtime.mount) {
-    fn();
-  }
-
-  (parentElement as any)[DEBUG] = mergedContext;
-
   const unmountHooks = runtime.unmount;
   let unmounted = false;
-  return function () {
+  const unmount = (() => {
     if (unmounted) return;
     unmounted = true;
     for (const fn of unmountHooks) {
       fn();
     }
     disposeScope(runtime.cleanup);
+  }) as MountDisposer;
+
+  const commit = () => {
+    if (unmounted) return;
+    parentElement.innerHTML = "";
+    parentElement.appendChild(dom);
+
+    if (options.styles?.length) {
+      for (const sheet of options.styles) {
+        adoptStyleSheet(target.shadowRoot || document, sheet);
+      }
+    }
+
+    for (const fn of runtime.mount) {
+      fn();
+    }
+
+    (parentElement as any)[DEBUG] = mergedContext;
   };
+
+  if (FF.codePlan) {
+    unmount.ready = trackCodePlanMount(
+      prepareCodePlan(template, readOnlyContext)
+        .then((plan) => {
+          if (unmounted) return;
+          runInScope(runtime.cleanup, () => plan(dom, readOnlyContext));
+          commit();
+        })
+        .catch((error) => {
+          if (!unmounted) console.error(error);
+          unmount();
+        }),
+    );
+  } else {
+    runInScope(runtime.cleanup, () => linkTreeToContext(dom, readOnlyContext));
+    commit();
+    unmount.ready = Promise.resolve();
+  }
+
+  return unmount;
 }
 
 const runtimeStack: RuntimeContext[] = [];
@@ -455,12 +489,13 @@ export async function defineFromTemplate(
   return { name, ...options };
 }
 
-export function findApps() {
+export async function findApps(): Promise<void> {
   const apps = Array.from(document.querySelectorAll("template[app]")) as HTMLTemplateElement[];
 
-  for (const template of apps) {
-    readOptionsFromTemplate(template)
-      .then((options) => {
+  await Promise.all(
+    apps.map(async (template) => {
+      try {
+        const options = await readOptionsFromTemplate(template);
         // SSR hydration: reuse the projection div the server rendered (marked
         // with data-li3-root) instead of creating a duplicate app root.
         // Contents are still fully re-rendered by mount() (innerHTML = '').
@@ -476,31 +511,36 @@ export function findApps() {
         app.style.display = "contents";
         template.parentNode!.insertBefore(app, template);
 
-        mount(app, options);
+        const unmount = mount(app, options);
+        await unmount.ready;
         // SSR keeps the source template as the client re-rendering blueprint.
         FF.debug || FF.ssr || template.remove();
-      })
-      .catch((error) => console.error(error));
-  }
+      } catch (error) {
+        console.error(error);
+      }
+    }),
+  );
 }
 
-export function autoInitialize() {
+export async function autoInitialize(): Promise<void> {
   const components = Array.from(document.querySelectorAll("template[component]")) as HTMLTemplateElement[];
   const links = Array.from(document.querySelectorAll('link[rel="component"]')) as HTMLLinkElement[];
 
-  components.forEach((c) => defineFromTemplate(c));
-  links.forEach((l) => load(l.href));
-
-  findApps();
+  await Promise.all([
+    ...components.map((component) => defineFromTemplate(component)),
+    ...links.map((link) => load(link.href)),
+  ]);
+  await findApps();
+  await waitForCodePlanMounts();
 }
 
 // give time to import the module and set feature flags
 setTimeout(() => {
   if (!FF.skipAutoInitialize) {
     if (["complete", "interactive"].includes(document.readyState)) {
-      return autoInitialize();
+      return autoInitialize().catch((error) => console.error(error));
     }
 
-    window.addEventListener("DOMContentLoaded", autoInitialize);
+    window.addEventListener("DOMContentLoaded", () => autoInitialize().catch((error) => console.error(error)));
   }
 }, 10);
