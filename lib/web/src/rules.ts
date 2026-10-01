@@ -213,7 +213,7 @@ export class SetStyle implements Rule {
 
 export class TemplateForeach implements Rule {
   match(node, name) {
-    return node.nodeName === "TEMPLATE" && name === "foreach";
+    return node.nodeName === "TEMPLATE" && (name === "foreach" || name === "for");
   }
 
   exec(node, _name, source, context) {

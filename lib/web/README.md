@@ -333,8 +333,10 @@ Renders its content only while the expression is truthy.
 
 Renders the content once per item of an iterable.
 
-Lithium deliberately uses `foreach`, not `for`, so its list directive does not claim the standard
-`<template for>` attribute. `TemplateForeach` is the corresponding built-in rule class.
+`foreach` is the recommended list directive and maps to the `TemplateForeach` built-in rule class.
+For migration compatibility, `<template for="...">` is also accepted for now. It may conflict with
+the proposed platform meaning of `for`, so migrate applications to `foreach` before that alias is
+removed in a future release.
 
 ```html
 <ul>

@@ -90,12 +90,12 @@ describe("computed dependencies", () => {
 });
 
 describe("nested template structures", () => {
-  it("matches foreach and leaves the standard for attribute alone", () => {
+  it("matches both foreach and the legacy for attribute", () => {
     const rule = new TemplateForeach();
     const node = document.createElement("template");
 
     expect(rule.match(node, "foreach")).toBe(true);
-    expect(rule.match(node, "for")).toBe(false);
+    expect(rule.match(node, "for")).toBe(true);
   });
 
   it("links text and if content inside for rows", async () => {
