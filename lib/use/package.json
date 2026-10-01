@@ -1,6 +1,6 @@
 {
   "name": "@li3/use",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "exports": {
     ".": "./dist/index.js",
     "./*": {
@@ -12,6 +12,9 @@
     "url": "https://github.com/apphorde/lithium"
   },
   "peerDependencies": {
-    "@li3/web": ">=0.2.0"
+    "@li3/web": ">=0.2.40"
+  },
+  "devDependencies": {
+    "@li3/web": "workspace:*"
   }
 }

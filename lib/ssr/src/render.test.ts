@@ -55,7 +55,7 @@ describe('renderPage', () => {
   it('renders for-loops with per-row context', async () => {
     const app = `<!doctype html><html><body>
       <template app>
-        <ul><template for="[t, i] of todos"><li>{{ i }}: {{ t.title }}</li></template></ul>
+        <ul><template foreach="[t, i] of todos"><li>{{ i }}: {{ t.title }}</li></template></ul>
         <script setup>
           import { ref } from '@li3/web';
           export default function () {

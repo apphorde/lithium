@@ -329,13 +329,16 @@ Renders its content only while the expression is truthy.
 - DOM insertion is asynchronous (microtask-ish `setTimeout`); don't query the new DOM synchronously
   right after changing the condition.
 
-### 3.8 List rendering: `<template for="item of items">`
+### 3.8 List rendering: `<template foreach="item of items">`
 
 Renders the content once per item of an iterable.
 
+Lithium deliberately uses `foreach`, not `for`, so its list directive does not claim the standard
+`<template for>` attribute. `TemplateForeach` is the corresponding built-in rule class.
+
 ```html
 <ul>
-  <template for="todo of todos">
+  <template foreach="todo of todos">
     <li class-done="todo.done" on-click="toggle(todo)">{{ todo.title }}</li>
   </template>
 </ul>
@@ -344,7 +347,7 @@ Renders the content once per item of an iterable.
 With an index, use array destructuring syntax:
 
 ```html
-<template for="[user, i] of users">
+<template foreach="[user, i] of users">
   <tr>
     <td>{{ i + 1 }}</td>
     <td>{{ user.name }}</td>
@@ -364,9 +367,9 @@ With an index, use array destructuring syntax:
 - Nested loops work; inner loops shadow outer variables:
 
   ```html
-  <template for="group of groups">
+  <template foreach="group of groups">
     <h2>{{ group.name }}</h2>
-    <template for="[member, j] of group.members">
+    <template foreach="[member, j] of group.members">
       <p>{{ j }}: {{ member.name }} ({{ group.name }})</p>
     </template>
   </template>
@@ -550,7 +553,7 @@ Components with no behavior can skip the setup script and declare their initial 
   </script>
 
   <h1>{{ title }}</h1>
-  <template for="fact of facts">
+  <template foreach="fact of facts">
     <article>
       <h3>{{ fact.title }}</h3>
       <p>{{ fact.content }}</p>
@@ -768,7 +771,7 @@ slot implementation).
   <p>{{ remaining }} of {{ todos.length }} remaining</p>
 
   <ul>
-    <template for="[todo, i] of todos">
+    <template foreach="[todo, i] of todos">
       <li class-done="todo.done">
         <span on-click="toggle(todo)">{{ i + 1 }}. {{ todo.title }}</span>
         <button on-click="remove(todo)">x</button>
@@ -818,7 +821,7 @@ Note the patterns: array mutations (`todos.value.push(...)`) and nested object m
 
   <button on-click="setCount(count + 1)">Count: {{ count }}</button>
   <ul>
-    <template for="c of concepts">
+    <template foreach="c of concepts">
       <li>{{ c }}</li>
     </template>
   </ul>
@@ -1192,7 +1195,7 @@ use({
 
 - For every attribute of every element, rules are tried **in registration order**; the first match
   runs `exec`, and the attribute is removed from the DOM.
-- Built-in rules (also exported, so you can subclass them): `TemplateIf`, `TemplateFor`,
+- Built-in rules (also exported, so you can subclass them): `TemplateIf`, `TemplateForeach`,
   `AddEventListener`, `SetProperty`, `SetAttribute`, `SetClassName`, `SetStyle`.
 - `context` is the read-only template context. Expressions are compiled with the internal
   `createFunction(expression, context, args)`; wire reactivity with `effect`/`watch`.
@@ -1220,7 +1223,7 @@ Example — Vue-style syntax (this is how the sibling `@li3/use` package impleme
 subclass the built-ins and remap attribute names:
 
 ```js
-import { use, TemplateFor, TemplateIf, SetProperty, AddEventListener } from '@li3/web';
+import { use, TemplateForeach, TemplateIf, SetProperty, AddEventListener } from '@li3/web';
 
 class VueSetProperty extends SetProperty {
   match(node, name) { return name.startsWith(':'); }
@@ -1247,14 +1250,14 @@ class VueTemplateIf extends TemplateIf {
   }
 }
 
-class VueTemplateFor extends TemplateFor {
+class VueTemplateFor extends TemplateForeach {
   match(node, name) { return name === 'v-for'; }
   exec(node, name, value, context) {
     const t = document.createElement('template');
     node.replaceWith(t);
     node.removeAttribute('v-for');
     t.content.append(node);
-    super.exec(t, 'for', value, context);
+    super.exec(t, 'foreach', value, context);
   }
 }
 
@@ -1302,8 +1305,8 @@ Debugging aids:
 | Class toggle | `class-<name>[.<name2>]="expr"` | `<li class-done="t.done">` |
 | Style property | `style-<prop>="expr"` (camelCased) | `<div style-color="c">` |
 | Conditional | `<template if="expr">` | `<template if="user">...</template>` |
-| List | `<template for="item of items">` | `<template for="u of users">...</template>` |
-| List + index | `<template for="[item, i] of items">` | `<template for="[u, i] of users">...</template>` |
+| List | `<template foreach="item of items">` | `<template foreach="u of users">...</template>` |
+| List + index | `<template foreach="[item, i] of items">` | `<template foreach="[u, i] of users">...</template>` |
 | Element ref | `ref="name"` + `templateRef('name')` | `<input ref="box">` |
 | Declarative state | `<ref name value setter>` inside template | `<ref name="n" value="0" setter="setN">` |
 | JSON state | `<script state type="application/json">` | `{ "title": "Hi" }` |

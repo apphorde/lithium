@@ -1,6 +1,6 @@
 {
   "name": "@li3/ssr",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Server-side rendering for @li3/web applications using a virtual server DOM",
   "exports": {
     ".": {

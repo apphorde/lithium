@@ -32,11 +32,13 @@ programming interface.</p>
     hook(value)                              Creates a reactive wrapper using React style hooks (e.g. const [value, setValue] = hook(initialValue))
     watch(ref, callback)                     Watches a reactive source and calls the callback when it changes
     effect(fn, effectFn)                     Runs a function and tracks its dependencies, re-running the effectFn when they change (wraps fn in computed)
-    reactive(object, effect)                 Creates a reactive version of an object that triggers an effect when it changes</code></pre>
+    reactive(object, effect)                 Creates a reactive version of an object that triggers an effect when it changes
+    nextTick()                               Resolves after the pending reactive update queue flushes</code></pre>
 <p><strong>Lifecycle Hooks:</strong></p>
 <pre><code class="language-txt">    onInit(fn)                               Called just before the component is initialized
     onDestroy(fn)                            Called just before the component is destroyed
     onUpdate(fn)                             Called just before the component inputs have changed (i.e. one or more props have changed)
+    onCleanup(fn)                            Registers per-instance cleanup for resources created during setup
 </code></pre>
 <p><strong>Component setup definitions:</strong></p>
 <pre><code class="language-txt">    defineProp(name, options)                Defines a prop for a component with the given name and options (type, default value, etc.)
@@ -275,15 +277,17 @@ For object style maps use <code>bind-style=&quot;{ ... }&quot;</code>.</p>
 <li>DOM insertion is asynchronous (microtask-ish <code>setTimeout</code>); don't query the new DOM synchronously</li>
 </ul>
 <p>right after changing the condition.</p>
-<h3 id="3-8-list-rendering"><a href="#3-8-list-rendering" class="anchor">3.8 List rendering: <code>&lt;template for=&quot;item of items&quot;&gt;</code></a></h3>
+<h3 id="3-8-list-rendering"><a href="#3-8-list-rendering" class="anchor">3.8 List rendering: <code>&lt;template foreach=&quot;item of items&quot;&gt;</code></a></h3>
 <p>Renders the content once per item of an iterable.</p>
+<p>Lithium deliberately uses <code>foreach</code>, not <code>for</code>, so its list directive does not claim the standard<br />
+<code>&lt;template for&gt;</code> attribute. <code>TemplateForeach</code> is the corresponding built-in rule class.</p>
 <pre><code class="language-html">&lt;ul&gt;
-  &lt;template for=&quot;todo of todos&quot;&gt;
+  &lt;template foreach=&quot;todo of todos&quot;&gt;
     &lt;li class-done=&quot;todo.done&quot; on-click=&quot;toggle(todo)&quot;&gt;{{ todo.title }}&lt;/li&gt;
   &lt;/template&gt;
 &lt;/ul&gt;</code></pre>
 <p>With an index, use array destructuring syntax:</p>
-<pre><code class="language-html">&lt;template for=&quot;[user, i] of users&quot;&gt;
+<pre><code class="language-html">&lt;template foreach=&quot;[user, i] of users&quot;&gt;
   &lt;tr&gt;
     &lt;td&gt;{{ i + 1 }}&lt;/td&gt;
     &lt;td&gt;{{ user.name }}&lt;/td&gt;
@@ -308,9 +312,9 @@ each row at its index rather than moving DOM nodes.</p>
 <li>Nested loops work; inner loops shadow outer variables:</li>
 </ul>
 <p>```html<br />
-&lt;template for=&quot;group of groups&quot;&gt;<br />
+&lt;template foreach=&quot;group of groups&quot;&gt;<br />
 &lt;h2&gt;{{ group.name }}&lt;/h2&gt;<br />
-&lt;template for=&quot;[member, j] of group.members&quot;&gt;<br />
+&lt;template foreach=&quot;[member, j] of group.members&quot;&gt;<br />
 &lt;p&gt;{{ j }}: {{ member.name }} ({{ group.name }})&lt;/p&gt;<br />
 &lt;/template&gt;<br />
 &lt;/template&gt;<br />
@@ -475,7 +479,7 @@ component instance. Everything the template needs must be <strong>returned</stro
   &lt;/script&gt;
 
   &lt;h1&gt;{{ title }}&lt;/h1&gt;
-  &lt;template for=&quot;fact of facts&quot;&gt;
+  &lt;template foreach=&quot;fact of facts&quot;&gt;
     &lt;article&gt;
       &lt;h3&gt;{{ fact.title }}&lt;/h3&gt;
       &lt;p&gt;{{ fact.content }}&lt;/p&gt;
@@ -653,7 +657,7 @@ slot implementation).</p>
   &lt;p&gt;{{ remaining }} of {{ todos.length }} remaining&lt;/p&gt;
 
   &lt;ul&gt;
-    &lt;template for=&quot;[todo, i] of todos&quot;&gt;
+    &lt;template foreach=&quot;[todo, i] of todos&quot;&gt;
       &lt;li class-done=&quot;todo.done&quot;&gt;
         &lt;span on-click=&quot;toggle(todo)&quot;&gt;{{ i + 1 }}. {{ todo.title }}&lt;/span&gt;
         &lt;button on-click=&quot;remove(todo)&quot;&gt;x&lt;/button&gt;
@@ -698,7 +702,7 @@ slot implementation).</p>
 
   &lt;button on-click=&quot;setCount(count + 1)&quot;&gt;Count: {{ count }}&lt;/button&gt;
   &lt;ul&gt;
-    &lt;template for=&quot;c of concepts&quot;&gt;
+    &lt;template foreach=&quot;c of concepts&quot;&gt;
       &lt;li&gt;{{ c }}&lt;/li&gt;
     &lt;/template&gt;
   &lt;/ul&gt;
@@ -798,6 +802,21 @@ the flag and forces a re-update. Used internally to freeze rows removed by <code
 </ul>
 <p>notifications run synchronously. All DOM updates from bindings flow through this, so DOM reflects<br />
 state changes asynchronously — don't assert on the DOM synchronously after a state change.</p>
+<p>Use <code>await nextTick()</code> when code needs to wait for the scheduled reactive work:</p>
+<pre><code class="language-js">import { nextTick } from '@li3/web';
+
+count.value++;
+await nextTick();
+// DOM bindings have now processed the queued update.</code></pre>
+<p>Resources created during setup and template linking are disposed when the component is unmounted.<br />
+Application code can register its own cleanup:</p>
+<pre><code class="language-js">import { onCleanup } from '@li3/web';
+
+export default function () {
+  const timer = setInterval(refresh, 1000);
+  onCleanup(() =&gt; clearInterval(timer));
+  return { refresh };
+}</code></pre>
 <h2 id="8-props"><a href="#8-props" class="anchor">8. Props</a></h2>
 <p><code>defineProp(name, options?)</code> declares an input. Call it in setup; it returns a writable ref and also<br />
 exposes the prop in the template context by name.</p>
@@ -974,7 +993,7 @@ flag is set.</p>
 </ul>
 <p>runs <code>exec</code>, and the attribute is removed from the DOM.</p>
 <ul>
-<li>Built-in rules (also exported, so you can subclass them): <code>TemplateIf</code>, <code>TemplateFor</code>,</li>
+<li>Built-in rules (also exported, so you can subclass them): <code>TemplateIf</code>, <code>TemplateForeach</code>,</li>
 </ul>
 <p><code>AddEventListener</code>, <code>SetProperty</code>, <code>SetAttribute</code>, <code>SetClassName</code>, <code>SetStyle</code>.</p>
 <ul>
@@ -995,7 +1014,7 @@ use({
 <pre><code class="language-html">&lt;span tooltip=&quot;user.fullName&quot;&gt;hover me&lt;/span&gt;</code></pre>
 <p>Example — Vue-style syntax (this is how the sibling <code>@li3/use</code> package implements <code>useVue()</code>):<br />
 subclass the built-ins and remap attribute names:</p>
-<pre><code class="language-js">import { use, TemplateFor, TemplateIf, SetProperty, AddEventListener } from '@li3/web';
+<pre><code class="language-js">import { use, TemplateForeach, TemplateIf, SetProperty, AddEventListener } from '@li3/web';
 
 class VueSetProperty extends SetProperty {
   match(node, name) { return name.startsWith(':'); }
@@ -1022,14 +1041,14 @@ class VueTemplateIf extends TemplateIf {
   }
 }
 
-class VueTemplateFor extends TemplateFor {
+class VueTemplateFor extends TemplateForeach {
   match(node, name) { return name === 'v-for'; }
   exec(node, name, value, context) {
     const t = document.createElement('template');
     node.replaceWith(t);
     node.removeAttribute('v-for');
     t.content.append(node);
-    super.exec(t, 'for', value, context);
+    super.exec(t, 'foreach', value, context);
   }
 }
 
@@ -1040,13 +1059,11 @@ use(new VueTemplateFor());</code></pre>
 <p>This enables <code>:value=&quot;x&quot;</code>, <code>@click=&quot;fn()&quot;</code>, <code>v-if=&quot;cond&quot;</code>, <code>v-for=&quot;item of items&quot;</code> on any element.</p>
 <h2 id="14-feature-flags-and-debugging"><a href="#14-feature-flags-and-debugging" class="anchor">14. Feature flags and debugging</a></h2>
 <p>Set flags via <code>setFeatureFlag(name, value?)</code> (must run before components initialize) or by listing them<br />
-comma-separated in <code>window.name</code> (e.g. <code>window.name = 'debug,linker'</code> — note this replaces the window<br />
-name).</p>
+comma-separated in <code>window.name</code> (e.g. <code>window.name = 'debug'</code> — note this replaces the window name).</p>
 <table>
 <thead><tr><th>Flag</th><th>Effect</th></tr></thead>
 <tbody>
 <tr><td><code>debug</code></td><td>Keeps processed binding attributes on elements; keeps <code>&lt;template app&gt;</code> elements in the DOM; attaches every signal to <code>window.refList</code> (a <code>Set</code> of <code>WeakRef</code>s); logs component redefinition and computed errors.</td></tr>
-<tr><td><code>linker</code></td><td>Pre-compiles template rule matches once per template and replays them per mount (faster mounts for repeated components).</td></tr>
 <tr><td><code>strictCompare</code></td><td>Uses <code>===</code> instead of the deep-ish <code>compare</code> for change detection.</td></tr>
 <tr><td><code>skipAutoInitialize</code></td><td>Disables the automatic startup pass; call <code>autoInitialize()</code> yourself.</td></tr>
 </tbody>
@@ -1078,8 +1095,8 @@ name).</p>
 <tr><td>Class toggle</td><td><code>class-&lt;name&gt;[.&lt;name2&gt;]=&quot;expr&quot;</code></td><td><code>&lt;li class-done=&quot;t.done&quot;&gt;</code></td></tr>
 <tr><td>Style property</td><td><code>style-&lt;prop&gt;=&quot;expr&quot;</code> (camelCased)</td><td><code>&lt;div style-color=&quot;c&quot;&gt;</code></td></tr>
 <tr><td>Conditional</td><td><code>&lt;template if=&quot;expr&quot;&gt;</code></td><td><code>&lt;template if=&quot;user&quot;&gt;...&lt;/template&gt;</code></td></tr>
-<tr><td>List</td><td><code>&lt;template for=&quot;item of items&quot;&gt;</code></td><td><code>&lt;template for=&quot;u of users&quot;&gt;...&lt;/template&gt;</code></td></tr>
-<tr><td>List + index</td><td><code>&lt;template for=&quot;[item, i] of items&quot;&gt;</code></td><td><code>&lt;template for=&quot;[u, i] of users&quot;&gt;...&lt;/template&gt;</code></td></tr>
+<tr><td>List</td><td><code>&lt;template foreach=&quot;item of items&quot;&gt;</code></td><td><code>&lt;template foreach=&quot;u of users&quot;&gt;...&lt;/template&gt;</code></td></tr>
+<tr><td>List + index</td><td><code>&lt;template foreach=&quot;[item, i] of items&quot;&gt;</code></td><td><code>&lt;template foreach=&quot;[u, i] of users&quot;&gt;...&lt;/template&gt;</code></td></tr>
 <tr><td>Element ref</td><td><code>ref=&quot;name&quot;</code> + <code>templateRef('name')</code></td><td><code>&lt;input ref=&quot;box&quot;&gt;</code></td></tr>
 <tr><td>Declarative state</td><td><code>&lt;ref name value setter&gt;</code> inside template</td><td><code>&lt;ref name=&quot;n&quot; value=&quot;0&quot; setter=&quot;setN&quot;&gt;</code></td></tr>
 <tr><td>JSON state</td><td><code>&lt;script state type=&quot;application/json&quot;&gt;</code></td><td><code>{ &quot;title&quot;: &quot;Hi&quot; }</code></td></tr>

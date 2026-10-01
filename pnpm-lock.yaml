@@ -91,13 +91,13 @@ importers:
     dependencies:
       '@li3/web':
         specifier: latest
-        version: 0.2.37
+        version: 0.2.39
 
   lib/use:
-    dependencies:
+    devDependencies:
       '@li3/web':
-        specifier: '>=0.2.0'
-        version: 0.2.37
+        specifier: workspace:*
+        version: link:../web
 
   lib/web:
     devDependencies:
@@ -938,8 +938,8 @@ packages:
   '@li3/sfc@0.0.4':
     resolution: {integrity: sha512-OeHyhEVbpqFgxON3Uk33vD5TeIzm3KWZKI8tOR8aZ/8nAIV1dV704nmNdhyG/EgK/k7wjLX2c/y3v4er4hQq7Q==}
 
-  '@li3/web@0.2.37':
-    resolution: {integrity: sha512-TnKuzDKUcrdqKGgllpcWib7+am7IzrloX0LVLyL89/xle5s87LZ9FTnAqBji7UZnt2/tiV7EItvYqNN/bu2ARw==}
+  '@li3/web@0.2.39':
+    resolution: {integrity: sha512-clAXOA9J8RLuYd0FrVP4BKmNjft7rAbs+ywCK3J3kzdhsiGTNvXdaXirhWGjRNd+1KhmTBWkxRHCdRa6bbLVuA==}
 
   '@napi-rs/wasm-runtime@0.2.4':
     resolution: {integrity: sha512-9zESzOO5aDByvhIAsOy9TbpZ0Ur2AJbUI7UT73kcUTS2mxAMHOBaa1st/jAymNoCtvrit99kkzT1FZuXVcgfIQ==}
@@ -3569,7 +3569,7 @@ snapshots:
       '@li3/html-parser': 0.0.7
       acorn: 8.18.0
 
-  '@li3/web@0.2.37': {}
+  '@li3/web@0.2.39': {}
 
   '@napi-rs/wasm-runtime@0.2.4':
     dependencies:

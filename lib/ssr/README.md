@@ -46,7 +46,7 @@ classes, styles, `<template if>`, `<template for>`, `<template component>`, and 
       </template>
 
       <ul>
-        <template for="item of items">
+        <template foreach="item of items">
           <li>{{ item }}</li>
         </template>
       </ul>

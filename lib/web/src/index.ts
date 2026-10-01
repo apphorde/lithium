@@ -1,7 +1,7 @@
-import type { PropOptions } from './types';
-import { onCleanup as registerCleanup, ref } from './reactivity.js';
-import { debounce, eventEmitter, setModuleLoader } from './internals.js';
-import { definePropInternal, getCurrentNode } from './component.js';
+import type { PropOptions } from "./types";
+import { onCleanup as registerCleanup, ref } from "./reactivity.js";
+import { debounce, eventEmitter, setModuleLoader } from "./internals.js";
+import { definePropInternal, getCurrentNode } from "./component.js";
 
 function getElement() {
   return getCurrentNode().element;
@@ -53,10 +53,10 @@ export {
   SetProperty,
   SetStyle,
   AddEventListener,
-  TemplateFor,
+  TemplateForeach,
   TemplateIf,
   type Rule,
-} from './rules.js';
-export * from './reactivity.js';
-export { mount, load, loadCss, autoInitialize } from './component.js';
-export { setFeatureFlag } from './feature-flags.js';
+} from "./rules.js";
+export * from "./reactivity.js";
+export { mount, load, loadCss, autoInitialize } from "./component.js";
+export { setFeatureFlag } from "./feature-flags.js";

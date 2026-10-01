@@ -1,8 +1,8 @@
-import { createFunction, createReadOnlyContext, walkDomTree, toCamelCase, isValidAttribute } from './internals.js';
-import { ref, computed, disposeScope, effect, onCleanup, runInScope, watch, suspend } from './reactivity.js';
-import type { Signal } from './reactivity';
-import type { AnyFunction } from './types';
-import { FF } from './feature-flags.js';
+import { createFunction, createReadOnlyContext, walkDomTree, toCamelCase, isValidAttribute } from "./internals.js";
+import { ref, computed, disposeScope, effect, onCleanup, runInScope, watch, suspend } from "./reactivity.js";
+import type { Signal } from "./reactivity";
+import type { AnyFunction } from "./types";
+import { FF } from "./feature-flags.js";
 
 const isElement = (x: any): x is Element => x.nodeType === x.ELEMENT_NODE;
 const isText = (x: any): x is Text => x.nodeType === x.TEXT_NODE;
@@ -10,9 +10,9 @@ const isText = (x: any): x is Text => x.nodeType === x.TEXT_NODE;
 export function applyTextRules(node: Text, context: any) {
   const template = node.textContent.trim();
 
-  if (!template || !template.includes('{{')) return;
+  if (!template || !template.includes("{{")) return;
 
-  const source = '`' + template.replace(/{{(.*?)}}/g, (_: any, exp: string) => '${' + exp.trim() + '}') + '`';
+  const source = "`" + template.replace(/{{(.*?)}}/g, (_: any, exp: string) => "${" + exp.trim() + "}") + "`";
 
   effect(createFunction(source, context), (v: any) => setText(node, v));
 }
@@ -49,13 +49,13 @@ export function linkTreeToContext(tree: Node, context: any) {
 }
 
 const mappedProperties: Record<string, string> = {
-  innerhtml: 'innerHTML',
-  baseuri: 'baseURI',
-  class: 'className',
+  innerhtml: "innerHTML",
+  baseuri: "baseURI",
+  class: "className",
 };
 
 function setClassName(el: Element, classNames: string, value: any): void {
-  for (const cls of classNames.split('.').filter(Boolean)) {
+  for (const cls of classNames.split(".").filter(Boolean)) {
     el.classList.toggle(cls, value);
   }
 }
@@ -65,13 +65,13 @@ function setStyle(el: any, key: string, value: any): void {
 }
 
 function setText(el: Text, text: any): void {
-  el.textContent = String(text !== undefined ? text : '');
+  el.textContent = String(text !== undefined ? text : "");
 }
 
 function setProperty(node: any, key: string, value: any, modifiers: string[]): void {
   const mappedKey = mappedProperties[key] || key;
 
-  if (modifiers.includes('bool')) {
+  if (modifiers.includes("bool")) {
     node.toggleAttribute(mappedKey, Boolean(value));
   } else {
     node[mappedKey] = value;
@@ -83,7 +83,7 @@ function setAttribute(el: Element, attribute: string, value: boolean, modifiers:
     return;
   }
 
-  if (modifiers.includes('bool')) {
+  if (modifiers.includes("bool")) {
     el.toggleAttribute(attribute, !!value);
     return;
   }
@@ -108,12 +108,12 @@ export function resetRules() {
 
 export class AddEventListener implements Rule {
   match(_, name) {
-    return name.startsWith('on-');
+    return name.startsWith("on-");
   }
 
   exec(node, name, value, context) {
     const key = name.slice(3);
-    const [event, ...tags] = key.split('.');
+    const [event, ...tags] = key.split(".");
     const modifiers: any = {
       // Safari's default is true
       passive: false,
@@ -123,7 +123,7 @@ export class AddEventListener implements Rule {
       modifiers[tag] = true;
     }
 
-    const fn = createFunction(value, context, ['$event']);
+    const fn = createFunction(value, context, ["$event"]);
     const listener = (e: Event) => {
       if (modifiers.stop) e.stopPropagation();
       if (modifiers.prevent) e.preventDefault();
@@ -138,11 +138,11 @@ export class AddEventListener implements Rule {
 
 export class SetAttribute implements Rule {
   match(_, name) {
-    return name.startsWith('attr-');
+    return name.startsWith("attr-");
   }
 
   exec(node, name, source, context) {
-    const [key, ...modifiers] = name.slice(5).split('.');
+    const [key, ...modifiers] = name.slice(5).split(".");
 
     effect(createFunction(source, context), (v: any) => setAttribute(node, key, v, modifiers));
   }
@@ -150,15 +150,15 @@ export class SetAttribute implements Rule {
 
 export class SetProperty implements Rule {
   match(_, name) {
-    return name.startsWith('bind-');
+    return name.startsWith("bind-");
   }
 
   exec(node, name, source, context) {
     const key = name.slice(5);
     const fn = createFunction(source, context);
-    const isObject = source.startsWith('{');
+    const isObject = source.startsWith("{");
 
-    if (key === 'class') {
+    if (key === "class") {
       const currentValue = node.className;
       effect(fn, (mapOrString) => {
         if (isObject) {
@@ -166,22 +166,22 @@ export class SetProperty implements Rule {
             setClassName(node, classNames, value);
           }
         } else {
-          node.className = currentValue + ' ' + mapOrString;
+          node.className = currentValue + " " + mapOrString;
         }
       });
       return;
-    } 
-    
-    if (key === 'style' && isObject) {
+    }
+
+    if (key === "style" && isObject) {
       effect(fn, (map) => {
         for (const [property, value] of Object.entries(map || {})) {
           setStyle(node, toCamelCase(property), value);
         }
       });
       return;
-    } 
-    
-    const [propertyText, ...modifiers] = key.split('.');
+    }
+
+    const [propertyText, ...modifiers] = key.split(".");
     const property = toCamelCase(propertyText);
     effect(fn, (value: any) => setProperty(node, property, value, modifiers));
   }
@@ -189,7 +189,7 @@ export class SetProperty implements Rule {
 
 export class SetClassName implements Rule {
   match(_, name) {
-    return name.startsWith('class-');
+    return name.startsWith("class-");
   }
 
   exec(node, name, source, context) {
@@ -201,7 +201,7 @@ export class SetClassName implements Rule {
 
 export class SetStyle implements Rule {
   match(_, name) {
-    return name.startsWith('style-');
+    return name.startsWith("style-");
   }
 
   exec(node, name, source, context) {
@@ -211,13 +211,13 @@ export class SetStyle implements Rule {
   }
 }
 
-export class TemplateFor implements Rule {
+export class TemplateForeach implements Rule {
   match(node, name) {
-    return node.nodeName === 'TEMPLATE' && name === 'for';
+    return node.nodeName === "TEMPLATE" && name === "foreach";
   }
 
   exec(node, _name, source, context) {
-    const forNodes: { nodes: Node[]; index: number; item: Signal; scope: Set<AnyFunction> }[] = [];
+    const rows: { nodes: Node[]; index: number; item: Signal; scope: Set<AnyFunction> }[] = [];
     const timers = new Set<ReturnType<typeof setTimeout>>();
     let disposed = false;
     onCleanup(() => {
@@ -225,39 +225,41 @@ export class TemplateFor implements Rule {
       for (const timer of timers) clearTimeout(timer);
       timers.clear();
     });
-    const [left, expression] = source.split('of').map((s) => s.trim());
-    const [key, indexKey] = left.includes('[')
+    const [left, expression] = source.split("of").map((s) => s.trim());
+    const [key, indexKey] = left.includes("[")
       ? left
           .slice(1, -1)
-          .split(',')
+          .split(",")
           .map((s) => s.trim())
-      : [left, ''];
+      : [left, ""];
 
     const signal = computed(createFunction(`Array.from(${expression} || [])`, context));
-    FF.debug && Object.assign(node, { signal, forNodes });
-    const anchor = document.createComment('for: ' + source);
+    FF.debug && Object.assign(node, { signal, rows });
+    const anchor = document.createComment("foreach: " + source);
     node.replaceWith(anchor);
     let initial = true;
-    watch(signal, (value) =>
-      this.updateForOfList(
-        forNodes,
-        anchor,
-        node,
-        key,
-        indexKey,
-        context,
-        value ?? [],
-        timers,
-        () => disposed,
-        initial,
-      ),
+    watch(
+      signal,
+      (value) =>
+        this.updateForeachList(
+          rows,
+          anchor,
+          node,
+          key,
+          indexKey,
+          context,
+          value ?? [],
+          timers,
+          () => disposed,
+          initial,
+        ),
       { immediate: true },
     );
     initial = false;
   }
 
-  updateForOfList(
-    forNodes: any[],
+  updateForeachList(
+    rows: any[],
     anchor: any,
     node: Node,
     key: string,
@@ -270,7 +272,7 @@ export class TemplateFor implements Rule {
   ) {
     const list = value == null ? [] : value;
     const newLength = list.length | 0;
-    const itemsToRemove = forNodes.slice(newLength);
+    const itemsToRemove = rows.slice(newLength);
     const nodesToRemove = [];
 
     for (const next of itemsToRemove) {
@@ -290,16 +292,16 @@ export class TemplateFor implements Rule {
       timers.add(timer);
     }
 
-    forNodes.length = newLength;
+    rows.length = newLength;
 
     if (!newLength) return;
 
-    const lastInsertedNode = forNodes.at(-1)?.nodes.at(-1) ?? anchor;
+    const lastInsertedNode = rows.at(-1)?.nodes.at(-1) ?? anchor;
     const nodesToInsert = document.createDocumentFragment();
 
     for (let index = 0; index < newLength; index++) {
-      if (forNodes[index]) {
-        forNodes[index].item.value = list[index];
+      if (rows[index]) {
+        rows[index].item.value = list[index];
         continue;
       }
 
@@ -312,7 +314,7 @@ export class TemplateFor implements Rule {
       }
 
       const dom = (node as HTMLTemplateElement).content.cloneNode(true);
-      forNodes[index] = { item, index: index, nodes: Array.from(dom.childNodes), scope };
+      rows[index] = { item, index: index, nodes: Array.from(dom.childNodes), scope };
       const reader = createReadOnlyContext(Object.assign({}, context, subContext));
       runInScope(scope, () => linkTreeToContext(dom, reader));
       onCleanup(() => disposeScope(scope));
@@ -338,11 +340,11 @@ export class TemplateFor implements Rule {
 
 export class TemplateIf implements Rule {
   match(node, name) {
-    return node.nodeName === 'TEMPLATE' && name === 'if';
+    return node.nodeName === "TEMPLATE" && name === "if";
   }
 
   exec(node, _name, value, context) {
-    const source = 'Boolean(' + value + ')';
+    const source = "Boolean(" + value + ")";
     const ifNodes: any[] = [];
     let branchScope: Set<AnyFunction> | null = null;
     const timers = new Set<ReturnType<typeof setTimeout>>();
@@ -352,52 +354,56 @@ export class TemplateIf implements Rule {
       for (const timer of timers) clearTimeout(timer);
       timers.clear();
     });
-    const anchor: any = document.createComment('if: ' + value);
+    const anchor: any = document.createComment("if: " + value);
     node.replaceWith(anchor);
     let initial = true;
 
-    effect(createFunction(source, context), (value: any, lastValue: any) => {
-      if (value === lastValue) {
-        return;
-      }
-
-      if (value && !ifNodes.length) {
-        const dom = (node as HTMLTemplateElement).content.cloneNode(true);
-        ifNodes.push(...Array.from(dom.childNodes));
-        branchScope = new Set<AnyFunction>();
-
-        runInScope(branchScope, () => linkTreeToContext(dom, context));
-        onCleanup(() => branchScope && disposeScope(branchScope));
-        if (initial) {
-          if (!disposed && anchor.parentNode) anchor.parentNode.insertBefore(dom, anchor);
+    effect(
+      createFunction(source, context),
+      (value: any, lastValue: any) => {
+        if (value === lastValue) {
           return;
         }
 
-        const timer = setTimeout(() => {
-          timers.delete(timer);
-          if (disposed || !anchor.parentNode) return;
-          anchor.parentNode.insertBefore(dom, anchor);
-        });
-        timers.add(timer);
-        return;
-      }
+        if (value && !ifNodes.length) {
+          const dom = (node as HTMLTemplateElement).content.cloneNode(true);
+          ifNodes.push(...Array.from(dom.childNodes));
+          branchScope = new Set<AnyFunction>();
 
-      if (!value && ifNodes.length) {
-        if (branchScope) disposeScope(branchScope);
-        branchScope = null;
-        for (const node of ifNodes) {
-          node.remove();
+          runInScope(branchScope, () => linkTreeToContext(dom, context));
+          onCleanup(() => branchScope && disposeScope(branchScope));
+          if (initial) {
+            if (!disposed && anchor.parentNode) anchor.parentNode.insertBefore(dom, anchor);
+            return;
+          }
+
+          const timer = setTimeout(() => {
+            timers.delete(timer);
+            if (disposed || !anchor.parentNode) return;
+            anchor.parentNode.insertBefore(dom, anchor);
+          });
+          timers.add(timer);
+          return;
         }
 
-        ifNodes.length = 0;
-      }
-    }, { immediate: true });
+        if (!value && ifNodes.length) {
+          if (branchScope) disposeScope(branchScope);
+          branchScope = null;
+          for (const node of ifNodes) {
+            node.remove();
+          }
+
+          ifNodes.length = 0;
+        }
+      },
+      { immediate: true },
+    );
     initial = false;
   }
 }
 
 use(new TemplateIf());
-use(new TemplateFor());
+use(new TemplateForeach());
 use(new AddEventListener());
 use(new SetProperty());
 use(new SetAttribute());
