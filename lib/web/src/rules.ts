@@ -66,7 +66,7 @@ const mappedProperties: Record<string, string> = {
 };
 
 function setClassName(el: Element, classNames: string, value: any): void {
-  for (const cls of classNames.split(".").filter(Boolean)) {
+  for (const cls of classNames.split(/[.\s]+/).filter(Boolean)) {
     el.classList.toggle(cls, value);
   }
 }

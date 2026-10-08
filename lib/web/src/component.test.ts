@@ -75,6 +75,29 @@ describe("component cleanup", () => {
   });
 });
 
+describe("class bindings", () => {
+  it("supports space-separated class names in bind-class maps", async () => {
+    const target = document.createElement("div");
+    const enabled = ref(true);
+    mount(target, {
+      template: template(`<div bind-class="{ 'foo bar xyz': enabled, 'dot-one.dot-two': enabled }"></div>`),
+      setup: () => ({ enabled }),
+    });
+
+    await nextTick();
+    const element = target.querySelector("div")!;
+    expect(element.classList.contains("foo")).toBe(true);
+    expect(element.classList.contains("bar")).toBe(true);
+    expect(element.classList.contains("xyz")).toBe(true);
+    expect(element.classList.contains("dot-one")).toBe(true);
+    expect(element.classList.contains("dot-two")).toBe(true);
+
+    enabled.value = false;
+    await nextTick();
+    expect(element.className).toBe("");
+  });
+});
+
 describe("DOM traversal", () => {
   it("visits text and element nodes in the existing breadth-first order", () => {
     const fragment = document.createDocumentFragment();

@@ -240,10 +240,12 @@ Sets a DOM **property** (not an attribute). Re-evaluated whenever the expression
   ```
 
 - **Object syntax for `class`** — when the expression _source text_ starts with `{`, each key is
-  toggled as a class name by the truthiness of its value:
+  toggled as class name(s) by the truthiness of its value. Separate multiple class names in a key
+  with spaces or dots:
 
   ```html
   <div bind-class="{ active: isActive, disabled: isDisabled }"></div>
+  <div bind-class="{ 'foo bar xyz': isActive }"></div>
   ```
 
 - **Object syntax for `style`** — sets style properties (keys camelCased):
