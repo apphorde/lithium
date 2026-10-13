@@ -98,6 +98,26 @@ describe("class bindings", () => {
   });
 });
 
+describe("text bindings", () => {
+  it("evaluates expressions that span multiple lines", async () => {
+    const target = document.createElement("div");
+    const entry = ref({ uncommitted: true, type: "Added" });
+    mount(target, {
+      template: template(`<span>{{ entry.uncommitted ? 'Uncommitted' :
+        entry.type }}</span>`),
+      setup: () => ({ entry }),
+    });
+
+    await nextTick();
+    const text = target.querySelector("span")!;
+    expect(text.textContent).toBe("Uncommitted");
+
+    entry.value.uncommitted = false;
+    await nextTick();
+    expect(text.textContent).toBe("Added");
+  });
+});
+
 describe("DOM traversal", () => {
   it("visits text and element nodes in the existing breadth-first order", () => {
     const fragment = document.createDocumentFragment();

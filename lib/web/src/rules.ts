@@ -25,7 +25,7 @@ export function applyTextRules(node: Text, context: any, evaluate?: AnyFunction)
 }
 
 function textExpression(template: string) {
-  return "`" + template.replace(/{{(.*?)}}/g, (_: any, exp: string) => "${" + exp.trim() + "}") + "`";
+  return "`" + template.replace(/{{([\s\S]*?)}}/g, (_: any, exp: string) => "${" + exp.trim() + "}") + "`";
 }
 
 export function applyElementRules(node: Element, context: any) {
