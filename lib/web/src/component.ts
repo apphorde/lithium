@@ -148,18 +148,21 @@ export function defineComponent(name: string, options: MountOptions) {
     }
 
     async connectedCallback() {
-      if (this.isConnected) {
+      if (this.isConnected && !this.unmount) {
         this.unmount = mount(this, Component.options);
         await (this.unmount as MountDisposer).ready;
-      } else {
-        this.unmount?.();
       }
     }
 
     disconnectedCallback() {
-      if (!this.isConnected) {
-        this.unmount?.();
-      }
+      // DOM moves synchronously trigger disconnect/connect callbacks. Defer cleanup
+      // until the microtask checkpoint so a move does not tear down the instance.
+      queueMicrotask(() => {
+        if (!this.isConnected && this.unmount) {
+          this.unmount();
+          this.unmount = null;
+        }
+      });
     }
   }
 
