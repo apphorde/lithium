@@ -1,7 +1,7 @@
-import { computed, effect, isRef, isWritableRef, unwrap } from '@li3/web';
+import { computed, effect, isRef, isWritableRef, unwrap } from "@li3/web";
 
 const stores = new Map();
-const error = new Error('Store values are read-only');
+const error = new Error("Store values are read-only");
 const storeKey = (name) => `_store_${name}`;
 
 export function defineStore(storeName: string, factory: CallableFunction) {
@@ -80,21 +80,25 @@ export function definePersistentStore(storeName: string, storage: any, factory: 
 }
 
 export function storeToRefs(store) {
-  return new Proxy(store, {
-    get(_t, p) {
-      const v = store[p];
-      if (typeof v !== 'function') {
-        return computed(() => store[v]);
-      }
+  const refs = Object.create(Object.getPrototypeOf(store));
 
-      return v;
-    },
-  });
+  for (const key of Reflect.ownKeys(store)) {
+    const value = store[key];
+
+    Object.defineProperty(refs, key, {
+      configurable: false,
+      enumerable: Object.prototype.propertyIsEnumerable.call(store, key),
+      writable: false,
+      value: typeof value === "function" ? value : computed(() => store[key]),
+    });
+  }
+
+  return refs;
 }
 
 export function useIndexedDbStorage(name: string) {
-  const dbName = 'li3Store_' + name;
-  const storeName = 'kv_' + name;
+  const dbName = "li3Store_" + name;
+  const storeName = "kv_" + name;
 
   function getDB() {
     return new Promise((resolve, reject) => {
@@ -128,22 +132,22 @@ export function useIndexedDbStorage(name: string) {
 
   return {
     async setItem(key, value) {
-      const store = await getStore('readwrite');
+      const store = await getStore("readwrite");
       return wrap(() => store.put(value, key));
     },
 
     async getItem(key) {
-      const store = await getStore('readonly');
+      const store = await getStore("readonly");
       return wrap(() => store.get(key));
     },
 
     async removeItem(key) {
-      const store = await getStore('readwrite');
+      const store = await getStore("readwrite");
       return wrap(() => store.delete(key));
     },
 
     async clear() {
-      const store = await getStore('readwrite');
+      const store = await getStore("readwrite");
       return wrap(() => store.clear());
     },
   };
