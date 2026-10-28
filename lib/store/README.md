@@ -1,70 +1,62 @@
 # @li3/store
 
-Manage state and logic in one place.
-
-## What is a store?
-
-Stores are a concept used in many different languages and frameworks.
-
-In this library, a store is a place for adding _methods_ and keeping track of _state_ in one unit.
-Methods, sometimes called **actions**, can change the internal state of a store.
-
-The internal **state** is stored as a [Signal](/lib/reactive). To access that state, use `selectors`.
-
-## Usage
-
-First declare a store in a module
+Create composable stores from Li3 signals. Store values are exposed read-only; actions returned by the factory can update
+the private refs.
 
 ```js
-// count-store.js
-import { createStore } from "@li3/store";
+import { defineStore } from "@li3/store";
+import { ref } from "@li3/web";
 
-export default createStore(
-  { count: 0 },
-  {
-    add(state, amount) {
-      state.count += amount;
+export const useCounter = defineStore("counter", () => {
+  const count = ref(0);
+
+  return {
+    count,
+    increment() {
+      count.value += 1;
     },
-    remove(state, amount) {
-      state.count -= amount;
+  };
+});
+
+const counter = useCounter();
+counter.increment();
+console.log(counter.count); // 1
+```
+
+`storeToRefs(store)` returns computed refs for store values and keeps actions as functions.
+
+## Plugins and persistence
+
+Plugins are registered by name. Each plugin gets the store name and its private factory result, and its completion promise
+is exposed as `$<pluginName>` on the returned store.
+
+```js
+import { defineStore, persist, useIndexedDbStorage } from "@li3/store";
+import { ref } from "@li3/web";
+
+const storage = useIndexedDbStorage("my-app");
+
+export const useProfile = defineStore(
+  "profile",
+  () => {
+    const profile = ref(null);
+    return { profile };
+  },
+  {
+    plugins: {
+      persist: persist({ storage, pick: ["profile"] }),
     },
   },
 );
+
+const profile = useProfile();
+await profile.$persist; // Wait for saved state to be loaded.
 ```
 
-Then import the store and dispatch actions:
+`persist()` saves selected writable refs as JSON. By default, it persists all top-level writable refs. The storage key
+defaults to `_store_<name>`; `key`, `pick`, and `debounce` can be set in its options. `$persist` waits for initial
+hydration and setup, not for later debounced writes.
 
-```js
-import countStore from "./count-store.js";
-
-// it's safe to import the same store many times
-const { select, store } = countStore;
-
-store.add(10);
-store.remove(5);
-
-// counter is a computed value
-const counter = select((s) => s.count);
-```
-
-## Transactions
-
-Stores can push multiple changes and run side effects within a single update cycle.
-That can be done with a `.transaction()` call in the store:
-
-```js
-import countStore from './count-store.js';
-
-const { store, transaction, events } = countStore;
-
-events.addEventListener('commit', (state) => {...})
-
-transaction(async () => {
-  await store.increment(1);
-  await store.increment(10);
-  await store.decrement(5);
-});
-```
-
-All intermediate states are not propagated to any selector.
-When all actions are completely dispatched, the state is pushed into the store and all computed values reflect the changes.
+`useIndexedDbStorage(name)` returns an async, key-value storage with `getItem`, `setItem`, `removeItem`, and `clear`
+methods. The methods match the Web Storage API and return promises. The `StoreStorage` interface also accepts synchronous
+Storage implementations such as `localStorage`; persistence awaits either form.
